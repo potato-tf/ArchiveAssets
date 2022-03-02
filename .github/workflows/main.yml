@@ -1,0 +1,56 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: [gameserverusa]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          for i in  "22 pterodactyl@us.potato.tf :/" "22 pterodactyl@eu.potato.tf :/" "22 pterodactyl@eu2.potato.tf :/"; do a=( $i );
+          {
+          ssh -p ${a[0]} ${a[1]} "mkdir -p /var/tf2server/tf/archive/"
+          rsync -a -e "ssh -p ${a[0]}" --delete --update --exclude=".*" . ${a[1]}${a[2]}var/tf2server/tf/archive/
+          } &
+          done
+          
+  webdownload:
+    runs-on: [gameserverusa]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a set of commands using the runners shell
+      - name: Install web assets
+        continue-on-error: true
+        run: |
+          echo . -type f -not \( -name "*.bsp" -or -name "*.mp3" -or -name "*.nav" -or -name "*.res" -or -name ".bz2" \)  -exec pbzip2 -n 1 -f -k -4 {} +
+          find . -type f -not \( -name "*.bsp" -or -name "*.mp3" -or -name "*.nav" -or -name "*.res" -or -name "*.bz2" \) \( ! -regex '.*/\..*' \) -exec bzip2 -f -k {} +
+          rsync -a --no-o --no-g --no-p --delete --exclude=".*" . /var/www/html/HHAssets/
+    
+          
