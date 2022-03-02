@@ -1,0 +1,2028 @@
+#base robot_standard.pop
+#base robot_giant.pop
+
+// River of Despair , By PDA Expert
+// Intermediate
+
+ZombieSchedule
+{
+    StartingCurrency 1200
+	BotsDropSpells 1
+	GiantsDropRareSpells 1
+	SpellDropRateCommon 0.08
+	SpellDropRateGiant 0.1
+	TextPrintTime 0 // cosmetic
+	CanBotsAttackWhileInSpawnRoom no
+	RespawnWaveTime 4
+	ImprovedAirblast 0
+	ForceHoliday 2
+	//ZombiesNoWave666 1
+	NoThrillerTaunt 1 
+	FastNPCUpdate 1
+	//EventPopfile Halloween
+	PrecacheModel	"models/bots/skeleton_sniper/skeleton_sniper.mdl"	
+	
+    Mission
+	{
+		Objective	DestroySentries
+		Where	spawnbot
+		BeginAtWave	1
+		CooldownTime	40
+		DesiredCount	1
+		
+		TFBot
+		{
+			Template	T_TFBot_SentryBuster
+		}
+	}
+	
+	Mission
+	{
+	    Objective Spy
+		Where spawnbot
+		BeginAtWave	6
+		DesiredCount 3
+		
+		InitialCooldown 10
+		CooldownTime 35
+		
+		TFBot
+		{
+		    Template T_TFBot_Spy
+			UseHumanModel 2
+			Item "Zombie Spy"
+			Item "Murderer's Motif"
+			Item "Bandit's Boots"
+		}
+	}
+	
+
+	
+	SpellBookNormalRoll   // Override spell roll. The value specifies how many spell charges to give. You can duplicate spells to increase their roll chance
+	{
+		"Healing Aura" 1
+		"Fireball" 3
+		"Fireball" 3 // fireball charges increased to 3
+		"Fireball" 3
+		// ball of bats removed entierly.
+		"Healing Aura" 2
+		"Pumpkin MIRV" 2 
+		// super jump removed entierly, replaced with teleport instead
+		"Teleport" 1
+		"Teleport" 1
+		"Invisibility" 1 // still has its niece scenarios
+		"Healing Aura" 2
+		"Pumpkin MIRV" 2 
+		"Fireball" 3
+		"Fireball" 3
+		"Fireball" 3
+		"Healing Aura" 2
+		"Pumpkin MIRV" 2 
+		"Teleport" 1
+		"Teleport" 1
+		"Invisibility" 1
+		"Healing Aura" 2
+		"Pumpkin MIRV" 2 
+		"Fireball" 3
+		"Fireball" 3
+		"Fireball" 3
+		"Healing Aura" 2
+		"Pumpkin MIRV" 2 
+		"Teleport" 1
+		"Teleport" 1
+		"Invisibility" 1
+		"Minify" 1
+		"Minify" 1
+		"Minify" 1
+	}
+
+	SpellBookRareRoll   // Override spell roll. The value specifies how many spell charges to give. You can duplicate spells to increase their roll chance
+	{
+	    "Tesla Bolt" 1
+		"Meteor Shower" 1
+	    "Tesla Bolt" 1
+		"Meteor Shower" 1
+		"Summon Monoculus" 1
+		"Summon Monoculus" 1
+	}
+	
+	ExtraSpawnPoint    //Adds spawn points on specified location
+    {
+        Name "gibfest"
+		// StartDisabled 1 // If the spawn point starts disabled (Default: 0)
+        TeamNum 3 // 2 - Red team 3 - Robots. If you are adding spawn for reprogrammed robots, use team 3
+        X	"-1562"                     
+        Y	"-3029"                  
+        Z	"244"        
+    }
+	
+	ExtraSpawnPoint    //Adds spawn points on specified location
+    {
+        Name "spawnbot_boss_support"
+		// StartDisabled 1 // If the spawn point starts disabled (Default: 0)
+        TeamNum 3 // 2 - Red team 3 - Robots. If you are adding spawn for reprogrammed robots, use team 3
+        X	"-2308"                     
+        Y	"505"                  
+        Z	"117"        
+    }
+	
+    PointTemplates [$SIGSEGV] // purely for color tank
+    {
+        Tank_Ghost
+        {
+            OnSpawnOutput
+            {
+                Target  "!activator"
+                Action  "color"
+                Param  "188 221 179" 
+            }
+            OnSpawnOutput
+            {
+				Target "!activator"
+				Action "addoutput"
+				Param "rendermode 5"
+            }
+            OnSpawnOutput
+            {
+				Target "!activator"
+				Action "alpha"
+				Param "125"
+            }
+			prop_dynamic
+            {
+                "targetname" 	"tank_ghost_hat"
+                "model" 		"models/workshop/player/items/all_class/hw2013_the_haunted_hat/hw2013_the_haunted_hat_scout.mdl"
+				"origin" 		"-60 0 -50"
+				"angles"        "-85 0 0"
+				"modelscale"	"2.5"
+            }
+        }
+		// thank you seelpit
+		BombTeleport //Teleports tagged bots to the bomb
+		{
+	    	NoFixup 1
+			filter_tf_bot_has_tag
+			{
+		    	"Negated" "0"
+				"require_all_tags" "1"
+				"tags" "gibfest" //add this tag to the bot you want to teleport
+				"targetname" "filter_bombtp"
+			}
+			trigger_teleport
+			{
+		    	"origin" "-1562 -3029 244" //locate this where the bot will spawn
+				"mins" "-256 -256 -256" 
+				"maxs" "256 256 256" 
+				"spawnflags" "1"
+				"filtername" "filter_bombtp"
+				"target" "intel" //Bombname here
+			}
+		}
+    }
+	
+	Templates
+	{
+	    br_giant_mace_knight
+		{
+			Class Demoman
+			ClassIcon scout_sunstick_swordstone
+			Name "Giant Fire Mace Knight"
+			Skill Expert
+			Health 3300
+			
+			Item "Nasty Norsemann"
+			Item "The Eyelander"
+			Item "Zombie Demo"
+			Item "Ali Baba's Wee Booties"
+			UseHumanModel 2
+			
+			ItemModel   // Replaces item model
+			{
+				ItemName "The Eyelander"
+				Model "models/workshop/weapons/c_models/c_rift_fire_mace/c_rift_fire_mace.mdl"
+			}
+			
+			Attributes MiniBoss
+			WeaponRestrictions MeleeOnly
+			
+			ItemAttributes
+			{
+				ItemName "The Eyelander"
+				"fire rate penalty" 2.0
+				"damage bonus" 2.0
+				"attach particle effect" 1
+				"decapitate type" 0
+				"custom kill icon" "firedeath"
+				"Set DamageType Ignite" 1
+			}
+			
+			CharacterAttributes
+			{
+				"move speed bonus" 0.5
+				"hand scale" 2.0
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4
+			}
+		}
+		
+		br_milk_crossbow_medic
+		{
+		    Class Medic
+			ClassIcon medic_syringe_milk2
+			Skill Easy
+			Name "Diary Crusader"
+			Item "The Crusader's Crossbow"
+			Item "The Milkman"
+			Item "Zombie Medic"
+			UseHumanModel 2
+			WeaponRestrictions PrimaryOnly
+            Attributes SuppressFire
+			Action FetchFlag
+			
+			FireWeapon    //Periodically fires weapon
+			{
+     			Delay 0 //Time before the first fire input starts (Default: 10)
+				Cooldown 1 //Time between each fire input (Default: 10)
+				IfSeeTarget 1 //When set to 1, this task activates only when the bot can see the target player (Default 0 - Always activate)
+				Type "Secondary" // Type of fire input, Possible values:
+			}
+			
+			ItemAttributes
+			{
+			    ItemName "The Crusader's Crossbow"
+				"damage penalty" 0.5
+				"fires milk bolt" 2
+			}
+		}
+	}
+	
+	// Wave 1/6
+	
+	// 4 Giant Fire Mace Knights
+	// 32 Axtinguisher Pyros
+	
+	// 16 Sub-Giant Neon Pyros
+	// 48 Diary Crusaders
+	
+	Wave
+	{
+		Explanation
+		{
+		    Line "{1CCAED}The night of terror is upon thee!"
+			Line "{1CCAED}Fend off the fiends for long enough, and you shall get outta here."
+			Line "{1CCAED}Perhaps you can use magiks to assist you, but you might wanna stick to the old bottle."
+		}		
+		
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave01"
+		    TotalCount 4
+			SpawnCount 1
+			MaxActive 2
+			
+			Where spawnbot
+			
+			WaitBetweenSpawns 12
+			TotalCurrency 200
+			TFBot
+			{
+			    Template br_giant_mace_knight
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave01"
+		    TotalCount 32
+			SpawnCount 1
+			MaxActive 12
+			
+			Where spawnbot
+			
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 1.8
+			TotalCurrency 300
+			TFBot
+			{
+			    Class Pyro
+				ClassIcon pyro_jug_axtinguisher
+				
+				Tag norampflank
+				
+				Skill Hard
+				WeaponRestrictions MeleeOnly
+				
+				Item "The Axtinguisher"
+				Item "Spine-Chilling Skull 2011 Style 1"
+				Item "Zombie Pyro"
+				UseHumanModel 2
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave02"
+			WaitForAllDead "wave01"
+			TotalCount 16
+			MaxActive 8
+			SpawnCount 4
+			
+			Where spawnbot
+			
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 13
+			TotalCurrency 600
+			
+			TFBot
+			{
+			    Class Pyro
+				Health 550
+			    Scale 1.3
+				ClassIcon pyro_neon
+				
+				Skill Hard
+				
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+				
+				Name "Reaper Shark"
+				WeaponRestrictions MeleeOnly
+			    
+				Item "The Neon Annihilator"
+				Item "The Wraith Wrap"
+				Item "Zombie Pyro"
+				UseHumanModel 2
+			}
+		}
+		
+		WaveSpawn
+		{
+			WaitForAllDead "wave01"
+			TotalCount 32
+			MaxActive 8
+			SpawnCount 2
+			
+			Where spawnbot_mid
+			
+			WaitBetweenSpawns 4
+			TotalCurrency 300
+			
+			TFBot
+			{
+			    Template br_milk_crossbow_medic
+				Tag nostairflank
+				Tag norampflank
+				Tag noflank
+			}
+		}
+
+	}
+	
+	// Wave 2/6
+	
+	// 2 Giant Discharged Soldiers
+	
+    // 12 Heavies
+	// 64 Batsaber Scouts (Random Colors)
+	
+	// 3 Giant Soldiers
+	
+	// 1 Giant Family Heavy	
+	
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave01"
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			
+			Where spawnbot
+			
+			WaitBetweenSpawns 7
+			TotalCurrency 200
+			
+			TFBot
+			{
+			    Template T_TFBot_Giant_Soldier_Crit	
+				Tag noflank
+				UseHumanModel 2
+				Item "Zombie Soldier"
+				Item "The Whirly Warrior"
+				Item "The Diplomat"
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave02"
+			WaitForAllDead "wave01"
+			TotalCount 16
+			MaxActive 8
+			SpawnCount 2
+			
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 2
+			
+			TotalCurrency 400
+			
+			Where spawnbot
+			
+			TFBot
+			{
+			    Class Heavy
+				Skill Easy
+				
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+				
+				UseHumanModel 2
+				Item "Zombie Heavy"
+				Item "The Merc's Mohawk"
+				Item "The Unshaved Bear"
+				Item "Bone-Cut Belt"
+			}
+		}
+		
+		WaveSpawn
+		{
+		    //Name "wave02"
+			WaitForAllDead "wave01"
+		    TotalCount 80
+			MaxActive 8
+			SpawnCount 2
+			
+			WaitBetweenSpawns 3.5
+			
+			Support Limited
+			
+			TotalCurrency 200
+			
+			Where spawnbot
+			
+			RandomChoice
+			{
+			    TFBot // pink
+				{
+				    Class Scout
+				    Name "Glow Stick Scout"
+					Skill Expert
+					
+					WeaponRestrictions MeleeOnly
+					Item Batsaber
+					UseHumanModel 2
+					Item "Zombie Scout"
+					Item "The Virtual Viewfinder"
+					
+					Tag noflank
+					
+					ItemAttributes
+					{
+					    ItemName Batsaber
+						"set item tint RGB" 16738740
+				    }
+					
+					ItemAttributes
+					{
+					    ItemName "The Virtual Viewfinder"
+						"set item tint RGB" 16738740
+					}
+				}
+				
+			    TFBot // lime
+				{
+				    Class Scout
+				    Name "Glow Stick Scout"
+					Skill Expert
+					
+					WeaponRestrictions MeleeOnly
+					Item Batsaber
+					UseHumanModel 2
+					Item "Zombie Scout"
+					Item "The Virtual Viewfinder"
+					
+					Tag noflank
+					
+					ItemAttributes
+					{
+					    ItemName Batsaber
+						"set item tint RGB" 3329330
+				    }
+					
+					ItemAttributes
+					{
+					    ItemName "The Virtual Viewfinder"
+						"set item tint RGB" 3329330
+					}
+				}
+				
+			    TFBot // white
+				{
+				    Class Scout
+				    Name "Glow Stick Scout"
+					Skill Expert
+					
+					WeaponRestrictions MeleeOnly
+					Item Batsaber
+					UseHumanModel 2
+					Item "Zombie Scout"
+					Item "The Virtual Viewfinder"
+					
+					Tag noflank
+					
+					ItemAttributes
+					{
+					    ItemName Batsaber
+						"set item tint RGB" 15132390
+				    }
+					
+					ItemAttributes
+					{
+					    ItemName "The Virtual Viewfinder"
+						"set item tint RGB" 15132390
+					}
+				}
+				
+			    TFBot // orange
+				{
+				    Class Scout
+				    Name "Glow Stick Scout"
+					Skill Expert
+					
+					WeaponRestrictions MeleeOnly
+					Item Batsaber
+					UseHumanModel 2
+					Item "Zombie Scout"
+					Item "The Virtual Viewfinder"
+					
+					Tag noflank
+					
+					ItemAttributes
+					{
+					    ItemName Batsaber
+						"set item tint RGB" 13595446
+				    }
+					
+					ItemAttributes
+					{
+					    ItemName "The Virtual Viewfinder"
+						"set item tint RGB" 13595446
+					}
+				}
+				
+			    TFBot // yellow
+				{
+				    Class Scout
+				    Name "Glow Stick Scout"
+					Skill Expert
+					
+					WeaponRestrictions MeleeOnly
+					Item Batsaber
+					UseHumanModel 2
+					Item "Zombie Scout"
+					Item "The Virtual Viewfinder"
+					
+					Tag noflank
+					
+					ItemAttributes
+					{
+					    ItemName Batsaber
+						"set item tint RGB" 15185211
+				    }
+					
+					ItemAttributes
+					{
+					    ItemName "The Virtual Viewfinder"
+						"set item tint RGB" 15185211
+					}
+				}
+			}
+	    }
+		
+		WaveSpawn
+		{
+		    Name "wave03"
+			WaitForAllDead "wave02"
+			
+			TotalCount 3
+			MaxActive 2
+		    
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 8
+			
+			TotalCurrency 300
+			
+			Where spawnbot
+			
+			TFBot
+			{
+                Template T_TFBot_Giant_Soldier
+				Tag noflank
+				Tag nostairflank
+				Tag norampflank
+				UseHumanModel 2
+				Item "Zombie Soldier"
+				Item "Soldier Samurai Hat"
+				Item "The Shogun's Shoulder Guard"
+				Item "The Faux Manchu"
+			}
+	    }
+		
+		WaveSpawn
+		{
+		    Name "wave04"
+			WaitForAllSpawned "wave03"
+			
+			TotalCount 1
+			
+			TotalCurrency 500
+			
+			Where spawnbot
+			
+			WaitBeforeStarting 10
+			
+			TFBot
+			{
+		    	Class Heavyweapons
+				Name "Giant Family Heavy" // but not as strong as family.....
+				ClassIcon heavy_shotgun_spammer_pda
+				Skill Expert
+				Health 5000
+				
+				WeaponRestrictions SecondaryOnly
+				MaxVisionRange 1200
+				Attributes MiniBoss
+				
+				Item "The Family Business"
+				Item "Capone's Capper"
+				Item "The Siberian Sophisticate"
+				UseHumanModel 2
+				Item "Zombie Heavy"
+				Tag noflank
+				Tag nostairflank
+				Tag norampflank
+				
+				ItemAttributes
+				{
+			    	ItemName "The Family Business"
+					"fire rate bonus" 0.5
+					"damage penalty" 0.44
+					"faster reload rate" -1
+				}
+				CharacterAttributes
+				{
+    				"move speed bonus"	0.7
+					"damage force reduction" 0.3
+					"airblast vulnerability multiplier" 0.3
+					"override footstep sound set" 2
+				}
+			
+			}		
+		}
+	}
+	
+	// Wave 3/6
+	
+	// 1 Unyielding Launcher
+	
+	// 3 Giant Soldiers
+	// 36 Scattergun Scouts (Easy Skill)
+	
+	// 16 SMG Snipers
+    // 16 Pistol Scouts
+	
+	// 4 Giant Demomen
+	// 32 Copper Gauntlets
+	
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+		    TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			
+			Name "boss"
+			
+			Where spawnbot
+			
+			TotalCurrency 200
+			
+			TFBot
+			{
+		    	Class Heavyweapons
+				Name "Unyielding Launcher"
+				ClassIcon heavy_launcher
+				Skill Expert
+				Health 15000
+				
+				Item "The Buccaneer's Bicorne"
+				Item "Wild West Whiskers"
+				Item "Tsar Platinum"
+				UseHumanModel 2
+				Item "Zombie Heavy"
+				
+				WeaponRestrictions PrimaryOnly
+				MaxVisionRange 2100
+				Attributes MiniBoss
+				Attributes UseBossHealthBar
+				
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+				
+				ItemAttributes
+				{
+			    	ItemName "TF_WEAPON_MINIGUN"
+					"damage penalty" 0.5
+					"apply z velocity on damage" 100
+					"apply look velocity on damage" 180
+					"paintkit_proto_def_index" 285
+				}
+				
+				CharacterAttributes
+				{
+			    	"move speed bonus"	0.35
+					"damage force reduction" 0.1
+					"airblast vertical vulnerability multiplier" 0.1
+					"airblast vulnerability multiplier" 0.1
+					"override footstep sound set" 2
+					"rage giving scale" 0.1
+				}			    
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave01"
+			WaitForAllDead "boss"
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			
+			WaitBetweenSpawns 10
+			
+			TotalCurrency 300
+			
+			Where spawnbot
+			
+			TFBot
+			{
+		    	Class Soldier
+				Name "Rocket Privateer"
+				ClassIcon soldier_barrage
+				Health 3800
+				
+				Skill Hard
+				WeaponRestrictions PrimaryOnly
+				Attributes MiniBoss
+				Attributes HoldFireUntilFullReload
+				ItemAttributes
+				{
+		    		ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"clip size upgrade atomic" 18.0
+					"faster reload rate" 0.36
+					"fire rate bonus" 0.28
+					"projectile spread angle penalty" 8
+				}
+				CharacterAttributes
+				{
+			    	"move speed bonus"	0.5
+					"damage force reduction" 0.4
+					"airblast vulnerability multiplier" 0.4
+					"override footstep sound set" 3
+					"airblast vertical vulnerability multiplier" 0.1
+					"Projectile speed increased" 0.4
+				}
+			
+				
+				Tag norampflank
+				Tag noflank
+				Tag nostairflank
+				UseHumanModel 2
+				Item "Zombie Soldier"
+				Item "The Gilded Guard"
+				Item "The Colonial Clogs"
+				Item "The Hornblower"
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave01"
+			WaitForAllDead "boss"
+			TotalCount 36
+			MaxActive 12
+			SpawnCount 2
+			
+			WaitBetweenSpawns 3
+			
+			TotalCurrency 200
+			
+			Where spawnbot
+			
+			TFBot
+			{
+			    Class Scout
+				Skill Easy
+				
+				Tag norampflank
+				Tag noflank
+				Tag nostairflank
+				UseHumanModel 2
+				Item "Zombie Scout"
+				Item "The Track Terrorizer"
+				Item "The Human Cannonball"
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave02"
+			WaitForAllDead "wave01"
+			TotalCount 18
+			SpawnCount 3
+			MaxActive 6
+		
+		    WaitBetweenSpawns 2
+			
+			Where spawnbot_invasion
+			
+			TotalCurrency 300
+			
+			TFBot
+			{
+			    Class Sniper
+				WeaponRestrictions SecondaryOnly
+				Skill Normal
+				ClassIcon sniper_smg_tind
+				
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+				UseHumanModel 2
+				Item "Zombie Sniper"
+				Item "That '70s Chapeau"
+				Item "The Tuxxy"
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave02"
+			WaitForAllDead "wave01"
+			TotalCount 18
+			SpawnCount 3
+			MaxActive 6
+		
+		    WaitBetweenSpawns 2
+			
+			Where spawnbot_invasion
+			
+			TotalCurrency 100
+			
+			TFBot
+			{
+			    Class Scout
+				Skill Normal
+				
+				Tag norampflank
+				Tag noflank
+				Tag nostairflank
+				UseHumanModel 2
+				Item "Zombie Scout"
+				Item "The Track Terrorizer"
+				Item "The Human Cannonball"
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave03"
+			WaitForAllSpawned "wave02"
+		    
+		    TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			
+			WaitBeforeStarting 4
+			WaitBetweenSpawns 6.5
+			Where spawnbot
+			
+			TotalCurrency 100
+			
+			TFBot
+			{
+		    	Class Demoman
+				Name "Giant Demoman"
+				Skill Expert
+				Health 3300
+				
+				WeaponRestrictions PrimaryOnly
+				Attributes HoldFireUntilFullReload
+				Attributes MiniBoss
+				
+				CharacterAttributes
+				{
+			    	"move speed bonus"	0.5
+					"damage force reduction" 0.5
+					"airblast vulnerability multiplier" 0.5
+					"override footstep sound set" 4
+				}
+				UseHumanModel 2
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+				Item "Zombie Demo"
+				Item "The Buccaneer's Bicorne"
+				Item "Mann of the Seven Sees"
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave03"
+			WaitForAllSpawned "wave02"
+		    
+		    TotalCount 32
+			MaxActive 16
+			SpawnCount 1
+			
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 1
+			Where spawnbot
+			
+			TotalCurrency 100
+			
+			TFBot
+			{
+			    Name "Copper Gauntlet"
+				Skill Hard
+				Class Heavy
+				ClassIcon heavy_steelfist
+				
+				WeaponRestrictions MeleeOnly
+				
+				ItemColor   //Set item color
+				{
+					ItemName "Fists of Steel"
+					Red 176
+					Green 101
+					Blue 44
+				}
+				
+				ItemModel
+				{
+				    ItemName "Canteen Crasher Bronze Ammo Medal 2018"
+					Model "models/workshop_partner/player/items/all_class/dex_glasses/dex_glasses_heavy.mdl"
+				}				
+				ItemModel
+				{
+				    ItemName "The Breakneck Baggies"
+					Model "models/workshop/player/items/heavy/hwn2016_mad_mask/hwn2016_mad_mask.mdl"
+				}
+				
+				Tag norampflank				
+				Tag nostairflank
+				Tag noflank
+				
+				Item "Fists of Steel"
+				Item "Zombie Heavy"
+				//Item "Mad Mask" // lame ass tf2 cosmetic bs
+				//Item "The Deus Specs" // lame ass tf2 cosmetic bs
+				Item "The Merc's Mohawk"
+				Item "The Breakneck Baggies"	
+				Item "Canteen Crasher Bronze Ammo Medal 2018"
+				UseHumanModel 2
+			}
+		}
+	}
+	
+	// Wave 4/6
+	
+	// 1 Gluttony
+	
+	// 48 Pyros
+	// 2 Tanks (15k)
+	
+	// 4 Giant Demomen
+	// 16 Soldiers with Quickfix
+	
+	// 2 Giant Heavies
+	// 48 Scouts (Support Limited)
+	
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		SpawnTemplate BombTeleport
+		
+		WaveSpawn
+		{
+		    Name "actual_boss"
+			TotalCount 1
+			
+			Where spawnbot
+			FirstSpawnMessage "{007A31}Gluttony :{red} Must... Consume..."   //Chat message when a bot is spawned for the first time
+			
+			TFBot
+			{
+			    Class Heavy
+				Skill Expert
+				Name "Gluttony"				
+				Health 30000
+				WeaponRestrictions MeleeOnly
+				
+				ClassIcon heavy_breadbite_nys
+				
+				Item "The Trash Man"
+				Item "The Unshaved Bear"
+				Item "The Apparatchik's Apparel"
+				Item "The Bread Bite"
+				UseHumanModel 2
+				Item "Zombie Heavy"
+				
+				Attributes MiniBoss
+				Attributes UseBossHealthBar
+
+				Tag norampflank
+				Tag nostairflank
+				
+				ItemAttributes
+				{
+				    ItemName "The Bread Bite"
+					"damage bonus" 1.33
+					"damage penalty" 1.0
+					"fire rate bonus" 0.77
+					"heal on kill" 5000
+					"mult_player_movespeed_active" 1
+					"mod_maxhealth_drain_rate" 0
+					"critboost on kill" 5
+					"crit on hard hit" 1
+					"lunchbox adds minicrits" 0
+					"single wep holster time increased" 0
+				}
+				
+				CharacterAttributes
+				{
+				    "move speed bonus" 0.3
+					"health regen" -125
+					"damage force reduction" 0.01
+					"airblast vulnerability multiplier" 0.01
+					"airblast vertical vulnerability multiplier" 0.01
+					"override footstep sound set" 4
+					"rage giving scale" 0.6
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+		    TotalCount 36
+			MaxActive 6
+			SpawnCount 2
+		    Where spawnbot_boss_support
+			Support 1
+			
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 2
+			TotalCurrency 100
+			
+			TFBot
+			{
+			    Class Scout
+				Name "Breadcrab Zombie"
+				Item "Unarmed Combat"
+				Item Breadcrab
+				Action Mobber // breadcrab not understand bomb
+				Item "Zombie Scout"
+				Skill Hard
+				WeaponRestrictions MeleeOnly
+				UseHumanModel 2
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "shityourself"
+			TotalCount 20
+			Where gibfest
+			Support Limited
+			MaxActive 16
+			WaitBetweenSpawns 0.1
+		    WaitForAllDead "actual_boss"
+			TotalCurrency 100
+			
+			RandomChoice
+			{
+			RandomChoice
+			{
+			    TFBot
+				{
+				    Class Scout
+					Health 1
+					Name "gib"
+					ClassIcon scout_bat
+					Attributes IgnoreFlag
+					Attributes SuppressFire
+					DeathSound "npc/antlion_grub/squashed.wav"
+					WeaponRestrictions MeleeOnly
+					UseHumanModel 2
+					Tag gibfest
+					Skin 1
+					Scale 1.1
+					AddCond 
+					{
+					    Index 66
+					}
+					CharacterAttributes
+					{
+					    "move speed bonus" 0
+						"health drain" -1
+						"dmg from ranged reduced" 0
+						"dmg from melee increased" 0
+						"dmg taken from fire reduced" 0
+					}
+				}
+			    TFBot
+				{
+				    Class Soldier
+					Health 1
+					Name "gib"
+					ClassIcon scout_bat
+					Attributes IgnoreFlag
+					Attributes SuppressFire
+					DeathSound "physics/flesh/flesh_squishy_impact_hard1.wav"
+					WeaponRestrictions MeleeOnly
+					UseHumanModel 2
+					Tag gibfest
+					Skin 1
+					Scale 1.1
+					AddCond 
+					{
+					    Index 66
+					}
+					CharacterAttributes
+					{
+					    "move speed bonus" 0
+						"health drain" -1
+						"dmg from ranged reduced" 0
+						"dmg from melee increased" 0
+						"dmg taken from fire reduced" 0
+					}
+				}
+			    TFBot
+				{
+				    Class Pyro
+					Health 1
+					Name "gib"
+					ClassIcon scout_bat
+					Attributes IgnoreFlag
+					Attributes SuppressFire
+					DeathSound "physics/flesh/flesh_squishy_impact_hard2.wav"
+					WeaponRestrictions MeleeOnly
+					UseHumanModel 2
+					Tag gibfest
+					Skin 1
+					Scale 1.1
+					AddCond 
+					{
+					    Index 66
+					}
+					CharacterAttributes
+					{
+					    "move speed bonus" 0
+						"health drain" -1
+						"dmg from ranged reduced" 0
+						"dmg from melee increased" 0
+						"dmg taken from fire reduced" 0
+					}
+				}
+			    TFBot
+				{
+				    Class Demoman
+					Health 1
+					Name "gib"
+					ClassIcon scout_bat
+					Attributes IgnoreFlag
+					Attributes SuppressFire
+					DeathSound "physics/flesh/flesh_squishy_impact_hard3.wav"
+					WeaponRestrictions MeleeOnly
+					UseHumanModel 2
+					Tag gibfest
+					Skin 1
+					Scale 1.1
+					AddCond 
+					{
+					    Index 66
+					}
+					CharacterAttributes
+					{
+					    "move speed bonus" 0
+						"health drain" -1
+						"dmg from ranged reduced" 0
+						"dmg from melee increased" 0
+						"dmg taken from fire reduced" 0
+					}
+				}
+				TFBot
+				{
+				    Class Heavy
+					Health 1
+					Name "gib"
+					ClassIcon scout_bat
+					Attributes IgnoreFlag
+					Attributes SuppressFire
+					DeathSound "physics/flesh/flesh_bloody_break.wav"
+					WeaponRestrictions MeleeOnly
+					UseHumanModel 2
+					Tag gibfest
+					Skin 1
+					Scale 1.1
+					AddCond 
+					{
+					    Index 66
+					}
+					CharacterAttributes
+					{
+					    "move speed bonus" 0
+						"health drain" -1
+						"dmg from ranged reduced" 0
+						"dmg from melee increased" 0
+						"dmg taken from fire reduced" 0
+					}
+				}				
+				TFBot
+				{
+				    Class Engineer
+					Name "gib"
+					Health 1
+					ClassIcon scout_bat
+					Attributes IgnoreFlag
+					Attributes SuppressFire
+					DeathSound "physics/flesh/flesh_squishy_impact_hard4.wav"
+					WeaponRestrictions MeleeOnly
+					UseHumanModel 2
+					Tag gibfest
+					Skin 1
+					Scale 1.1
+					AddCond 
+					{
+					    Index 66
+					}
+					CharacterAttributes
+					{
+					    "move speed bonus" 0
+						"health drain" -1
+						"dmg from ranged reduced" 0
+						"dmg from melee increased" 0
+						"dmg taken from fire reduced" 0
+					}
+				}
+			}
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "boss"
+			TotalCount 1
+			Where gibfest
+			Support Limited
+		    WaitForAllDead "actual_boss"
+			
+			FirstSpawnOutput
+			{
+			    Target spawnbot_boss_support
+				Action Disable
+			}
+			
+			DoneOutput
+			{
+			    Target gibfest
+				Action Disable
+			}
+			
+			Squad
+			{
+			Squad
+			{
+			    TFBot
+				{
+				    Name "Gluttony"
+					Health 60000
+					WeaponRestrictions MeleeOnly
+					Class Heavy
+					Scale 1.9
+					
+					Item "The Trash Man"
+					Item "The Unshaved Bear"
+					Item "The Apparatchik's Apparel"
+					//Item "The Bread Bite"
+					UseHumanModel 2
+					Item "Zombie Heavy"
+					
+					Attributes IgnoreFlag
+					Attributes AlwaysFireWeapon
+					Attributes MiniBoss
+					
+					Tag gibfest
+					
+					CharacterAttributes
+					{
+					    "move speed bonus" 0
+						"damage force reduction" 0
+						"airblast vulnerability multiplier" 0
+						"override footstep sound set" 4
+						"fire rate bonus" 0.8
+						"damage penalty" 0.001
+						"mult stun resistance" 0
+						"cannot be backstabbed" 1
+						"health regen" -10000
+						"voice pitch scale" 0.0
+						"dmg from ranged reduced" 0
+						"dmg from melee increased" 0
+						"increased jump height" 0
+					}
+				}
+			}
+			}
+		}
+	    
+		WaveSpawn
+		{
+		    Name "wave01"
+			TotalCount 48
+			WaitForAllDead "boss"
+			SpawnCount 4
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 3
+			Where spawnbot_left
+			MaxActive 16
+			TotalCurrency 200
+			
+			TFBot
+			{
+			    Class Pyro
+				Skill Easy
+				Item "Ghastly Gibus"
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+				UseHumanModel 2
+				Item "Zombie Pyro"
+			}
+		}
+
+		WaveSpawn
+		{
+		    Name "wave01"
+			WaitForAllDead "boss"
+			TotalCount 2
+			SpawnCount 1
+			MaxActive 2
+			
+			WaitBetweenSpawns 10
+			TotalCurrency 200
+
+			Tank
+			{
+				Name   "Tank"
+				Health 15000
+				Speed  75
+				StartingPathTrackNode "boss_path_1"
+				Model "models/bots/boss_bot/boss_tank_color.mdl" 
+				SpawnTemplate Tank_Ghost
+
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave02"
+			WaitForAllDead "wave01"
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			
+			Where spawnbot
+			WaitBetweenSpawns 8
+			TotalCurrency 100
+			
+			TFBot
+			{
+			    Template T_TFBot_Giant_Demoman
+				UseHumanModel 2
+				Item "Zombie Demo"
+				Item "A Whiff of the Old Brimstone"
+				Item "The Dark Age Defender"
+				Item "The Bomber Knight"
+				Tag norampflank
+				Tag noflank
+				Tag nostairflank
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave02"
+			WaitForAllDead "wave01"
+			TotalCount 24
+			MaxActive 12
+			SpawnCount 4
+			
+			Where spawnbot
+			WaitBetweenSpawns 5
+			TotalCurrency 100
+			
+			Squad
+			{
+			    TFBot
+				{
+				    Class Soldier
+					Skill Easy
+					UseHumanModel 2
+					Item "Zombie Soldier"
+					Item "Stout Shako"
+					Item "Fancy Dress Uniform"
+					Tag norampflank
+					Tag noflank
+					Tag nostairflank
+				}
+				TFBot
+				{
+				    Template T_TFBot_Medic_QuickFix
+					UseHumanModel 2
+					Item "Zombie Medic"
+					Item "The Gauzed Gaze"
+					Item "The Smock Surgeon"
+					Tag norampflank
+					Tag nostairflank
+					Tag noflank
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave03"
+			WaitForAllDead "wave02"
+			TotalCount 2
+			MaxActive 2
+			
+			Where spawnbot
+			WaitBetweenSpawns 15
+			TotalCurrency 200
+			
+			TFBot
+			{
+			    Template T_TFBot_Giant_Heavyweapons
+				UseHumanModel 2
+				Item "Zombie Heavy"
+				Item "Combat Slacks"
+				Item "Copper's Hard Top"
+				Item "The Eye-Catcher"
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+			}
+		}
+		
+		WaveSpawn
+		{
+			WaitForAllDead "wave02"
+			TotalCount 48
+			MaxActive 8
+			SpawnCount 2
+			
+			Support Limited
+			
+			WaitBetweenSpawns 2
+			Where spawnbot
+			TotalCurrency 100
+			
+			TFBot
+			{
+			    Class Scout
+				Skill Easy
+				UseHumanModel 2
+				Item "Zombie Scout"
+				Item "The Track Terrorizer"
+				Item "The Human Cannonball"
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+			}
+		
+		}
+	}
+
+    // 4 Steel Giants
+	// 26 Heavies (Normal Skill)
+	
+	// 5 Giant Demomen
+	// 48 Bison Soldiers (Easy Skill, Critboosted)
+	
+	// 4 Giant Shotgun Heavies
+	// 40 Random Gauntlet Heavies (Champ & Steel)
+	
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+	
+		WaveSpawn
+		{
+		    Name "wave01"
+		    TotalCount 4
+			MaxActive 3
+			SpawnCount 1
+			
+			TotalCurrency 200
+			
+			WaitBetweenSpawns 8
+			
+			Where spawnbot
+			
+			TFBot
+			{
+			Class Heavy
+			Name "Steel Giant"
+			ClassIcon heavy_steelfist_giant
+			Skill Expert
+			Health 5000
+			Item "Fists of Steel"
+			Item "War Head"
+			WeaponRestrictions MeleeOnly
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "Fists of Steel"
+				"fire rate bonus" 0.6
+				"damage bonus" 1.2
+
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+			}
+				UseHumanModel 2
+				Item "Zombie Heavy"
+			}
+		}
+		
+		WaveSpawn
+		{
+		    //Name "wave01"
+		    TotalCount 26
+			MaxActive 12
+			SpawnCount 6
+			
+			TotalCurrency 200
+			
+			Where spawnbot
+			
+			WaitBetweenSpawns 15
+			
+			TFBot
+			{
+			    Class Heavy
+				Skill Normal
+				Item "Zombie Heavy"
+				Item "The Merc's Mohawk"
+				Item "The Unshaved Bear"
+				Item "Bone-Cut Belt"
+				UseHumanModel 2
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave02"
+			WaitForAllDead "wave01"
+		    TotalCount 5
+			MaxActive 3
+			SpawnCount 1
+			
+			TotalCurrency 300
+			
+			WaitBetweenSpawns 7
+			
+			Where spawnbot
+			
+			TFBot
+			{
+			    Template T_TFBot_Giant_Demoman
+				UseHumanModel 2
+				Item "Zombie Demo"				
+				Item "A Whiff of the Old Brimstone"
+				Item "The Dark Age Defender"
+				Item "The Bomber Knight"
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+			}
+		}
+	
+		WaveSpawn
+		{
+		    Name "wave02"
+			WaitForAllDead "wave01"
+		    TotalCount 24
+			MaxActive 16
+			SpawnCount 4
+			
+			TotalCurrency 200
+			
+			WaitBetweenSpawns 6
+			
+			Where spawnbot
+			
+			TFBot
+			{
+			    Class Soldier
+				Skill Hard
+				ClassIcon heavy_shotgun
+				WeaponRestrictions SecondaryOnly
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+				
+				Item "Zombie Soldier"
+				Item "The Shellmet"
+				UseHumanModel 2
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave03"
+			WaitForAllSpawned "wave02"
+		    TotalCount 4
+			MaxActive 2
+			SpawnCount 1
+			
+			TotalCurrency 200
+			
+			WaitBetweenSpawns 13
+			WaitBeforeStarting 10
+			
+			Where spawnbot
+			
+			TFBot
+			{
+			    Template T_TFBot_Giant_Heavyweapons_Shotgun
+				ClassIcon heavy_shotgun_giant
+				Item "Zombie Heavy"
+				Item "The Eliminators Safeguard"
+				Item "Siberian Tigerstripe"
+				Item "Gone Commando"
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+				UseHumanModel 2
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave03"
+			WaitForAllSpawned "wave02"
+		    TotalCount 26
+			MaxActive 12
+			SpawnCount 2
+			
+			WaitBetweenSpawns 2
+			WaitBeforeStarting 10
+			TotalCurrency 100
+			
+			Where spawnbot
+			
+			TFBot
+			{
+			    Name "Copper Gauntlet"
+				Skill Hard
+				Class Heavy
+				ClassIcon heavy_steelfist
+				
+				WeaponRestrictions MeleeOnly
+				
+				ItemColor   //Set item color
+				{
+					ItemName "Fists of Steel"
+					Red 176
+					Green 101
+					Blue 44
+				}
+				
+				ItemModel
+				{
+				    ItemName "Canteen Crasher Bronze Ammo Medal 2018"
+					Model "models/workshop_partner/player/items/all_class/dex_glasses/dex_glasses_heavy.mdl"
+				}				
+				ItemModel
+				{
+				    ItemName "The Breakneck Baggies"
+					Model "models/workshop/player/items/heavy/hwn2016_mad_mask/hwn2016_mad_mask.mdl"
+				}
+				
+				Tag norampflank				
+				Tag nostairflank
+				Tag noflank
+				
+				Item "Fists of Steel"
+				Item "Zombie Heavy"
+				//Item "Mad Mask" // lame ass tf2 cosmetic bs
+				//Item "The Deus Specs" // lame ass tf2 cosmetic bs
+				Item "The Merc's Mohawk"
+				Item "The Breakneck Baggies"	
+				Item "Canteen Crasher Bronze Ammo Medal 2018"
+				UseHumanModel 2
+			}
+	    }
+	}
+	
+	// 4 Giant Bat Scouts
+	// 69 Homing Dud Shooters
+	
+	// 16 Tomislav Heavies with Quickfix Medics
+	// 6 Giant Burst Demomen
+	
+	// 2 Giant Deflector Heavy with 3 Uber Medics each
+	
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave01"
+			TotalCount 4
+			MaxActive 4
+            SpawnCount 1
+			
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 6
+			
+			TotalCurrency 200
+			Where spawnbot
+			
+			TFBot
+			{
+			    Template T_TFBot_Giant_Scout
+				ClassIcon scout_bat
+				WeaponRestrictions MeleeOnly
+				Tag noflank
+			    UseHumanModel 2
+			    Item "Zombie Scout"
+				Item "Fuel Injector"
+				Item "Jungle Jersey"
+				Item "Transparent Trousers"
+			}
+		}
+		
+		
+		WaveSpawn
+		{
+			TotalCount 69
+			MaxActive 16
+			SpawnCount 2
+			
+			WaitBetweenSpawns 2
+			
+			TotalCurrency 200
+			Where spawnbot_mid
+			Where spawnbot_left
+			
+			TFBot
+			{
+			    Class Soldier
+				Skill Expert
+				Name "Homing Dud Soldier"
+				
+				Item "Rocket Jumper"
+				Attributes AlwaysCrit
+				ClassIcon soldier_homing_nys
+				
+				RocketCustomParticle eyeboss_projectile
+				
+				ItemAttributes
+				{
+				    ItemName "Rocket Jumper"
+					"mod projectile heat seek power" 360
+					"mod projectile heat aim error" 90
+					"cannot pick up intelligence" 0
+				}
+				
+				ItemAttributes
+				{
+				    ItemName "Ghostly Gibus"
+					"set item tint RGB" 8208497
+				}
+			    UseHumanModel 2
+			    Item "Zombie Soldier"
+				Item "Ghostly Gibus"
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave02"
+			WaitForAllDead "wave01"
+			TotalCount 6
+			MaxActive 3
+			SpawnCount 1
+			
+			WaitBetweenSpawns 8
+			Where spawnbot
+			TotalCurrency 100
+			
+			TFBot
+			{
+			    Template T_TFBot_Giant_Demo_Burst
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+			    UseHumanModel 2
+			    Item "Zombie Demo"
+				Item "Hazard Headgear"
+				Item "The Hurt Locher"
+				Item "Blast Blocker"
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave02"
+			WaitForAllDead "wave01"
+			TotalCount 32
+			MaxActive 16
+			SpawnCount 4
+			
+			WaitBetweenSpawns 5
+			Where spawnbot
+			TotalCurrency 100
+			
+			Squad
+			{
+			    TFBot
+				{
+				    Class Heavy
+					Skill Hard
+					Name "Mobby Mobber"
+					Item Tomislav
+					Item "Capone's Capper"
+					Item "The Tyurtlenek"
+					Item "Zombie Heavy"
+					UseHumanModel 2
+				}
+				TFBot
+				{
+				    Template T_TFBot_Medic_QuickFix
+					Item "Zombie Medic"
+					Item "The Gauzed Gaze"
+					Item "The Smock Surgeon"
+					UseHumanModel 2
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+		    Name "wave03"
+			WaitForAllSpawned "wave02"
+			TotalCount 8
+			MaxActive 5
+			SpawnCount 4
+			
+			Where spawnbot
+			WaitBeforeStarting 7
+			TotalCurrency 100
+			
+			Squad
+			{
+			    TFBot
+				{
+			        Template T_TFBot_Giant_Heavyweapons_Deflector
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+					UseHumanModel 2
+					Item "Zombie Heavy"
+				Item "Siberian Tigerstripe"
+				Item "Gone Commando"
+				}
+				TFBot
+				{
+				    Template T_TFBot_Medic_QuickUber
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+					UseHumanModel 2
+					Item "Zombie Medic"
+					Item "The Trepanabotomizer"
+					Item "The Surgeon's Space Suit"
+				}
+				TFBot
+				{
+				    Template T_TFBot_Medic_QuickUber
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+					UseHumanModel 2
+					Item "Zombie Medic"
+					Item "The Trepanabotomizer"
+					Item "The Surgeon's Space Suit"
+				}
+				TFBot
+				{
+				    Template T_TFBot_Medic_QuickUber
+				Tag norampflank
+				Tag nostairflank
+				Tag noflank
+					UseHumanModel 2
+					Item "Zombie Medic"
+					Item "The Trepanabotomizer"
+					Item "The Surgeon's Space Suit"
+				}
+			}
+		}
+	}
+}

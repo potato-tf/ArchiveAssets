@@ -1,0 +1,2331 @@
+
+// Discernment
+// Rustvalley Event Expert
+// Made by Ciaran
+
+// we do a little trolling. I haven't made an expert in a fucking year
+
+#base robot_giant.pop
+#base robot_standard.pop
+
+// >be me
+// >want to do cool thing like one down/some other halloween missions where gatebots use unusual effects instead of gatebot hats
+// >instead be too lazy to wanna do that for virtually every gatebot in the game + custom ones
+#base robot_gatebot.pop
+// :ujel:
+
+
+// SPAWN NAMES:
+
+// Main Area
+// spawnbot_mid0
+// spawnbot_mid_slow0
+// spawnbot_right0
+// spawnbot_left0
+// spawnbot_scattered0
+// spawnbot_boss0
+
+// Gate 1
+// spawnbot_main1
+// spawnbot_main_slow1
+
+// the flanks™
+// spawnbot_flank_1 (removed)
+// spawnbot_flank_2 (removed?)
+// spawnbot_sniper_tower	// bruh, peep this one. like really, peep this one!
+
+// TANK SPAWNS
+// path_tank_1		= Spawns at left building
+// path_tank_alt	= Spawns at middle area
+
+// MALLET TANK
+// tank_hammer			= use for name or mallet won't attach
+// hammer_tank_spawn	= fire on spawn
+// hammer_tank_dead		= fire on death
+
+WaveSchedule
+{
+	StartingCurrency	1600
+	RespawnWaveTime	4
+	CanBotsAttackWhileInSpawnRoom	no
+	Advanced	1
+	EventPopfile	Halloween
+
+	NoRomevisionCosmetics	1	[$SIGSEGV]
+	TextPrintTime			0	[$SIGSEGV]
+	BotsAreHumans        	1	[$SIGSEGV]
+	ForceHoliday          	2	[$SIGSEGV]
+	NoThrillerTaunt			1	[$SIGSEGV]	// no more
+	NoCritPumpkin			1	[$SIGSEGV]
+	NoMissionInfo			1	[$SIGSEGV]	// fixes false information
+	ZombiesNoWave666		1	[$SIGSEGV]
+	FastNPCUpdate			1	[$SIGSEGV]
+	ForceRobotBleed			1	[$SIGSEGV]
+
+	ItemBlacklist	[$SIGSEGV]	// prevent spellbooks from showing up (map has spells enabled by default and causes it to forcefully equip the spellbooks)
+	{
+		Classname	"tf_weapon_spellbook"
+		Name		"Secret Diary"
+	}
+
+	PrecacheModel	"models/bots/skeleton_sniper/skeleton_sniper.mdl"	[$SIGSEGV]
+	PrecacheModel	"models/bots/boss_bot/boss_tank_color.mdl"			[$SIGSEGV]	// hell-met moment
+	PrecacheSound	"w3_boss_spawn.mp3"
+	
+	FlagResetTime [$SIGSEGV]
+	{
+		Name		"intel_classic"
+		ResetTime	90
+	}
+	PointTemplates	[$SIGSEGV]
+	{
+		killcrumpkin	// no. more. crumpkins! no. more. bullshit! no. more. giants bazinga-ing the whole team because they picked up a crumpkin! nooooooooooooo mooooooooooooooore abusing crumpkin drops! you're getting killed
+		{
+			NoFixup 1
+			trigger_brush
+			{
+				"origin" "636 2827 308"
+				"targetname" "game_playerdie"
+				"StartDisabled" "0"
+				"OnUse" "tf_ammo_pack,Kill,0,-1"
+			}
+		}
+		WHAT_IF_IT_WAS_PURPLE
+		{
+			OnSpawnOutput
+			{
+				Target "!activator"
+				Action "color"
+				Param "165 0 255"
+			}
+		}
+		WHAT_IF_IT_WAS_BROWN
+		{
+			OnSpawnOutput
+			{
+				Target "!activator"
+				Action "color"
+				Param "193 151 113"
+			}
+		}
+		WHAT_IF_IT_WAS_GREEN
+		{
+			OnSpawnOutput
+			{
+				Target "!activator"
+				Action "color"
+				Param "25 37 9"
+			}
+		}
+		WHAT_IF_IT_WAS_ORANGE
+		{
+			OnSpawnOutput
+			{
+				Target "!activator"
+				Action "color"
+				Param "100 65 0"
+			}
+		}
+
+
+
+		Distortion_Effect
+		{
+			OnSpawnOutput
+			{
+				Target	"!activator"
+				Action	"addoutput"
+				Param	"renderfx 15"
+			}
+		}
+		TitanSpawnShake
+        {
+            NoFixup 1
+            env_shake
+            {
+                "spawnflags" "1" 
+                "amplitude" "16"
+                "duration" "12"
+                "frequency" "40"
+                "targetname" "shake_effect_titan"
+            }
+        }
+		WhiteoutEffect
+		{
+            NoFixup 1
+			env_fade
+			{
+				"duration"	"2"
+				"holdtime"	"1"
+				"rendercolor"	"255 255 255"
+                "targetname"	"whiteout_trigger"
+			}
+		}
+	}
+	SpawnTemplate	"killcrumpkin"
+	SpawnTemplate	"TitanSpawnShake"
+	SpawnTemplate	"WhiteoutEffect"
+	Templates
+	{
+		// MODULAR GATEBOT TEMPLATES
+		// to be used with the sigsegv mod AddTemplate
+		//
+        GatebotScout
+        {
+            Class Scout
+			Item "MvM GateBot Light Scout"
+            EventChangeAttributes
+			{
+				Default
+				{
+					Tag bot_gatebot 				// having these will cause bots to run towards gates
+					Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+					BehaviorModifiers push			// having these will cause bots to run towards gates
+					Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+				}
+				RevertGateBotsBehavior
+				{
+					ItemAttributes               // turn off light hat
+					{
+						ItemName "MvM GateBot Light Scout"
+						"item style override" 1
+					}
+				}
+			}
+        }
+        GatebotSoldier
+        {
+            Class Soldier
+			Item "MvM GateBot Light Soldier"
+            EventChangeAttributes
+			{
+				Default
+				{
+					Tag bot_gatebot 				// having these will cause bots to run towards gates
+					Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+					BehaviorModifiers push			// having these will cause bots to run towards gates
+					Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+				}
+				RevertGateBotsBehavior
+				{
+					ItemAttributes               // turn off light hat
+					{
+						ItemName "MvM GateBot Light Soldier"
+						"item style override" 1
+					}
+				}
+			}
+        }
+        GatebotPyro
+        {
+            Class Pyro
+			Item "MvM GateBot Light Pyro"
+            EventChangeAttributes
+			{
+				Default
+				{
+					Tag bot_gatebot 				// having these will cause bots to run towards gates
+					Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+					BehaviorModifiers push			// having these will cause bots to run towards gates
+					Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+				}
+				RevertGateBotsBehavior
+				{
+					ItemAttributes               // turn off light hat
+					{
+						ItemName "MvM GateBot Light Pyro"
+						"item style override" 1
+					}
+				}
+			}
+        }
+        GatebotDemoman
+        {
+            Class Demoman
+			Item "MvM GateBot Light Demoman"
+            EventChangeAttributes
+			{
+				Default
+				{
+					Tag bot_gatebot 				// having these will cause bots to run towards gates
+					Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+					BehaviorModifiers push			// having these will cause bots to run towards gates
+					Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+				}
+				RevertGateBotsBehavior
+				{
+					ItemAttributes               // turn off light hat
+					{
+						ItemName "MvM GateBot Light Demoman"
+						"item style override" 1
+					}
+				}
+			}
+        }
+        GatebotHeavy
+        {
+            Class Heavy
+			Item "MvM GateBot Light Heavy"
+            EventChangeAttributes
+			{
+				Default
+				{
+					Tag bot_gatebot 				// having these will cause bots to run towards gates
+					Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+					BehaviorModifiers push			// having these will cause bots to run towards gates
+					Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+				}
+				RevertGateBotsBehavior
+				{
+					ItemAttributes               // turn off light hat
+					{
+						ItemName "MvM GateBot Light Heavy"
+						"item style override" 1
+					}
+				}
+			}
+        }
+        GatebotEngineer
+        {
+            Class Engineer
+			Item "MvM GateBot Light Engineer"
+            EventChangeAttributes
+			{
+				Default
+				{
+					Tag bot_gatebot 				// having these will cause bots to run towards gates
+					Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+					BehaviorModifiers push			// having these will cause bots to run towards gates
+					Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+				}
+				RevertGateBotsBehavior
+				{
+					ItemAttributes               // turn off light hat
+					{
+						ItemName "MvM GateBot Light Engineer"
+						"item style override" 1
+					}
+				}
+			}
+        }
+        GatebotMedic
+        {
+            Class Medic
+			Item "MvM GateBot Light Medic"
+            EventChangeAttributes
+			{
+				Default
+				{
+					Tag bot_gatebot 				// having these will cause bots to run towards gates
+					Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+					BehaviorModifiers push			// having these will cause bots to run towards gates
+					Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+				}
+				RevertGateBotsBehavior
+				{
+					ItemAttributes               // turn off light hat
+					{
+						ItemName "MvM GateBot Light Medic"
+						"item style override" 1
+					}
+				}
+			}
+        }
+        GatebotSpy
+        {
+            Class Spy
+			Item "MvM GateBot Light Spy"
+            EventChangeAttributes
+			{
+				Default
+				{
+					Tag bot_gatebot 				// having these will cause bots to run towards gates
+					Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+					BehaviorModifiers push			// having these will cause bots to run towards gates
+					Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+				}
+				RevertGateBotsBehavior
+				{
+					ItemAttributes               // turn off light hat
+					{
+						ItemName "MvM GateBot Light Spy"
+						"item style override" 1
+					}
+				}
+			}
+        }
+        GatebotSniper
+        {
+            Class Sniper
+			Item "MvM GateBot Light Sniper"
+            EventChangeAttributes
+			{
+				Default
+				{
+					Tag bot_gatebot 				// having these will cause bots to run towards gates
+					Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+					BehaviorModifiers push			// having these will cause bots to run towards gates
+					Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+				}
+				RevertGateBotsBehavior
+				{
+					ItemAttributes               // turn off light hat
+					{
+						ItemName "MvM GateBot Light Sniper"
+						"item style override" 1
+					}
+				}
+			}
+        }
+
+
+
+		T_TFBot_Boss_HybridShifter	// FINAL BOSS
+		{
+			Class			Demoman
+			Name			"Morphing Menace"
+			ClassIcon		boss_morphing_menace
+			SpawnTemplate	"Distortion_Effect"
+			Health			70000
+			Scale			1.9
+			ChangeAttributes [$SIGSEGV]  
+			{
+				Delay	0
+				Repeats	0
+				IfHealthBelow	60000
+				Name	"Sergeant_Crits_Form"
+			}
+			ChangeAttributes [$SIGSEGV]  
+			{
+				Delay	0
+				Repeats	0
+				IfHealthBelow	50000
+				Name	"Default"
+			}
+			ChangeAttributes [$SIGSEGV]  
+			{
+				Delay	0
+				Repeats	0
+				IfHealthBelow	40000
+				Name	"Sergeant_Crits_Form"
+			}
+			ChangeAttributes [$SIGSEGV]  
+			{
+				Delay	0
+				Repeats	0
+				IfHealthBelow	30000
+				Name	"Default"
+			}
+			ChangeAttributes [$SIGSEGV]  
+			{
+				Delay	0
+				Repeats	0
+				IfHealthBelow	20000
+				Name	"Sergeant_Crits_Form"
+			}
+			ChangeAttributes [$SIGSEGV]  
+			{
+				Delay	0
+				Repeats	0
+				IfHealthBelow	10000
+				Name	"Default"
+			}
+
+			EventChangeAttributes
+			{
+				Default	// Major Bomber Form
+				{
+					Item	"Prince Tavish's Crown"
+					Item	"Upgradeable TF_WEAPON_GRENADELAUNCHER"
+					UseCustomModel  "models/player/demo.mdl"
+					Item	"Zombie Demo"
+					Attributes	MiniBoss
+					Attributes	UseBossHealthBar
+					Item	"Honest Halo"
+					Skill	Expert
+					CustomEyeGlowColor	"255 0 0"
+					Attributes AlwaysCrit
+					WeaponRestrictions PrimaryOnly
+					Attributes HoldFireUntilFullReload
+					Tag	bot_giant
+					ItemColor			[$SIGSEGV]
+					{
+						ItemName	"Honest Halo"
+						Red			255
+						Green		0
+						Blue		0
+					}
+					ItemAttributes
+					{
+						ItemName	"Upgradeable TF_WEAPON_GRENADELAUNCHER"
+						"fire rate bonus" 0.2
+						"damage bonus"	1.5
+						"faster reload rate" 0.3
+						"clip size penalty" 3.0
+						"Projectile speed increased" 1.5
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.3
+						"damage force reduction"			0.01
+						"airblast vulnerability multiplier"	0.01
+						"override footstep sound set"		2
+						"airblast vertical vulnerability multiplier"	0.1
+						"rage giving scale"	0.1
+						"voice pitch scale"	0
+					}
+				}
+				Sergeant_Crits_Form
+				{
+					Item	"Tyrant's Helm"
+					Item	"Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+					UseCustomModel  "models/player/soldier.mdl"
+					Item	"Zombie Soldier"
+					Attributes	MiniBoss
+					Attributes	UseBossHealthBar
+					Item	"Honest Halo"
+					Skill	Expert
+					Attributes AlwaysCrit
+					WeaponRestrictions PrimaryOnly
+					Attributes HoldFireUntilFullReload
+					ItemColor			[$SIGSEGV]
+					{
+						ItemName	"Honest Halo"
+						Red			255
+						Green		0
+						Blue		0
+					}
+					ItemAttributes
+					{
+						ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+						"damage bonus" 1.5
+						"faster reload rate" 0.6
+						"fire rate bonus" 0.2
+						"clip size upgrade atomic" 7.0
+						"Projectile speed increased" 1.3
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.3
+						"damage force reduction"			0.01
+						"airblast vulnerability multiplier"	0.01
+						"override footstep sound set"		2
+						"airblast vertical vulnerability multiplier"	0.1
+						"rage giving scale"	0.1
+						"voice pitch scale"	0
+					}
+				}
+			}
+		}
+		T_TFBoss_Captain_Punch_Soul_IReallyHopeThisShitDoesntCrashTheServer	//	W3 initial boss - reused from Barbaric Bloodshed (rip)
+		{
+			Class	Heavyweapons
+			Name	"Captain Punch Soul"
+			ClassIcon	heavy_chief_soul
+			SpawnTemplate	"Distortion_Effect"
+			Health	50000
+			Scale	1.9
+			ChangeAttributes [$SIGSEGV]  
+			{
+				Delay	0
+				Repeats	0
+				IfHealthBelow	25000
+				Name	"Phase2"
+			}
+			EventChangeAttributes
+			{
+				Default
+				{
+					Item	"War Head"
+					Attributes	MiniBoss
+					Attributes	UseBossHealthBar
+					Item	"Honest Halo"
+					StripItemSlot	0	[$SIGSEGV]
+					StripItemSlot	1	[$SIGSEGV]
+					Skill	Expert
+					CustomEyeGlowColor	"255 0 0"
+					Tag		bot_giant
+					UseMeleeThreatPrioritization	1	[$SIGSEGV]
+					ItemColor			[$SIGSEGV]
+					{
+						ItemName	"Honest Halo"
+						Red			255
+						Green		0
+						Blue		0
+						// T I K Y
+					}
+					ItemAttributes
+					{
+						ItemName	"TF_WEAPON_FISTS"
+						"fire rate bonus"	0.6
+						"damage bonus"		3
+						"critboost on kill"	3
+						"heal on kill"	3000
+						"melee range multiplier"	1.5
+						"melee bounds multiplier"	1.5
+					}
+					Item	"TF_WEAPON_SPELLBOOK"
+					Spell
+					{
+						Delay		10
+						Cooldown	20
+						Type		"Summon Skeletons"
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.35
+						"damage force reduction"			0.01
+						"airblast vulnerability multiplier"	0.01
+						"override footstep sound set"		2
+						"airblast vertical vulnerability multiplier"	0.1
+						"rage giving scale"	0.1
+					}
+				}
+				Phase2
+				{
+					Item	"War Head"
+					Attributes	MiniBoss
+					Attributes	UseBossHealthBar
+					Item	"Honest Halo"
+					StripItemSlot	0	[$SIGSEGV]
+					StripItemSlot	1	[$SIGSEGV]
+					Item    "The Apparatchik's Apparel"
+					Skill	Expert
+					Tag		bot_giant
+					UseMeleeThreatPrioritization	1	[$SIGSEGV]
+					ItemModel			[$SIGSEGV]
+					{
+						ItemName    "The Apparatchik's Apparel"
+						Model "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+					}
+					ItemColor			[$SIGSEGV]
+					{
+						ItemName	"Honest Halo"
+						Red			255
+						Green		0
+						Blue		0
+					}
+					Item	"TF_WEAPON_SPELLBOOK"
+					Spell
+					{
+						Cooldown	6.9
+						Type		"Teleport"
+					}
+					ItemAttributes
+					{
+						ItemName	"TF_WEAPON_FISTS"
+						"fire rate bonus"	0.6
+						"damage bonus"		3
+						"critboost on kill"	3
+						"heal on kill"	1000
+						"melee range multiplier"	1.5
+						"melee bounds multiplier"	1.5
+					}
+					ItemAttributes
+					{
+						ItemName	"The Apparatchik's Apparel"
+						"item style override"	2
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.6
+						"damage force reduction"			0.01
+						"airblast vulnerability multiplier"	0.01
+						"override footstep sound set"		2
+						"airblast vertical vulnerability multiplier"	0.1
+						"rage giving scale"	0.1
+					}
+				}
+			}
+		}
+
+		T_TFBot_Heavyweapons_Soul_Melee	// UNUSED - remnant of mvm_bloodlust gimmick mission (captain expurgation's home mission)
+		{
+			Class	Heavyweapons
+			ClassIcon	heavy_fist_nys
+			WeaponRestrictions	MeleeOnly
+			Skill	Expert
+			Name	"Fragmented Soul"
+			Item	"Spine-Chilling Skull 2011 Style 3"
+			SpawnTemplate	"Distortion_Effect"
+			CustomEyeGlowColor	"255 0 0"
+			ItemColor			[$SIGSEGV]
+			{
+				ItemName	"Spine-Chilling Skull 2011 Style 3"
+				Red			255
+				Green		255
+				Blue		255
+			}
+		}
+        T_TFGateBot_Sniper_Huntsman_Event
+        {
+            Name		"Skeletal Bowman"
+            Class		Sniper
+			ClassIcon	sniper_bow
+            UseCustomModel  "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+            DeathSound  	"misc/halloween/skeleton_break.wav"
+			Scale	1.001
+            EventChangeAttributes
+            {
+                Default
+                {
+					Item	"The Huntsman"
+					Skill	Hard
+                    Attributes			IgnoreFlag
+                    BehaviorModifiers	Push
+                    Attributes			DisableDodge
+                    Tag		nav_prefer_gate1_flank
+                    Tag		bot_gatebot
+                    Skin	3
+					ItemAttributes
+					{
+						ItemName "The Huntsman"
+						"damage bonus" 0.5
+					}
+					ItemModel
+					{
+						ItemName	"Zombie Sniper"
+						Model		"models/empty.mdl"
+					}
+                    CharacterAttributes
+                    {
+                        "voice pitch scale"	0
+                    }
+                }
+                RevertGateBotsBehavior
+                {
+					Item	"The Huntsman"
+					Skill	Hard
+					ItemAttributes
+					{
+						ItemName "The Huntsman"
+						"damage bonus" 0.5
+					}
+
+					ItemModel
+					{
+						ItemName	"Zombie Sniper"
+						Model		"models/empty.mdl"
+					}
+                    Skin 1
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0
+                    }
+                }
+            }
+		}
+        T_TFGateBot_Sniper_Huntsman_Event_Crit
+        {
+            Name		"Skeletal Bowman"
+            Class		Sniper
+			ClassIcon	sniper_bow
+            UseCustomModel  "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+            DeathSound  	"misc/halloween/skeleton_break.wav"
+            EventChangeAttributes
+            {
+                Default
+                {
+					Item	"The Huntsman"
+					Skill	Hard
+                    Attributes			IgnoreFlag
+                    BehaviorModifiers	Push
+                    Attributes			DisableDodge
+					Attributes			AlwaysCrit
+                    Tag		nav_prefer_gate1_flank
+                    Tag		bot_gatebot
+                    Skin	3
+					ItemAttributes
+					{
+						ItemName "The Huntsman"
+						"damage bonus" 0.5
+					}
+					ItemModel
+					{
+						ItemName	"Zombie Sniper"
+						Model		"models/empty.mdl"
+					}
+                    CharacterAttributes
+                    {
+                        "voice pitch scale"	0
+                    }
+                }
+                RevertGateBotsBehavior
+                {
+					Item	"The Huntsman"
+					Attributes			AlwaysCrit
+					Skill	Hard
+					ItemAttributes
+					{
+						ItemName "The Huntsman"
+						"damage bonus" 0.5
+					}
+
+					ItemModel
+					{
+						ItemName	"Zombie Sniper"
+						Model		"models/empty.mdl"
+					}
+                    Skin 1
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0
+                    }
+                }
+            }
+		}
+		T_TFGatebot_Giant_Demoman	// fuck valve for not having this already
+		{
+			Class	Demoman
+			Name	"Giant Demoman"
+			ClassIcon	demo_giant
+			Health		3300
+			EventChangeAttributes
+			{
+				Default
+				{
+					BehaviorModifiers push
+					Attributes IgnoreFlag
+					Tag nav_prefer_gate1_flank
+					Tag bot_gatebot
+					Item "MvM GateBot Light Demoman"
+					Tag bot_giant
+					Skill Expert
+					WeaponRestrictions PrimaryOnly
+					Attributes MiniBoss
+					Attributes HoldFireUntilFullReload
+					CharacterAttributes
+					{
+						"move speed bonus"	0.5
+						"damage force reduction" 0.4
+						"airblast vulnerability multiplier" 0.4
+						"override footstep sound set" 4
+					}
+				}
+				RevertGateBotsBehavior
+				{
+					Item "MvM GateBot Light Demoman"
+					ItemAttributes
+					{
+						ItemName "MvM GateBot Light Demoman"
+						"item style override" 1
+					}
+					Tag bot_giant
+					Skill Expert
+					WeaponRestrictions PrimaryOnly
+					Attributes MiniBoss
+					Attributes HoldFireUntilFullReload
+					CharacterAttributes
+					{
+						"move speed bonus"	0.5
+						"damage force reduction" 0.4
+						"airblast vulnerability multiplier" 0.4
+						"override footstep sound set" 4
+					}
+				}
+			}
+		}
+		T_TFBot_Giant_Heavyweapons_Shotgun_Rapidfire
+		{
+			Class		Heavyweapons
+			Name		"Giant Rapid-Fire Shotgun Heavy"
+			ClassIcon	heavy_family_business_lite
+			Skill		Expert
+			Health		5000
+			WeaponRestrictions	SecondaryOnly
+			MaxVisionRange		1200
+			Attributes			MiniBoss
+			Item				"The Family Business"
+			Item				"Capone's Capper"
+			ItemAttributes
+			{
+				ItemName				"The Family Business"
+				"Reload time decreased"	-1
+				"bullets per shot bonus" 1.2
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"					0.7
+				"damage force reduction"			0.3
+				"airblast vulnerability multiplier"	0.3
+				"override footstep sound set"		2
+			}
+		}
+		T_TFBot_Medic_Kritzkrieg_BigHeal
+		{
+			Class	Medic
+			Name	"Kritzkrieg Medic"
+			ClassIcon	medic_kritz
+			Attributes	SpawnWithFullCharge
+			Attributes	IgnoreEnemies
+			Item	"The Kritzkrieg"
+			Item	"Titanium Tyrolean"
+			ItemAttributes
+			{
+				ItemName "The Kritzkrieg"
+				"ubercharge rate bonus"	9999
+				"uber duration bonus"	9999
+				"heal rate bonus"	200
+			}
+			CharacterAttributes
+			{
+				"bot medic uber health threshold"	690
+			}
+		}
+		Colonel_Barrage_Torture_CBT_For_Short	// beefier and double damage Colonel that heals on hit instead of regenning passively
+		{										// throwback to my god awful mission I made for Transmission lmao
+			Class		Soldier
+			Name		"Healthy Colonel Barrage"
+			ClassIcon	soldier_barrage_heal
+			Health		6000
+			Tag			bot_giant
+			Skill		Expert
+			WeaponRestrictions	PrimaryOnly
+			Attributes	MiniBoss
+			Attributes	HoldFireUntilFullReload
+			Attributes	UseBossHealthBar
+			Item		"Das Naggenvatcher"
+			Item		"The Black Box"
+			ItemAttributes
+			{
+				ItemName	"The Black Box"
+				"clip size upgrade atomic"	27.0
+				"damage bonus"	2.0
+				"heal on hit for rapidfire"	100
+				"hand scale"	1.15
+				"faster reload rate"	0.22
+				"fire rate bonus"	0.2
+				"projectile spread angle penalty"	6.9
+				"killstreak tier"	1
+				"paintkit_proto_def_index"	458	//	applies Wrapped Reviver MK.II warpaint
+				"set_item_texture_wear"	0.2		//	sets to Factory New
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction"	0.01
+				"airblast vulnerability multiplier"	0.01
+				"override footstep sound set"	3
+				"airblast vertical vulnerability multiplier"	0.01
+				"Projectile speed increased"	0.4
+			}
+		}
+	}
+
+	Mission
+	{
+		Objective	DestroySentries
+		Where	spawnbot_mid_slow0
+		Where	spawnbot_main_slow1
+		InitialCooldown	35
+		CooldownTime	35
+		DesiredCount	1
+		SuppressSentryBusterModel	1
+		TFBot
+		{
+			Template		T_TFBot_SentryBuster
+			Attributes		DisableDodge
+			Tag				bot_giant
+            UseCustomModel  "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+            DeathSound  	"misc/halloween/skeleton_break.wav"
+			Name			"Skeleton Buster"
+            Item			"The Crocodile Smile"
+            Skin			1
+            ItemModel
+			{
+				ItemName	"The Crocodile Smile"
+				Model		"models/workshop/player/items/demo/tw_sentrybuster/tw_sentrybuster.mdl"
+			}
+            CustomWeaponModel
+            {
+                Slot		2
+                Model		"models\empty.mdl"
+            }
+			CharacterAttributes
+			{
+				"damage force reduction"						0.01
+				"airblast vulnerability multiplier"				0.01
+				"airblast vertical vulnerability multiplier"	0.01
+				"rage giving scale"								0.01
+			}	
+		}
+	}
+	Mission	// W2 Spies
+	{
+		Objective		Spy
+		Where			spawnbot_scattered0
+		Where			spawnbot_main_slow1
+		InitialCooldown	45
+		CooldownTime	45
+		DesiredCount	2
+		BeginAtWave		2
+		RunForThisManyWaves	1
+		TFBot
+		{
+			Template	T_TFBot_Spy
+			UseHumanModel	2	[$SIGSEGV]
+		}
+	}
+	Mission
+	{
+		Objective		Sniper
+		Where			spawnbot_sniper_tower		// COPIOUS AMOUNTS OF TROLLAGE
+		InitialCooldown	69
+		CooldownTime	96
+		DesiredCount	1
+		BeginAtWave		4
+		RunForThisManyWaves	1
+		TFBot
+		{
+			Template	T_TFBot_Sniper
+			Attributes	AlwaysCrit
+			Name	"Asshole Assassin"
+			UseHumanModel	2	[$SIGSEGV]
+			CharacterAttributes
+			{
+				"kill forces attacker to laugh"	1
+			}
+		}
+	}
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_relay_expert 
+			Action	Trigger
+		}
+		DoneOutput					
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		InitWaveOutput
+		{
+			Target	disable_spells
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	wave1a
+			TotalCurrency	100
+			TotalCount	36
+			MaxActive	12
+			SpawnCount	3
+			WaitBeforeStarting	2.5
+			WaitBetweenSpawns	2.5
+			Where	spawnbot_scattered0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Template	T_TFGateBot_Sniper_Huntsman_Event
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave1a
+			TotalCurrency	100
+			TotalCount	12
+			MaxActive	5
+			SpawnCount	4
+			WaitBetweenSpawns	16
+			Where	spawnbot_mid0
+			Where	spawnbot_main1
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Scout_Baseball_Armored
+					UseHumanModel	2	[$SIGSEGV]
+					Tag	bot_giant
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+					UseHumanModel	2	[$SIGSEGV]
+					Name		"Big-Heal Medic"
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+					UseHumanModel	2	[$SIGSEGV]
+					Name		"Big-Heal Medic"
+				}
+				TFBot
+				{
+
+					Template	T_TFBot_Medic_BigHeal
+					UseHumanModel	2	[$SIGSEGV]
+					Name		"Big-Heal Medic"
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave1b
+			WaitForAllDead	wave1a
+			TotalCurrency	100
+			TotalCount	70
+			MaxActive	12
+			SpawnCount	1
+			WaitBetweenSpawns	1
+			Where	spawnbot_scattered0
+			Where	spawnbot_main1
+			RandomChoice
+			{
+				TFBot
+				{
+					Class	Pyro
+					UseHumanModel	2	[$SIGSEGV]
+					Skill	Easy
+				}
+				TFBot
+				{
+					Template	T_TFBot_Demoman_Knight
+					UseHumanModel	2	[$SIGSEGV]
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave1b
+			WaitForAllDead	wave1a
+			TotalCurrency	150
+			TotalCount	3
+			MaxActive	2
+			SpawnCount	1
+			WaitBetweenSpawns	16
+			Where	spawnbot_left0
+			Where	spawnbot_main_slow1
+			TFBot
+			{
+				Template	T_TFGatebot_Giant_Demoman
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave1b
+			WaitForAllDead	wave1a
+			TotalCurrency	150
+			TotalCount	3
+			MaxActive	2
+			SpawnCount	1
+			WaitBetweenSpawns	16
+			Where	spawnbot_right0
+			Where	spawnbot_main_slow1
+			TFBot
+			{
+				Template	T_TFGatebot_Giant_Demoman
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave1c_man
+			WaitForAllDead	wave1b
+			TotalCurrency	100
+			TotalCount	20
+			MaxActive	6
+			SpawnCount	5
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	10
+			Where	spawnbot_mid_slow0
+			Where	spawnbot_main_slow1
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Fist
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Shotgun
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Shotgun
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Shotgun
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Shotgun
+					UseHumanModel	2	[$SIGSEGV]
+				}
+
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave1c_common
+			WaitForAllDead	wave1b
+			TotalCurrency	100
+			TotalCount	46
+			MaxActive	10
+			SpawnCount	2
+			WaitBeforeStarting	2
+			WaitBetweenSpawns	2
+			Where	spawnbot_scattered0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Template	T_TFGateBot_Scout_Normal
+				UseHumanModel	2	[$SIGSEGV]
+				
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave1c_giants
+			WaitForAllDead	wave1b
+			TotalCurrency	400
+			TotalCount	6
+			MaxActive	4
+			SpawnCount	2
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	15
+			Where	spawnbot_mid_slow0
+			Where	spawnbot_main1
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier
+					UseHumanModel	2	[$SIGSEGV]
+					Tag	bot_giant
+					Attributes	AlwaysCrit
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+					UseHumanModel	2	[$SIGSEGV]
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave1_support
+			WaitForAllSpawned	wave1c_common
+			Support	1
+			TotalCount	9
+			MaxActive	9
+			SpawnCount	3
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	3
+			Where	spawnbot_scattered0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Class	Scout
+				Skill	Normal
+				ClassIcon	scout_giant
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave1_support
+			WaitForAllSpawned	wave1c_common
+			Support	1
+			TotalCount	6
+			MaxActive	6
+			SpawnCount	2
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	2
+			Where	spawnbot_main_slow1
+			Where	spawnbot_main1
+			TFBot
+			{
+				Class	Pyro
+				Skill	Easy
+				ClassIcon	pyro_giant
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave1d
+			WaitForAllDead	wave1c_giants
+			TotalCurrency	400
+			TotalCount	8
+			MaxActive	5
+			SpawnCount	4
+			Where	spawnbot_mid0
+			Where	spawnbot_main1
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Heavyweapons
+					UseHumanModel	2	[$SIGSEGV]
+					Tag	bot_giant
+				}
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Fist
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Fist
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Fist
+					UseHumanModel	2	[$SIGSEGV]
+				}
+
+			}
+		}
+	}
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_relay_expert
+			Action	Trigger
+		}
+		DoneOutput					
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		InitWaveOutput
+		{
+			Target	disable_spells
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	wave2a
+			TotalCurrency	100
+			TotalCount	4
+			MaxActive	4
+			SpawnCount	2
+			WaitBetweenSpawns	18
+			Where	spawnbot_left0
+			Where	spawnbot_mid_slow0
+			TFBot
+			{
+				Template	T_TFBot_Giant_Scout_Fast
+				UseHumanModel	2	[$SIGSEGV]
+				Tag	bot_giant
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave2a
+			TotalCurrency	100
+			TotalCount	4
+			MaxActive	3
+			SpawnCount	2
+			WaitBetweenSpawns	30
+			Where	spawnbot_mid0
+			Where	spawnbot_main1
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFGateBot_Giant_Pyro_AlwaysFire
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Giant_Medic_Regen
+					UseHumanModel	2	[$SIGSEGV]
+					Tag	bot_giant
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave2a
+			TotalCurrency	50
+			TotalCount	36
+			MaxActive	12
+			SpawnCount	3
+			WaitBeforeStarting	6
+			WaitBetweenSpawns	3
+			Where	spawnbot_scattered0
+			Where	spawnbot_main_slow1
+			TFBot
+			{
+				Class	Soldier
+				UseHumanModel	2	[$SIGSEGV]
+				Skill	Hard
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave2b
+			WaitForAllDead	wave2a
+			TotalCurrency	50
+			TotalCount	18
+			MaxActive	9
+			SpawnCount	3
+			WaitBeforeStarting	8
+			WaitBetweenSpawns	8
+			Where	spawnbot_left0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Template	T_TFGateBot_Heavy_IronFist
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave2b
+			WaitForAllDead	wave2a
+			TotalCurrency	50
+			TotalCount	28
+			MaxActive	10
+			SpawnCount	2
+			WaitBetweenSpawns	3
+			Where	spawnbot_mid0
+			Where	spawnbot_right0
+			Where	spawnbot_main1
+			Squad
+			{
+				TFBot
+				{
+					Class	Pyro
+					Name	"Dragon Pyro"
+					Skill	Easy
+					ClassIcon	pyro_dragon_fury_swordstone
+					Item	"The Dragon's Fury"
+					Item	"Pyromancer's Mask"
+					MaxVisionRange	600
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+					Name	"Big-Heal Medic"
+					UseHumanModel	2	[$SIGSEGV]
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave2_loltank
+			TotalCurrency	50
+			WaitForAllDead	wave2a
+			TotalCount	1
+			SpawnCount	1
+			Tank
+			{
+				Name	"loltank"
+				Health	26900
+				Speed	69
+				StartingPathTrackNode	"path_tank_1"
+				SpawnTemplate	"WHAT_IF_IT_WAS_PURPLE"
+				Model	"models/bots/boss_bot/boss_tank_color.mdl" [$SIGSEGV]
+				OnBombDroppedOutput 
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave2c
+			WaitForAllDead	wave2b
+			TotalCurrency	200
+			TotalCount	32
+			MaxActive	12
+			SpawnCount	2
+			WaitBeforeStarting	3
+			WaitBetweenSpawns	3
+			Where	spawnbot_scattered0
+			Where	spawnbot_main1
+			Where	spawnbot_main_slow1
+			RandomChoice
+			{
+				TFBot
+				{
+					Template	T_TFGateBot_Soldier_Hard
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFGateBot_Demoman_Hard
+					UseHumanModel	2	[$SIGSEGV]
+				}
+			}
+		}
+		WaveSpawn	// the gang™ is here
+		{
+			Name	wave2c
+			WaitForAllDead	wave2b
+			TotalCurrency	150
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	15
+			Where	spawnbot_mid0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Template	T_TFBot_Giant_Heavyweapons_Shotgun_Rapidfire
+				UseHumanModel	2	[$SIGSEGV]
+				Tag	bot_giant
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave2c
+			WaitForAllDead	wave2b
+			TotalCurrency	150
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	15
+			Where	spawnbot_left0
+			Where	spawnbot_main_slow1
+			TFBot
+			{
+				Template	T_TFBot_Giant_Heavyweapons_Shotgun_Rapidfire
+				UseHumanModel	2	[$SIGSEGV]
+				Tag	bot_giant
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave2c
+			WaitForAllDead	wave2b
+			TotalCurrency	200
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	15
+			Where	spawnbot_right0
+			Where	spawnbot_main_slow1
+			TFBot
+			{
+				Template	T_TFBot_Giant_Heavyweapons_Shotgun_Rapidfire
+				UseHumanModel	2	[$SIGSEGV]
+				Tag	bot_giant
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave2d
+			WaitForAllDead	wave2c
+			TotalCurrency	100
+			TotalCount	12
+			MaxActive	6
+			SpawnCount	3
+			WaitBetweenSpawns	10
+			Where	spawnbot_main1
+			Where	spawnbot_mid0
+			TFBot
+			{
+				Template	T_TFBot_Heavyweapons_Fist
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave2d
+			WaitForAllDead	wave2c
+			TotalCurrency	100
+			TotalCount	4
+			MaxActive	3
+			SpawnCount	2
+			WaitBeforeStarting	6.9
+			Where	spawnbot_mid_slow0
+			Where	spawnbot_main_slow1
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier_Spammer_Reload
+					UseHumanModel	2	[$SIGSEGV]
+					Tag	bot_giant
+					Attributes	AlwaysCrit
+				}
+				TFBot
+				{
+					Template	T_TFBot_Giant_Medic
+					UseHumanModel	2	[$SIGSEGV]
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave2_finalsupport
+			WaitForAllDead	wave2c
+			Support	1
+			TotalCount	69
+			MaxActive	10
+			SpawnCount	4
+			WaitBeforeStarting	4
+			WaitBetweenSpawns	5
+			Where	spawnbot_scattered0
+			Where	spawnbot_main_slow1
+			RandomChoice
+			{
+				TFBot
+				{
+					Class	Demoman
+					Skill	Expert
+					ClassIcon	demo_giant
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Class	Demoman
+					Skill	Expert
+					ClassIcon	demo_giant
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Heavyweight_Champ_Fast
+					Attributes	AlwaysCrit
+					Name	"Featherweight Champ"
+					UseHumanModel	2	[$SIGSEGV]
+				}
+			}
+		}
+	}
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_relay_expert 
+			Action	Trigger
+		}
+		DoneOutput					
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		InitWaveOutput
+		{
+			Target	disable_spells
+			Action	Trigger
+		}
+		Explanation [$SIGSEGV]
+		{
+			Line	"{red}The zombie forces have summoned the phantom of Captain Punch..."
+			Line	"{yellow}Be careful not to let it get too far with the bomb or else enemy Engineers will become a bigger threat!"
+		}
+		WaveSpawn
+		{
+			Name	wave3a
+			TotalCurrency	100
+			TotalCount	30
+			MaxActive	10
+			SpawnCount	2
+			WaitBetweenSpawns	3.5
+			Where	spawnbot_mid0
+			Where	spawnbot_main_slow1
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFGateBot_Demo_Burst_Normal_Crit
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+					UseHumanModel	2	[$SIGSEGV]
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave3a
+			TotalCurrency	100
+			TotalCount	42
+			MaxActive	10
+			SpawnCount	2
+			WaitBetweenSpawns	2
+			Where	spawnbot_left0
+			Where	spawnbot_right0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Template	T_TFBot_Scout_Bonk
+				WeaponRestrictions	PrimaryOnly
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	dummy1
+			Support	Limited
+			TotalCount	0
+			MaxActive	0
+			SpawnCount	0
+			WaitForAllSpawned	wave3a
+			StartWaveWarningSound	"w3_boss_spawn.mp3"
+		}
+		WaveSpawn
+		{
+			Name	dummy1
+			Support	Limited
+			TotalCount	0
+			MaxActive	0
+			SpawnCount	0
+			WaitForAllSpawned	wave3a
+			StartWaveWarningSound	"w3_boss_spawn.mp3"
+		}
+
+		WaveSpawn
+		{
+			Name	wave3b
+			WaitForAllSpawned	wave3a
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot_boss0
+			Where	spawnbot_main_slow1
+			TFBot
+			{
+				Template	T_TFBoss_Captain_Punch_Soul_IReallyHopeThisShitDoesntCrashTheServer
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave3b
+			WaitForAllSpawned	wave3a
+			TotalCurrency	100
+			TotalCount	30
+			MaxActive	12
+			SpawnCount	3
+			WaitBeforeStarting	4
+			Where	spawnbot_scattered0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Template	T_TFGateBot_Heavy_Normal
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave3_supportengis
+			Support	1
+			TotalCount	2
+			MaxActive	2
+			SpawnCount	2
+			WaitForAllDead	wave3b
+			WaitBeforeStarting	35
+			WaitBetweenSpawns	60
+			Where	spawnbot_left0
+			Where	spawnbot_main_slow1
+			Squad
+			{
+				TFBot
+				{
+					Class			Engineer
+					Name			Engineer
+					Skill			Expert
+					TeleportWhere	spawnbot_scattered0
+					TeleportWhere	spawnbot_main1
+
+					Health			500
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot	// let's do a LITTLE trolling.
+				{
+					Template	T_TFBot_Medic
+					ClassIcon	medic_uber_giant	// prevent icon stacking
+					UseHumanModel	2	[$SIGSEGV]
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave3_support_gamers
+			WaitForAllDead	wave3b
+			Support	1
+			TotalCurrency	400
+			TotalCount	100
+			MaxActive	12
+			SpawnCount	3
+			WaitBeforeStarting	6
+			WaitBetweenSpawns	4
+			Where	spawnbot_scattered0
+			Where	spawnbot_main1
+			RandomChoice
+			{
+				TFBot
+				{
+					Class	Soldier
+					UseHumanModel	2	[$SIGSEGV]
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Demoman
+					UseHumanModel	2	[$SIGSEGV]
+					Skill	Expert
+				}
+				TFBot
+				{
+					Template	T_TFBot_Pyro_Flaregun
+					UseHumanModel	2	[$SIGSEGV]
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave3c
+			WaitForAllDead	wave3b
+			TotalCurrency	400
+			TotalCount	12
+			MaxActive	6
+			SpawnCount	2
+			WaitBetweenSpawns	10
+			Where	spawnbot_mid_slow0
+			Where	spawnbot_main_slow1
+			TFBot
+			{
+				Class	Scout
+				Name	"Giant Soda Popper Scout"
+				ClassIcon	scout_pop_giant
+				Skill	Expert
+				Health	1600
+				WeaponRestrictions	PrimaryOnly
+				Attributes	MiniBoss
+				Item	"The Soda Popper"
+				Item	"The Bottle Cap"
+				Tag	bot_giant
+				UseHumanModel	2	[$SIGSEGV]
+				ItemAttributes
+				{
+					ItemName	"The Bottle Cap"
+					"item style override"	1
+				}
+				ItemAttributes
+				{
+					ItemName	"The Soda Popper"
+					"fire rate penalty"	2.0
+					"bullets per shot bonus"	3
+					"damage penalty"	0.5
+					"reload time increased"	1.5
+				}
+				CharacterAttributes
+				{
+					"damage force reduction"	0.7
+					"airblast vulnerability multiplier"	0.7
+					"override footstep sound set"	5
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave3_hahafuckyouheresmoretanks
+			WaitForAllDead	wave3b
+			TotalCurrency	150
+			TotalCount	1
+			SpawnCount	1
+			WaitBeforeStarting	12
+			Tank
+			{
+				Name	"tank1"
+				Health	22500
+				Speed	65
+				StartingPathTrackNode	"path_tank_alt"
+				SpawnTemplate	"WHAT_IF_IT_WAS_ORANGE"
+				Model	"models/bots/boss_bot/boss_tank_color.mdl" [$SIGSEGV]
+				OnBombDroppedOutput 
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave3_hahafuckyouheresmoretanks
+			WaitForAllDead	wave3b
+			TotalCurrency	150
+			TotalCount	1
+			SpawnCount	1
+			WaitBeforeStarting	24
+			Tank
+			{
+				Name	"tank1"
+				Health	22500
+				Speed	65
+				StartingPathTrackNode	"path_tank_1"
+				SpawnTemplate	"WHAT_IF_IT_WAS_GREEN"
+				Model	"models/bots/boss_bot/boss_tank_color.mdl" [$SIGSEGV]
+				OnBombDroppedOutput 
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave3_finalsupport_trollage
+			WaitForAllDead	wave3c
+			Support		1
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	3
+			Where	spawnbot_scattered0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Template	T_TFBot_Scout_Bonk
+				UseHumanModel	2	[$SIGSEGV]
+				ClassIcon	scout_bonk_giant
+				Attributes	AlwaysCrit
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave3d
+			WaitForAllDead	wave3c
+			TotalCurrency	400
+			TotalCount	4
+			MaxActive	4
+			SpawnCount	2
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	30
+			Where	spawnbot_mid_slow0
+			Where	spawnbot_main_slow1
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Heavyweapons
+					Tag		bot_giant
+					Item	"Tomislav"	// no dmg bonus because accuracy with kritzkrieg is already brutal enough
+					Item	"Capone's Capper"
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Class	Medic
+					Name	"Giant Kritzkrieg Medic"
+					ClassIcon	medic_kritz_giant
+					Skill	Expert
+					Health	4500
+					Attributes	SpawnWithFullCharge
+					Attributes	MiniBoss
+					Attributes	IgnoreEnemies
+					Item	"The Kritzkrieg"
+					Item	"Titanium Tyrolean"
+					Tag	bot_giant
+					UseHumanModel	2	[$SIGSEGV]
+					ItemAttributes
+					{
+						ItemName "The Kritzkrieg"
+						"ubercharge rate bonus"	9999
+						"uber duration bonus"	9999
+						"heal rate bonus"	70
+					}
+					CharacterAttributes
+					{
+						"bot medic uber health threshold"	6900
+						"move speed bonus"	0.5
+						"damage force reduction"	0.6
+						"airblast vulnerability multiplier"	0.6
+					}
+				}
+			}
+		}
+
+	}
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_relay_expert 
+			Action	Trigger
+		}
+		DoneOutput					
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		InitWaveOutput
+		{
+			Target	disable_spells
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	too_much_trolling!
+			TotalCount	0
+			MaxActive	0
+			SpawnCount	0
+			Support	Limited
+			FirstSpawnWarningSound	"ui/halloween_boss_summoned_fx.wav"
+			FirstSpawnOutput
+			{
+				Target	shake_effect_titan
+				Action	StartShake
+			}
+		}
+		WaveSpawn
+		{
+			Name	too_much_trolling!
+			TotalCount	0
+			MaxActive	0
+			SpawnCount	0
+			Support	Limited
+			WaitBeforeStarting	7
+			FirstSpawnWarningSound	"misc/halloween/gotohell.wav"
+			FirstSpawnOutput
+			{
+				Target	whiteout_trigger
+				Action	Fade
+			}
+		}
+		WaveSpawn
+		{
+			Name	too_much_trolling!
+			TotalCount	0
+			MaxActive	0
+			SpawnCount	0
+			Support	Limited
+			WaitBeforeStarting	9
+			FirstSpawnOutput
+			{
+				Target	purgatory_init
+				Action	Trigger
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave4a
+			TotalCurrency	150
+			TotalCount	5
+			MaxActive	5
+			SpawnCount	1
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	10
+			Where	spawnbot_mid0
+			Where	spawnbot_main_slow1
+			TFBot
+			{
+				Template	Colonel_Barrage_Torture_CBT_For_Short
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave4a
+			TotalCurrency	150
+			TotalCount	3
+			MaxActive	2
+			SpawnCount	1
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	20
+			Where	spawnbot_left0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Template	T_TFGateBot_Giant_Heavyweapons_Deflector
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave4a
+			TotalCurrency	200
+			TotalCount	39
+			MaxActive	12
+			SpawnCount	3
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	3.5
+			Where	spawnbot_mid0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Template	T_TFGateBot_Sniper_Huntsman_Event_Crit
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	THATS_IT_IM_GETTING_ME_MALLET
+			WaitForAllDead	wave4a
+			TotalCurrency	150
+			TotalCount	1
+			SpawnCount	1
+			FirstSpawnOutput
+			{
+				Target	hammer_tank_spawn
+				Action	Trigger
+			}
+			Tank
+			{
+				Name	"tank_hammer"
+				Health	50000
+				ClassIcon	tank_mallet
+				Speed	60
+				SpawnTemplate	"WHAT_IF_IT_WAS_BROWN"
+				Model	"models/bots/boss_bot/boss_tank_color.mdl" [$SIGSEGV]
+				StartingPathTrackNode	"path_tank_alt"
+				OnBombDroppedOutput 
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+				OnKilledOutput
+				{
+					Target	hammer_tank_dead
+					Action	Trigger
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave4b
+			WaitForAllDead	wave4a
+			TotalCurrency	150
+			TotalCount	39
+			MaxActive	12
+			SpawnCount	3
+			WaitBeforeStarting	3
+			WaitBetweenSpawns	3
+			Where	spawnbot_scattered0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Class	Pyro
+				Skill	Expert	// bye bye trolldiers
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave4b
+			WaitForAllDead	wave4a
+			TotalCurrency	150
+			TotalCount	4
+			MaxActive	3
+			SpawnCount	2
+			WaitBeforeStarting	11
+			WaitBetweenSpawns	21
+			Where	spawnbot_mid_slow0
+			Where	spawnbot_main_slow1
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Scout_Baseball_Armored
+					Attributes	AlwaysCrit
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Giant_Medic_Regen	// TOO MUCH TROLLING
+					UseHumanModel	2	[$SIGSEGV]
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave4c_commons
+			WaitForAllDead	wave4b
+			TotalCurrency	150
+			TotalCount	20
+			MaxActive	10
+			SpawnCount	2
+			WaitBeforeStarting	4
+			WaitBetweenSpawns	4
+			Where	spawnbot_mid_slow0
+			Where	spawnbot_main_slow1
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFGateBot_Heavy_Normal_Crit
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+					UseHumanModel	2	[$SIGSEGV]
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave4c
+			WaitForAllDead	wave4b
+			TotalCurrency	150
+			TotalCount	8
+			MaxActive	4
+			SpawnCount	2
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	15
+			Where	spawnbot_right0
+			Where	spawnbot_main_slow1
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFGateBot_Giant_Demo_Burst
+					UseHumanModel	2	[$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFGateBot_Giant_Soldier_Extended_Concheror
+					UseHumanModel	2	[$SIGSEGV]
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave4c
+			WaitForAllDead	wave4b
+			TotalCurrency	150
+			TotalCount	4
+			MaxActive	2
+			SpawnCount	1
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	15
+			Where	spawnbot_left0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Class	Pyro
+				Name	"Giant Dragon Pyro"
+				ClassIcon	pyro_dragon_fury_swordstone_giant
+				Skill	Expert
+				Health	3000
+				MaxVisionRange	690
+				WeaponRestrictions	PrimaryOnly
+				Attributes	MiniBoss
+				Attributes	AlwaysCrit
+				Item	"The Dragon's Fury"
+				Item	"Pyromancer's Mask"
+				Tag	bot_giant
+				UseHumanModel	2	[$SIGSEGV]
+				CharacterAttributes
+				{
+					"move speed bonus"	0.5
+					"damage force reduction"	0.6
+					"airblast vulnerability multiplier"	0.6
+					"override footstep sound set"	6
+				}
+			}
+		}
+
+
+
+		WaveSpawn
+		{
+			Name	HAAAAAAAAAAAAAAAAAAAAAAAAAAANK
+			WaitForAllDead	wave4c
+
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	12
+			Where	spawnbot_boss0
+			Where	spawnbot_main_slow1
+			TFBot
+			{
+				Template	T_TFBot_Boss_HybridShifter
+			}
+		}
+		WaveSpawn
+		{
+			Name	dummy2
+			Support	Limited
+			TotalCount	0
+			MaxActive	0
+			SpawnCount	0
+			WaitBeforeStarting	12
+			WaitForAllDead	wave4c
+			FirstSpawnWarningSound	"w3_boss_spawn.mp3"	// fuck you I'm adding it twice
+		}
+		WaveSpawn
+		{
+			Name	dummy2
+			Support	Limited
+			TotalCount	0
+			MaxActive	0
+			SpawnCount	0
+			WaitBeforeStarting	12
+			WaitForAllDead	wave4c
+			FirstSpawnWarningSound	"w3_boss_spawn.mp3"
+		}
+
+		WaveSpawn
+		{
+			Name	wave4_finalsupport1
+			WaitForAllSpawned	wave4c_commons
+			Support		1
+			TotalCount	10
+			MaxActive	10
+			SpawnCount	2
+			WaitBeforeStarting	4
+			WaitBetweenSpawns	4
+			Where	spawnbot_scattered0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Template	T_TFBot_Scout_Sandman_FastCharge
+				Attributes	AlwaysCrit
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave4_finalsupport2
+			WaitForAllDead	wave4c_commons
+			Support		1
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting			10
+			WaitBetweenSpawnsAfterDeath	10
+			Where	spawnbot_mid0
+			Where	spawnbot_main1
+			TFBot
+			{
+				Template	T_TFBot_Scout_Shortstop
+				Attributes	AlwaysCrit
+				Skill	Hard
+				UseHumanModel	2	[$SIGSEGV]
+			}
+		}
+		WaveSpawn
+		{
+			Name	wave4_finalsupport3
+			WaitForAllDead	wave4c_commons
+			Support		1
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	3
+			WaitBeforeStarting	12
+			WaitBetweenSpawns	12
+			Where	spawnbot_left0
+			Where	spawnbot_main_slow1
+			TFBot
+			{
+				Class	Pyro
+				Skill	Expert
+				UseHumanModel	2	[$SIGSEGV]
+				ClassIcon	pyro_giant
+			}
+		}
+
+
+	}
+}

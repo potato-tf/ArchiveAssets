@@ -1,0 +1,1959 @@
+//Mountain of Fear, by Seelpit
+//An intermediate difficulty, Touhou-themed mission!
+//References Mountain of Faith, in both abbreviation and some bots
+
+////////INFO FOR MAP
+// spawnbot - spawn bots in carrier
+
+// spawnbot_mission_sentrybuster - main carrier
+// spawnbot_mission_spy - main carrier
+// spawnbot_mission_engineer - side thing
+// spawnbot_mission_sniper - one spawn near carrier and another on side thing.
+
+// spawnbot_side - spawns bots in side thing
+// spawnbot_alt - spawn bots on main spawn, closer to the drop. mostly a relic from alpha which is still used for some reason.
+
+// spawnbot_airdrop0 
+// spawnbot_airdrop1
+// spawnbot_airdrop2
+
+// spawnbot_invasion - uses every available land spawn
+
+// infinite limited spawns - controlled by relays!
+
+// spawnbot_alt_limited_a
+// spawnbot_alt_limited_b
+// spawnbot_alt_limited_c
+// spawnbot_alt_limited_d
+
+// spawnbot_side_limited_a
+// spawnbot_side_limited_b
+// spawnbot_side_limited_c
+// spawnbot_side_limited_d
+
+// spawnbot_airdrop0_limited_a
+// spawnbot_airdrop0_limited_b
+// spawnbot_airdrop0_limited_c
+// spawnbot_airdrop0_limited_d
+
+// spawnbot_airdrop1_limited_a
+// spawnbot_airdrop1_limited_b
+// spawnbot_airdrop1_limited_c
+// spawnbot_airdrop1_limited_d
+
+// spawnbot_airdrop2_limited_a
+// spawnbot_airdrop2_limited_b
+// spawnbot_airdrop2_limited_c
+// spawnbot_airdrop2_limited_d
+
+// suggested tank name: "tank" - otherwise they won't blow up on bomb deployment. ("droptank0" for tank_path_drop0_a / tank_path_drop0_b and "droptank1" for tank_path_drop1)
+// vac tanks: "tank_blast" (blast resistance) "tank_fire" (fire resistance) "tank_bullet" (bullet resistance) - only 1 vac tank of given type can exist. (so like, can't have 2 bullet vacs. but you can have all 3 different things out at once.)
+
+// tank pathes: tank_path_a (left side, past scaffold); tank_path_b (right side, through blu building);
+
+// tank_path_air_bombrandom - must be used AFTER dropbomb_coords_stop_relay or else game might crash because those thing don't exist unless spawned by their respective relay.
+
+// tank_path_drop0_a; tank_path_drop0_b; - spawns parachuting tanks that go down on ground, land after ~18 seconds and go on a/b path for usual tanks.
+// tank_path_drop1; - spawns parachuting tank close to hatch, that lands in ~16 seconds and proceeds to go towards the hatch.
+////////
+
+// Changelog V2:
+// W1
+// - Bomb will now always start on a common scout
+// - Added Giant Flare Rain to subwave 2
+// - Increased spawncount of Detonator Pyros, lowered maxactive and totalcount
+
+// W2
+// - Blast Soldiers are now minigiants, spawn with waaay less
+// - Less Reserve Soldiers
+// - Tank has final tank skin now, as it shouold
+// - Doubled Phlog Pyro buff duration
+
+// W3
+// - Boss shoots more slowly in shorter intervals. Damage penalty is now -35% (from -25%)
+// - Eviction Heavies are now support limited
+
+// W4
+// - Bomb will now always start on a common scout
+// - Giant Cleaver Scout now moves 30% slower (from 25%)
+// - Removed one Giant Blaster Scout
+// - Halved TotalCount of Burst Soldiers (24 -> 12)
+
+// W6
+// - Reduced TotalCount, SpawnCount, MaxActive of Bowmen and Engies
+// - Boss' third phase: no more crits. Projectiles start out slowly and accelerate briefly afterwards; more spread.
+
+//Basic enemy types:
+//- Fairy: Playful/Fire (pyro), Mischievous (demo), Spring (medic)
+//Bullet Hell (heavy), Blitz (scout), Explosive (soldier), 
+//- Greater Fairy (minigiant)
+//- Kappa
+//- Kappa Leader (giant)
+//- Tengu
+
+#base robot_standard.pop
+#base robot_giant.pop
+
+popuwashyon
+{
+	StartingCurrency 750 //A solid amount, really
+	RespawnWaveTime 3
+	FixedRespawnWaveTime 1 //Feels better...probably
+	
+	ForceHoliday 2
+	EventPopfile Halloween
+	ZombiesNoWave666 1 [$SIGSEGV]
+	
+	PointTemplates
+	{
+		target_hint_y
+		{
+			NoFixup 1
+			info_target
+			{
+				"origin" "-6123 -2280 194"
+				"targetname" "gohere"
+			}
+		}
+		target_hint_z
+		{
+			NoFixup 1
+			info_target
+			{
+				"targetname" "aimhere"
+			}
+		}
+		
+		Teleporter_Invis
+		{
+			OnSpawnOutput //make teleporter non solid, otherwise the bots might get stuck on it
+			{
+				Target "tp"
+				Action "addoutput"
+				Param "solid 0"
+				Delay 5
+			}
+			OnSpawnOutput //make teleporter invis
+			{
+				Target "tp"
+				Action "$SetModel"
+				Param "models/empty.mdl"
+				Delay 1
+			}
+			obj_teleporter 
+			{
+				// "model" "models/empty.mdl"
+				"targetname" "tp"
+				"origin" "10 0 160"
+				"teamnum" "3"
+				"spawnflags" "2"
+				//"skin" "1"
+				//"health" "220"
+				"TeleportWhere" "spawnbot_alt"
+				"solid" "0"
+				"SolidToPlayer" "0"
+				//"DefaultAnim" "running"
+			}
+		}
+		//directly taken from Jurrell, gotem
+		powerup_logic
+		{
+			NoFixup 1
+			logic_relay
+			{
+				"targetname" "powerup_logic_relay"
+				"OnTrigger" "@p@powerup_haver_target*,$RemoveCond,109,0.1,-1"
+			}
+		}
+		powerup_logic_owned
+		{
+            OnSpawnOutput
+			{
+				Target "powerup_haver_target"
+				Action SetParent
+				Param "!activator"
+				Delay 0.01
+			}
+            OnParentKilledOutput
+            {
+                Target "item_powerup_rune"
+                Action Kill
+                Delay 0
+            }
+            info_target
+            {
+                "targetname" "powerup_haver_target"
+            }
+        }
+		powerup_logic_medic
+		{
+            OnParentKilledOutput
+            {
+                Target "item_powerup_rune"
+                Action Kill
+                Delay 0
+            }
+            OnParentKilledOutput
+            {
+                Target "powerup_logic_relay"
+                Action Trigger
+                Delay 0.001
+            }
+		}
+	}
+	
+	
+	SpawnTemplate "target_hint_y" [$SIGSEGV]
+	SpawnTemplate powerup_logic [$SIGSEGV]
+	
+	Templates
+	{
+		//An Air Strike Soldier!
+		T_TFBot_Soldier_Airstrike
+		{
+			Name "Falling Leaf Fairy"
+			Class Soldier
+			Attributes HoldFireUntilFullReload
+			Skill Normal
+			Item "The Air Strike"
+			Item "The B.A.S.E. Jumper"
+			ClassIcon soldier_airstrike
+			ItemAttributes
+			{
+				ItemName "The Air Strike"
+				"paintkit_proto_def_index" 160 //autumn
+			}
+		}
+		//An Air Strike Burst Soldier!
+		T_TFBot_Soldier_Burst_Airstrike
+		{
+			Name "Air Burst Soldier"
+			Class Soldier
+			Attributes HoldFireUntilFullReload
+			Skill Normal
+			Item "The Air Strike"
+			Item "The B.A.S.E. Jumper"
+			ClassIcon soldier_airstrike
+			ItemAttributes
+			{
+				ItemName "The Air Strike"
+				"fire rate bonus" 0.35
+				"projectile spread angle penalty" 1
+				"faster reload rate" 1.5
+				"clipsize increase on kill" 0
+			}
+		}
+		
+		//Colonel Barrage taken a step down.
+		T_TFBot_Giant_Soldier_Barrage
+		{
+			Name "Giant Barrage Soldier"
+			Class Soldier
+			Skill Expert
+			Health 4000
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			ClassIcon soldier_barrage
+			Tag giant
+			ItemAttributes
+			{
+				ItemName "tf_weapon_rocketlauncher"
+				"faster reload rate" 0.4 //V2 has .3
+				"clip size upgrade atomic" 11
+				"fire rate bonus" 0.2
+				"Projectile speed increased" 0.5 //V2 has .6
+				"projectile spread angle penalty" 5
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+			}
+		}
+		T_TFBot_Giant_Engineer
+		{
+			Class Engineer
+			Name "Giant Engineer"
+			Skill Hard
+			Health 3000
+			Attributes MiniBoss
+			Tag giant
+			Action FetchFlag [$SIGSEGV]
+			CharacterAttributes
+			{
+				"move speed bonus" 0.5
+				"voice pitch scale" 0
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 6
+			}
+		}
+	}
+	
+	
+	//W1-3 busters
+	Mission
+	{
+		Objective DestroySentries
+		Where spawnbot
+		DesiredCount 1
+		InitialCooldown 20
+		CooldownTime 75
+		BeginAtWave 1
+		RunForThisManyWaves 3
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Name "Big Walking Bomb Kaiju"
+			Attributes IgnoreEnemies
+			Attributes DisableDodge
+		}
+	}
+	//W4-6 busters
+	Mission
+	{
+		Objective DestroySentries
+		Where spawnbot
+		DesiredCount 1
+		InitialCooldown 30
+		CooldownTime 60
+		BeginAtWave 4
+		RunForThisManyWaves 3
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Name "Big Walking Bomb Kaiju"
+			Attributes IgnoreEnemies
+			Attributes DisableDodge
+		}
+	}
+	//W2 spies
+	Mission
+	{
+		Objective Spy
+		Where spawnbot
+		DesiredCount 2
+		InitialCooldown 15
+		CooldownTime 50
+		BeginAtWave 2
+		RunForThisManyWaves 1
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Name "Hide-and-seek Fairy"
+		}
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////
+	
+	//Subwave 1
+	//- Super Lightweight Champ
+	//- Shotgun Heavy
+	//- Kukri Sniper
+	
+	//Subwave 2
+	//- Super Lightweight Champ
+	//- Detonator Pyro
+	
+	//Subwave 3
+	//- Giant Penta-Rocket Soldier
+	//- Minor League Scout
+	
+	//- Support: Air Strike Soldier (after Supers, stop at gsoldier)
+	
+	Wave //Payout: 750$
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+			
+		WaveSpawn
+		{
+			Name "wave1a"
+			Where spawnbot
+			WaitBeforeStarting 0.5
+			WaitBetweenSpawns 30
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 120
+			TFBot
+			{
+				Template T_TFBot_Giant_Boxing_Heavy
+				Name "Greater Punchy Fairy"
+				ClassIcon heavy_gru
+				Tag giant
+				Item "Gloves of Running Urgently MvM"
+				ItemAttributes
+				{
+					ItemName "Gloves of Running Urgently MvM"
+					"fire rate bonus" 0.8
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1a2"
+			Where spawnbot
+			WaitBetweenSpawns 3.5
+			TotalCount 36
+			MaxActive 6
+			SpawnCount 2
+			TotalCurrency 180
+			TFBot
+			{
+				Class Scout
+				WeaponRestrictions MeleeOnly
+				ClassIcon scout_bat
+				Name "Playful Fairy"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1a2"
+			Where spawnbot
+			WaitBeforeStarting 0.5
+			WaitBetweenSpawns 4
+			TotalCount 18
+			MaxActive 3
+			SpawnCount 1
+			TotalCurrency 90
+			TFBot
+			{
+				Class Sniper
+				Skill Normal
+				Scale 1.2
+				Health 350
+				Name "Slashy Fairy"
+				ClassIcon sniper_kukri_lite
+				WeaponRestrictions MeleeOnly
+				CharacterAttributes
+				{
+					"health regen" 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1b"
+			WaitForAllSpawned "wave1a"
+			WaitBeforeStarting 20
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 40
+			TFBot
+			{
+				Template T_TFBot_Giant_Boxing_Heavy
+				ClassIcon heavy_gru
+				Name "Greater Punchy Fairy"
+				Tag giant
+				Item "Gloves of Running Urgently MvM"
+				ItemAttributes
+				{
+					ItemName "Gloves of Running Urgently MvM"
+					"fire rate bonus" 0.8
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1c"
+			WaitForAllDead "wave1a"
+			WaitBetweenSpawns 25
+			Where spawnbot
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 240
+			LastSpawnOutput
+			{
+				Target limited_spawns_disable_a_relay
+				Action Trigger
+			}
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier
+				Tag giant
+				Name "Greater Explosive Fairy"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1c2"
+			WaitForAllDead "wave1a2"
+			Where spawnbot
+			WaitBetweenSpawns 5
+			TotalCount 16
+			MaxActive 8
+			SpawnCount 2
+			TotalCurrency 80
+			TFBot
+			{
+				Class Scout
+				WeaponRestrictions MeleeOnly
+				ClassIcon scout_bat
+				Name "Playful Fairy"
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave1a"
+			Where spawnbot_airdrop0_limited_a
+			WaitBetweenSpawns 22
+			TotalCount 10
+			MaxActive 4
+			SpawnCount 2
+			Support 1
+			FirstSpawnOutput
+			{
+				Target air_warning_relay
+				Action Trigger
+			}
+			TFBot
+			{
+				Template T_TFBot_Soldier_Airstrike
+			}
+		}
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////
+	
+	//Wave 2: unlocks, "misfortune"
+	//Subwave 1
+	//- Giant Bleed Bowman
+	//- Tank
+	//- Hyped-up Scout (Cola)
+	//- Back Scratcher Pyro
+	
+	//Subwave 2
+	//- Droptank
+	//- Liberty Soldier (mix of Liberty and Reserve)
+	
+	//Subwave 3
+	//- Giant Phlog Pyro
+	//- Hyped-up Scout
+	//- Bleed Bowman
+	
+	//Support: Spies
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+			
+		WaveSpawn
+		{
+			Name "wave2a"
+			Where spawnbot
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 18
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 200
+			TFBot
+			{
+				Template T_TFBot_Sniper_Huntsman
+				ClassIcon sniper_bow_bleed_giant
+				Name "Great Fairy of Misfortune"
+				Health 2500
+				Attributes MiniBoss
+				Tag giant
+				ItemAttributes
+				{
+					ItemName "The Huntsman"
+					"bleeding duration" 5
+				}
+				CharacterAttributes
+				{
+					"move speed bonus" 0.5
+					"damage force reduction" 0.4
+					"airblast vulnerability multiplier" 0.4
+					"override footstep sound set" 6
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a2"
+			Where spawnbot
+			WaitBetweenSpawns 6
+			TotalCount 24
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 120
+			TFBot
+			{
+				Class Scout
+				Name "Hyped-up Fairy"
+				ClassIcon scout_pop
+				Item "Bottle Cap"
+				Item "The Soda Popper"
+				ItemAttributes
+				{
+					ItemName "The Soda Popper"
+					"reload time decreased" 1
+				}
+				ItemAttributes
+				{
+					ItemName "Bottle Cap"
+					"item style override" 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a2"
+			Where spawnbot_invasion
+			WaitBeforeStarting 0.5
+			WaitBetweenSpawns 2.5
+			TotalCount 36
+			MaxActive 6
+			SpawnCount 2
+			TotalCurrency 120
+			TFBot
+			{
+				Class Pyro
+				Name "Leaf Raker Fairy"
+				WeaponRestrictions MeleeOnly
+				Item "The Back Scratcher"
+				ClassIcon pyro_backscratcher_lite
+				ItemAttributes
+				{
+					ItemName "The Back Scratcher"
+					"paintkit_proto_def_index" 160 //autumn!
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave2b"
+			WaitForAllDead "wave2a"
+			TotalCount 1
+			TotalCurrency 90
+			FirstSpawnOutput
+			{
+				Target air_warning_relay
+				Action Trigger
+			}
+			Tank
+			{
+				Name "droptank0"
+				Health 16000
+				Speed 75
+				Skin 1
+				StartingPathTrackNode "tank_path_drop0_b" // takes ~18 seconds to land
+				OnKilledOutput
+				{
+					Target droptank0_killed_relay
+					Action Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay 					
+					Action Trigger                         		
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b2"
+			WaitForAllDead "wave2a2"
+			Where spawnbot
+			WaitBetweenSpawns 8
+			TotalCount 6
+			MaxActive 2
+			SpawnCount 2
+			TotalCurrency 60
+			TFBot
+			{
+				Class Soldier
+				Name "War Fairy"
+				Health 650
+				Scale 1.4
+				Skill Hard
+				Attributes HoldFireUntilFullReload
+				Item "The Liberty Launcher"
+				Item "Jumper's Jeepcap"
+				CharacterAttributes
+				{
+					"health regen" 1
+					"move speed penalty" 0.9
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b2"
+			WaitForAllDead "wave2a2"
+			Where spawnbot
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 6
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 3
+			TotalCurrency 30
+			TFBot
+			{
+				Class Soldier
+				Name "Armed Fairy"
+				Skill Normal
+				ClassIcon shotgun_reserve_lite
+				WeaponRestrictions SecondaryOnly
+				Item "The Reserve Shooter"
+				Item "Jumper's Jeepcap"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c"
+			WaitForAllDead "wave2b"
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 24
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 90
+			TFBot
+			{
+				Template T_TFBot_Giant_Pyro
+				Name "Greater Power-up Fairy"
+				Item "The Phlogistinator"
+				ClassIcon pyro_phlog
+				Attributes AlwaysFireWeapon
+				Attributes SpawnWithFullCharge
+				Tag giant
+				ItemAttributes
+				{
+					ItemName "The Phlogistinator"
+					"increase buff duration" 2
+				}
+				Taunt
+				{
+					IfHealthBelow 2000
+					Repeats 1
+					Delay 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c2"
+			WaitForAllDead "wave2b2"
+			Where spawnbot_side
+			WaitBetweenSpawns 2
+			TotalCount 24
+			MaxActive 12
+			SpawnCount 2
+			TotalCurrency 90
+			TFBot
+			{
+				Template T_TFBot_Sniper_Huntsman
+				Name "Fairy with Arrows"
+			}
+		}
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////
+	
+	//Wave 3
+	//Subwave 1
+	//- Giant Pomson Engineer + Quick-Fix medic
+	//- Demoman
+	
+	//Subwave 2
+	//- Giant Syringe Spammer Medic
+	//- Sticky Demo
+	
+	//Subwave 3
+	//- Camo-tech Kappa Leader (Giant Cloaked Pomson Engineer) + Charged Quick-Fix Medic
+	//- wy Demo
+	//- Demoman
+	
+	//Support: Eviction Heavy ("Scratchy Kappa")
+	
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+			Name "wave3a"
+			Where spawnbot
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 18
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 180
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Engineer
+					Name "Kappa-tech Inventor"
+					ClassIcon engineer_pomson
+					Item "The Pomson 6000"
+					AimLeadProjectileSpeed 1200 [$SIGSEGV]
+					ItemAttributes
+					{
+						ItemName "The Pomson 6000"
+						"fire rate bonus" 0.5
+						"faster reload rate" 0
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix
+					Name "Healer Kappa"
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a2"
+			Where spawnbot_invasion
+			WaitBetweenSpawns 2.5
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 2
+			TotalCurrency 120
+			TFBot
+			{
+				Class Demoman
+				Skill Normal
+				Name "Bomb-tossing Kappa"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave3b"
+			WaitForAllDead "wave3a"
+			Where spawnbot
+			Where spawnbot_side
+			WaitBetweenSpawns 24
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 160
+			TFBot
+			{
+				Template T_TFBot_Giant_Medic_Regen
+				Name "Raging Tengu"
+				ClassIcon medic_syringe_spammer
+				WeaponRestrictions PrimaryOnly
+				Item "Upgradeable TF_WEAPON_SYRINGEGUN_MEDIC"
+				Item "Flatliner"
+				AimAt Body [$SIGSEGV]
+				AimOffset "0 0 10" [$SIGSEGV]
+				AimLeadProjectileSpeed 1500 [$SIGSEGV]
+				Tag giant
+				Action FetchFlag [$SIGSEGV]
+				ItemAttributes
+				{
+					ItemName "Upgradeable TF_WEAPON_SYRINGEGUN_MEDIC"
+					"faster reload rate" 0
+				}
+				CharacterAttributes
+				{
+					"health regen" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b2"
+			WaitForAllDead "wave3a2"
+			Where spawnbot
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 2.5
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 2
+			TotalCurrency 120
+			TFBot
+			{
+				Class Demoman
+				Skill Normal
+				Name "Bomb-tossing Kappa"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave3c"
+			WaitForAllDead "wave3b"
+			Where spawnbot
+			WaitBeforeStarting 1
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 240
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Engineer
+					Name "Kappa-tech Leader"
+					Health 10000
+					ClassIcon engineer_pomson
+					Item "The Pomson 6000"
+					Attributes SuppressFire
+					Attributes UseBossHealthBar
+					FireWeapon [$SIGSEGV]
+					{
+						Delay 5
+						Duration 0.6
+						Cooldown 2
+					}
+					AddCond
+					{
+						Index 36
+						Delay 4
+						Duration 999
+					}
+					ItemAttributes
+					{
+						ItemName "The Pomson 6000"
+						"set item tint rgb" 8208497
+						"mod projectile heat seek power" 25
+						"mod projectile heat aim error" 15
+						"mod projectile heat aim time" 5
+						"projectile speed decreased" 0.5
+						"fire rate bonus" 0.125 //0.1s
+						"faster reload rate" 0
+						"damage bonus" 0.65
+						"projectile spread angle penalty" 12
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix
+					Attributes SpawnWithFullCharge
+					Name "Healer Kappa"
+					Item "Das Naggenvatcher"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix
+					Attributes SpawnWithFullCharge
+					Name "Healer Kappa"
+					Item "Das Naggenvatcher"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix
+					Attributes SpawnWithFullCharge
+					Name "Healer Kappa"
+					Item "Das Naggenvatcher"
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave3b2"
+			Where spawnbot_invasion
+			WaitBetweenSpawns 7
+			TotalCount 10
+			MaxActive 10
+			SpawnCount 5
+			TotalCurrency 30
+			Support Limited
+			TFBot
+			{
+				Class Heavyweapons
+				Name "Sharp Claw Kappa"
+				ClassIcon heavy_eviction_nys
+				Skill Hard
+				WeaponRestrictions MeleeOnly
+				Item "The Eviction Notice"
+				ItemAttributes
+				{
+					ItemName "The Eviction Notice"
+					"mod_maxhealth_drain_rate" 0
+				}
+			}
+		}
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////
+	
+	//Wave 4: speedy leaves
+	//Subwave 1
+	//- Major League Scout
+	//- Armored Sandman Scout
+	//- Blaster Scout
+	
+	//Subwave 2
+	//- Giant Cleaver Scout
+	//- Air Strike Burst Soldier
+	//- Burst Fire Soldier
+	
+	//Subwave 3
+	//- Giant Blaster Scout
+	//- Air Strike Burst Soldier
+	//- Shield Demo (Screen)
+	
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+			Name "wave4a"
+			Where spawnbot
+			WaitBeforeStarting 2
+			WaitBetweenSpawnsAfterDeath 6
+			TotalCount 3
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 120
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Baseball
+				Tag giant
+				Name "Baseball Tengu Captain"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a2"
+			WaitBeforeStarting 0.75
+			Where spawnbot_side
+			WaitBetweenSpawns 7
+			TotalCount 12
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 120
+			TFBot
+			{
+				Class Scout
+				Name "Bulky Baseball Tengu"
+				Skill Hard
+				Item "The Sandman"
+				Item "Fortunate Son"
+				WeaponRestrictions MeleeOnly
+				ClassIcon scout_stun_armored
+				Health 350
+				Scale 1.2
+				ItemAttributes
+				{
+					ItemName "The Sandman"
+					"effect bar recharge rate increased" 0.5
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a2"
+			Where spawnbot
+			WaitBetweenSpawns 0.75
+			TotalCount 32
+			MaxActive 8
+			SpawnCount 1
+			TotalCurrency 160
+			TFBot
+			{
+				Class Scout
+				Name "Speedy Tengu"
+				Item "Baby Face's Blaster"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave4b"
+			WaitForAllDead "wave4a"
+			Where spawnbot
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 15
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 80
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout
+				Name "Butchering Tengu Leader"
+				Health 2500
+				Item "The Flying Guillotine"
+				ClassIcon scout_cleaver_giant
+				WeaponRestrictions SecondaryOnly
+				Tag giant
+				ItemAttributes
+				{
+					ItemName "The Flying Guillotine"
+					"fire rate penalty" 1.2
+					"effect bar recharge rate increased" 0.02
+				}
+				CharacterAttributes
+				{
+					"move speed bonus" 0.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b2"
+			WaitForAllDead "wave4a2"
+			Where spawnbot_airdrop0
+			WaitBetweenSpawns 6
+			TotalCount 12
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 60
+			FirstSpawnOutput
+			{
+				Target air_warning_notxt_relay
+				Action Trigger
+			}
+			TFBot
+			{
+				Template T_TFBot_Soldier_Airstrike
+				Name "Bomber Tengu"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b2"
+			WaitForAllDead "wave4a2"
+			Where spawnbot
+			WaitBetweenSpawns 4
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 2
+			TotalCurrency 120
+			TFBot
+			{
+				Template T_TFBot_Soldier_RocketShotgun
+				Name "Eternal Tengu"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave4c"
+			WaitForAllDead "wave4b"
+			Where spawnbot
+			WaitBetweenSpawnsAfterDeath 8
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 180
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout
+				Name "Wind God Shrine Protector"
+				Health 2500
+				Item "Baby Face's Blaster"
+				Tag giant
+				AddCond [$SIGSEGV]
+				{
+					Index 32
+					Delay 0
+					Duration 99
+					IfHealthBelow 1200
+				}
+				ItemAttributes
+				{
+					ItemName "Baby Face's Blaster"
+					"lose hype on take damage" 0
+					"boost on damage" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave4b2"
+			WaitBeforeStarting 2
+			Where spawnbot_airdrop0
+			Where spawnbot_airdrop1
+			WaitBetweenSpawns 10
+			TotalCount 12
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 60
+			Support 1
+			TFBot
+			{
+				Template T_TFBot_Soldier_Burst_Airstrike
+				Name "Bomber Tengu"
+			}
+		}
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////
+	
+	//Wave 5
+	//Subwave 1
+	//- Giant Barrage Soldier
+	//- Giant Barrage Soldier + uber meds
+	//- Giant Barrage Soldier + shield meds
+	//- Combo Pyro
+	
+	//Subwave 2
+	//- Giant Heavy + uber meds
+	//- Giant Heavy + Giant Kritzkrieg Medic
+	//- Combo Pyro
+	
+	//Subwave 3
+	//- Chief Barrage Soldier ("cauldron" variant; looks at info_target + has gravity, simulates rain)
+	//Support: Ranger Engineer, Pyro
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		WaveSpawn
+		{
+			Name "wave5a1"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 40
+			TFBot
+            {
+                Template T_TFBot_Giant_Soldier_Barrage
+				Name "Greater Rocket Hell Fairy"
+            }
+		}
+		WaveSpawn
+		{
+			Name "wave5a"
+			WaitBeforeStarting 15
+			Where spawnbot
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			TotalCurrency 120
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Barrage
+					Name "Greater Rocket Hell Fairy"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_SlowRecharge
+					Name "No-Hit Fairy"
+					CharacterAttributes
+					{
+						"bot medic uber deploy delay duration" 1.5
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_SlowRecharge
+					Name "No-Hit Fairy"
+					CharacterAttributes
+					{
+						"bot medic uber deploy delay duration" 1.5
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a"
+			WaitForAllDead "wave5a1"
+			WaitBeforeStarting 2
+			Where spawnbot
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			TotalCurrency 120
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Barrage
+					Name "Greater Rocket Hell Fairy"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_SlowRecharge
+					Name "No-Hit Fairy"
+					CharacterAttributes
+					{
+						"bot medic uber deploy delay duration" 1.5
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_SlowRecharge
+					Name "No-Hit Fairy"
+					CharacterAttributes
+					{
+						"bot medic uber deploy delay duration" 1.5
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a2"
+			Where spawnbot_side
+			WaitBeforeStarting 4
+			TotalCount 18
+			MaxActive 6
+			SpawnCount 3
+			TotalCurrency 180
+			TFBot
+			{
+				Class Pyro
+				Skill Hard
+				Name "Clever Combo Fairy"
+				ClassIcon pyro_degreaser_flare
+				Item "The Degreaser"
+				Item "The Flare Gun"
+				MaxVisionRange 1200
+				UseBestWeapon 1 [$SIGSEGV]
+				ItemAttributes
+				{
+					ItemName "The Degreaser"
+					"airblast disabled" 1
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave5b"
+			WaitForAllDead "wave5a"
+			WaitBeforeStarting 4
+			Where spawnbot
+			TotalCount 5
+			MaxActive 5
+			SpawnCount 5
+			TotalCurrency 200
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons
+					Name "Greater Fairy with a gun"
+					Tag giant
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_MINIGUN"
+						"damage bonus" 1.2
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_SlowRecharge
+					Name "No-Hit Fairy"
+					CharacterAttributes
+					{
+						"bot medic uber deploy delay duration" 1.5
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_SlowRecharge
+					Name "No-Hit Fairy"
+					CharacterAttributes
+					{
+						"bot medic uber deploy delay duration" 1.5
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_SlowRecharge
+					Name "No-Hit Fairy"
+					CharacterAttributes
+					{
+						"bot medic uber deploy delay duration" 1.5
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_SlowRecharge
+					Name "No-Hit Fairy"
+					CharacterAttributes
+					{
+						"bot medic uber deploy delay duration" 1.5
+					}
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave5b2"
+			WaitForAllDead "wave5a2"
+			Where spawnbot
+			WaitBeforeStarting 4
+			WaitBetweenSpawns 6
+			TotalCount 30
+			MaxActive 10
+			SpawnCount 5
+			TotalCurrency 150
+			TFBot
+			{
+				Class Pyro
+				Skill Hard
+				Name "Clever Combo Fairy"
+				ClassIcon pyro_degreaser_flare
+				Item "The Degreaser"
+				Item "The Flare Gun"
+				MaxVisionRange 1200
+				UseBestWeapon 1 [$SIGSEGV]
+				ItemAttributes
+				{
+					ItemName "The Degreaser"
+					"airblast disabled" 1
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave5c"
+			WaitForAllSpawned "wave5b"
+			WaitBeforeStarting 10
+			Where spawnbot
+			WaitBetweenSpawns 4
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 150
+			TFBot
+			{
+				Class Soldier
+				Health 12000
+				Name "Deified Wielder of the Wind"
+				ClassIcon soldier_barrage
+                InterruptAction [$SIGSEGV]
+                {
+					Target "-5910.6 -2280.9 150.1"
+					AimTarget "ClosestPlayer"
+                    WaitUntilDone 1
+                    Delay 5
+                    Repeats 1
+                    Duration 1
+                    OnDoneChangeAttributes "Attack"
+                }
+				FireWeapon [$SIGSEGV]
+				{
+					Type "Primary"
+					Delay 1.5
+					Repeats 0
+					Duration 4
+					Cooldown 8
+					IfSeeTarget 1
+				}
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"faster reload rate" 0.1
+					"clip size upgrade atomic" 26
+					"fire rate bonus" 0.2
+					"projectile spread angle penalty" 5
+					"projectile speed decreased" 0.4
+					"stomp player force" 300
+				}
+				CharacterAttributes
+				{
+					"move speed bonus" 0.5
+					"damage force reduction" 0
+					"airblast vulnerability multiplier" 0
+					"force distribute currency on death" 1
+				}
+				Attributes MiniBoss
+				Attributes UseBossHealthBar
+				Attributes IgnoreFlag
+				Attributes IgnoreEnemies
+				EventChangeAttributes
+				{
+					Attack
+					{
+						FireWeapon [$SIGSEGV]
+						{
+							Type "Primary"
+							Delay 1.5
+							Repeats 0
+							Duration 4
+							Cooldown 8
+						}
+						InterruptAction [$SIGSEGV] // Stop current bot ai and force the bot to move to a location
+						{
+							AimTarget "-5550 -2660 893" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+							WaitUntilDone 1
+							// KillAimTarget 1 // Attack aim target (Default: 0)
+							Delay 1.5 // Time before the first task starts (Default: 10)
+							Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+							Cooldown 12 //Time between each task (Default: 10)
+							Duration 6 // How long should the ai be interrupted
+							OnDoneChangeAttributes "Attack2"
+						}
+						ItemAttributes
+						{
+							ItemName "TF_WEAPON_ROCKETLAUNCHER"
+							"faster reload rate" 0.1
+							"clip size upgrade atomic" 26
+							"fire rate bonus" 0.15
+							"blast radius decreased" 0.5
+							"projectile spread angle penalty" 18
+							"projectile speed decreased" 0.8
+							"projectile acceleration" -440
+							"projectile acceleration time" 1.2
+							"projectile gravity" 150
+							"rocket jump damage reduction" -0.01
+						}
+					}
+					Attack2
+					{
+						FireWeapon [$SIGSEGV]
+						{
+							Type "Primary"
+							Delay 1.5
+							Repeats 0
+							Duration 4
+							Cooldown 8
+						}
+						InterruptAction [$SIGSEGV] // Stop current bot ai and force the bot to move to a location
+						{
+							AimTarget "-5550 -2000 893" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+							WaitUntilDone 1
+							// KillAimTarget 1 // Attack aim target (Default: 0)
+							Delay 1.5 // Time before the first task starts (Default: 10)
+							Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+							Cooldown 12 //Time between each task (Default: 10)
+							Duration 6 // How long should the ai be interrupted
+							OnDoneChangeAttributes "Attack"
+						}
+						ItemAttributes
+						{
+							ItemName "TF_WEAPON_ROCKETLAUNCHER"
+							"faster reload rate" 0.1
+							"clip size upgrade atomic" 26
+							"fire rate bonus" 0.15
+							"blast radius decreased" 0.5
+							"projectile spread angle penalty" 18
+							"projectile speed decreased" 0.8
+							"projectile acceleration" -440
+							"projectile acceleration time" 1.2
+							"projectile gravity" 150
+							"rocket jump damage reduction" -0.01
+						}
+
+					}
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "Support"
+			Where spawnbot_invasion
+			WaitBeforeStarting 1.5
+			WaitBetweenSpawns 8
+			TotalCount 10
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 40
+			Support 1
+			TFBot
+			{
+				Class Scout
+				Name "Fairy of Fear"
+				WeaponRestrictions MeleeOnly
+				Item "The Fan O'War"
+				Skill Hard
+				ClassIcon scout_fanowar
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave5b2"
+			Where spawnbot
+			WaitBetweenSpawns 7
+			TotalCount 10
+			MaxActive 5
+			SpawnCount 5
+			Support 1
+			TFBot
+			{
+				Class Scout
+				Name "Blitz Fairy"
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave5b2"
+			Where spawnbot_side
+			WaitBetweenSpawnsAfterDeath 10
+			TotalCount 10
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			TFBot
+			{
+				Class Pyro
+				Name "Mischievous Fairy"
+				ClassIcon pyro_backburner_nys
+				Scale 1.2
+				Health 350
+				Item "The Backburner"
+				CharacterAttributes
+				{
+					"health regen" 1
+				}
+                InterruptAction [$SIGSEGV]
+                {
+					Target "-6170.6 -2270.9 180.1"
+					AimTarget "ClosestPlayer"
+					KillAimTarget 1
+                    WaitUntilDone 0
+                    Delay 1
+                    Repeats 0
+					Cooldown 10
+                    Duration 11
+                }
+			}
+		}
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////
+	
+	//Wave 6 - a bunch of giants with enhanced spamminess!
+	
+	//Subwave 1: old god
+	//- Giant Charged Soldier + Old God of the Mountain
+	//- Pomson Engie
+	//- Arrow Mastery Bowman
+	
+	//Subwave 2: new god
+	//- New God of the Mountain
+	
+	//Support: Fan O' War Scout, 
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+			Name "wave6a1"
+			WaitBeforeStarting 2
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			TotalCurrency 90
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Crit
+					Tag giant
+					SpawnTemplate powerup_logic_owned [$SIGSEGV]
+				}
+				TFBot
+				{
+					Class Medic
+					Name "Old God of the Mountain"
+					Health 4400
+					Item "The Crusader's Crossbow"
+					Item "Festive Medigun 2011"
+					Item "The Nunhood"
+					Item "The Heat of Winter"
+					Tag	giant
+					ClassIcon medic_king
+					Attributes MiniBoss
+					SpawnTemplate powerup_logic_medic [$SIGSEGV]
+					ItemAttributes
+					{
+						ItemName "Festive Medigun 2011"
+						"uber duration bonus" 999
+						"ubercharge rate bonus" 80
+						"effect cond override" 109
+						"heal rate bonus" 150
+					}
+					CharacterAttributes
+					{
+						"damage force reduction" 0.4
+						"bot medic uber health threshold" 9999
+						"airblast vulnerability multiplier" 0.4
+						"move speed bonus" 0.5
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a"
+			WaitForAllDead "wave6a1"
+			WaitForAllSpawned "wave6a2"
+			Where spawnbot_side
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			TotalCurrency 90
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons_Shotgun
+					Tag giant
+					Name "Bullet Hell Fairy of Fear"
+					SpawnTemplate powerup_logic_owned [$SIGSEGV]
+				}
+				TFBot
+				{
+					Class Medic
+					Name "Old God of the Mountain"
+					Health 4400
+					Item "The Crusader's Crossbow"
+					Item "Festive Medigun 2011"
+					Item "The Nunhood"
+					Item "The Heat of Winter"
+					Tag	giant
+					ClassIcon medic_king
+					Attributes MiniBoss
+					SpawnTemplate powerup_logic_medic [$SIGSEGV]
+					ItemAttributes
+					{
+						ItemName "Festive Medigun 2011"
+						"uber duration bonus" 8
+						"ubercharge rate bonus" 80
+						"effect cond override" 109
+						"heal rate bonus" 150
+					}
+					CharacterAttributes
+					{
+						"damage force reduction" 0.4
+						"bot medic uber health threshold" 9999
+						"airblast vulnerability multiplier" 0.4
+						"move speed bonus" 0.5
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a2"
+			WaitBeforeStarting 20
+			Where spawnbot_invasion
+			WaitBetweenSpawns 4
+			TotalCount 16
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 160
+			TFBot
+			{
+				Class Sniper
+				Name "Ace Archery Fairy"
+				Item "The Huntsman"
+				Attributes AlwaysCrit
+				ClassIcon sniper_bow_multi
+				ItemAttributes
+				{
+					ItemName "The Huntsman"
+					"arrow mastery" 1
+					"damage penalty" 0.5
+					"fire rate penalty" 1.25
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a2"
+			Where spawnbot
+			WaitBeforeStarting 22
+			WaitBetweenSpawns 4
+			TotalCount 16
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 160
+			TFBot
+			{
+				Class Engineer
+				Name "Laser-tech Kappa"
+				Skill Hard
+				Action FetchFlag [$SIGSEGV]
+				ClassIcon engineer_pomson
+				Item "The Pomson 6000"
+				AimLeadProjectileSpeed 1200 [$SIGSEGV]
+				ItemAttributes
+				{
+					ItemName "The Pomson 6000"
+					"faster reload rate" 0
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave6b"
+			WaitForAllDead "wave6a"
+			WaitForAllSpawned "wave6a2"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 1
+			TFBot
+			{
+				//Stages:
+				//- Rapid
+				//- Barrage
+				//- Slow Crit Barrage
+				Template T_TFBot_Giant_Soldier
+				Name "New God of the Mountain"
+				Health 20000
+				Attributes UseBossHealthBar
+				ClassIcon soldier_barrage_infinite
+				SpawnTemplate Teleporter_Invis [$SIGSEGV]
+				Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+				Item "Telefragger Toque"
+				Tag giant
+				ItemAttributes
+				{
+					ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+					"paintkit_proto_def_index" 241
+				}
+				ChangeAttributes
+				{
+					IfHealthBelow 15000
+					Name "Barrage"
+					Delay 0
+				}
+				ChangeAttributes
+				{
+					IfHealthBelow 7500
+					Name "Charged"
+					Delay 0
+				}
+				EventChangeAttributes
+				{
+					Default
+					{
+						ItemAttributes
+						{
+							ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+							"paintkit_proto_def_index" 241
+							"faster reload rate" 0
+							"fire rate bonus" 0.5
+							"projectile speed decreased" 0.65
+						}
+					}
+					Barrage
+					{
+						ItemAttributes
+						{
+							ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+							"paintkit_proto_def_index" 241
+							"faster reload rate" 0.25
+							"fire rate bonus" 0.2
+							"clip size upgrade atomic" 26
+							"projectile speed decreased" 0.4
+							"projectile spread angle penalty" 5
+							"damage bonus" 1.25
+						}
+					}
+					Charged
+					{
+						ItemAttributes
+						{
+							ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+							"paintkit_proto_def_index" 241
+							"faster reload rate" 0
+							"projectile lifetime" 15 //just in case some weird reflect shenanigan happens
+							"fire rate bonus" 0.1
+							"projectile speed decreased" 0.1
+							"projectile acceleration" 2200
+							"projectile acceleration time" 0.15 //total: 0.4 spd
+							"projectile acceleration start time" 0.48 //after 4 rockets
+							"projectile spread angle penalty" 15
+							"damage bonus" 1.25
+						}
+					}
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "Support"
+			WaitBeforeStarting 15
+			Where spawnbot_alt
+			WaitBetweenSpawns 16
+			TotalCount 100
+			MaxActive 4
+			SpawnCount 4
+			Support Limited
+			TFBot
+			{
+				Class Scout
+				Name "Fairy of Fear"
+				WeaponRestrictions MeleeOnly
+				Item "The Fan O'War"
+				Skill Hard
+				ClassIcon scout_fanowar
+			}
+		}
+	}
+}

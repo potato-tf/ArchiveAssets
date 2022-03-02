@@ -1,0 +1,2514 @@
+//Glory to mvm.tf
+#base robot_giant.pop
+#base robot_standard.pop
+population
+{
+	StartingCurrency	400
+	RespawnWaveTime	7
+	CanBotsAttackWhileInSpawnRoom	no
+    PrecacheModel "models/bots/boss_bot/boss_blimp.mdl" [$SIGSEGV]
+    PrecacheModel "models/bots/boss_bot/boss_blimp_damage1.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_blimp_damage2.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_blimp_damage3.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_blimp_damage_explode.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_blimp_explode.mdl" [$SIGSEGV]
+	PrecacheModel "models/props_halloween/crumpkin_loot.mdl" [$SIGSEGV]
+	PrecacheModel "models/props_halloween/crumpkin_loot_large.mdl" [$SIGSEGV]
+    EventPopfile	Halloween
+    ZombiesNoWave666 1
+    NoCritPumpkin 1 [$SIGSEGV] // No crit pumpkin on player death drop in halloween (default: 0)
+
+    ExtraTankPath [$SIGSEGV]
+    {
+        Name "blimp_path_left"
+        Node "1280 312 500"
+        Node "1280 64 672"
+        Node "1280 -240 672"
+        Node "1232 -304 672"
+        Node "1104 -304 672"
+        Node "32 -304 672"
+        Node "-1216 624 672"
+        Node "-1216 1680 672"
+        Node "-1344 1808 672"
+        Node "-1568 1808 672"
+        Node "-1696 1936 672"
+        Node "-1696 3872 672"
+        Node "-1712 3952 672"
+        Node "-1776 3984 672"
+        Node "-2144 3984 672"
+        Node "-2272 4112 672"
+        Node "-2272 5280 672"
+        Node "-2400 5408 672"
+        Node "-2872 5408 672"
+    }
+    ExtraTankPath [$SIGSEGV]
+    {
+        Name "blimp_path_right"
+        Node "1280 312 500"
+        Node "1280 64 672"
+        Node "1280 -240 672"
+        Node "1232 -304 672"
+        Node "1104 -304 672"
+        Node "32 -304 672"
+        Node "0 -288 672"
+        Node "-32 -256 672"
+        Node "-32 1376 672"
+        Node "-80 1472 672"
+        Node "-144 1520 672"
+        Node "-288 1552 672"
+        Node "-2224 1552 672"
+        Node "-2352 1680 672"
+        Node "-2352 3872 672"
+        Node "-2368 3952 672"
+        Node "-2432 3984 672"
+        Node "-3392 3984 672"
+        Node "-3520 4112 672"
+        Node "-3520 5280 672"
+        Node "-3392 5408 672"
+        Node "-3208 5408 672"
+    }
+    PointTemplates
+    {
+        logic
+        {
+            NoFixup 1
+            logic_relay //Entity classname
+			{
+				"targetname" "wave_start_relay_forcetankpath"
+				"ontrigger" "tank_path_a_1,DisableAlternatePath,0,0,-1"
+				"ontrigger" "tank_path_b_1,DisableAlternatePath,0,0,-1"
+				"OnTrigger" "bombpath_arrows_clear_relay,Trigger,0,0,-1"
+                "OnTrigger" "intel,Enable,0,0,-1"
+                "OnTrigger" "intel_2,Disable,0,0,-1"
+                "OnTrigger" "upgrade_station_forward_disable_logic,Trigger,0,0,-1"
+                "OnTrigger" "intel_3,Disable,0,0,-1"
+                "OnTrigger" "intel_timed,Disable,0,0,-1"
+                "OnTrigger" "intel_timed2,Disable,0,0,-1"
+                "OnTrigger" "intel_timed3,Disable,0,0,-1"
+			}
+            logic_auto
+            {
+                "onmapspawn" "wave_finished_relay,AddOutput,OnTrigger good_crumpkin*:Kill:1:1:-1,0,-1"
+                "onmapspawn" "drop_player_minidispenser_prop,Kill,0,0,-1"
+                "onmapspawn" "drop_player_minidispenser_override_prop,Kill,0,0,-1"
+                "onmapspawn" "intel,$SetModelOverride,models/props_td/atom_bomb.mdl,0,-1"
+            }
+            path_corner
+            {
+                "origin" "-3005 6295 338"
+                "targetname" "glow_bot_lighting_source"
+            }
+            logic_relay
+            {
+                "targetname" "make_bot_glow"
+                "ontrigger" "!activator,AddOutput,LightingOrigin glow_bot_lighting_source,0,-1"
+                "ontrigger" "!activator,AddOutput,rendercolor 64 255 64,0,-1"
+            }
+            logic_relay
+            {
+                "targetname" "large_make_bot_glow"
+                "ontrigger" "!activator,AddOutput,LightingOrigin glow_bot_lighting_source,0,-1"
+                "ontrigger" "!activator,AddOutput,rendercolor 255 145 32,0,-1"
+            }
+            filter_tf_condition
+            {
+                "condition" "65"
+                "Negated" "0"
+                "targetname" "largecrumpkinfilter"
+                "onpass" "!activator,$RemoveCond,65,0,-1"
+                "onpass" "!activator,$AddCond,33 4.8,0,-1"
+                "onpass" "!activator,$AddCond,72 4.8,0,-1"
+                
+                "onpass" "!activator,$AddItemAttribute,heal rate penalty|4|1,0,-1"
+                "onpass" "!activator,$AddItemAttribute,ubercharge rate penalty|4|1,0,-1"
+                "onpass" "!activator,$AddItemAttribute,fire rate bonus|0.5|2,0,-1"
+                "onpass" "!activator,$AddItemAttribute,headshot damage increase|3|0,0,-1"
+                "onpass" "!activator,$AddItemAttribute,Blast Radius Increased|1.4|0,0,-1"
+                "onpass" "!activator,$AddItemAttribute,Blast Radius Increased|1.4|1,0,-1"
+                "onpass" "!activator,$AddItemAttribute,engy sentry fire rate increased|0.1|3,0,-1"
+                "onpass" "!activator,$AddItemAttribute,minigun spinup time decreased|0.2|0,0,-1"
+                "onpass" "!activator,$AddItemAttribute,projectile penetration|1|0,0,-1"
+                "onpass" "!activator,$AddItemAttribute,projectile penetration|1|1,0,-1"
+                
+                "onpass" "!activator,$RemoveItemAttribute,heal rate penalty|1,4.8,-1"
+                "onpass" "!activator,$RemoveItemAttribute,ubercharge rate penalty|1,4.8,-1"
+                "onpass" "!activator,$RemoveItemAttribute,fire rate bonus|2,4.8,-1"
+                "onpass" "!activator,$RemoveItemAttribute,headshot damage increase|0,4.8,-1"
+                "onpass" "!activator,$RemoveItemAttribute,Blast Radius Increased|0,4.8,-1"
+                "onpass" "!activator,$RemoveItemAttribute,Blast Radius Increased|1,4.8,-1"
+                "onpass" "!activator,$RemoveItemAttribute,engy sentry fire rate increased|3,4.8,-1"
+                "onpass" "!activator,$RemoveItemAttribute,minigun spinup time decreased|0,4.8,-1"
+                "onpass" "!activator,$RemoveItemAttribute,projectile penetration|0,4.8,-1"
+                "onpass" "!activator,$RemoveItemAttribute,projectile penetration|1,4.8,-1"
+                
+                "onpass" "!activator,$PlaySoundToSelf,items/powerup_pickup_supernova.wav,0,-1"
+            }
+        }
+        SmallCrumpkin
+        {
+            //NoFixup 1
+            KeepAlive 1
+            OnParentKilledOutput //kill players after the carrier was dead
+			{
+				Target "enable_crumpkin"
+				Action "trigger"
+				Delay 0.00
+				Param 1
+			}
+            info_particle_system
+            {
+                "origin" "0 0 0"
+                "targetname" "good_crumpkin_botlive_particle"
+                "start_active" "1"
+                "flag_as_weather" "0"
+                "effect_name" "utaunt_arcane_green_parent"
+                "parentname" "!parent"
+            }
+            logic_relay
+            {
+                "targetname" "enable_crumpkin"
+                "ontrigger" "!parent,Color,255 255 255,0,-1"
+                "ontrigger" "!activator,Color,255 255 255,0,-1"
+                "ontrigger" "good_crumpkin_prop,Enable,0,0,-1"
+                "ontrigger" "good_crumpkin_botlive_particle,Kill,0,0,-1"
+                "ontrigger" "good_crumpkin_trigger,Enable,0,0,-1"
+                "ontrigger" "!self,Kill,0,0,-1"
+                "ontrigger" "!self,Kill,0,0,-1"
+            }
+            logic_relay
+            {
+                "targetname" "player_effect_small_crumpkin"
+                
+                "ontrigger" "!activator,$AddCond,33 3.2,0,-1"
+                
+                "ontrigger" "!activator,$AddItemAttribute,heal rate penalty|3|1,0,-1"
+                "ontrigger" "!activator,$AddItemAttribute,ubercharge rate penalty|3|1,0,-1"
+                "ontrigger" "!activator,$AddItemAttribute,fire rate bonus|0.5|2,0,-1"
+                "ontrigger" "!activator,$AddItemAttribute,headshot damage increase|3|0,0,-1"
+                
+                "ontrigger" "!activator,$RemoveItemAttribute,heal rate penalty|1,3.2,-1"
+                "ontrigger" "!activator,$RemoveItemAttribute,ubercharge rate penalty|1,3.2,-1"
+                "ontrigger" "!activator,$RemoveItemAttribute,fire rate bonus|2,3.2,-1"
+                "ontrigger" "!activator,$RemoveItemAttribute,headshot damage increase|0,3.2,-1"
+                
+                "ontrigger" "!activator,$PlaySoundToSelf,items/powerup_pickup_crits.wav,0,-1"
+                
+                "ontrigger" "!self,Kill,0,4,-1"
+            }
+            prop_dynamic
+            {
+                "angles" "0 0 0"
+                "model" "models/props_halloween/crumpkin_loot.mdl"
+                "solid" "0"
+                "DefaultAnim" "idle"
+                "targetname" "good_crumpkin_prop"
+                "StartDisabled" "1"
+            }
+            trigger_multiple
+            {
+                "targetname" "good_crumpkin_trigger"
+                "mins" "-15 -15 -20"
+                "maxs" "15 15 20"
+                "filtername" "filter_redteam"
+                "parentname" "good_crumpkin_prop"
+                "spawnflags" "1"
+                "StartDisabled" "1"
+                "onstarttouch" "player_effect_small_crumpkin,trigger,0,0,-1"
+                "onstarttouch" "good_crumpkin_prop,Kill,0,0,-1"
+                "onstarttouch" "!self,Kill,0,0,-1"
+            }
+        }
+        SmallCrumpkinHeadParticle
+        {
+            info_particle_system
+            {
+                "origin" "0 0 0"
+                "targetname" "good_crumpkin_botlive_head_particle"
+                "start_active" "1"
+                "flag_as_weather" "0"
+                "effect_name" "unusual_zap_green"
+            }
+        }
+        LargeCrumpkin
+        {
+            //NoFixup 1
+            KeepAlive 1
+            OnParentKilledOutput //kill players after the carrier was dead
+			{
+				Target "enable_large_crumpkin"
+				Action "trigger"
+				Delay 0.00
+				Param 1
+			}
+            info_particle_system
+            {
+                "origin" "0 0 0"
+                "targetname" "good_crumpkin_large_botlive_particle"
+                "start_active" "1"
+                "flag_as_weather" "0"
+                "effect_name" "utaunt_arcane_yellow_parent"
+                "parentname" "!parent"
+            }
+            logic_relay
+            {
+                "targetname" "enable_large_crumpkin"
+                "ontrigger" "!parent,Color,255 255 255,0,-1"
+                "ontrigger" "!activator,Color,255 255 255,0,-1"
+                "ontrigger" "good_crumpkin_large_prop,Enable,0,0,-1"
+                "ontrigger" "good_crumpkin_large_botlive_particle,Kill,0,0,-1"
+                "ontrigger" "good_crumpkin_large_starttrigger,Enable,0,0,-1"
+                "ontrigger" "!self,Kill,0,0,-1"
+            }
+            
+            prop_dynamic
+            {
+                "angles" "0 0 0"
+                "model" "models/props_halloween/crumpkin_loot_large.mdl"
+                "solid" "0"
+                "DefaultAnim" "idle"
+                "targetname" "good_crumpkin_large_prop"
+                "StartDisabled" "1"
+            }
+            info_particle_system
+            {
+                "origin" "0 0 4"
+                "targetname" "good_crumpkin_large_particle"
+                "start_active" "0"
+                "flag_as_weather" "0"
+                "effect_name" "powerup_supernova_explode_red"
+            }
+            trigger_multiple
+            {
+                "targetname" "good_crumpkin_large_starttrigger"
+                "mins" "-26.25 -26.25 -35"
+                "maxs" "26.25 26.25 35"
+                "filtername" "filter_redteam"
+                //"parentname" "good_crumpkin_large_prop"
+                "spawnflags" "1"
+                "StartDisabled" "1"
+                "wait" "4"
+                "onstarttouch" "good_crumpkin_large_maintrigger,enable,0,0,-1"
+                "onstarttouch" "good_crumpkin_large_particle,Start,0,0,-1"
+                "onstarttouch" "good_crumpkin_large_particle,Kill,0,1,-1"
+                "onstarttouch" "!self,Kill,0,2,-1"
+            }
+            trigger_add_tf_player_condition
+            {
+                "targetname" "good_crumpkin_large_maintrigger"
+                "mins" "-192 -192 -384"
+                "maxs" "192 192 384"
+                "filtername" "filter_redteam"
+                //"parentname" "good_crumpkin_large_prop"
+                "spawnflags" "1"
+                "condition" "65"
+                "duration" "0.5"
+                "StartDisabled" "1"
+                //"onstarttouch" "player_effect_large_crumpkin,trigger,0,0,-1"
+                "onstarttouch" "largecrumpkinfilter,testactivator,0,0,-1"
+                "onstarttouch" "good_crumpkin_large_prop,Kill,0,0,-1"
+                "onstarttouch" "!self,Kill,0,0.6,-1"
+            }
+        }
+        LargeCrumpkinHeadParticle
+        {
+            info_particle_system
+            {
+                "origin" "0 0 0"
+                "targetname" "good_crumpkin_large_botlive_head_particle"
+                "start_active" "1"
+                "flag_as_weather" "0"
+                "effect_name" "unusual_zap_yellow"
+            }
+        }
+    }
+    SpawnTemplate [$SIGSEGV] //Spawn template once the mission loads
+	{
+		Name "logic"
+		//Origin "0 0 0" //Position where to spawn the template
+		//Angles "0 0 0" //Rotation
+	}
+    
+	Templates
+	{
+        T_TFBot_Soldier_Bison_Burstfire
+		{
+			Class Soldier
+			Name "Bison Rapid Fire" //Intended to be Burst Fire, but the attribute doesn't work on bison :(
+			Item "The Righteous Bison"
+			ClassIcon soldier_bison
+			Skill Hard
+			Health 1350
+			scale 1.5
+			Attributes HoldFireUntilFullReload
+			WeaponRestrictions SecondaryOnly
+			ItemAttributes
+			{
+				ItemName "The Righteous Bison"
+				"fire rate bonus" 0.6
+				"faster reload rate" -0.6
+				"clip size bonus" 2
+			}
+			CharacterAttributes
+			{
+				"head scale" 0.7
+				"move speed bonus"	0.8
+			}
+		}
+        T_TFBot_Pyro_Jockey
+		{
+			Name	"Jockey Pyro"
+			Class	Pyro
+			ClassIcon	pyro_powerjack
+			Skill	Expert
+			WeaponRestrictions	MeleeOnly
+            Item	"the powerjack"
+            ItemAttributes
+            {
+                ItemName "the powerjack"
+                "dmg bonus vs buildings" 1.5
+                "damage causes airblast" 1
+            }
+			Item	"pyro's boron beanie"
+		}
+        T_TFBot_Giant_Pyro_Fury
+		{
+			Class Pyro
+			Name "Giant Fury Pyro"
+			ClassIcon pyro_dragon_fury_swordstone
+			Skill Expert
+			Health 3000
+            Tag bot_giant
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+            Item "The Dragon's Fury"
+            Item "Respectless Robo-Glove"
+            ItemAttributes
+            {
+                ItemName "The Dragon's Fury"
+                "damage bonus" 1.5
+            }
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 6
+			}
+		}
+        DropsSmallCrumpkin
+        {
+            SpawnTemplate "SmallCrumpkin" [$SIGSEGV]
+            SpawnTemplate [$SIGSEGV] //Spawn custom player template
+            {
+                Name "SmallCrumpkinHeadParticle"
+                Bone "bip_head"
+            }
+            FireInput [$SIGSEGV] 
+            {
+                Target "make_bot_glow" //Entity name to use
+                Action "Trigger" //Input to fire
+                Param "" //Parameter to use
+                Delay 0.2 //Delay before firing the input
+                Cooldown 1 //Cooldown between firing the input
+                Repeats 1 //How many times should the input be fired
+            }
+        }
+        DropsLargeCrumpkin
+        {
+            SpawnTemplate "LargeCrumpkin" [$SIGSEGV]
+            SpawnTemplate [$SIGSEGV] //Spawn custom player template
+            {
+                Name "LargeCrumpkinHeadParticle"
+                Bone "bip_head"
+            }
+            FireInput [$SIGSEGV] 
+            {
+                Target "large_make_bot_glow" //Entity name to use
+                Action "Trigger" //Input to fire
+                Param "" //Parameter to use
+                Delay 0.2 //Delay before firing the input
+                Cooldown 1 //Cooldown between firing the input
+                Repeats 1 //How many times should the input be fired
+            }
+        }
+	}
+	Mission
+	{
+		Objective	Engineer
+		Where	spawnbot
+		BeginAtWave	2
+		RunForThisManyWaves	1
+		InitialCooldown	10
+		CooldownTime	60
+		DesiredCount	1
+		TFBot
+		{
+			TeleportWhere	spawnbot_main
+			Template	T_TFBot_Engineer_Sentry_Teleporter
+		}
+	}
+	Mission
+	{
+		Objective	Sniper
+		Where	spawnbot_secondary
+		BeginAtWave	3
+		RunForThisManyWaves	1
+		InitialCooldown	30
+		CooldownTime	45
+		DesiredCount	2
+		TFBot
+		{
+			Template	T_TFBot_Sniper
+		}
+	}
+    Mission
+	{
+		Objective	Spy
+		Where	spawnbot_secondary
+		BeginAtWave	5
+		RunForThisManyWaves	1
+		InitialCooldown	30
+		CooldownTime	150
+		DesiredCount	6
+		TFBot
+		{
+			Template	T_TFBot_Spy
+		}
+	}
+    Mission
+	{
+		Objective	Sniper
+		Where	spawnbot_secondary
+		BeginAtWave	6
+		RunForThisManyWaves	1
+		InitialCooldown	18
+		CooldownTime	150
+		DesiredCount	5
+		TFBot
+		{
+			Template	T_TFBot_Sniper
+		}
+	}
+    Mission // sentry buster
+	{
+		Objective DestroySentries
+
+		InitialCooldown 5
+		Where spawnbot
+		BeginAtWave 1
+		RunForThisManyWaves 9
+
+		CooldownTime 27         
+
+            TFBot
+			{
+				Template T_TFBot_SentryBuster
+            }
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+        WaveSpawn
+		{
+			Name	1a
+			TotalCurrency	650
+			TotalCount	8
+			MaxActive	8
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	12
+			Where	spawnbot_secondary
+            RandomChoice //1 out of 7 chance of small crumpkin
+            {
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Bison_Burstfire
+                    AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Bison_Burstfire
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Bison_Burstfire
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Bison_Burstfire
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Bison_Burstfire
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Bison_Burstfire
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Bison_Burstfire
+                }
+            }
+		}
+		WaveSpawn
+		{
+			Name	1b
+			TotalCurrency	350
+			TotalCount	70
+			MaxActive	20
+			SpawnCount	5
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	1.5
+			Where	spawnbot
+			RandomChoice
+			{
+				TFBot
+				{
+					Class	Scout
+					Skill	Easy
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+			}
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			TotalCurrency	400
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	10
+			Where	spawnbot
+            Tank
+            {
+                Health	28000
+                Name	tank_boss
+                Speed	75
+                StartingPathTrackNode	tank_path_a_1
+                OnKilledOutput
+                {
+                    Target	boss_dead_relay
+                    Action	Trigger
+                }
+                OnBombDroppedOutput
+                {
+                    Target	boss_deploy_relay
+                    Action	Trigger
+                }
+            }
+		}
+		WaveSpawn
+		{
+			Name	2a
+			TotalCurrency	100
+			TotalCount	18
+			MaxActive	18
+			SpawnCount	18
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	10
+			Where	spawnbot_secondary
+            TFBot
+            {
+                Class	Soldier
+                Skill	Easy
+            }
+		}
+		WaveSpawn
+		{
+			Name	2b
+			TotalCurrency	100
+			TotalCount	50
+			MaxActive	18
+			SpawnCount	3
+			WaitBeforeStarting	25
+			WaitBetweenSpawns	1.75
+			Support	1
+			RandomSpawn	1
+			Where	spawnbot_main
+            RandomChoice //1 out of 18 chance to drop crumpkin
+            {
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                    Tag flank_front
+                    BehaviorModifiers Push
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                    Tag flank_back
+                    BehaviorModifiers Push
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                    AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                    Tag flank_front
+                    BehaviorModifiers Push
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Jockey
+                    Tag flank_back
+                    BehaviorModifiers Push
+                }
+            }
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			TotalCurrency	400
+			TotalCount	8
+			MaxActive	8
+			SpawnCount	2
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	30
+			Where	spawnbot
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Pyro_Fury
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	3a
+			TotalCurrency	200
+			TotalCount	36
+			MaxActive	12
+			SpawnCount	6
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	10
+			Where	spawnbot
+            RandomChoice //1 out of 9 chance for small crumpkin
+            {
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                    AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+            }
+		}
+		WaveSpawn
+		{
+			Name	3b
+			WaitForAllSpawned	3a
+			TotalCurrency	100
+			TotalCount	18
+			MaxActive	18
+			SpawnCount	1
+			WaitBeforeStarting	6
+			WaitBetweenSpawns	0.5
+			Where	spawnbot
+            TFBot
+            {
+                Template	T_TFBot_Demoman_Knight
+                Skill Expert
+            }
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			TotalCurrency	250
+			TotalCount	5
+			MaxActive	5
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	27.5
+			Where	spawnbot_secondary
+            TFBot
+            {
+                Template	T_TFBot_Giant_Scout_Fast
+            }
+		}
+		WaveSpawn
+		{
+			TotalCurrency	50
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	3
+			WaitBetweenSpawns	12.5
+			Where	spawnbot
+            TFBot
+            {
+                Template	T_TFBot_Giant_DemoMan_PrinceTavish
+            }
+		}
+        WaveSpawn
+		{
+			TotalCurrency	50
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	15.5
+			WaitBetweenSpawns	12.5
+			Where	spawnbot
+            TFBot
+            {
+                Template	T_TFBot_Giant_DemoMan_PrinceTavish
+                AddTemplate DropsLargeCrumpkin [$SIGSEGV]
+            }
+		}
+        WaveSpawn
+		{
+			TotalCurrency	150
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	1
+			WaitBeforeStarting	28
+			WaitBetweenSpawns	12.5
+			Where	spawnbot
+            TFBot
+            {
+                Template	T_TFBot_Giant_DemoMan_PrinceTavish
+            }
+		}
+        WaveSpawn
+		{
+			TotalCurrency	50
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	65.5
+			WaitBetweenSpawns	12.5
+			Where	spawnbot
+            TFBot
+            {
+                Template	T_TFBot_Giant_DemoMan_PrinceTavish
+                AddTemplate DropsLargeCrumpkin [$SIGSEGV]
+            }
+		}
+        WaveSpawn
+		{
+			TotalCurrency	200
+			TotalCount	4
+			MaxActive	4
+			SpawnCount	1
+			WaitBeforeStarting	78
+			WaitBetweenSpawns	12.5
+			Where	spawnbot
+            TFBot
+            {
+                Template	T_TFBot_Giant_DemoMan_PrinceTavish
+            }
+		}
+		WaveSpawn
+		{
+			TotalCurrency	150
+			TotalCount	32
+			MaxActive	8
+			SpawnCount	4
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	14
+			Support	1
+			Where	spawnbot
+            TFBot
+            {
+                Classicon medic_kritz
+                Name	"Kritzkrieg Medic"
+                Class	Medic
+                Skill	Expert
+                Attributes	"SpawnWithFullCharge"
+                WeaponRestrictions SecondaryOnly
+                ItemAttributes
+                {
+                    ItemName	"the kritzkrieg"
+                    "uber duration bonus"	1000
+                    "ubercharge rate bonus"	1000
+                    "heal rate bonus"	1.5
+                }
+                CharacterAttributes
+                {
+                    "bot medic uber health threshold"	200
+                }
+                Item	"the kritzkrieg"
+            }
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			TotalCurrency	200
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	10
+			Where	spawnbot
+            Tank
+            {
+                Name "tank_boss"
+                StartingPathTrackNode blimp_path_right_1
+                Health 20000
+                Speed 75
+                Skin 1
+                ClassIcon blimp2_lite  
+                DisableSmokestack 1  
+                DisableTracks 1  
+                Model "models/bots/boss_bot/boss_blimp.mdl"  
+                DisableChildModels 1 [$SIGSEGV]
+				ReplaceModelCollisions 1  
+                Gravity 0  
+                RotatePitch 0 [$SIGSEGV] // If tank should change its pitch rotation (Default: 1) 
+                EngineLoopSound "npc/combine_gunship/dropship_engine_distant_loop1.wav"   
+				PingSound "npc/combine_gunship/ping_search.wav"  
+                OnKilledOutput 
+                {
+                    Target boss_dead_relay
+                    Action Trigger
+                }
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+            }
+		}
+		WaveSpawn
+		{
+			TotalCurrency	150
+			TotalCount	24
+			MaxActive	12
+			SpawnCount	4
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	3
+			Where	spawnbot_secondary
+            RandomChoice //1 out of 12 chance for small crumpkin
+            {
+                TFBot
+                {
+                    Class	Pyro
+                    Skill	Easy
+                    AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+                }
+                TFBot
+                {
+                    Class	Pyro
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	Pyro
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	Pyro
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	Pyro
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	Pyro
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	Pyro
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	Pyro
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	Pyro
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	Pyro
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	Pyro
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	Pyro
+                    Skill	Easy
+                }
+            }
+		}
+		WaveSpawn
+		{
+			TotalCurrency	150
+			TotalCount	30
+			MaxActive	15
+			SpawnCount	1
+			WaitBeforeStarting	55
+			WaitBetweenSpawns	0.7
+			Where	spawnbot
+            RandomChoice //1 out of 28 chance for small crumpkin
+            {
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                    AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Hard
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Hard
+                }
+                TFBot
+                {
+                    Class	Soldier
+                    Skill	Expert
+                }
+            }
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			WaitForAllSpawned	6a
+			TotalCurrency	400
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	21
+			Where	spawnbot
+            TFBot //Guaranteed large crumpkin
+            {
+                Class Pyro
+                Name "Giant Spellcaster"
+                ClassIcon spellbook_lite
+                Skill Expert
+                Health 4500
+                Item "The Electric Escorter"
+                Attributes MiniBoss
+                Item "TF_WEAPON_SPELLBOOK"
+                Spell [$SIGSEGV] //Gives specified spell to bots.
+                {
+                    Delay 0 //Time before the first spell charges are given (Default: 10)
+                    Cooldown 8 //Time between each spell changes (Default: 10)
+                    Repeats 0 //How many times should spell charges be given in total (Default: 0 - Infinite)
+                    IfSeeTarget 1 //When set to 1, this task activates only when the bot can see the target player (Default: 0 - Always activate)
+                    Charges 1 //How many spell charges to give every time the spell is given (Default: 1)
+                    Limit 1 //How many spell charges the bot can store (Default: Same as charges given)
+                    Type "Fireball"
+                }
+                Spell [$SIGSEGV] //Gives specified spell to bots.
+                {
+                    Delay 4 //Time before the first spell charges are given (Default: 10)
+                    Cooldown 8 //Time between each spell changes (Default: 10)
+                    Repeats 0 //How many times should spell charges be given in total (Default: 0 - Infinite)
+                    IfSeeTarget 1 //When set to 1, this task activates only when the bot can see the target player (Default: 0 - Always activate)
+                    Charges 1 //How many spell charges to give every time the spell is given (Default: 1)
+                    Limit 1 //How many spell charges the bot can store (Default: Same as charges given)
+                    Type "Ball O' Bats"
+                }
+                CharacterAttributes
+                {
+                    "move speed bonus"	0.5
+                    "damage force reduction" 0.3
+                    "airblast vulnerability multiplier" 0.3
+                    "override footstep sound set" 6
+                    "airblast disabled" 1
+                }
+                AddTemplate DropsLargeCrumpkin [$SIGSEGV]
+            }
+		}
+        WaveSpawn
+		{
+			WaitForAllSpawned	6a
+			TotalCurrency	800
+			TotalCount	2
+			MaxActive	2
+			SpawnCount	1
+			WaitBeforeStarting	21
+			WaitBetweenSpawns	21
+			Where	spawnbot
+            TFBot
+            {
+                Class Pyro
+                Name "Giant Spellcaster"
+                ClassIcon spellbook_lite
+                Skill Expert
+                Health 4500
+                Item "The Electric Escorter"
+                Attributes MiniBoss
+                Item "TF_WEAPON_SPELLBOOK"
+                Spell [$SIGSEGV] //Gives specified spell to bots.
+                {
+                    Delay 0 //Time before the first spell charges are given (Default: 10)
+                    Cooldown 8 //Time between each spell changes (Default: 10)
+                    Repeats 0 //How many times should spell charges be given in total (Default: 0 - Infinite)
+                    IfSeeTarget 1 //When set to 1, this task activates only when the bot can see the target player (Default: 0 - Always activate)
+                    Charges 1 //How many spell charges to give every time the spell is given (Default: 1)
+                    Limit 1 //How many spell charges the bot can store (Default: Same as charges given)
+                    Type "Fireball"
+                }
+                Spell [$SIGSEGV] //Gives specified spell to bots.
+                {
+                    Delay 4 //Time before the first spell charges are given (Default: 10)
+                    Cooldown 8 //Time between each spell changes (Default: 10)
+                    Repeats 0 //How many times should spell charges be given in total (Default: 0 - Infinite)
+                    IfSeeTarget 1 //When set to 1, this task activates only when the bot can see the target player (Default: 0 - Always activate)
+                    Charges 1 //How many spell charges to give every time the spell is given (Default: 1)
+                    Limit 1 //How many spell charges the bot can store (Default: Same as charges given)
+                    Type "Ball O' Bats"
+                }
+                CharacterAttributes
+                {
+                    "move speed bonus"	0.5
+                    "damage force reduction" 0.3
+                    "airblast vulnerability multiplier" 0.3
+                    "override footstep sound set" 6
+                    "airblast disabled" 1
+                }
+            }
+		}
+		WaveSpawn
+		{
+			Name	6a
+			TotalCurrency	200
+			TotalCount	40
+			MaxActive	12
+			SpawnCount	2
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	1
+			Where	spawnbot
+			RandomChoice //1 out of 14 chance for small crumpkin
+			{
+				TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Normal
+					Item	"the direct hit"
+                    AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Normal
+					Item	"the direct hit"
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Easy
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Normal
+					Item	"the direct hit"
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Normal
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Hard
+					Item	"the direct hit"
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Normal
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Hard
+					Item	"the direct hit"
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Hard
+					Item	"the direct hit"
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Normal
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Normal
+					Item	"the direct hit"
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Hard
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Hard
+					Item	"the direct hit"
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Easy
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Hard
+					Item	"the direct hit"
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Normal
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Hard
+					Item	"the direct hit"
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Normal
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Hard
+					Item	"the direct hit"
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Normal
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Normal
+					Item	"the direct hit"
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Normal
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Hard
+					Item	"the direct hit"
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Normal
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					ClassIcon	soldier_dh_nys
+					Name	"Direct Hit Soldier"
+					Class	Soldier
+					Skill	Normal
+					Item	"the direct hit"
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Class	Scout
+					Skill	Hard
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	6a
+			TotalCurrency	100
+			TotalCount	20
+			MaxActive	5
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	1.2
+			Where	spawnbot_secondary
+            RandomChoice //1 out of 20 chance for small crumpkin
+            {
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                    AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Normal
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Easy
+                }
+                TFBot
+                {
+                    Class	HeavyWeapons
+                    Skill	Hard
+                }
+            }
+		}
+		WaveSpawn
+		{
+			WaitForAllSpawned	6a
+			TotalCurrency	300
+			TotalCount	14
+			MaxActive	8
+			SpawnCount	2
+			WaitBeforeStarting	12
+			WaitBetweenSpawns	4
+			Where	spawnbot
+			Squad
+			{
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Heavyweapons_Shotgun
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+				}
+			}
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay_forcetankpath
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			TotalCurrency	180
+			TotalCount	4
+			MaxActive	4
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	4
+			Where	spawnbot
+            TFBot
+            {
+                Template	T_TFBot_Giant_Scout_Fast
+            }
+		}
+		WaveSpawn
+		{
+			Name	7a
+			TotalCurrency	100
+			TotalCount	10
+			MaxActive	10
+			SpawnCount	10
+			WaitBeforeStarting	17
+			WaitBetweenSpawns	17
+			Where	spawnbot_secondary
+			Squad //Guaranteed large crumpkin
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Heavyweapons_Deflector
+                    AddTemplate DropsLargeCrumpkin [$SIGSEGV]
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+			}
+		}
+        WaveSpawn
+		{
+			Name	7a
+			TotalCurrency	100
+			TotalCount	10
+			MaxActive	10
+			SpawnCount	10
+			WaitBeforeStarting	34
+			WaitBetweenSpawns	17
+			Where	spawnbot_secondary
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Heavyweapons_Deflector
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+			}
+		}
+        WaveSpawn
+		{
+			Name	7a
+			TotalCurrency	120
+			TotalCount	12
+			MaxActive	6
+			SpawnCount	6
+			WaitBeforeStarting	12
+			WaitBetweenSpawns	17
+			Where	spawnbot
+            TFBot
+            {
+                Template T_TFBot_Soldier_Bison_Burstfire
+            }
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	7a
+			TotalCurrency	200
+			TotalCount	2
+			MaxActive	2
+			SpawnCount	1
+			WaitBeforeStarting	7
+			WaitBetweenSpawns	50
+			Where	spawnbot
+            Tank
+            {
+                Name "tank_boss"
+                StartingPathTrackNode "blimp_path_right_1"
+                Health 5000
+                Speed 75
+                ClassIcon blimp2_lite  
+                DisableSmokestack 1  
+                DisableChildModels 1 [$SIGSEGV]
+                DisableTracks 1
+                Skin 1
+                Model "models/bots/boss_bot/boss_blimp.mdl"  
+				ReplaceModelCollisions 1  
+                Gravity 0  
+                RotatePitch 0 [$SIGSEGV] // If tank should change its pitch rotation (Default: 1) 
+                EngineLoopSound "npc/combine_gunship/dropship_engine_distant_loop1.wav"   
+				PingSound "npc/combine_gunship/ping_search.wav"  
+                OnKilledOutput 
+                {
+                    Target boss_dead_relay
+                    Action Trigger
+                }
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+            }
+		}
+        WaveSpawn
+		{
+			WaitForAllDead	7a
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	32
+			WaitBetweenSpawns	50
+			Where	spawnbot
+            Tank
+            {
+                Name "tank_boss"
+                StartingPathTrackNode "blimp_path_left_1"
+                Health 5000
+                Speed 75
+                Skin 1
+                ClassIcon blimp2_lite 
+                DisableChildModels 1 [$SIGSEGV]                
+                DisableSmokestack 1  
+                DisableTracks 1  
+                Model "models/bots/boss_bot/boss_blimp.mdl"  
+				ReplaceModelCollisions 1  
+                Gravity 0  
+                RotatePitch 0 [$SIGSEGV] // If tank should change its pitch rotation (Default: 1) 
+                EngineLoopSound "npc/combine_gunship/dropship_engine_distant_loop1.wav"   
+				PingSound "npc/combine_gunship/ping_search.wav"  
+                OnKilledOutput 
+                {
+                    Target boss_dead_relay
+                    Action Trigger
+                }
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+            }
+		}
+        WaveSpawn
+		{
+			WaitForAllDead	7a
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	85
+			WaitBetweenSpawns	50
+			Where	spawnbot
+            Tank
+            {
+                Name "tank_boss"
+                StartingPathTrackNode "blimp_path_left_1"
+                Health 5000
+                Speed 75
+                Skin 4
+                ClassIcon blimp2_lite  
+                DisableSmokestack 1  
+                DisableTracks 1  
+                DisableChildModels 1 [$SIGSEGV]
+                Model "models/bots/boss_bot/boss_blimp.mdl"  
+				ReplaceModelCollisions 1  
+                Gravity 0  
+                RotatePitch 0 [$SIGSEGV] // If tank should change its pitch rotation (Default: 1) 
+                EngineLoopSound "npc/combine_gunship/dropship_engine_distant_loop1.wav"   
+				PingSound "npc/combine_gunship/ping_search.wav"  
+                OnKilledOutput 
+                {
+                    Target boss_dead_relay
+                    Action Trigger
+                }
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+            }
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	7a
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	19.5
+			WaitBetweenSpawns	50
+			Where	spawnbot
+            Tank
+            {
+                Health	10000
+                Name	tank_boss
+                Speed	75
+                StartingPathTrackNode tank_path_b_1
+                OnKilledOutput
+                {
+                    Target	boss_dead_relay
+                    Action	Trigger
+                }
+                OnBombDroppedOutput
+                {
+                    Target	boss_deploy_relay
+                    Action	Trigger
+                }
+            }
+		}
+        WaveSpawn
+		{
+			WaitForAllDead	7a
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	44.5
+			WaitBetweenSpawns	50
+			Where	spawnbot
+            Tank
+            {
+                Health	10000
+                Name	tank_boss
+                Speed	75
+                StartingPathTrackNode tank_path_a_1
+                OnKilledOutput
+                {
+                    Target	boss_dead_relay
+                    Action	Trigger
+                }
+                OnBombDroppedOutput
+                {
+                    Target	boss_deploy_relay
+                    Action	Trigger
+                }
+            }
+		}
+        WaveSpawn
+		{
+			WaitForAllDead	7a
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	69.5
+			WaitBetweenSpawns	70
+			Where	spawnbot
+            Tank
+            {
+                Health	10000
+                Name	tank_boss
+                Speed	75
+                Skin 1
+                StartingPathTrackNode tank_path_b_1
+                OnKilledOutput
+                {
+                    Target	boss_dead_relay
+                    Action	Trigger
+                }
+                OnBombDroppedOutput
+                {
+                    Target	boss_deploy_relay
+                    Action	Trigger
+                }
+            }
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	7a
+			TotalCurrency	300
+			TotalCount	8
+			MaxActive	8
+			SpawnCount	1
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	11.5
+			Where	spawnbot
+            RandomChoice //1 out of 4 chance for large crumpkin
+            {
+                TFBot
+                {
+                    Template	T_TFBot_Giant_Pyro_Fury
+                    AddTemplate DropsLargeCrumpkin [$SIGSEGV]
+                }
+                TFBot
+                {
+                    Template	T_TFBot_Giant_Pyro_Fury
+                }
+                TFBot
+                {
+                    Template	T_TFBot_Giant_Pyro_Fury
+                }
+                TFBot
+                {
+                    Template	T_TFBot_Giant_Pyro_Fury
+                }
+            }
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	7a
+			TotalCurrency	200
+			TotalCount	70
+			MaxActive	15
+			SpawnCount	5
+			WaitBeforeStarting	35
+			WaitBetweenSpawns	2
+			Where	spawnbot
+			RandomChoice //1 out of 15 chance for small crumpkin
+			{
+				TFBot
+				{
+					Class	Scout
+					Skill	Easy
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+                    Tag flank_front
+                    Tag flank_back
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+                    Tag flank_front
+                    BehaviorModifiers Push
+				}
+                TFBot
+				{
+					Class	Scout
+					Skill	Easy
+                    Tag flank_back
+                    BehaviorModifiers Push
+                    AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+				}
+				TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Scout_Sandman
+                    Tag flank_back
+                    BehaviorModifiers Push
+                    AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+				}
+                TFBot
+				{
+					Skill	Expert
+					Template	T_TFBot_Pyro_Jockey
+                    Tag flank_back
+                    BehaviorModifiers Push
+                    AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+				}
+			}
+		}
+	}
+}
+//mvm.tf above all

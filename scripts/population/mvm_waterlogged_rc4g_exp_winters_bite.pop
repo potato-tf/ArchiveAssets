@@ -1,0 +1,1510 @@
+#base robot_standard.pop
+#base robot_giant.pop
+#base robot_gatebot.pop
+#base robot_gettysburg.pop
+
+//Winter's Bite
+//Made by gettysburg
+//Expert
+
+gettysburg
+{
+	StartingCurrency 600
+	RespawnWaveTime 5
+	CanBotsAttackWhileInSpawnRoom No
+	Advanced 1
+	
+	Mission //Sentry Buster
+	{
+		Objective DestroySentries
+		Where spawnbot_flank
+		Where spawnbot_gate_invasion
+		Where spawnbot_mission_sentrybuster2
+		CooldownTime 30
+		
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Skill Easy
+			Item eotl_demopants
+            Attributes IgnoreEnemies
+            Attributes DisableDodge
+			WeaponRestrictions PrimaryOnly
+			Tag bot_sentrybuster
+			
+			CharacterAttributes
+			{
+				"damage force reduction" 0.2
+				"airblast vulnerability multiplier" 0.2
+				"airblast vertical vulnerability multiplier" 0
+			}
+		}
+	}
+	
+	Mission //Wave 1-2 Snipers
+	{
+		Objective Sniper
+		Where spawnbot_mission_sniper
+		Where spawnbot_mission_sniper1
+		Where spawnbot_mission_sniper2
+		DesiredCount 2
+		BeginAtWave 1
+		RunForThisManyWaves 2
+		InitialCooldown 15
+		CooldownTime 45
+		
+		TFBot
+		{
+			Template T_TFBot_Sniper_Razorback
+			Item Graybanns
+			Item "The Triggerman's Tacticals"
+			Item "The Snow Scoper"
+			Item "The Shahanshah"
+			Item concealedkiller_sniperrifle_nightowl
+			
+			ItemAttributes
+			{
+				ItemName concealedkiller_sniperrifle_nightowl
+				"set_item_texture_wear" 0.2
+				"killstreak tier" 1
+			}
+		}
+	}
+
+	Mission //Wave 5 Headshot Snipers
+	{
+		Objective Sniper
+		Where spawnbot_mission_sniper
+		Where spawnbot_mission_sniper1
+		Where spawnbot_mission_sniper2
+		DesiredCount 2
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		InitialCooldown 30
+		CooldownTime 30
+		
+		TFBot
+		{
+			Template G_Sniper_Headshot
+			Item "The Snow Scoper"
+		}
+	}
+	
+	Mission //Wave 4-5 Spies
+	{
+		Objective Spy
+		Where spawnbot_mission_sniper
+		Where spawnbot_mission_sniper1
+		Where spawnbot_mission_sniper2
+		DesiredCount 2
+		BeginAtWave 4
+		RunForThisManyWaves 2
+		InitialCooldown 30
+		CooldownTime 30
+		
+		TFBot
+		{
+			Template G_Spy
+		}
+	}
+
+	Mission //Wave 1-2 Engineers - teleports in small bots
+	{
+		Objective Engineer
+		Where spawnbot_flank
+		Where spawnbot_gate_invasion
+		Where spawnbot_gate2_invasion
+		DesiredCount 1
+		BeginAtWave 1
+		RunForThisManyWaves 2
+		InitialCooldown 15
+		CooldownTime 45
+		
+		TFBot
+		{
+			Template G_Engineer_Tele_In
+			Name "Dam Engineer"
+		}
+	}
+
+	Mission //Wave 3-5 Engineers - teleports in small bots
+	{
+		Objective Engineer
+		Where spawnbot_invasion
+		Where spawnbot_gate_invasion
+		Where spawnbot_gate2_invasion
+		DesiredCount 1
+		BeginAtWave 3
+		RunForThisManyWaves 3
+		InitialCooldown 15
+		CooldownTime 45
+		
+		TFBot
+		{
+			Template G_Engineer_Tele_In
+			Name "Dam Engineer"
+			TeleportWhere spawnbot_invasion
+			TeleportWhere spawnbot_gate_invasion
+			TeleportWhere spawnbot_gate2_invasion
+		}
+	}
+
+	Wave //Wave 1 - $900
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+
+		WaveSpawn
+		{
+			Name 1a
+			Where spawnbot_invasion
+			Where spawnbot_gate_invasion
+			Where spawnbot_gate2_invasion
+			TotalCount 24
+			SpawnCount 6
+			MaxActive 6
+			
+			WaitBetweenSpawns 15
+			
+			TotalCurrency 100
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_GateBot_Demo_Hard
+				}
+				
+				TFBot
+				{
+					Template G_Medic_QuickRecharge
+
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1b
+			Where spawnbot
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 45
+			SpawnCount 3
+			MaxActive 7
+			
+			WaitBetweenSpawns 2
+			
+			TotalCurrency 150
+			
+			TFBot
+			{
+				Template G_Sniper_Huntsman
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1c
+			Where spawnbot
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 3
+			SpawnCount 1
+			MaxActive 2
+			
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 25
+			
+			TotalCurrency 75
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_DemoMan_PrinceTavish
+					Tag bot_giant
+					Item "The King of Scotland Cape"
+					Item "eotl_demopants"
+					
+					ItemAttributes
+					{
+						ItemName "The Eyelander"
+						"killstreak tier" 2
+						"killstreak idleeffect" 1
+					}
+					
+					CharacterAttributes
+					{
+						"damage force reduction" 0.25
+						"airblast vulnerability multiplier" 0.25
+					}
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1d
+			Where spawnbot_flank
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 6
+			SpawnCount 1
+			MaxActive 2
+			
+			WaitForAllSpawned 1a
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 7
+			
+			TotalCurrency 150
+			
+			TFBot
+			{
+				Template T_TFGateBot_Heavy_IronFist
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1d
+			Where spawnbot_invasion
+			Where spawnbot_gate
+			Where spawnbot_gate2_invasion
+			TotalCount 6
+			SpawnCount 1
+			MaxActive 2
+			
+			WaitForAllSpawned 1a
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 5
+			
+			TotalCurrency 125
+			
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Fist
+				Tag bot_giant
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1e
+			Where spawnbot
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 9
+			SpawnCount 3
+			MaxActive 4
+			
+			WaitForAllDead 1c
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 15
+			
+			TotalCurrency 50
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_Heavy_Giant_Shotgun_Burst
+					Item "Weight Room Warmer"
+				}
+				
+				TFBot
+				{
+					Template T_TFBot_Medic
+					Skill Expert
+					Attributes IgnoreEnemies
+					Item "The Chronoscarf"
+
+					Tag bot_squad_member
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic
+					Skill Expert
+					Attributes IgnoreEnemies
+					Item "The Chronoscarf"
+
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1f
+			Where spawnbot_invasion
+			Where spawnbot_gate
+			Where spawnbot_gate2_invasion
+			TotalCount 24
+			SpawnCount 3
+			MaxActive 8
+			
+			WaitForAllDead 1b
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 4
+			
+			TotalCurrency 225
+			
+			RandomChoice
+			{
+				TFBot
+				{
+					Class Pyro
+					Skill Hard
+					Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+					Item "The Winter Wonderland Wrap"
+					Item "The Sub Zero Suit"
+				}
+				
+				TFBot
+				{
+					Class Pyro
+					Skill Hard
+					Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+					Item "The Winter Wonderland Wrap"
+					Item "The Sub Zero Suit"
+				}
+				
+				TFBot
+				{
+					Class Pyro
+					Skill Hard
+					Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+					Item "The Winter Wonderland Wrap"
+					Item "The Sub Zero Suit"
+				}
+				
+				TFBot
+				{
+					Class Pyro
+					Skill Hard
+					Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+					Item "The Winter Wonderland Wrap"
+					Item "The Sub Zero Suit"
+					Attributes AlwaysFireWeapon
+				}
+				
+				TFBot
+				{
+					Class Pyro
+					Skill Hard
+					Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+					Item "The Winter Wonderland Wrap"
+					Item "The Sub Zero Suit"
+					Attributes AlwaysFireWeapon
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1g
+			Where spawnbot_flank
+			Where spawnbot_gate_invasion
+			Where spawnbot_gate2_invasion
+			Support 1
+			TotalCount 3
+			SpawnCount 1
+			MaxActive 5
+			
+			WaitForAllDead 1d
+			WaitBetweenSpawns 1
+			
+			TotalCurrency 25
+			
+			TFBot
+			{
+				Template G_Sniper_Huntsman
+				Item "The Snow Scoper"
+				Item "The Triggerman's Tacticals"
+			}
+		}
+	}
+	
+	Wave //Wave 2 - $800
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+			Name 2s1
+			Where spawnbot_flank
+			Where spawnbot_gate_invasion
+			Where spawnbot_gate2_invasion
+			Support 1
+			TotalCount 25
+			SpawnCount 2
+			MaxActive 4
+			
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 6
+			
+			TotalCurrency 100
+			
+			TFBot
+			{
+				Template G_Demo_Stickybomb
+				Item "eotl_demopants"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2a
+			Where spawnbot
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 18
+			SpawnCount 6
+			MaxActive 7
+			
+			WaitBetweenSpawns 20
+			
+			TotalCurrency 100
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_Soldier_Conch_Giant
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Kritz
+					
+					Tag bot_squad_member
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Kritz
+					
+					Tag bot_squad_member
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Kritz
+					
+					Tag bot_squad_member
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Kritz
+					
+					Tag bot_squad_member
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Kritz
+					
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2a
+			Where spawnbot_invasion
+			Where spawnbot_gate
+			Where spawnbot_gate2_invasion
+			TotalCount 8
+			SpawnCount 2
+			MaxActive 3
+			
+			WaitBetweenSpawns 15
+			
+			TotalCurrency 50
+			
+			TFBot
+			{
+				Template T_TFGateBot_Heavy_IronFist
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2b
+			Where spawnbot_invasion
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			RandomSpawn 1
+			TotalCount 90
+			SpawnCount 2
+			MaxActive 8
+			
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 2
+			
+			TotalCurrency 108
+
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Scout_Sandman_FastCharge
+					Item "eotl_thermal_sleeves"
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Scout_Sandman_FastCharge
+					Item "eotl_thermal_sleeves"
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Scout_Sandman_FastCharge
+					Item "eotl_thermal_sleeves"
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Scout_Sandman_FastCharge
+					Item "eotl_thermal_sleeves"
+				}
+
+				TFBot
+				{
+					Template T_TFGateBot_Scout_Hard
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2tank1
+			TotalCount 1
+			SpawnCount 1
+			
+			WaitForAllDead 2a
+			WaitBeforeStarting 5
+			
+			FirstSpawnWarningSound "mvm/mvm_tank_start.wav"
+			
+			TotalCurrency 92
+			
+			Tank
+			{
+				Name tankboss
+				Speed 75
+				Health 22000
+				StartingPathTrackNode boss_path_1
+				
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name 2ca
+			Where spawnbot_right
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 10
+			SpawnCount 5
+			MaxActive 6
+			
+			WaitForAllDead 2a
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 25
+			
+			TotalCurrency 125
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_GateBot_Demo_Stickybomb_Giant
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Kritz
+
+					Tag bot_squad_member
+				}
+
+				TFBot
+				{
+					Template G_Medic_Kritz
+
+					Tag bot_squad_member
+				}
+
+				TFBot
+				{
+					Template G_Medic_Kritz
+
+					Tag bot_squad_member
+				}
+
+				TFBot
+				{
+					Template G_Medic_Kritz
+
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2cb
+			Where spawnbot_left
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 2
+			SpawnCount 2
+			MaxActive 2
+			
+			WaitForAllDead 2ca
+			WaitBeforeStarting 6
+			
+			TotalCurrency 225
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_Soldier_Rapid_Giant
+				}
+				
+				TFBot
+				{
+					Template G_Medic_QuickFix_Regen_Giant
+					
+					Tag bot_squad_member
+				}
+			}
+		}
+	}
+	
+	Wave //Wave 3 - $800
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+			Name 3s
+			Where spawnbot_flank
+			Where spawnbot_gate_invasion
+			Where spawnbot_gate2_invasion
+			Support 1
+			TotalCount 10
+			SpawnCount 1
+			MaxActive 2
+			
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 8
+			
+			TotalCurrency 60
+			
+			TFBot
+			{
+				Template G_Soldier_Charged
+			}
+		}
+
+		WaveSpawn
+		{
+			Name 3s
+			Where spawnbot_invasion
+			Where spawnbot_gate_invasion
+			Where spawnbot_gate2_invasion
+			Support 1
+			TotalCount 3
+			SpawnCount 1
+			MaxActive 1
+
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 12
+
+			TotalCurrency 65
+
+			TFBot
+			{
+				Template T_TFBot_Medic
+				Item "The Chronoscarf"
+				Skill Expert
+				Attributes IgnoreEnemies
+				Attributes IgnoreFlag
+
+				Tag bot_squad_member
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3a
+			Where spawnbot
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 8
+			SpawnCount 1
+			MaxActive 3
+			
+			WaitBetweenSpawns 18
+			
+			TotalCurrency 200
+			
+			RandomChoice
+			{
+				TFBot
+				{
+					Template G_Heavy_Heater_Giant
+					Item "Weight Room Warmer"
+				}
+
+				TFBot
+				{
+					Template G_Pyro_Backburner_Giant
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3b
+			Where spawnbot_flank
+			Where spawnbot_gate
+			Where spawnbot_gate2_invasion
+			TotalCount 24
+			SpawnCount 2
+			MaxActive 6
+			
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 3
+			
+			TotalCurrency 200
+
+			Squad
+			{
+				TFBot
+				{
+					Template G_Gatebot_Heavy_Heater
+				}
+				
+				TFBot
+				{
+					Template G_Medic_QuickRecharge
+
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3b
+			Where spawnbot_invasion
+			Where spawnbot_gate
+			Where spawnbot_gate2_invasion
+			TotalCount 30
+			SpawnCount 5
+			MaxActive 6
+			
+			WaitBeforeStarting 5
+			
+			TotalCurrency 105
+			
+			TFBot
+			{
+				Class Pyro
+				Skill Normal
+				Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+				Item "The Winter Wonderland Wrap"
+				Item "The Sub Zero Suit"
+				Attributes AlwaysCrit
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c
+			Where spawnbot_invasion
+			Where spawnbot_gate_invasion
+			Where spawnbot_gate2_invasion
+			TotalCount 14
+			SpawnCount 7
+			MaxActive 7
+			
+			WaitForAllSpawned 3a
+			WaitForAllDead 3b
+			
+			TotalCurrency 85
+			
+			TFBot
+			{
+				Template T_TFBot_Soldier_Extended_Buff_Banner
+				Item "Merc's Pride Scarf"
+				
+				CharacterAttributes
+				{
+					"increase buff duration" 900
+					"deploy time increased" 0.33
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c
+			Where spawnbot_invasion
+			Where spawnbot_gate_invasion
+			Where spawnbot_gate2_invasion
+			TotalCount 14
+			SpawnCount 7
+			MaxActive 7
+			
+			WaitForAllSpawned 3a
+			WaitForAllDead 3b
+			WaitBeforeStarting 2
+			
+			TotalCurrency 85
+			
+			TFBot
+			{
+				Template T_TFBot_Soldier_Extended_Concheror
+				Item "Merc's Pride Scarf"
+				
+				CharacterAttributes
+				{
+					"increase buff duration" 900
+					"deploy time increased" 0.33
+				}
+			}
+		}
+	}
+	
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+			Name 4a
+			Where spawnbot
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 2
+			
+			WaitBetweenSpawns 25
+			
+			TotalCurrency 100
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_GateBot_Heavy_Giant
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Uber_Giant
+					Item "The Chronoscarf"
+
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 4b
+			Where spawnbot_invasion
+			Where spawnbot_gate
+			Where spawnbot_gate2_invasion
+			TotalCount 16
+			SpawnCount 2
+			MaxActive 4
+			
+			WaitBetweenSpawns 2
+			WaitBeforeStarting 10
+			
+			TotalCurrency 18
+			
+			Squad
+			{
+				TFBot
+				{
+					Class Soldier
+					Skill Hard
+					Item "Merc's Pride Scarf"
+				}
+				
+				TFBot
+				{
+                    Name "Big Heal Medic"
+					Template T_TFBot_Medic_BigHeal
+					Skill Expert
+					Attributes IgnoreEnemies
+					WeaponRestrictions SecondaryOnly
+					Item "Medic's Mountain Cap"
+					Item "Das Metalmeatencasen"
+					
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 4b
+			Where spawnbot_invasion
+			Where spawnbot_gate
+			Where spawnbot_gate2_invasion
+			TotalCount 18
+			SpawnCount 2
+			MaxActive 4
+			
+			WaitBetweenSpawns 2
+			WaitBeforeStarting 10
+			
+			TotalCurrency 18
+			
+			TFBot
+			{
+				Template G_GateBot_Pyro_Hard
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 4ca
+			Where spawnbot
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 4
+			SpawnCount 1
+			MaxActive 2
+			
+			WaitForAllDead 4a
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 12
+			
+			TotalCurrency 164
+			
+			TFBot
+			{
+				Template G_GateBot_Soldier_Backup_Giant
+			}
+		}
+
+		WaveSpawn
+		{
+			Name dummy
+			
+			WaitForAllDead 4ca
+
+			FirstSpawnOutput
+			{
+				Target intel
+				Action ForceReset
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 4cb
+			Where spawnbot
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 4
+			SpawnCount 2
+			MaxActive 4
+			
+			WaitForAllDead 4ca
+			WaitBetweenSpawns 16
+			WaitBeforeStarting 2
+			
+			TotalCurrency 75
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_Soldier_BurstFire_Giant
+                    Attributes AlwaysCrit
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Uber_Giant
+					Item "The Chronoscarf"
+
+					Tag bot_squad_member
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name 4d
+			Where spawnbot_flank
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 6
+			SpawnCount 1
+			MaxActive 1
+			
+			WaitForAllDead 4a
+			WaitBeforeStarting 2
+			WaitBetweenSpawnsAfterDeath 7
+			
+			TotalCurrency 35
+			
+			TFBot
+			{
+				Template G_Scout_Giant
+				Item "EOTL_thermal_sleeves"
+				Item "Snowwing"
+			}
+		}
+
+		WaveSpawn
+		{
+			Name 4e
+			Where spawnbot
+			Where spawnbot_gate_invasion
+			Where spawnbot_gate2_invasion
+			TotalCount 16
+			SpawnCount 2
+			MaxActive 4
+			
+			WaitForAllDead 4b
+			WaitBeforeStarting 2
+			
+			TotalCurrency 40
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Demo_Burst
+					Item "The Iron Bomber"
+					Item "eotl_demopants"
+					Item "Scotch Bonnet"
+					Item "The Hurt Locher"
+					
+					ItemAttributes
+					{
+						ItemName "The Iron Bomber"
+						"reload time increased" 1.75
+						"fire rate bonus" 0.05
+						"clip size penalty" 0.5
+						"projectile spread angle penalty" 3
+					}
+				}
+				
+				TFBot
+				{
+                    Name "Big Heal Medic"
+					Template T_TFBot_Medic_BigHeal
+					Skill Expert
+					Attributes IgnoreEnemies
+					WeaponRestrictions SecondaryOnly
+					Item "Medic's Mountain Cap"
+					Item "Das Metalmeatencasen"
+					
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 4e
+			Where spawnbot_flank
+			Where spawnbot_gate
+			Where spawnbot_gate2_invasion
+			TotalCount 20
+			SpawnCount 2
+			MaxActive 4
+			
+			WaitForAllDead 4b
+			WaitBeforeStarting 2
+			
+			TotalCurrency 150
+			
+			Squad
+			{
+				TFBot
+				{
+					Name "Backburner Pyro"
+					Class Pyro
+					Skill Hard
+					Attributes AlwaysFireWeapon
+					Item "The Backburner"
+					Item "The Winter Wonderland Wrap"
+					Item "The Sub Zero Suit"
+					Item "Pyro Helm"
+					
+					ItemAttributes
+					{
+						ItemName "The Backburner"
+						"lunchbox adds minicrits" 2
+						"flame_drag" 4
+					}
+				}
+				
+				TFBot
+				{
+                    Name "Big Heal Medic"
+					Template T_TFBot_Medic_BigHeal
+					Skill Expert
+					Attributes IgnoreEnemies
+					WeaponRestrictions SecondaryOnly
+					Item "Medic's Mountain Cap"
+					Item "Das Metalmeatencasen"
+					
+					Tag bot_squad_member
+				}
+			}
+		}
+	}
+	
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+
+		WaveSpawn
+		{
+			Name 5tanks1
+			TotalCount 1
+			SpawnCount 1
+			
+			WaitBeforeStarting 9
+			WaitForAllDead 5ba
+			
+			TotalCurrency 32
+			
+			Tank
+			{
+				Name tankboss
+				Speed 75
+				Health 40000
+				StartingPathTrackNode boss_path_1
+				
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5aa
+			Where spawnbot
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 2
+			SpawnCount 2
+			MaxActive 2
+			
+			WaitBeforeStarting 4
+			TotalCurrency 50
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_Heavy_Giant_Deflector
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Uber_Giant
+					Item "The Chronoscarf"
+
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5ba
+			Where spawnbot_flank
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 2
+			SpawnCount 2
+			MaxActive 2
+			
+			TotalCurrency 50
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_GateBot_Demo_Stickybomb_Giant
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Kritz_Giant
+
+                    Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5ab
+			Where spawnbot_flank
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 2
+			SpawnCount 2
+			MaxActive 2
+			
+			WaitForAllDead 5ba
+			
+			TotalCurrency 50
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_GateBot_Heavy_Deflector_Giant
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Uber_Giant
+					Item "The Chronoscarf"
+
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5bb
+			Where spawnbot
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 2
+			SpawnCount 2
+			MaxActive 2
+			
+			WaitForAllDead 5ba
+			WaitBeforeStarting 8
+			
+			TotalCurrency 50
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_Demo_Stickybomb_Giant
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Kritz_Giant
+					
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5ac
+			Where spawnbot
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 2
+			SpawnCount 2
+			MaxActive 2
+			
+			WaitForAllDead 5bb
+			
+			TotalCurrency 50
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_Heavy_Giant_Deflector
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Uber_Giant
+					Item "The Chronoscarf"
+
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5bc
+			Where spawnbot
+			Where spawnbot_gate
+			Where spawnbot_gate2
+			TotalCount 2
+			SpawnCount 2
+			MaxActive 2
+			
+			WaitForAllSpawned 5ac
+			WaitBeforeStarting 12
+			
+			TotalCurrency 25
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_Demo_Stickybomb_Giant
+				}
+				
+				TFBot
+				{
+					Template G_Medic_Kritz_Giant
+					
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5s1
+			Where spawnbot_invasion
+			Where spawnbot_gate_invasion
+			Where spawnbot_gate2_invasion
+			Support 1
+			TotalCount 20
+			SpawnCount 2
+			MaxActive 5
+			
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 2
+			
+			TotalCurrency 87
+			
+			Squad
+			{
+				TFBot
+				{
+					Template G_Soldier_Direct_Hit
+				}
+				
+				TFBot
+				{
+                    Name "Big Heal Medic"
+					Template T_TFBot_Medic_BigHeal
+					Skill Expert
+					Attributes IgnoreEnemies
+					WeaponRestrictions SecondaryOnly
+					Item "Medic's Mountain Cap"
+					Item "Das Metalmeatencasen"
+					
+					Tag bot_squad_member
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5s2
+			Where spawnbot_invasion
+			Where spawnbot_gate_invasion
+			Where spawnbot_gate2_invasion
+			Support 1
+			TotalCount 6
+			SpawnCount 3
+			MaxActive 6
+			
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 8
+			
+			TotalCurrency 6
+			
+			TFBot
+			{
+				Name "Pistol Scout"
+				Class Scout
+				Skill Hard
+				WeaponRestrictions SecondaryOnly
+				Item "eotl_thermal_sleeves"
+				Item "Upgradeable TF_WEAPON_PISTOL"
+			}
+		}
+	}
+}

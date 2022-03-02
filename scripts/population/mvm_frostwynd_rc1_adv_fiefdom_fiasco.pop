@@ -1,0 +1,1425 @@
+// [U:1:169916051]
+//
+// Fiefdom Fiasco (for mvm_frostwynd_rc1)
+// Advanced
+//
+// By Swordstone
+// Map by Signalmax
+//
+// Made as an entry in the Madness vs. Machines MvM contest
+// 
+// Version 1.3.3
+
+#base robot_frostwynd.pop
+#base robot_custom_weapons.pop
+
+WaveSchedule
+{
+	// Init
+	StartingCurrency 800
+	RespawnWaveTime 4
+	CanBotsAttackWhileInSpawnRoom no
+	Advanced 1
+	
+	// No templates: all bots are in the frostwynd pop
+	
+	// Missions
+	Mission // Spies Waves 4, 5 & 6
+	{
+		Where spawnbot
+		Objective Spy
+		InitialCooldown 60
+		BeginAtWave 4
+		RunForThisManyWaves 3
+		CooldownTime 40
+		DesiredCount 3
+		TFBot
+		{
+			Template FW_Spy
+		}
+	}
+	Mission // Longshot Snipers Waves 3
+	{
+		Where spawnbot_right
+		Objective Sniper
+		InitialCooldown 45
+		BeginAtWave 3
+		RunForThisManyWaves 1
+		CooldownTime 30
+		DesiredCount 2
+		TFBot
+		{
+			Template FW_Sniper_Longshot
+		}
+	}
+	Mission // Longshot Snipers Wave 5
+	{
+		Where spawnbot_right
+		Objective Sniper
+		InitialCooldown 30
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		CooldownTime 25
+		DesiredCount 3
+		TFBot
+		{
+			Template FW_Sniper_Longshot
+		}
+	}
+	
+	// Waves
+	Wave // Wave 1 - 800 credits
+	{
+		StartWaveOutput
+		{
+			Target wave_start_endurance_relay
+			Action trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaitWhenDone 65
+		Checkpoint Yes
+		WaveSpawn // 1A - Scouts
+		{
+			Name "wave1a"
+			Where spawnbot_right
+			TotalCount 30
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 8
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Scout
+			}
+		}
+		WaveSpawn // 1A2 - Disciplinary Soldiers
+		{
+			Name "wave1a2"
+			Where spawnbot_right
+			TotalCount 20
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 6
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Soldier_Disciplinary
+			}
+		}
+		WaveSpawn // 1B - Huntsmen
+		{
+			Name "wave1b"
+			Where spawnbot_left
+			TotalCount 12
+			MaxActive 3
+			SpawnCount 3
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 3
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Sniper_Huntsman
+			}
+		}
+		WaveSpawn // 1C - Flare Champions
+		{
+			Name "wave1c"
+			Where spawnbot
+			TotalCount 6
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 5
+			TotalCurrency 200
+			TFBot
+			{
+				Template FW_Pyro_Champion_Flaregun
+			}
+		}
+		WaveSpawn // 1C - Fragment Pyros
+		{
+			Name "wave1c"
+			Where spawnbot
+			TotalCount 10
+			MaxActive 8
+			SpawnCount 1
+			WaitForAllSpawned "wave1b"
+			WaitBetweenSpawns 2
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Pyro_Volcanic
+			}
+		}
+		WaveSpawn // 1D - Sandman Scouts
+		{
+			Name "wave1d"
+			Where spawnbot_left
+			TotalCount 15
+			MaxActive 9
+			SpawnCount 3
+			WaitForAllSpawned "wave1c"
+			WaitBetweenSpawns 10
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Scout_Sandman
+			}
+		}
+		WaveSpawn // 1D - Demoknights
+		{
+			Name "wave1d"
+			Where spawnbot_right
+			TotalCount 20
+			MaxActive 6
+			SpawnCount 1
+			WaitForAllSpawned "wave1c"
+			WaitBetweenSpawns 2
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Demoman_Knight
+			}
+		}
+		WaveSpawn // 1D - Giant Soldiers
+		{
+			Name "wave1d"
+			Where spawnbot
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitForAllSpawned "wave1c"
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 10
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Giant_Pyro_Volcanic
+			}
+		}
+		WaveSpawn // 1E - Giant Demoknights
+		{
+			Name "wave1e"
+			Where spawnbot
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 4
+			WaitForAllSpawned "wave1d"
+			WaitBetweenSpawns 12
+			TotalCurrency 50
+			Squad 
+			{
+				TFBot
+				{
+					Template FW_Giant_Demoman_Knight
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+			}
+			
+		}
+		WaveSpawn // 1E - Buff Soldiers
+		{
+			Name "wave1e"
+			Where spawnbot_right
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 2
+			WaitForAllSpawned "wave1d"
+			WaitBetweenSpawns 3
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Soldier_Buff
+			}
+		}
+		WaveSpawn // 1S - Support Milk Scouts
+		{
+			Name "wave1s"
+			Where spawnbot
+			TotalCount 10
+			MaxActive 4
+			SpawnCount 2
+			WaitForAllSpawned "wave1c"
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 8
+			Support 1
+			TFBot
+			{
+				Template FW_Scout_Milk
+			}
+		}
+	}	
+	Wave // Wave 2 - 900 credits
+	{
+		StartWaveOutput
+		{
+			Target wave_start_endurance_relay
+			Action trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaitWhenDone 65
+		Checkpoint Yes
+		WaveSpawn // 2A - FoS Heavies
+		{
+			Name "wave2a"
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 24
+			MaxActive 9
+			SpawnCount 3
+			WaitBetweenSpawns 8
+			TotalCurrency 200
+			TFBot
+			{
+				Template FW_Heavy_Champion_Steel
+			}
+		}
+		WaveSpawn // 2A - Fan-O-War Scouts
+		{
+			Name "wave2a"
+			Where spawnbot
+			TotalCount 15
+			MaxActive 4
+			SpawnCount 2
+			WaitBetweenSpawns 5
+			WaitBeforeStarting 10
+			TotalCurrency 50
+			Support 1
+			TFBot
+			{
+				Template FW_Scout_Fan
+			}
+		}
+		WaveSpawn // 2B - Giant Cannon Demos
+		{
+			Name "wave2bdemos"
+			Where spawnbot
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 4
+			WaitBetweenSpawns 15
+			WaitBeforeStarting 30
+			TotalCurrency 250
+			Squad
+			{
+				TFBot
+				{
+					Template FW_Giant_Demoman_Cannon
+				}
+				TFBot
+				{
+					Template FW_Medic_Kritz
+				}
+				TFBot
+				{
+					Template FW_Medic_Kritz
+				}
+				TFBot
+				{
+					Template FW_Medic_Kritz
+				}
+			}
+		}
+		WaveSpawn // 2B - KGB Heavies
+		{
+			Name "wave2bheavies"
+			Where spawnbot_left
+			TotalCount 16
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 30
+			WaitBetweenSpawns 3
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Heavy_KGB
+			}
+		}
+		WaveSpawn // 2C - Giant Equalizer Soldiers
+		{
+			Name "wave2c"
+			Where spawnbot
+			TotalCount 15
+			MaxActive 10
+			SpawnCount 5
+			WaitForAllSpawned "wave2bdemos"
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 10
+			TotalCurrency 100
+			Squad
+			{
+				TFBot
+				{
+					Template FW_Giant_Soldier_Equalizer
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+			}
+		}
+		WaveSpawn // 2C - Tide Turner Demos
+		{
+			Name "wave2cdemoknights"
+			Where spawnbot_right
+			Where spawnbot_left
+			TotalCount 40
+			MaxActive 6
+			SpawnCount 2
+			WaitForAllSpawned "wave2bheavies"
+			WaitBetweenSpawns 5
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Demoman_Turner
+			}
+		}
+		WaveSpawn // 2D - Giant Scouts
+		{
+			Name "wave2d"
+			Where spawnbot_right
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllSpawned "wave2cdemoknights"
+			WaitBetweenSpawns 20
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Giant_Scout
+			}
+		}
+		WaveSpawn // 2D - Basher Scouts
+		{
+			Name "wave2d"
+			Where spawnbot
+			Where spawnbot_left
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 3
+			WaitForAllSpawned "wave2cdemoknights"
+			WaitBetweenSpawns 7
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Scout_Basher
+			}
+		}
+		WaveSpawn // 2S - Flaregun Support
+		{
+			Name "wave2s"
+			Where spawnbot_right
+			TotalCount 20
+			MaxActive 2
+			SpawnCount 1
+			WaitForAllSpawned "wave2bdemos"
+			WaitBetweenSpawns 6
+			Support 1
+			TFBot
+			{
+				Template FW_Pyro_Flaregun
+			}
+		}
+	}
+	Wave // Wave 3 - 900 credits
+	{
+		StartWaveOutput
+		{
+			Target wave_start_endurance_relay
+			Action trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaitWhenDone 65
+		Checkpoint Yes
+		WaveSpawn // 3A - Champion Vile Snipers
+		{
+			Name "wave3asnipers"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 1
+			WaitBetweenSpawns 8
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Sniper_Champion_Vile
+			}
+		}
+		WaveSpawn // 3A - Sandman Scouts
+		{
+			Name "wave3a"
+			Where spawnbot_right
+			Where spawnbot_left
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 4
+			WaitBetweenSpawns 10
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Scout_Sandman
+			}
+		}
+		WaveSpawn // 3B - Champion Powerjacks
+		{
+			Name "wave3bpyros"
+			Where spawnbot_right
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 2
+			WaitBetweenSpawns 10 
+			WaitForAllSpawned "wave3asnipers"
+			TotalCurrency 150
+			TFBot
+			{
+				Template FW_Pyro_Champion_Powerjack
+			}
+		}
+		WaveSpawn // 3B - Buff Soldiers
+		{
+			Name "wave3bsoldiers"
+			Where spawnbot
+			TotalCount 15
+			MaxActive 6
+			SpawnCount 3
+			WaitBetweenSpawns 8 
+			WaitForAllSpawned "wave3asnipers"
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Soldier_Buff
+			}
+		}
+		WaveSpawn // 3B - Caber Demos
+		{
+			Name "wave3b"
+			Where spawnbot_left
+			TotalCount 10
+			MaxActive 4
+			SpawnCount 2
+			WaitBetweenSpawns 12 
+			WaitBeforeStarting 10
+			WaitForAllSpawned "wave3asnipers"
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Demoman_Caber
+			}
+		}
+		WaveSpawn // 3C - Giant Warrior Heavies
+		{
+			Name "wave3cwarriors"
+			Where spawnbot_left
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBetweenSpawns 20 
+			WaitBeforeStarting 5
+			WaitForAllSpawned "wave3bpyros"
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Giant_Heavy_Warrior
+			}
+		}
+		WaveSpawn // 3C - Gnome Heavies
+		{
+			Name "wave3c"
+			Where spawnbot_right
+			TotalCount 18
+			MaxActive 6
+			SpawnCount 3
+			WaitBetweenSpawns 10
+			WaitForAllSpawned "wave3bpyros"
+			TotalCurrency 50	
+			TFBot 
+			{
+				Template FW_Heavy_Gnome
+			}
+		}
+		WaveSpawn // 3D - Giant Flametossers & Champion Powerjacks
+		{
+			Name "wave3dpyros"
+			Where spawnbot
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 3
+			WaitBetweenSpawns 20
+			WaitBeforeStarting 10
+			WaitForAllSpawned "wave3cwarriors"
+			TotalCurrency 50
+			Squad 
+			{
+				TFBot
+				{
+					Template FW_Giant_Pyro_Flametosser
+				}
+				TFBot 
+				{
+					Template FW_Pyro_Champion_Powerjack
+				}
+				TFBot 
+				{
+					Template FW_Pyro_Champion_Powerjack
+				}
+			}
+		}
+		WaveSpawn // 3D - Milk Scouts
+		{
+			Name "wave3dscouts"
+			Where spawnbot_right
+			Where spawnbot_left
+			TotalCount 30
+			MaxActive 10
+			SpawnCount 4
+			WaitBetweenSpawns 10
+			WaitForAllSpawned "wave3cwarriors"
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Scout_Milk
+			}
+		}
+		WaveSpawn // 3E - Tank
+		{
+			Name "wave3etank"
+			TotalCount 1
+			WaitBeforeStarting 2
+			WaitForAllDead "wave3dpyros"
+			TotalCurrency 50
+			Tank
+			{
+				Name Tank
+				Health 20000
+				Speed 74
+				StartingPathTrackNode "tankpath"
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+		WaveSpawn // 3E - Flare Pyros
+		{
+			Name "wave3e"
+			Where spawnbot_right
+			Where spawnbot
+			TotalCount 20
+			MaxActive 12
+			SpawnCount 4
+			WaitBetweenSpawns 8 
+			WaitForAllSpawned "wave3dpyros"
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Pyro_Flaregun
+			}
+		}
+		WaveSpawn // 3F - Giant Charge Demoknights
+		{
+			Name "wave3f"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBetweenSpawns 10
+			WaitBeforeStarting 7
+			WaitForAllDead "wave3dpyros"
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Giant_Demoman_Charge
+			}
+		}
+		WaveSpawn // 3S - Support Demoknights
+		{
+			Name "wave3s"
+			Where spawnbot_right
+			Where spawnbot_left
+			Where spawnbot
+			MaxActive 4
+			SpawnCount 1
+			WaitBetweenSpawns 5
+			TotalCurrency 50
+			Support 1
+			TFBot
+			{
+				Template FW_Demoman_Knight
+			}
+		}
+	}
+	Wave // Wave 4 - 1000 credits
+	{
+		StartWaveOutput
+		{
+			Target wave_start_endurance_relay
+			Action trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaitWhenDone 65
+		Checkpoint Yes
+		WaveSpawn // 4A - Angry Mob
+		{
+			Name "wave4amob"
+			Where spawnbot_left
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 8
+			TotalCurrency 50
+			RandomChoice
+			{
+				TFBot
+				{
+					Template FW_Demoman_Knight
+					Name "Angry Mobber"
+					CharacterAttributes
+					{
+						"move speed bonus" 1.2
+					}
+				}
+				TFBot
+				{
+					Template FW_Soldier_Disciplinary
+					Name "Angry Mobber"
+					CharacterAttributes
+					{
+						"move speed bonus" 1.2
+					}
+				}
+				TFBot
+				{
+					Template FW_Pyro_Volcanic
+					Name "Angry Mobber"
+					CharacterAttributes
+					{
+						"move speed bonus" 1.2
+					}
+				}
+			}
+		}
+		WaveSpawn // 4A - Angry Mob
+		{
+			Name "wave4amob"
+			Where spawnbot
+			TotalCount 7
+			MaxActive 7
+			SpawnCount 7
+			TotalCurrency 50
+			RandomChoice
+			{
+				TFBot
+				{
+					Template FW_Demoman_Knight
+					Name "Angry Mobber"
+					CharacterAttributes
+					{
+						"move speed bonus" 1.2
+					}
+				}
+				TFBot
+				{
+					Template FW_Soldier_Disciplinary
+					Name "Angry Mobber"
+					CharacterAttributes
+					{
+						"move speed bonus" 1.2
+					}
+				}
+				TFBot
+				{
+					Template FW_Pyro_Volcanic
+					Name "Angry Mobber"
+					CharacterAttributes
+					{
+						"move speed bonus" 1.2
+					}
+				}
+			}
+		}
+		WaveSpawn // 4A - Angry Mob
+		{
+			Name "wave4amob"
+			Where spawnbot_right
+			TotalCount 7
+			MaxActive 7
+			SpawnCount 7
+			TotalCurrency 50
+			RandomChoice
+			{
+				TFBot
+				{
+					Template FW_Demoman_Knight
+					Name "Angry Mobber"
+					CharacterAttributes
+					{
+						"move speed bonus" 1.2
+					}
+				}
+				TFBot
+				{
+					Template FW_Soldier_Disciplinary
+					Name "Angry Mobber"
+					CharacterAttributes
+					{
+						"move speed bonus" 1.2
+					}
+				}
+				TFBot
+				{
+					Template FW_Pyro_Volcanic
+					Name "Angry Mobber"
+					CharacterAttributes
+					{
+						"move speed bonus" 1.2
+					}
+				}
+			}
+		}
+		WaveSpawn // 4C - Champion Huntsmen
+		{
+			Name "wave4chuntsmen"
+			Where spawnbot
+			TotalCount 6
+			MaxActive 3
+			SpawnCount 1
+			WaitBetweenSpawns 8
+			WaitForAllDead "wave4amob"
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Sniper_Champion_Huntsman
+			}
+		}
+		WaveSpawn // 4C - Conch Soldiers
+		{
+			Name "wave4c"
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 15
+			MaxActive 10
+			SpawnCount 5
+			WaitBetweenSpawns 8
+			WaitForAllDead "wave4amob"
+			TotalCurrency 100
+			Squad
+			{
+				TFBot
+				{
+					Template FW_Giant_Soldier_Escape
+				}
+				TFBot
+				{
+					Template FW_Soldier_Conch
+				}
+				TFBot
+				{
+					Template FW_Soldier_Conch
+				}
+				TFBot
+				{
+					Template FW_Soldier_Conch
+				}
+				TFBot
+				{
+					Template FW_Soldier_Conch
+				}
+			}
+			
+		}
+		WaveSpawn // 4D - Champion Huntsmen & Kritz Clerics
+		{
+			Name "wave4dhuntsmen"
+			Where spawnbot
+			TotalCount 15
+			MaxActive 9
+			SpawnCount 3
+			WaitBetweenSpawns 8
+			WaitForAllDead "wave4chuntsmen"
+			TotalCurrency 150
+			Squad
+			{
+				TFBot
+				{
+					Template FW_Sniper_Champion_Huntsman
+				}
+				TFBot
+				{
+					Template FW_Medic_Kritz
+				}
+				TFBot
+				{
+					Template FW_Medic_Kritz
+				}
+			}
+			
+		}
+		WaveSpawn // 4D - Fan Scouts
+		{
+			Name "wave4d"
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 40
+			MaxActive 6
+			SpawnCount 2
+			WaitBetweenSpawns 7
+			WaitForAllDead "wave4chuntsmen"
+			WaitBeforeStarting 5
+			Support 1
+			TotalCurrency 75
+			TFBot
+			{
+				Template FW_Scout_Fan
+			}
+		}
+		WaveSpawn // 4E - Tank
+		{
+			Name "wave4etank"
+			TotalCount 1
+			WaitBeforeStarting 10
+			WaitForAllSpawned "wave4chuntsmen"
+			TotalCurrency 150
+			Tank
+			{
+				Name Tank
+				Health 30000
+				Speed 74
+				StartingPathTrackNode "tankpath"
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+		WaveSpawn // 4E - Flaregun Champions
+		{
+			Name "wave4e"
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 2
+			WaitBetweenSpawns 7
+			WaitForAllDead "wave4chuntsmen"
+			WaitBeforeStarting 25
+			TotalCurrency 50
+			TFBot
+			{
+				Template FW_Pyro_Champion_Flaregun
+			}
+		}
+		WaveSpawn // 4E - Flametosser Champions
+		{
+			Name "wave4e"
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 2
+			WaitBetweenSpawns 7
+			WaitForAllDead "wave4chuntsmen"
+			WaitBeforeStarting 25
+			TotalCurrency 275
+			TFBot
+			{
+				Template FW_Pyro_Champion_Flametosser
+			}
+		}
+	}
+	Wave // Wave 5 - 1300 credits
+	{
+		StartWaveOutput
+		{
+			Target wave_start_endurance_relay
+			Action trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaitWhenDone 65
+		Checkpoint Yes
+		WaveSpawn // 5A - Backup Soldiers
+		{
+			Name "wave5abackups"
+			Where spawnbot
+			TotalCount 12
+			MaxActive 8
+			SpawnCount 4
+			WaitBetweenSpawns 5
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Soldier_Backup
+			}
+		}
+		WaveSpawn // 5A - Crit KGB's
+		{
+			Name "wave5a"
+			Where spawnbot_right
+			Where spawnbot_left
+			TotalCount 24
+			MaxActive 6
+			SpawnCount 2
+			WaitBetweenSpawns 3
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Heavy_KGB
+				Attributes AlwaysCrit
+			}
+		}
+		WaveSpawn // 5B -  Crossbow Leech Champions & Vile Huntsman Champions
+		{
+			Name "wave5b"
+			Where spawnbot_right
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 4
+			WaitForAllSpawned "wave5abackups"
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 5
+			TotalCurrency 300
+			Squad
+			{
+				TFBot
+				{
+					Template FW_Medic_Champion_Crossbow_Leech
+				}
+				TFBot
+				{
+					Template FW_Sniper_Champion_Vile
+				}
+			}
+			
+		}
+		WaveSpawn // 5B - Giant Escape Plan Soldiers
+		{
+			Name "wave5bgiants"
+			Where spawnbot
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitForAllDead "wave5abackups"
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 15
+			TotalCurrency 200
+			TFBot
+			{
+				Template FW_Giant_Soldier_Escape
+			}
+		}
+		WaveSpawn // 5C - Champion Cabers w/ Uber Clerics
+		{
+			Name "wave5c"
+			Where spawnbot_right
+			TotalCount 12
+			MaxActive 8
+			SpawnCount 4
+			WaitForAllSpawned "wave5bgiants"
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 12
+			TotalCurrency 200
+			Squad
+			{
+				TFBot
+				{
+					Template FW_Demoman_Champion_Caber
+				}
+				TFBot
+				{
+					Template FW_Medic_Uber
+				}
+			}
+		}
+		WaveSpawn // 5C - Buff Soldiers
+		{
+			Name "wave5c"
+			Where spawnbot
+			TotalCount 12
+			MaxActive 9
+			SpawnCount 3
+			WaitForAllSpawned "wave5bgiants"
+			WaitBetweenSpawns 10
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Soldier_Buff
+				Attributes AlwaysCrit
+			}
+		}
+		WaveSpawn // 5D - Angry Crit Mob
+		{
+			Name "wave5dmob"
+			Where spawnbot_left
+			WaitForAllDead "wave5c"
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 25
+			TFBot
+			{
+				Template FW_Demoman_Knight
+				Attributes AlwaysCrit
+				Name "Angry Mobber"
+				CharacterAttributes
+				{
+					"move speed bonus" 1.1
+				}
+			}
+		}
+		WaveSpawn // 5D - Angry Crit Mob
+		{
+			Name "wave5dmob"
+			Where spawnbot
+			WaitForAllDead "wave5c"
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 25
+			TFBot
+			{
+				Template FW_Soldier_Disciplinary
+				Attributes AlwaysCrit
+				Name "Angry Mobber"
+				CharacterAttributes
+				{
+					"move speed bonus" 1.1
+				}
+			}
+		}
+		WaveSpawn // 5D - Angry Crit Mob
+		{
+			Name "wave5dmob"
+			Where spawnbot_right
+			WaitForAllDead "wave5c"
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 25
+			TFBot
+			{
+				Template FW_Pyro_Volcanic
+				ClassIcon pyro_volcano_giant
+				Attributes AlwaysCrit
+				Name "Angry Mobber"
+				CharacterAttributes
+				{
+					"move speed bonus" 1.1
+				}
+			}
+		}
+		WaveSpawn // 5D - Giant Cannon Demos & Giant Kritz Medics
+		{
+			Name "wave5d"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			WaitForAllSpawned "wave5c"
+			WaitBetweenSpawns 20
+			TotalCurrency 225
+			Squad
+			{
+				TFBot
+				{
+					Template FW_Giant_Demoman_Cannon
+				}
+				TFBot
+				{
+					Template FW_Giant_Medic_Kritz
+				}
+			}
+		}
+		WaveSpawn // 5S - Volcanic Champions
+		{
+			Name "wave5s"
+			Where spawnbot
+			Where spawnbot_right
+			Where spawnbot_left
+			TotalCount 10
+			MaxActive 3
+			SpawnCount 1
+			WaitForAllSpawned "wave5b"
+			WaitBetweenSpawns 15
+			Support 1
+			TFBot
+			{
+				Template FW_Pyro_Champion_Volcanic
+			}
+		}
+	}
+	Wave // Wave 6 - 1444 credits  
+	{
+		StartWaveOutput
+		{
+			Target wave_start_endurance_relay
+			Action trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaitWhenDone 65
+		Checkpoint Yes
+		WaveSpawn // 6A - Volcanic Pyros
+		{
+			Name "wave6a"
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 40
+			MaxActive 8
+			SpawnCount 4
+			WaitBetweenSpawns 3
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Pyro_Volcanic
+			}
+		}
+		WaveSpawn // 6A - Giant Flaregun Nukers & Medics
+		{
+			Name "wave6agiants"
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 21
+			MaxActive 14
+			SpawnCount 7
+			WaitBetweenSpawns 15
+			TotalCurrency 400
+			Squad
+			{
+				TFBot
+				{
+					Template FW_Giant_Pyro_Flaregun_Nuker
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template FW_Medic_Quickfix
+				}
+			}	
+		}
+		WaveSpawn // 6B - Giant Sandman Scouts
+		{
+			Name "wave6b"
+			Where spawnbot_right
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBetweenSpawns 10
+			WaitForAllDead "wave6agiants"
+			WaitBeforeStarting 5
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Giant_Scout_Sandman
+			}
+		}
+		WaveSpawn // 6B - Vile Huntsman Champions
+		{
+			Name "wave6b"
+			Where spawnbot
+			Where spawnbot_left
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 3
+			WaitBetweenSpawns 7
+			WaitForAllDead "wave6agiants"
+			TotalCurrency 100
+			TFBot
+			{
+				Template FW_Sniper_Champion_Vile
+				Attributes AlwaysCrit
+			}
+		}
+		WaveSpawn // 6C - Tank
+		{
+			Name "wave6c"
+			TotalCount 1
+			WaitForAllSpawned "wave6b"
+			WaitBeforeStarting 10
+			TotalCurrency 200
+			Tank
+			{
+				Name Tank
+				Health 35000
+				Speed 74
+				StartingPathTrackNode "tankpath"
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+		WaveSpawn // 6C - Crit Huntsmen
+		{
+			Name "wave6csupport"
+			Where spawnbot
+			Where spawnbot_left
+			TotalCount 30
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 3
+			WaitForAllDead "wave6b"
+			TotalCurrency 100
+			Support 1
+			TFBot
+			{
+				Template FW_Sniper_Huntsman
+				Attributes AlwaysCrit
+			}
+		}
+		WaveSpawn // BOSS - The Anachronism
+		{
+			Name "wave6boss"
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			WaitForAllSpawned "wave6c"
+			WaitBeforeStarting 30
+			TotalCurrency 444
+			Squad
+			{
+				TFBot
+				{
+					Class Heavyweapons
+					Name "The Anachronism"
+					ClassIcon heavy_giant
+					Skill Expert
+					Health 15000
+					Item "The Gridiron Guardian"
+					Attributes MiniBoss
+					Attributes UseBossHealthBar
+					CharacterAttributes
+					{
+						"move speed bonus" 0.4
+						"damage force reduction" 0.3
+						"airblast vulnerability multiplier" 0.5
+						"override footstep sound set" 4
+						"dmg taken from fire increased" 2
+					}
+				}
+				TFBot
+				{
+					Class Medic
+					Name "The War Doctor"
+					ClassIcon medic_giant
+					Skill Expert
+					Health 5000
+					Item "Platinum Pickelhaube"
+					Item "Practitioner's Processing Mask"
+					Item "The Quick-Fix"
+					Attributes MiniBoss
+					Attributes UseBossHealthBar
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+						"damage penalty" 0.1
+					}
+					ItemAttributes
+					{
+						ItemName "The Quick-Fix"
+						"ubercharge rate bonus" 0.01
+						// it's a minigun heavy in medieval mode. 
+						// giving it a popping medic would be evil.
+					}
+					CharacterAttributes
+					{
+						"move speed bonus" 0.5
+						"damage force reduction" 0.3
+						"airblast vulnerability multiplier" 0.5
+						"override footstep sound set" 4
+						"dmg taken from fire increased" 2
+						"heal rate bonus" 200
+					}
+				}
+			}
+			
+		}
+		WaveSpawn // 6S - Scouts
+		{
+			Name "wave6s"
+			Where spawnbot_right
+			TotalCount 30
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 8
+			Support 1
+			TFBot
+			{
+				Template FW_Scout
+				Attributes AlwaysCrit
+			}
+		}
+	}
+}

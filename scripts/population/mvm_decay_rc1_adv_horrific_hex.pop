@@ -1,0 +1,1599 @@
+//mission by randomguy
+#base robot_standard.pop
+#base robot_giant.pop
+
+yes_spy_counters_w4_got_a_fucking_problem?
+{
+	CanBotsAttackWhileInSpawnRoom no
+	RespawnWaveTime	2
+	StartingCurrency 1000 //800
+	Advanced 1
+	EventPopFile Halloween
+	ZombiesNoWave666 1 [$SIGSEGV] // If set to 1, the game will not display wave 666 when EventPopFile is set (default: 0)
+	NoRomevisionCosmetics 1 [$SIGSEGV]
+	SendBotsToSpectatorImmediately 1 [$SIGSEGV]
+	NoCritPumpkin 1 [$SIGSEGV]
+	ImprovedAirblast 0 [$SIGSEGV] //maybe this fixes always on
+	TextPrintTime 0 [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_blimp.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_blimp_damage1.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_blimp_damage2.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_blimp_damage3.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_blimp_damage_explode.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_blimp_explode.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_tank_color.mdl" [$SIGSEGV] //PRECACHE THESE
+	BotsDropSpells 1 [$SIGSEGV]
+	GiantsDropRareSpells 1 [$SIGSEGV]
+	SpellDropRateCommon 0.1 [$SIGSEGV]
+	SpellDropRateGiant 0.2 [$SIGSEGV]
+	NoThrillerTaunt 1 [$SIGSEGV]
+	FastNPCUpdate 1 [$SIGSEGV]
+
+	SpellBookNormalRoll   // Override spell roll. The value specifies how many spell charges to give. You can duplicate spells to increase their roll chance
+	{
+		"Healing Aura" 2
+		"Fireball" 3
+		"Fireball" 3 // fireball charges increased to 3
+		"Fireball" 3
+		// ball of bats removed entierly.
+		"Healing Aura" 2
+		"Pumpkin MIRV" 2 
+		// super jump removed entierly, replaced with healing instead
+		"Healing Aura" 2
+		"Healing Aura" 2
+		"Invisibility" 1 // still has its niece scenarios
+		"Healing Aura" 2
+		"Pumpkin MIRV" 2 
+		"Fireball" 3
+		"Fireball" 3
+		"Fireball" 3
+		"Pumpkin MIRV" 2
+		"Invisibility" 1
+		"Pumpkin MIRV" 2 
+		"Fireball" 3
+		"Fireball" 3
+		"Fireball" 3
+		"Healing Aura" 2
+		"Pumpkin MIRV" 2 
+		"Healing Aura" 2
+		"Healing Aura" 2
+		"Invisibility" 1
+		//fuck minify
+		"Fireball" 3
+		"Fireball" 3
+		"Minify" 1
+		//small chance for rare
+	    "Tesla Bolt" 1
+		"Meteor Shower" 1
+		"Summon Monoculus" 1
+	}
+
+	SpellBookRareRoll   // Override spell roll. The value specifies how many spell charges to give. You can duplicate spells to increase their roll chance
+	{
+	    "Tesla Bolt" 1
+		"Meteor Shower" 1
+	    "Tesla Bolt" 1
+		"Meteor Shower" 1
+		"Summon Monoculus" 1
+		"Summon Monoculus" 1
+		"Fireball" 15
+	}
+
+	ExtraTankPath [$SIGSEGV] //haha blimp go brrrrr
+	{
+		Name "decay_blimp_path"
+		Node "0 2976 1100"
+		Node "-100 -1700 500"
+	}
+
+	PointTemplates [$SIGSEGV]
+	{
+		ColorTank_Prpl //hellmet is ape
+        {
+            OnSpawnOutput
+            {
+                Target  "!activator"
+                Action  "color"
+                Param "165 0 255" //colour by Ciaran (Crinitus) 
+            }
+        }
+
+		annotation_blimp //Blimp Arrow
+        {
+            NoFixup 1
+            training_annotation
+            {
+              "targetname"   "blimp_hint"
+              "display_text" "Blimp incoming!"
+              "lifetime"     "5"
+              "origin" "0 2976 1100"
+            }
+        }
+
+		remove_pumps //thx jurrel
+        {
+            NoFixup 1
+            logic_auto
+            {
+                "OnMapSpawn" "bomb_manager,Kill,,0,-1"
+                "OnMapSpawn" "tf_pumpkin_bomb*,Kill,,0,-1"
+                "OnMapSpawn" "entity_spawn_point,Kill,,0,-1"
+				"origin" "69 69 69"
+            }
+        }
+	}
+	
+	Templates
+	{
+		T_TFBot_Giant_Demoman_Slowfire
+		{
+			Class Demoman
+			Name "Giant Demoman"
+			ClassIcon demo_giant
+			Skill Expert
+			Health 3000
+			WeaponRestrictions PrimaryOnly
+			Attributes HoldFireUntilFullReload
+			Attributes MiniBoss Tag bot_giant 
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.0 
+				"airblast vulnerability multiplier" 0.0 
+				"override footstep sound set" 4
+			}
+		}
+
+		T_TFBot_Pyro_DF_Giant
+		{
+			Class Pyro
+			ClassIcon pyro_dragon_fury_swordstone_giant ///custom icon
+			Name "Giant Dragon Pyro"
+			Health 3200
+			Skill Expert
+			Item "The Dragon's Fury"
+			Tag bot_giant
+			
+			Attributes MiniBoss Tag bot_giant 
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.0 
+				"airblast vulnerability multiplier" 0.0 
+				"override footstep sound set" 6
+			}
+		}
+
+		T_TFBot_Pyro_DF_Giant_Strong
+		{
+			Template T_TFBot_Pyro_DF_Giant
+			Health 4200
+			ItemAttributes
+			{
+				ItemName "The Dragon's Fury"
+				"item_meter_charge_rate" 0.5
+			}
+		}
+
+		T_TFBot_Pyro_Armored
+		{
+			Class Pyro
+			Skill Easy
+			Name "Armored Pyro"
+			Health 550
+			Scale 1.4
+			Tag bot_giant
+			CharacterAttributes
+			{
+			 "health regen" 1
+			 "move speed bonus" 0.8
+			}
+		}
+
+		T_TFBot_Giant_Medic_Uber
+		{
+			Name "Giant Uber Medic"
+			Item "The Byte'd Beak"
+			Class Medic
+			Skill Expert
+			Health 4500
+			ClassIcon medic_uber_giant
+			Tag bot_squad_member
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss Tag bot_giant
+			Attributes SpawnWithFullCharge
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_MEDIGUN"
+				"heal rate bonus" 200
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.0 //	0.0
+				"airblast vulnerability multiplier"	0.0
+				"move speed bonus" 0.5
+				"bot medic uber health threshold" 2500
+			}
+		}
+
+		T_TFBot_Medic_Kritz_Randomguy
+		{
+		    Class Medic
+			ClassIcon medic_kritz //custom icon
+			Name "Kritzkrieg Medic"
+			Skill Expert
+			Attributes SpawnWithFullCharge
+			//Attributes AlwaysCrit
+			Tag "bot_squad_member"
+			Item "The Kritzkrieg"
+			Tag bot_squad_member
+			ItemAttributes
+			{
+				ItemName "The Kritzkrieg"
+				"ubercharge rate bonus" 150
+				"uber duration bonus" 150
+				//"heal rate bonus" 3
+			}
+			CharacterAttributes
+			{
+			 "bot medic uber health threshold" 200
+			}
+		}
+
+		T_TFBot_Pyro_DF
+		{
+			Class Pyro
+			ClassIcon pyro_dragon_fury_swordstone ///custom icon
+			Name "Dragon Pyro"
+			Skill Easy
+			Item "The Dragon's Fury"
+		}
+	}
+	
+	Mission
+	{
+		Objective Spy
+
+		InitialCooldown 10
+		Where spawnbot
+		BeginAtWave 1
+		RunForThisManyWaves 1
+		CooldownTime 120
+		DesiredCount 2 //4
+
+		TFBot
+		{
+			Template T_TFBot_Spy
+		}
+	}
+
+	Mission
+	{
+		Objective Spy
+
+		InitialCooldown 10
+		Where spawnbot
+		BeginAtWave 3
+		RunForThisManyWaves 1
+		CooldownTime 30
+		DesiredCount 2
+
+		TFBot
+		{
+			Template T_TFBot_Spy
+		}
+	}
+
+	Mission
+	{
+		Objective Sniper
+		
+		Where spawnbot_mission_sniper
+		BeginAtWave 2
+		RunForThisManyWaves 1
+		InitialCooldown 60
+		CooldownTime 15
+		DesiredCount 2
+		TFBot
+		{
+			Template T_TFBot_Sniper
+		}
+	}
+
+	Mission
+	{
+		Objective Sniper
+		
+		Where spawnbot_mission_sniper
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		InitialCooldown 5
+		CooldownTime 30
+		DesiredCount 2 //4
+		TFBot
+		{
+			Template T_TFBot_Sniper
+		}
+	}
+
+	Mission
+	{
+		Objective Sniper
+		
+		Where spawnbot_mission_sniper
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		InitialCooldown 20
+		CooldownTime 30
+		DesiredCount 2
+		TFBot
+		{
+			Template T_TFBot_Sniper_Sydney_Sleeper
+		}
+	}
+	
+	Mission
+	{
+		Objective Engineer
+		
+		Where spawnbot
+		BeginAtWave 6
+		RunForThisManyWaves 1
+		InitialCooldown 5
+		CooldownTime 60
+		DesiredCount 2
+		TFBot
+		{
+			Template T_TFBot_Engineer_Sentry_Battle_TeleIn
+			Health 500
+			Name "Sentry Engineer"
+		}
+	}
+	
+	Mission
+	{
+		Objective	DestroySentries
+		
+		Where spawnbot
+		InitialCooldown 30
+		CooldownTime 30
+		BeginAtWave 1
+		RunForThisManyWaves 10
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+		}
+	}
+
+	SpawnTemplate [$SIGSEGV]
+	{
+		Name "remove_pumps"
+	}
+
+	SpawnTemplate [$SIGSEGV]
+	{
+		Name "annotation_blimp"
+	}
+	
+//
+// Starting Currency: 800
+//
+// +----------+----------+----------+
+// | Wave     | Currency | A+       |
+// +----------+----------+----------+
+// | Wave 1   | 800      | 900      |
+// | Wave 2   | 1100     | 1200     |
+// | Wave 3   | 1200     | 1300     |
+// | Wave 4   | 1200     | 1300     |
+// | Wave 5   | 900      | 1000     |
+// | Wave 6   | 1750     | 1850     |
+// +----------+----------+----------+
+// | Total    | 6950     | 7550     |
+// +----------+----------+----------+
+//	
+
+//WAVE 1 //////////CURRENCY 800///////////////////////////////////
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		InitWaveOutPut
+		{
+			Target intel 
+			Action forceresetsilent
+		}
+		
+		WaveSpawn
+		{
+			Name stage1
+			Where spawnbot
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			WaitBeforeStarting 0.1
+			WaitBetweenSpawns 8
+			TotalCurrency 300
+			RandomSpawn 1
+			
+			
+				TFBot
+				{
+					Template T_TFBot_Giant_Demoman
+				}
+		}
+
+		WaveSpawn
+		{
+			Name stage1
+			//WaitForAllSpawned stage1
+			Where spawnbot
+			TotalCount 39
+			MaxActive 18 //12
+			SpawnCount 3
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 4
+			TotalCurrency 250 //150
+			RandomSpawn 1
+			
+			
+				TFBot
+				{
+					Template T_TFBot_Demoman_Knight
+				}
+		}
+
+		WaveSpawn
+		{
+			Name stage1
+			//WaitForAllSpawned stage1
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 4
+			MaxActive 2 //4
+			SpawnCount 1
+			WaitBeforeStarting 20
+			WaitBetweenSpawns 10
+			//TotalCurrency 100
+			Support Limited
+			
+			
+				TFBot
+				{
+					Class Engineer
+					Name "Sentry Engineer"
+					Health 500 //we do a little bigrocking
+				}
+		}
+
+		WaveSpawn
+		{
+			Name stage2
+			WaitForAllSpawned stage1
+			Where spawnbot
+			TotalCount 16
+			MaxActive 12
+			SpawnCount 2
+			WaitBeforeStarting 8 //10 //15
+			WaitBetweenSpawns 6
+			TotalCurrency 250
+			RandomSpawn 1
+			
+			
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_Fist
+				}
+		}
+
+		WaveSpawn
+		{
+			Name stage2
+			WaitForAllSpawned stage1
+			Where spawnbot
+			TotalCount 8
+			MaxActive 6
+			SpawnCount 1
+			WaitBeforeStarting 8 //10 //15
+			WaitBetweenSpawns 6
+			TotalCurrency 250
+			RandomSpawn 1
+			
+			
+				TFBot
+				{
+					Template T_TFBot_Sniper_Huntsman_Spammer
+					Name "Rapid Fire Bowman"
+					ClassIcon sniper_bow_multi
+					ItemAttributes
+					{
+						ItemName "The Huntsman"
+						"damage penalty" 0.5
+					}
+				}
+		}
+	}
+	
+	//WAVE 2 //////////CURRENCY 1100///////////////////////////////////
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		InitWaveOutPut
+		{
+			Target intel 
+			Action forceresetsilent
+		}
+
+		WaveSpawn
+		{
+			Name stage1
+			Where spawnbot_single_flag
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0.1
+			WaitBetweenSpawns 2
+			TotalCurrency 25
+			RandomSpawn 0
+			
+			
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_BaseBall
+				}
+		}
+		
+		WaveSpawn
+		{
+			Name stage1
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 275
+			FirstSpawnWarningSound "mvm/mvm_tank_start.wav"
+			FirstSpawnMessage "{blue}Tank spawned in with 22.5k (22500) HP!" [$SIGSEGV] //Chat message when a bot is spawned for the first time
+			
+			
+			Tank
+			{
+				Health 22500 //25000 //27500 //25000 //30000
+				Speed 75
+				Name "tankboss"
+				Skin 0									// 0 - normal skin, 1 - final wave skin
+				StartingPathTrackNode "boss_path_1"		// if this is not here have fun with the hatch tank
+
+				OnBombDroppedOutput						// output sent when the Tank drops its bomb once it reaches the end of its path 
+				{
+					Target boss_deploy_relay
+					Action Trigger                         
+				}
+				SpawnTemplate "ColorTank_Prpl" [$SIGSEGV]
+				Model  "models/bots/boss_bot/boss_tank_color.mdl" [$SIGSEGV]
+			}
+		}
+
+		WaveSpawn
+		{
+			Name stage1
+			Where spawnbot_invasion
+			TotalCount 36
+			MaxActive 12
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 2
+			TotalCurrency 200
+			RandomSpawn 0
+			
+			
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_Gnome
+					Item "The All-Father"
+					Item "Point and Shoot"
+					Health 300 //250 //200 //150
+					Tag nav_prefer_flank_right
+				}
+
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_Gnome
+					Item "The All-Father"
+					Item "Point and Shoot"
+					Health 300 //250 //200 //150
+					Tag nav_prefer_flank_right
+				}
+
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_Gnome
+					Item "The All-Father"
+					Item "Point and Shoot"
+					Health 300 //250 //200 //150
+					Tag nav_prefer_flank_right
+				}
+
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_Gnome
+					Item "The All-Father"
+					Item "Point and Shoot"
+					Health 300 //250 //200 //150
+					Tag nav_prefer_flank_right
+				}
+
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_Gnome
+					Item "The All-Father"
+					Item "Point and Shoot"
+					Health 300 //250 //200 //150
+					Tag nav_prefer_flank_right
+					BehaviorModifiers push
+				}
+
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_Gnome
+					Item "The All-Father"
+					Item "Point and Shoot"
+					Tag nav_prefer_flank_left
+					Health 300 //250 //200 //150
+				}
+
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_Gnome
+					Item "The All-Father"
+					Item "Point and Shoot"
+					Tag nav_prefer_flank_left
+					Health 300 //250 //200 //150
+				}
+
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_Gnome
+					Item "The All-Father"
+					Item "Point and Shoot"
+					Tag nav_prefer_flank_left
+					Health 300 //250 //200 //150
+				}
+
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_Gnome
+					Item "The All-Father"
+					Item "Point and Shoot"
+					Tag nav_prefer_flank_left
+					Health 300 //250 //200 //150
+				}
+
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_Gnome
+					Item "The All-Father"
+					Item "Point and Shoot"
+					Health 300 //250 //200 //150
+					Tag nav_prefer_flank_left
+					BehaviorModifiers push
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name support
+			WaitForAllSpawned stage1
+			Where spawnbot
+			TotalCount 80 //48 support number now so more drop cash so scout isn't aped
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 4
+			TotalCurrency 300
+			Support 1
+			
+			
+				TFBot
+				{
+					Template T_TFBot_Sniper_Huntsman
+				}
+		}
+		
+
+		WaveSpawn
+		{
+			Name stage2
+			WaitForAllSpawned stage1
+			Where spawnbot
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 15 //20 //2
+			TotalCurrency 300
+			RandomSpawn 0
+			
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Spammer_Reload
+				}
+			}
+		}
+	}
+
+	//WAVE 3 //////////CURRENCY 1200///////////////////////////////////
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		InitWaveOutPut
+		{
+			Target intel 
+			Action forceresetsilent
+		}
+
+		WaveSpawn
+		{
+			Name stage1
+			Where spawnbot
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 0.1
+			WaitBetweenSpawns 8
+			TotalCurrency 200
+			RandomSpawn 1
+			
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Boxing_Heavy
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name stage2
+			WaitForAllSpawned stage1
+			Where spawnbot_invasion
+			TotalCount 48
+			MaxActive 12
+			SpawnCount 4
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 4
+			TotalCurrency 200
+			RandomSpawn 1
+			
+			
+				TFBot
+				{
+					Class Demoman
+					Skill Easy
+				}
+		}
+
+		WaveSpawn
+		{
+			Name stage2
+			WaitForAllSpawned stage1
+			Where spawnbot
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 2
+			WaitBeforeStarting 20
+			WaitBetweenSpawns 10
+			TotalCurrency 200
+			RandomSpawn 1
+			
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Pyro
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name stage3
+			WaitForAllSpawned stage2
+			Where spawnbot
+			TotalCount 12
+			MaxActive 12
+			SpawnCount 2
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 8
+			TotalCurrency 400
+			RandomSpawn 1
+			
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier
+					//ClassIcon soldier_homing_nys
+					//AddCond [$SIGSEGV]
+					//{
+						//Index 36
+						//Delay 1
+					//}
+					//RocketCustomParticle eyeboss_projectile [$SIGSEGV]
+					//HomingRockets [$SIGSEGV] 
+					//{
+						//IgnoreDisguisedSpies 1
+						//IgnoreStealthedSpies 1
+						//RocketSpeed 0.75 // Multiplier of rocket speed. 1 for default speed
+						//TurnPower 45 //How fast should the rocket rotate to face the target=
+						//MaxAimError 90 //Max angle between rocket and the target
+					//}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name stage3
+			WaitForAllSpawned stage2
+			Where spawnbot
+			TotalCount 36
+			MaxActive 12
+			SpawnCount 4
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 5
+			TotalCurrency 200
+			RandomSpawn 1
+			
+			
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_HeavyWeight_Champ
+				}
+		}
+	}
+	//WAVE 4 //////////CURRENCY 1200///////////////////////////////////
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		InitWaveOutPut
+		{
+			Target intel 
+			Action forceresetsilent
+		}
+
+		WaveSpawn
+		{
+			Name stage1
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 0.1
+			WaitBetweenSpawns 20
+			TotalCurrency 200
+			RandomSpawn 1
+			
+			
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_Burst
+				}
+		}
+
+		WaveSpawn
+		{
+			Name stage1_s
+			Where spawnbot
+			TotalCount 34 //48
+			MaxActive 14
+			SpawnCount 7
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 12 //9
+			TotalCurrency 300
+			RandomSpawn 1
+			
+			
+			RandomChoice
+			{
+				TFBot
+				{
+					Class Soldier
+					Skill Normal
+				}
+				TFBot
+				{
+					Class Soldier
+					Skill Normal
+					//BehaviorModifiers push
+					//Tag nav_prefer_flank_left
+				}
+				TFBot
+				{
+					Class Soldier
+					Skill Normal
+					//BehaviorModifiers push
+					//Tag nav_prefer_flank_right
+				}
+				TFBot
+				{
+					Class Soldier
+					Skill Hard
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name supported
+			WaitForAllDead stage1_s
+			Where spawnbot
+			TotalCount 48
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 8
+			TotalCurrency 300
+			Support 1
+			
+			
+			RandomChoice
+			{
+				TFBot
+				{
+					Class Scout
+					//Skill Normal
+				}
+				TFBot
+				{
+					Class Scout
+					//Skill Normal
+					//BehaviorModifiers push
+					//Tag nav_prefer_flank_left
+				}
+				TFBot
+				{
+					Class Scout
+					//Skill Normal
+					//BehaviorModifiers push
+					//Tag nav_prefer_flank_right
+				}
+				TFBot
+				{
+					Class Scout
+					//Skill Hard
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name stage2
+			WaitForAllSpawned stage1
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 35
+			WaitBetweenSpawns 25
+			TotalCurrency 400
+			RandomSpawn 1
+			
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_HeavyWeapons //T_TFBot_HeavyWeapons_Heater
+					//Name "Giant Heater Heavy"
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Regen
+				}
+			}
+		}
+	}
+
+	//WAVE 5 //////////CURRENCY 900///////////////////////////////////
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		InitWaveOutPut
+		{
+			Target intel 
+			Action forceresetsilent
+		}
+
+		WaveSpawn
+		{
+			Name stage1
+			Where spawnbot_single_flag
+			TotalCount 9
+			MaxActive 6 //9
+			SpawnCount 3
+			WaitBeforeStarting 0.1
+			WaitBetweenSpawns 20 //15
+			TotalCurrency 250
+			RandomSpawn 1
+			
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Spammer_Reload
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name stage1
+			Where spawnbot
+			TotalCount 40
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 5
+			TotalCurrency 300
+			RandomSpawn 1
+			
+			
+				TFBot
+				{
+					Template T_TFBot_HeavyWeapons_Fist
+				}
+		}
+
+		WaveSpawn
+		{
+			Name stage2
+			WaitForAllDead stage1
+			Where spawnbot
+			TotalCount 18
+			MaxActive 18
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 3
+			TotalCurrency 180
+			RandomSpawn 1
+			
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier
+					Item "The Direct Hit"
+					ClassIcon soldier_dh_nys
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_Kritz_Randomguy
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_Kritz_Randomguy
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name stage3
+			WaitForAllDead stage2
+			Where spawnbot
+			TotalCount 48 //28 //40
+			MaxActive 12 //10
+			SpawnCount 4 //5
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 4 //5
+			TotalCurrency 300
+			RandomSpawn 1
+			Support Limited
+			
+			
+			RandomChoice
+			{
+				TFBot
+				{
+					Class Sniper
+					Name "Rapid Fire Bowman"
+					Item "The Huntsman"
+					ClassIcon sniper_bow_multi
+					Skill Expert
+					Item "Rifleman's Regalia"
+					ItemAttributes
+					{
+						ItemName "The Huntsman"
+						"faster reload rate" 0.25
+						"fire rate bonus" 0.5
+						"damage penalty" 0.5
+					}
+				}
+
+				TFBot
+				{
+					Class Pyro
+					Skill Easy
+					Attributes AlwaysFireWeapon
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name stage3
+			WaitForAllDead stage2
+			Where spawnbot
+			TotalCount 9 //12
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 15
+			TotalCurrency 170
+			RandomSpawn 1
+			
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Extended_Battalion
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Soldier_Extended_Concheror
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Soldier_Extended_Buff_Banner
+				}
+			}
+		}
+	}
+
+	//WAVE 6 //////////CURRENCY 1750///////////////////////////////////
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		InitWaveOutPut
+		{
+			Target intel 
+			Action forceresetsilent
+		}
+
+		//Explanation [$SIGSEGV]  //Dispayed once the wave is initialized
+		//{
+			//Line "{red}After five minutes, the time will end and blimps will invade.{reset}"
+		//}
+
+		WaveSpawn
+		{
+			Name apetank
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 0
+			TotalCurrency 300
+			FirstSpawnWarningSound "mvm/mvm_tank_start.wav"
+			FirstSpawnMessage "{blue}Blimp spawned in with 10k (10000) HP!" [$SIGSEGV] //Chat message when a bot is spawned for the first time
+			
+			
+			Tank // mvm blimp concept designed by Hell-met
+			{
+				Health 10000 //12500 //15000
+				Speed 75
+				DisableSmokestack 1 [$SIGSEGV]
+				ClassIcon blimp2_lite [$SIGSEGV]
+				Skin 1 
+				Model "models/bots/boss_bot/boss_blimp.mdl" [$SIGSEGV]
+				Gravity 0 [$SIGSEGV]
+				DisableTracks 1 [$SIGSEGV]
+				DisableChildModels 1 [$SIGSEGV]
+				ReplaceModelCollisions 1 [$SIGSEGV]
+				EngineLoopSound "npc\combine_gunship\dropship_engine_distant_loop1.wav" [$SIGSEGV]
+				PingSound "npc\combine_gunship\ping_search.wav" [$SIGSEGV]
+				Name "tankboss"
+				StartingPathTrackNode "decay_blimp_path_1"
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+
+			StartWaveOutput //display the blimp arrow
+			{
+				Target blimp_hint
+				Action Show
+			}
+		}
+
+		WaveSpawn
+		{
+			Name stage1
+			Where spawnbot_single_flag
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			WaitBeforeStarting 0.1
+			WaitBetweenSpawns 0
+			TotalCurrency 150
+			RandomSpawn 1
+			
+			
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Fast
+				}
+		}
+
+		WaveSpawn
+		{
+			Name stage2
+			WaitForAllSpawned stage1
+			Where spawnbot
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 6
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 0
+			TotalCurrency 100
+			RandomSpawn 1
+			
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Demo_Burst
+					Skill Expert
+					Attributes AlwaysCrit
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name stage2
+			WaitForAllSpawned stage1
+			Where spawnbot
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 6
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 0
+			TotalCurrency 100
+			RandomSpawn 1
+			
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Pyro_DF
+					Skill Expert
+					Attributes AlwaysCrit
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name stage3
+			WaitForAllDead stage2
+			Where spawnbot
+			TotalCount 14 //12
+			MaxActive 8
+			SpawnCount 2
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 10
+			TotalCurrency 200
+			RandomSpawn 1
+			
+			
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_BaseBall
+				}
+		}
+
+		WaveSpawn
+		{
+			Name stage3
+			WaitForAllDead stage2
+			Where spawnbot
+			TotalCount 12
+			MaxActive 9
+			SpawnCount 3
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 15
+			TotalCurrency 200
+			RandomSpawn 1
+			
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_HeavyWeapons_Deflector
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber //_BigHeal
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber //_BigHeal
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name stage4
+			WaitForAllSpawned stage3
+			Where spawnbot
+			TotalCount 8 //6
+			MaxActive 3 //4 //6 //3
+			SpawnCount 1
+			WaitBeforeStarting 20
+			WaitBetweenSpawns 8 //7
+			TotalCurrency 200
+			RandomSpawn 1
+			
+			
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Spammer
+					Tag nav_prefer_flank_left
+				}
+		}
+
+		WaveSpawn
+		{
+			Name stage4
+			WaitForAllSpawned stage3
+			Where spawnbot
+			TotalCount 8 //6
+			MaxActive 3 //4 //6 //3
+			SpawnCount 1
+			WaitBeforeStarting 20
+			WaitBetweenSpawns 8 //7
+			TotalCurrency 200
+			RandomSpawn 1
+			
+			
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_Burst
+					Tag nav_prefer_flank_right
+				}
+		}
+
+		WaveSpawn
+		{
+			Name apetank_2
+			WaitForAllSpawned stage3
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 45 //30
+			WaitBetweenSpawns 0
+			TotalCurrency 300
+			FirstSpawnWarningSound "mvm/mvm_tank_start.wav"
+			FirstSpawnMessage "{blue}Tank spawned in with 27.5k (27500) HP!" [$SIGSEGV] //Chat message when a bot is spawned for the first time
+			
+			
+			Tank
+			{
+				Health 27500 //30000
+				Speed 75
+				Name "tankboss"
+				Skin 1									// 0 - normal skin, 1 - final wave skin
+				StartingPathTrackNode "boss_path_1"		// if this is not here have fun with the hatch tank
+
+				OnBombDroppedOutput						// output sent when the Tank drops its bomb once it reaches the end of its path 
+				{
+					Target boss_deploy_relay
+					Action Trigger                         
+				}
+				SpawnTemplate "ColorTank_Prpl" [$SIGSEGV]
+				Model  "models/bots/boss_bot/boss_tank_color.mdl" [$SIGSEGV]
+			}
+		}
+
+		//FUNNY TIMER GIMIK!!!!!!!!!
+
+		//WaveSpawn
+		//{
+			//Name stage1
+			//Where respawnpoints
+			//TotalCount 1
+			//MaxActive 1
+			//SpawnCount 1
+			//WaitBeforeStarting 0
+			//WaitBetweenSpawns 0
+			//Support Limited
+			
+			
+				//TFBot //4 min 58 sec timer fuck you close enough
+				//{
+					//Class Heavy
+					//Name "TIMER"
+					//Attributes UseBossHealthBar
+					//ClassIcon timer_lite
+					//Scale 0.01
+					//Health 280
+					//CharacterAttributes
+					//{
+						//"health regen" -1
+						//"move speed bonus" 0.01
+					//}
+					//Attributes SuppressFire
+					//Attributes IgnoreFlag
+					//AddCond [$SIGSEGV] //Adds conditions to bots
+					//{
+						//Name "TF_COND_REPROGRAMMED" // Condition to apply. List of available conditions https://wiki.teamfortress.com/wiki/Cheats#addcond
+					//}
+				//}
+		//}
+
+		//WaveSpawn 
+		//{
+			//Name blimps
+			//TotalCount 1
+			//MaxActive 1
+			//SpawnCount 1
+			//WaitBetweenSpawnsAfterDeath 10
+			//WaitBeforeStarting 300
+			//Support 1
+			
+			
+			//Tank // mvm blimp concept designed by Hell-met
+			//{
+				//Health 10000
+				//Speed 100
+				//DisableSmokestack 1 [$SIGSEGV]
+				//ClassIcon blimp2_lite [$SIGSEGV]
+				//Skin 1 
+				//Model "models/bots/boss_bot/boss_blimp.mdl" [$SIGSEGV]
+				//Gravity 0 [$SIGSEGV]
+				//DisableTracks 1 [$SIGSEGV]
+				//DisableChildModels 1 [$SIGSEGV]
+				//ReplaceModelCollisions 1 [$SIGSEGV]
+				//EngineLoopSound "npc\combine_gunship\dropship_engine_distant_loop1.wav" [$SIGSEGV]
+				//PingSound "npc\combine_gunship\ping_search.wav" [$SIGSEGV]
+				//Name "tankboss"
+				//StartingPathTrackNode "decay_blimp_path_1"
+				//OnKilledOutput
+				//{
+					//Target boss_dead_relay
+					//Action Trigger
+				//}
+				//OnBombDroppedOutput
+				//{
+					//Target boss_deploy_relay
+					//Action Trigger
+				//}
+			//}
+		//}
+	}
+}

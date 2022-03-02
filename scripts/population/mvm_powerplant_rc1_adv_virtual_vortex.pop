@@ -1,0 +1,5774 @@
+//Advanced Virtual Vortex Created by A+drew
+//Pointtemplates by Lite
+//Halloween Decoration by Lite
+//A submission for HH
+#base robot_giant.pop
+#base robot_standard.pop
+#base robot_andrew.pop
+
+population
+{
+	StartingCurrency	900
+	EventPopfile	Halloween
+	RespawnWaveTime	5
+	CanBotsAttackWhileInSpawnRoom	no
+        ForceHoliday 2
+        TextPrintTime 0
+   	NoRomevisionCosmetics 1              		     
+	NoMvMDeathTune 1 		                                                                  
+        ZombiesNoWave666 1
+	PrecacheModel "models/bots/boss_bot/boss_tank_color.mdl"
+	PrecacheModel "models\props_halloween\ghost.mdl"  
+
+        //Disabled Sounds
+	DisableSound "Announcer.MVM_Spy_Alert" 						 
+	DisableSound "Announcer.mvm_spybot_death"					 
+	DisableSound "Announcer.mvm_spybot_death_all"
+        PlayerAttributes [$SIGSEGV]
+	{
+		Scout
+		{
+			"cannot be backstabbed"	1
+		}
+		Soldier
+		{
+			"cannot be backstabbed"	1
+		}
+		Pyro
+		{
+			"cannot be backstabbed"	1
+		}
+		Demo
+		{
+			"cannot be backstabbed"	1
+		}
+		Heavy
+		{
+			"cannot be backstabbed"	1
+		}
+		Engineer
+		{
+			"cannot be backstabbed"	1
+		}
+		Medic
+		{
+			"medic machinery beam" 2.85
+			"cannot be backstabbed"	1
+		}
+		Sniper
+		{
+			"cannot be backstabbed"	1
+		}
+		Spy
+		{
+			"cannot be backstabbed"	1
+		}
+	}
+        PointTemplates  
+	{
+		gibustank
+		{
+			OnSpawnOutput
+			{
+				Target "!activator"
+				Action "color"
+				
+				//Change to any RGB value
+				Param "0 75 150"
+			}
+    			prop_dynamic
+    			{
+        			"origin" "-46 2 136"
+        			"angles" "-1 0 4.5"
+        			"modelscale" "6"
+        			"model" "models/player/items/all_class/ghostly_gibus_scout.mdl"
+    			}
+    			prop_dynamic
+    			{
+        			"origin" "-42 17 204"
+        			"angles" "6.5 0 4.5"
+        			"modelscale" "1.75"
+        			"model" "models/props_halloween/smlprop_ghost.mdl"
+    			}
+		}
+                RNGTank //a tank that changes color
+                {
+                    NoFixup 1
+                    logic_timer
+                    {
+                        "targetname"    "tank_color_timer"
+                        "RefireTime"    "0.05"            
+                        "spawnflags"    "0"
+                        "StartDisabled" "0"
+                        "UseRandomTime" "0"
+                        "OnTimer"       "tank_color_state,GetValue,,0,-1"
+                    }
+                    math_counter
+                    {
+                        "targetname" "tank_color_state"
+                        "startvalue" "1"
+                        "min"        "1"
+                        "max"        "3" 
+                        "OnGetValue" "tank_color_changecase,InValue,,0,-1"
+                    }
+                    logic_case
+                    {
+                        "targetname" "tank_color_changecase"
+                        "Case01"     "1"
+                        "Case02"     "2"
+                        "Case03"     "3"
+                        "OnCase01"   "tank_color_rg,Add,5,0,-1"
+                        "OnCase02"   "tank_color_gb,Add,5,0,-1"
+                        "OnCase03"   "tank_color_br,Add,5,0,-1"
+                    }
+                    math_counter
+                    {
+                        "targetname"    "tank_color_rg"
+                        "StartDisabled" "0"
+                        "startvalue"    "0"
+                        "min"           "0"
+                        "max"           "255"
+                        "OutValue"      "tank_color_rg_blend,InValue,,0,-1"
+                        "OnHitMax"      "tank_color_state,SetValueNoFire,2,0,-1"
+                        "OnHitMax"      "!self,SetValueNoFire,0,0.01,-1"
+                        "OnHitMax"      "!self,Disable,,0.02,-1"
+                        "OnHitMax"      "tank_color_gb,Enable,,0.02,-1"                
+                    }
+                    math_colorblend
+                    {
+                        "targetname" "tank_color_rg_blend"
+                        "spawnflags" "1"
+                        "inmin"      "0"
+                        "inmax"      "255"
+                        "colormin"   "255 0 0"
+                        "colormax"   "0 255 0"
+                        "OutColor"   "rngtankboss,Color,,0,-1"
+                    }
+                    math_counter
+                    {
+                        "targetname"    "tank_color_gb"
+                        "StartDisabled" "1"
+                        "startvalue"    "0"
+                        "min"           "0"
+                        "max"           "255"
+                        "OutValue"      "tank_color_gb_blend,InValue,,0,-1"
+                        "OnHitMax"      "tank_color_state,SetValueNoFire,3,0,-1"
+                        "OnHitMax"      "!self,SetValueNoFire,0,0.01,-1"
+                        "OnHitMax"      "!self,Disable,,0.02,-1"        
+                        "OnHitMax"      "tank_color_br,Enable,,0.02,-1"    
+                    }
+                    math_colorblend
+                    {
+                        "targetname" "tank_color_gb_blend"
+                        "spawnflags" "1"
+                        "inmin"      "0"
+                        "inmax"      "255"
+                        "colormin"   "0 255 0"
+                        "colormax"   "0 0 255"
+                        "OutColor"   "rngtankboss,Color,,0,-1"
+                    }
+                    math_counter
+                    {
+                        "targetname"    "tank_color_br"
+                        "StartDisabled" "1"
+                        "startvalue"    "0"
+                        "min"           "0"
+                        "max"           "255"
+                        "OutValue"      "tank_color_br_blend,InValue,,0,-1"
+                        "OnHitMax"      "tank_color_state,SetValueNoFire,1,0,-1"
+                        "OnHitMax"      "!self,SetValueNoFire,0,0.01,-1"
+                        "OnHitMax"      "!self,Disable,,0.02,-1"
+                        "OnHitMax"      "tank_color_rg,Enable,,0.02,-1"         
+                    }
+                    math_colorblend
+                    {
+                        "targetname" "tank_color_br_blend"
+                        "spawnflags" "1"
+                        "inmin"      "0"
+                        "inmax"      "255"
+                        "colormin"   "0 0 255"
+                        "colormax"   "255 0 0"
+                        "OutColor"   "rngtankboss,Color,,0,-1"
+                    }
+                    prop_dynamic
+                    {
+                        "targetname" "rngtankboss"
+                        "origin" "-46 2 136"
+                        "angles" "-1 0 4.5"
+                        "modelscale" "6"
+                        "model" "models/player/items/all_class/ghostly_gibus_scout.mdl"
+                    }
+                    prop_dynamic
+                    {
+                        "targetname" "rngtankboss"
+                        "origin" "-42 17 204"
+                        "angles" "6.5 0 4.5"
+                        "modelscale" "1.75"
+                        "model" "models/props_halloween/smlprop_ghost.mdl"
+                    }
+                }
+		allprops_sky
+		{
+			prop_dynamic
+			{
+				"origin" "5888 -16 112"
+				"model" "models/props_lakeside_event/vortex_lakeside.mdl"
+				"rendercolor" "0 115 255"
+				"renderfx" "15"
+				"disableshadows" "1"
+			}
+			prop_dynamic
+			{
+				"origin" "5888 -16 112"
+				"angles" "0 180 0"
+				"model" "models/props_lakeside_event/vortex_lakeside.mdl"
+				"rendercolor" "0 115 255"
+				"renderfx" "15"
+				"disableshadows" "1"
+			}
+			prop_dynamic
+			{
+				"origin" "5888 -16 250"
+				"angles" "90 180 0"
+				"model" "models/props_skybox/sunnoon.mdl"
+				"rendercolor" "0 90 255"
+				"rendermode" "1"
+				"renderfx" "15"
+				"disableshadows" "1"
+			}
+			prop_dynamic
+			{
+				"origin" "5888 416 88"
+				"angles" "-60 270 0"
+				"model" "models/props_manor/volume_light_01.mdl"
+				"modelscale" "0.7"
+				"rendercolor" "0 130 255"
+				"disableshadows" "1"
+			}
+			prop_dynamic
+			{
+				"origin" "5888 416 88"
+				"angles" "-60 270 0"
+				"model" "models/props_manor/volume_light_01.mdl"
+				"modelscale" "0.7"
+				"rendercolor" "0 130 255"
+				"disableshadows" "1"
+			}
+			prop_dynamic
+			{
+				"origin" "5888 416 88"
+				"angles" "-60 270 0"
+				"model" "models/props_manor/volume_light_01.mdl"
+				"modelscale" "0.7"
+				"rendercolor" "0 130 255"
+				"disableshadows" "1"
+			}
+			prop_dynamic
+			{
+				"origin" "5888 416 88"
+				"angles" "-60 270 0"
+				"model" "models/props_manor/volume_light_01.mdl"
+				"modelscale" "0.7"
+				"rendercolor" "0 130 255"
+				"disableshadows" "1"
+			}
+
+			prop_dynamic
+			{
+				"origin" "5895 416 8"
+				"angles" "13 266 7"
+				"model" "models/props_halloween/halloween_rock003.mdl"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+				"modelscale" "0.4"
+			}
+			prop_dynamic
+			{
+				"origin" "6128 256 -64"
+				"angles" "15 225 0"
+				"model" "models/props_halloween/halloween_rock002.mdl"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+				"modelscale" "0.8"
+			}
+			prop_dynamic
+			{
+				"origin" "6168 -40 32"
+				"angles" "15 180 0"
+				"model" "models/props_halloween/halloween_rock004.mdl"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+				"modelscale" "0.5"
+			}
+			prop_dynamic
+			{
+				"origin" "6048 -320 -8"
+				"angles" "14 101 -15"
+				"model" "models/props_halloween/halloween_rock005.mdl"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+				"modelscale" "0.8"
+			}
+			prop_dynamic
+			{
+				"origin" "5680 -312 8"
+				"angles" "15 45 0"
+				"model" "models/props_halloween/halloween_rock002.mdl"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+				"modelscale" "0.6"
+			}
+			prop_dynamic
+			{
+				"origin" "5504 16 48"
+				"angles" "30 9 4"
+				"model" "models/props_halloween/halloween_rock006.mdl"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+				"modelscale" "0.8"
+			}
+			prop_dynamic
+			{
+				"origin" "5272 368 -168"
+				"angles" "0 315 0"
+				"model" "models/props_halloween/halloween_rock004.mdl"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+				"modelscale" "1.2"
+			}
+			prop_dynamic
+			{
+				"origin" "5248 -472 -80"
+				"angles" "20 45 0"
+				"model" "models/props_halloween/halloween_rock002.mdl"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+				"modelscale" "1.3"
+			}
+			prop_dynamic
+			{
+				"origin" "6520 -472 -80"
+				"angles" "20 150 0"
+				"model" "models/props_halloween/halloween_rock007.mdl"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+				"modelscale" "1.2"
+			}
+		}
+		allprops
+		{
+			prop_dynamic
+			{
+				"model" "models/props_halloween/big_top_mouth.mdl"
+				"modelscale" "0.07"
+				"defaultanim" "idle"
+				"disablebonefollowers" "1"
+				"origin" "-576 -2496 256"
+				"angles" "0 90 0"
+				"disableshadows" "1"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_trainyard/crane_platform001.mdl"
+				"origin" "-448 -2512 176"
+				"angles" "90 0 0"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_trainyard/crane_platform001.mdl"
+				"origin" "-576 -2368 176"
+				"angles" "90 90 0"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_trainyard/crane_platform001.mdl"
+				"origin" "-704 -2512 176"
+				"angles" "90 180 0"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_trainyard/crane_platform001.mdl"
+				"origin" "-576 -2656 176"
+				"angles" "90 270 0"
+				"rendercolor" "0 0 0"
+				"disableshadows" "1"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_halloween/cobweb_01.mdl"
+				"disableshadows" "1"
+				"origin" "-204 504 76"
+				"angles" "0 270 0"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_halloween/cobweb_02.mdl"
+				"disableshadows" "1"
+				"origin" "-280 596 76"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_halloween/cobweb_01.mdl"
+				"disableshadows" "1"
+				"origin" "-280 684 316"
+				"angles" "0 0 -90"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"origin" "-1137 -1614 496"
+				"angles" "29 293 17"
+				"model" "models/props_mvm/mvm_human_skull.mdl"
+				"modelscale" "1.5"
+			}
+			prop_dynamic
+			{
+				"origin" "-1144 -1594 428"
+				"angles" "0 0 -15"
+				"model" "models/props_mvm/mvm_human_skull.mdl"
+				"modelscale" "1.5"
+			}
+			prop_dynamic
+			{
+				"origin" "-2176 320 320"
+				"angles" "0 0 0"
+				"model" "models/props_halloween/halloween_rock001.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+			}
+			prop_dynamic
+			{
+				"origin" "-2176 64 320"
+				"angles" "0 0 0"
+				"model" "models/props_halloween/halloween_rock006.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+			}
+			prop_dynamic
+			{
+				"origin" "-2176 768 448"
+				"angles" "0 60 0"
+				"model" "models/props_halloween/halloween_rock005.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+			}
+			prop_dynamic
+			{
+				"origin" "-2177 837 704"
+				"angles" "0 15 0"
+				"model" "models/props_halloween/ghost.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"defaultanim" "idle"
+			}
+			prop_dynamic
+			{
+				"origin" "-2067 707 229"
+				"angles" "0 0 0"
+				"model" "models/props_halloween/flask_erlenmeyer.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1000"
+				"fademindist" "1200"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"origin" "-2072 726 234"
+				"angles" "0 0 0"
+				"model" "models/props_halloween/flask_florence.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1000"
+				"fademindist" "1200"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"origin" "-2069 747 230"
+				"angles" "0 0 0"
+				"model" "models/props_halloween/flask_tub.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1000"
+				"fademindist" "1200"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"origin" "-2064 759 219"
+				"angles" "0 45 90"
+				"model" "models/props_halloween/flask_tube.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1000"
+				"fademindist" "1200"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"origin" "-2070 781 234"
+				"angles" "0 0 0"
+				"model" "models/props_halloween/flask_vial.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1000"
+				"fademindist" "1200"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"origin" "-2075 803 230"
+				"angles" "0 0 0"
+				"model" "models/props_halloween/flask_tub.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1000"
+				"fademindist" "1200"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"origin" "-2065 822 239"
+				"angles" "0 0 0"
+				"model" "models/props_halloween/flask_bottle.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1000"
+				"fademindist" "1200"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "1.2"
+			}
+			prop_dynamic
+			{
+				"origin" "-2071 839 235"
+				"angles" "0 0 0"
+				"model" "models/props_halloween/flask_florence.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1000"
+				"fademindist" "1200"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"origin" "-2071 839 235"
+				"angles" "0 0 0"
+				"model" "models/props_halloween/flask_florence.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1000"
+				"fademindist" "1200"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"origin" "-2068 860 234"
+				"angles" "0 0 0"
+				"model" "models/props_halloween/flask_vial.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1000"
+				"fademindist" "1200"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"origin" "-2368 1184 480"
+				"angles" "0 0 0"
+				"model" "models/props_halloween/halloween_rock003.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "0.7"
+			}
+			prop_dynamic
+			{
+				"origin" "-1853 1405 456"
+				"angles" "0 0 15"
+				"model" "models/props_halloween/halloween_rock002.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "0.7"
+			}
+			prop_dynamic
+			{
+				"origin" "-2208 963 640"
+				"angles" "-15 180 0"
+				"model" "models/props_halloween/halloween_rock002.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "0.7"
+			}
+			prop_dynamic
+			{
+				"origin" "-1632 2016 96"
+				"angles" "0 165 0"
+				"model" "models/props_halloween/halloween_rock001.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "1.5"
+			}
+			prop_dynamic
+			{
+				"origin" "-592 2176 -80"
+				"angles" "0 90 0"
+				"model" "models/props_halloween/halloween_rock006.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+			}
+			prop_dynamic
+			{
+				"origin" "-93 2128 -56"
+				"angles" "15 166 0"
+				"model" "models/props_halloween/halloween_rock009.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+			}
+			prop_dynamic
+			{
+				"origin" "-2074 908 223"
+				"angles" "-15 0 0"
+				"model" "models/props_halloween/smlprop_spider.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1000"
+				"fademindist" "1200"
+				"disableshadows" "1"
+				"solid" "6"
+				"modelscale" "4"
+			}
+			prop_dynamic
+			{
+				"origin" "400 1808 128"
+				"angles" "35 150 0"
+				"model" "models/props_halloween/halloween_rock005.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+			}
+			prop_dynamic
+			{
+				"origin" "416 1536 144"
+				"angles" "29 164 -4"
+				"model" "models/props_halloween/halloween_rock009.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.2"
+			}
+			prop_dynamic
+			{
+				"origin" "-2800 224 288"
+				"angles" "15 0 0"
+				"model" "models/props_halloween/halloween_rock004.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.2"
+			}
+			prop_dynamic
+			{
+				"origin" "-2704 752 688"
+				"angles" "12 22 30"
+				"model" "models/props_halloween/halloween_rock006.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.5"
+			}
+			prop_dynamic
+			{
+				"origin" "-2240 1936 41"
+				"angles" "10 161 -6"
+				"model" "models/props_halloween/halloween_rock009_large.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.5"
+			}
+			prop_dynamic
+			{
+				"origin" "-2884 1184 544"
+				"angles" "-21 163 12"
+				"model" "models/props_halloween/halloween_rock0010.mdl"
+				"disableshadows" "1"
+				"modelscale" "1"
+			}
+			prop_dynamic
+			{
+				"origin" "-1952 2880 -32"
+				"angles" "0 345 0"
+				"model" "models/props_halloween/halloween_rock007_large.mdl"
+				"disableshadows" "1"
+				"modelscale" "1"
+			}
+			prop_dynamic
+			{
+				"origin" "-1097 2768 -14"
+				"angles" "14 314 -4"
+				"model" "models/props_halloween/halloween_rock004.mdl"
+				"disableshadows" "1"
+				"modelscale" "2"
+			}
+			prop_dynamic
+			{
+				"origin" "-16 3408 7"
+				"angles" "15 120 0"
+				"model" "models/props_halloween/halloween_rock005_large.mdl"
+				"disableshadows" "1"
+				"modelscale" "1"
+			}
+			prop_dynamic
+			{
+				"origin" "432 3440 7"
+				"angles" "30 135 0"
+				"model" "models/props_halloween/halloween_rock004_large.mdl"
+				"disableshadows" "1"
+				"modelscale" "1"
+			}
+			prop_dynamic
+			{
+				"origin" "800 3792 7"
+				"angles" "30 135 0"
+				"model" "models/props_halloween/halloween_rock009_large.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.5"
+			}
+			prop_dynamic
+			{
+				"origin" "-462 5421 451"
+				"angles" "54 317 25"
+				"model" "models/props_halloween/halloween_rock004_large.mdl"
+				"disableshadows" "1"
+				"modelscale" "1"
+			}
+			prop_dynamic
+			{
+				"origin" "-1065 5106 380"
+				"angles" "54 332 25"
+				"model" "models/props_halloween/halloween_rock009_large.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.5"
+			}
+			prop_dynamic
+			{
+				"origin" "128 2752 80"
+				"angles" "43 290 14"
+				"model" "models/props_halloween/halloween_rock006.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.8"
+			}
+			prop_dynamic
+			{
+				"origin" "1501 2464 -77"
+				"model" "models/props_halloween/halloween_rock0010.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.3"
+			}
+			prop_dynamic
+			{
+				"origin" "1088 2784 37"
+				"angles" "28 350 -17"
+				"model" "models/props_halloween/halloween_rock006_large.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.3"
+			}
+			prop_dynamic
+			{
+				"origin" "896 3440 0"
+				"angles" "10 221 -6"
+				"model" "models/props_halloween/halloween_rock009_large.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.8"
+			}
+			prop_dynamic
+			{
+				"origin" "-2512 4096 -72"
+				"angles" "-14 114 35"
+				"model" "models/props_halloween/halloween_rock009_large.mdl"
+				"disableshadows" "1"
+				"modelscale" "2.5"
+			}
+			prop_dynamic
+			{
+				"origin" "-2512 2398 44"
+				"angles" "29 107 8"
+				"model" "models/props_halloween/halloween_rock003.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.5"
+			}
+			prop_dynamic
+			{
+				"origin" "-874 -3488 633"
+				"angles" "0 105 0"
+				"model" "models/props_halloween/ghost.mdl"
+				"disableshadows" "1"
+				"defaultanim" "idle"
+			}
+			prop_dynamic
+			{
+				"origin" "-992 -3424 633"
+				"angles" "0 60 0"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"defaultanim" "idle"
+			}
+			prop_dynamic
+			{
+				"origin" "-576 1479 38"
+				"angles" "0 15 0"
+				"model" "models/props_halloween/tombstone_02.mdl"
+				"disableshadows" "1"
+			}
+			prop_dynamic // i will now copy the keyvalues directly from the vmf
+			{
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-504 -3120 384"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-872 -3120 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 300 0"
+				"model" "models/props_halloween/jackolantern_01.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-808 -3136 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 255 0"
+				"model" "models/props_halloween/jackolantern_02.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-559 -3135 384"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1112 -3216 384"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1080 -3264 384"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-144 -2980 384"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-752 -3724 384"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-768 -3672 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 255 0"
+				"model" "models/props_halloween/jackolantern_02.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-936 -2824 384"
+			}
+			prop_dynamic
+			{
+				"angles" "86 173 -15"
+				"model" "models/props_viaduct_event/coffin_simple_base.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-568 -3738 400"
+			}
+			prop_dynamic
+			{
+				"angles" "0 165 -90"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-552 -3556 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 175 -90"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-552 -3554 410"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-72 -3380 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 62 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-120 -3392 384"
+			}
+			prop_dynamic
+			{
+				"angles" "15 0 -15"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"origin" "-607 -3062 386"
+			}
+			prop_dynamic
+			{
+				"angles" "0 330 0"
+				"model" "models/props_mvm/mvm_skeleton_arm.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.4"
+				"origin" "-632 -3712 388"
+			}
+			prop_dynamic
+			{
+				"angles" "0 270 90"
+				"model" "models/props_viaduct_event/coffin_simple_lid.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"origin" "-580 -3710 386"
+			}
+			prop_dynamic
+			{
+				"angles" "-3 285 179"
+				"model" "models/props_mvm/mvm_skeleton_arm.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.4"
+				"origin" "-648 -3678 387"
+			}
+			prop_dynamic
+			{
+				"angles" "0 45 -90"
+				"model" "models/props_mvm/mvm_skeleton_leg.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.2"
+				"origin" "-612 -3714 388"
+			}
+			prop_dynamic
+			{
+				"angles" "0 45 -90"
+				"model" "models/props_mvm/mvm_human_skull.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.4"
+				"origin" "-628 -3688 390"
+			}
+			prop_dynamic
+			{
+				"angles" "0 165 90"
+				"model" "models/props_mvm/mvm_skeleton_leg.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.2"
+				"origin" "-572 -3672 388"
+			}
+			prop_dynamic
+			{
+				"angles" "0 270 0"
+				"model" "models/props_halloween/smlprop_ghost.mdl"
+				"disableshadows" "1"
+				"origin" "-679 -3102 450"
+			}
+			prop_dynamic
+			{
+				"angles" "0 180 0"
+				"model" "models/props_gameplay/sign_gameplay01_witharrow_r.mdl"
+				"disableshadows" "1"
+				"skin" "1"
+				"origin" "-528 -3512 480"
+			}
+			prop_dynamic
+			{
+				"angles" "0 23 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1159 -1392 248"
+			}
+			prop_dynamic
+			{
+				"angles" "0 162 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1200 -1392 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 75 0"
+				"model" "models/props_halloween/jackolantern_01.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-792 -2400 460"
+			}
+			prop_dynamic
+			{
+				"angles" "0 42 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-856 -2432 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 50 0"
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-872 -2376 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 15 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1176 -2232 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 27 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1148 -2208 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 150 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1162 -2220 408"
+			}
+			prop_dynamic
+			{
+				"angles" "0 255 0"
+				"model" "models/props_manor/coffin_01.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "440 -2536 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 0 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1732 -2472 384"
+			}
+			prop_dynamic
+			{
+				"angles" "-30 105 0"
+				"model" "models/props_viaduct_event/coffin_simple_base.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1783 -2432 392"
+			}
+			prop_dynamic
+			{
+				"angles" "0 315 0"
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1672 -2608 384"
+			}
+			prop_dynamic
+			{
+				"angles" "5 90 90"
+				"model" "models/props_manor/coffin_02.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-2048 -684 280"
+			}
+			prop_dynamic
+			{
+				"angles" "0 330 0"
+				"model" "models/props_halloween/jackolantern_02.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-2019 -539 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 180 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-2028 -584 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 75 0"
+				"model" "models/props_halloween/jackolantern_01.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1744 -1397 288"
+			}
+			prop_dynamic
+			{
+				"angles" "0 160 0"
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-708 -1468 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 330 0"
+				"model" "models/props_halloween/jackolantern_01.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1182 -1254 320"
+			}
+			prop_dynamic
+			{
+				"angles" "7.07739 62.3744 -4.17701"
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "204 -344 131"
+			}
+			prop_dynamic
+			{
+				"angles" "-2.85017 186.747 9.06792"
+				"model" "models/props_halloween/jackolantern_01.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "166 -272 122"
+			}
+			prop_dynamic
+			{
+				"angles" "0 20 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1664 -560 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 42 0"
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-176 -1504 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 255 0"
+				"model" "models/props_halloween/jackolantern_02.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-548 -1950 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 75 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-496 -1968 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 165 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1792 -536 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 225 0"
+				"model" "models/props_halloween/jackolantern_02.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-936 -584 368"
+			}
+			prop_dynamic
+			{
+				"angles" "0 100 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-544 -280 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 150 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-592 -274 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 75 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-308 -484 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 135 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-344 -492 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 75 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-789 -573 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 51 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-544 -1528 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 120 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "96 -863 177"
+			}
+			prop_dynamic
+			{
+				"angles" "0 72 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-268 -1494 433"
+			}
+			prop_dynamic
+			{
+				"angles" "0 285 -15"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-400 -1496 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 240 0"
+				"model" "models/props_halloween/jackolantern_02.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-47 464 -32"
+			}
+			prop_dynamic
+			{
+				"angles" "0 30 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1744 -1055 288"
+			}
+			prop_dynamic
+			{
+				"angles" "0 150 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1191 -1159 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 225 0"
+				"model" "models/props_halloween/jackolantern_01.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-864 -37 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 150 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-848 -80 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 165 0"
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-2000 336 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 75 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1936 344 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 30 -45"
+				"model" "models/props_viaduct_event/coffin_simple_base.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1964 266 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 90 -30"
+				"model" "models/props_viaduct_event/coffin_simple_lid.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-2008 255 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 345 0"
+				"model" "models/props_well/hand_truck01.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-2012 45 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 165 0"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-2011 49 256"
+			}
+			prop_dynamic
+			{
+				"angles" "-44.9215 175.761 -87.0041"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-2028 212 268"
+			}
+			prop_dynamic
+			{
+				"angles" "0 60 0"
+				"model" "models/props_halloween/jackolantern_02.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-2012 -147 256"
+			}
+			prop_dynamic
+			{
+				"angles" "9.71494 57.2753 -6.20098"
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1786 -226 250"
+			}
+			prop_dynamic
+			{
+				"angles" "-9.41224 307.28 -7.09601"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1723.24 -230 250"
+			}
+			prop_dynamic
+			{
+				"angles" "90 279.5 0"
+				"model" "models/props_manor/coffin_01.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-2000 940 237"
+			}
+			prop_dynamic
+			{
+				"angles" "0 270 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-314 737 -32"
+			}
+			prop_dynamic
+			{
+				"angles" "0 225 0"
+				"model" "models/props_halloween/jackolantern_01.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "82 1124 -32"
+			}
+			prop_dynamic
+			{
+				"angles" "0 300 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "39 1134 -32"
+			}
+			prop_dynamic
+			{
+				"angles" "0 150 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "94 1080 -32"
+			}
+			prop_dynamic
+			{
+				"angles" "0 30 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1948 614 176"
+			}
+			prop_dynamic
+			{
+				"angles" "0 165 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1947 650 176"
+			}
+			prop_dynamic
+			{
+				"angles" "1.03449 345.035 3.86412"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1949 633 200"
+			}
+			prop_dynamic
+			{
+				"angles" "0 315 0"
+				"model" "models/props_halloween/jackolantern_01.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1840 976 176"
+			}
+			prop_dynamic
+			{
+				"angles" "0 180 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1800 1000 176"
+			}
+			prop_dynamic
+			{
+				"angles" "0 75 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1704 1216 176"
+			}
+			prop_dynamic
+			{
+				"angles" "0 75 0"
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1688 1688 176"
+			}
+			prop_dynamic
+			{
+				"angles" "0 345 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1632 1720 176"
+			}
+			prop_dynamic
+			{
+				"angles" "-10.5765 74.7495 3.87038"
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-554.705 1336 24"
+			}
+			prop_dynamic
+			{
+				"angles" "-13.6821 70.0942 3.0941"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-567 1278 11"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_halloween/pumpkin_02.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-222 788 -32"
+			}
+			prop_dynamic
+			{
+				"angles" "0 15 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-160 813 -32"
+			}
+			prop_dynamic
+			{
+				"angles" "0 315 0"
+				"model" "models/props_halloween/jackolantern_02.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-234 808 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 150 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-239 760 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 90 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "543 -736 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 225 0"
+				"model" "models/props_halloween/pumpkin_01.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "503 -743 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 285 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "447 -2358 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 150 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "400 -2375 320"
+			}
+			prop_dynamic
+			{
+				"angles" "4.14081 73.6656 -9.81902"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "104 1519 -120"
+			}
+			prop_dynamic
+			{
+				"angles" "0 180 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-311 2065 -157"
+			}
+			prop_dynamic
+			{
+				"angles" "3.87088 67.8746 13.1341"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1213 2178 -142"
+			}
+			prop_dynamic
+			{
+				"angles" "0 270 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-1031 2287 -177"
+			}
+			prop_dynamic
+			{
+				"angles" "0 75 -90"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "594 -1869 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 69 -90"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "597 -1879 344"
+			}
+			prop_dynamic
+			{
+				"angles" "0 210 0"
+				"model" "models/props_viaduct_event/coffin_simple_base.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "586 -2035 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 240 -15"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-544 -416 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 285 0"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "137 612 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 279 -90"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-406 753 209"
+			}
+			prop_dynamic
+			{
+				"angles" "0 15 -90"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "352 -408 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 180 0"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-98 -1329 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 300 -90"
+				"model" "models/props_viaduct_event/coffin_simple_closed.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-184 -1312 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 300 0"
+				"model" "models/props_well/hand_truck01.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-280 -1304 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 135 0"
+				"model" "models/props_halloween/jackolantern_02.mdl"
+				"disableshadows" "1"
+				"solid" "6"
+				"origin" "-96 -2920 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 165 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"origin" "574 -663 798"
+			}
+			prop_dynamic
+			{
+				"angles" "0 195 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"origin" "576 -393 798"
+			}
+			prop_dynamic
+			{
+				"angles" "0 75 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"origin" "-1440 -288 496"
+			}
+			prop_dynamic
+			{
+				"angles" "0 90 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"origin" "-526 -32 768"
+			}
+			prop_dynamic
+			{
+				"angles" "0 6.5 0"
+				"model" "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+				"disableshadows" "1"
+				"DefaultAnim" "taunt_russian"
+				"DisableBoneFollowers" "1"
+				"skin" "3"
+				"origin" "-1991 1361 176"
+			}
+			prop_dynamic
+			{
+				"angles" "0 96 0"
+				"model" "models/props_halloween/pumpkin_03.mdl"
+				"fadescale" "1"
+				"fademaxdist" "2100"
+				"fademindist" "2000"
+				"disableshadows" "1"
+				"origin" "-1760 1392 176"
+			}
+			prop_dynamic
+			{
+				"angles" "0 141 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "-1360 -288 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 156 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "-1985 414 176"
+			}
+			prop_dynamic
+			{
+				"angles" "0 111 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-1296 1536 176"
+			}
+			prop_dynamic
+			{
+				"angles" "0 111 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-1296 1296 176"
+			}
+			prop_dynamic
+			{
+				"angles" "0 351 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "-1184 592 176"
+			}
+			prop_dynamic
+			{
+				"angles" "0 111 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-1376 608 176"
+			}
+			prop_dynamic
+			{
+				"angles" "-21 90 90"
+				"model" "models/props_halloween/pumpkin_explode_jib02.mdl"
+				"disableshadows" "1"
+				"origin" "480 768 96"
+			}
+			prop_dynamic
+			{
+				"angles" "5.79484 148.442 -105.079"
+				"model" "models/props_halloween/pumpkin_explode_jib03.mdl"
+				"disableshadows" "1"
+				"origin" "551 717 100"
+			}
+			prop_dynamic
+			{
+				"angles" "48.6669 181.711 -158.006"
+				"model" "models/props_halloween/pumpkin_explode_jib01.mdl"
+				"disableshadows" "1"
+				"origin" "460 748 106"
+			}
+			prop_dynamic
+			{
+				"angles" "0 111 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "152 664 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 276 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "152 792 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 321 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "172 -216 240"
+			}
+			prop_dynamic
+			{
+				"angles" "0 186 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-528 -556 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 336 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-8 485 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 81 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "-480 -1044 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 231 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-1316 -1008 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 321 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "-920 -676 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 321 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-716 -1296 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 66 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "-1512 -2072 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 96 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "-1682 -918 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 6 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-1728 -1870 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 171 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-326 -2239 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 291 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-647 -3101 426"
+			}
+			prop_dynamic
+			{
+				"angles" "0 66 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "-772 -3104 426"
+			}
+			prop_dynamic
+			{
+				"angles" "0 186 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "-912 -3444 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 291 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "452 -2076 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 156 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "104 -1360 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 171 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.3"
+				"origin" "-713 -1308 320"
+			}
+			prop_dynamic
+			{
+				"angles" "0 111 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-1120 -2200 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 336 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-2028 -1008 288"
+			}
+			prop_dynamic
+			{
+				"angles" "0 336 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "556 -332 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 6 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "524 -301 208"
+			}
+			prop_dynamic
+			{
+				"angles" "0 36 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-844 -244 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 246 0"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "84 868 -31"
+			}
+			prop_dynamic
+			{
+				"angles" "0 111 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-412 -1896 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 336 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.3"
+				"origin" "-412 -1884 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 6 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-1848 -176 256"
+			}
+			prop_dynamic
+			{
+				"angles" "0 111 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-1288 -2756 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 306 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.3"
+				"origin" "-1280 -2764 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 216 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-82 -3142 392"
+			}
+			prop_dynamic
+			{
+				"angles" "0 51 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-1156 -2883 384"
+			}
+			prop_dynamic
+			{
+				"angles" "0 156 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-300 516 -31"
+			}
+			prop_dynamic
+			{
+				"angles" "-4.28047 113.005 350.682"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "109 1797 -134"
+			}
+			prop_dynamic
+			{
+				"angles" "2.83805 51.188 355.548"
+				"model" "models/props_halloween/candle_cluster.mdl"
+				"disableshadows" "1"
+				"origin" "-460 2071 -155"
+			}
+			prop_dynamic
+			{
+				"angles" "1.85549 106.335 -6.693"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-572 1527 36"
+			}
+			prop_dynamic
+			{
+				"angles" "0 0 0"
+				"model" "models/props_halloween/cobweb_04.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.5"
+				"origin" "-1161 472 296"
+			}
+			prop_dynamic
+			{
+				"angles" "0 180 0"
+				"model" "models/props_halloween/cobweb_02.mdl"
+				"disableshadows" "1"
+				"modelscale" "2.2"
+				"origin" "-2052 890 274"
+			}
+			prop_dynamic
+			{
+				"angles" "0 0 0"
+				"model" "models/props_halloween/cobweb_01.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.5"
+				"origin" "-2080 716 260"
+			}
+			prop_dynamic
+			{
+				"angles" "0 0 0"
+				"model" "models/props_halloween/cobweb_02.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.75"
+				"origin" "-527 -1230 410"
+			}
+			prop_dynamic
+			{
+				"angles" "0 300 0"
+				"model" "models/props_halloween/cobweb_04.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.75"
+				"origin" "-1188 -582 406"
+			}
+			prop_dynamic
+			{
+				"angles" "0 0 90"
+				"model" "models/props_halloween/cobweb_04.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.75"
+				"origin" "-851 -942 298"
+			}
+			prop_dynamic
+			{
+				"angles" "0 90 -90"
+				"model" "models/props_halloween/cobweb_01.mdl"
+				"disableshadows" "1"
+				"modelscale" "2.2"
+				"origin" "-884 -1902 516"
+			}
+			prop_dynamic
+			{
+				"angles" "0 270 0"
+				"model" "models/props_halloween/cobweb_02.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.75"
+				"origin" "-404 -3087 518"
+			}
+			prop_dynamic
+			{
+				"angles" "0 90 0"
+				"model" "models/props_halloween/cobweb_02.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.25"
+				"origin" "226 -1346 422"
+			}
+			prop_dynamic
+			{
+				"angles" "0 90 90"
+				"model" "models/props_halloween/cobweb_04.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.75"
+				"origin" "532 -511 250"
+			}
+			prop_dynamic
+			{
+				"angles" "0 15 -180"
+				"model" "models/props_halloween/cobweb_01.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.75"
+				"origin" "-1772.55 -1060 328"
+			}
+			prop_dynamic
+			{
+				"angles" "0 24 180"
+				"model" "models/props_halloween/cobweb_01.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.75"
+				"origin" "-387.136 -536 298"
+			}
+			prop_dynamic
+			{
+				"angles" "0 90 0"
+				"model" "models/props_halloween/cobweb_02.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.75"
+				"origin" "-700 263.89 288"
+			}
+			prop_dynamic
+			{
+				"angles" "0 15 75"
+				"model" "models/props_halloween/cobweb_01.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.75"
+				"origin" "118.032 -24 122"
+			}
+			prop_dynamic
+			{
+				"angles" "0 0 180"
+				"model" "models/props_halloween/cobweb_04.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.75"
+				"origin" "-1701.18 1542 218"
+			}
+			prop_dynamic
+			{
+				"angles" "-60 90 -90"
+				"model" "models/props_halloween/smlprop_spider.mdl"
+				"disableshadows" "1"
+				"modelscale" "1"
+				"origin" "-854 -970 270"
+			}
+			prop_dynamic
+			{
+				"angles" "0 90 90"
+				"model" "models/props_halloween/cobweb_02.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.75"
+				"origin" "-1450 592 218"
+			}
+			prop_dynamic
+			{
+				"angles" "0 270 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost.mdl"
+				"disableshadows" "1"
+				"rendercolor" "0 200 255"
+				"origin" "-1030 2342 12"
+			}
+			prop_dynamic
+			{
+				"angles" "0 270 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"rendercolor" "0 200 255"
+				"origin" "-652 2872 310"
+			}
+			prop_dynamic
+			{
+				"angles" "0 255 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"rendercolor" "0 200 255"
+				"origin" "114 2298 118"
+			}
+			prop_dynamic
+			{
+				"angles" "0 300 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"rendercolor" "0 200 255"
+				"origin" "-1623 1783 170"
+			}
+			prop_dynamic
+			{
+				"angles" "0 225 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"rendercolor" "0 200 255"
+				"origin" "905 2520 204"
+			}
+			prop_dynamic
+			{
+				"angles" "0 135 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"origin" "508 -2442 802"
+			}
+			prop_dynamic
+			{
+				"angles" "0 60 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"origin" "-1713 -2499 886"
+			}
+			prop_dynamic
+			{
+				"angles" "0 30 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"origin" "-1672 -2613 886"
+			}
+			prop_dynamic
+			{
+				"angles" "0 285 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"origin" "-482 -612 504"
+			}
+			prop_dynamic
+			{
+				"angles" "0 75 0"
+				"DefaultAnim" "idle"
+				"model" "models/props_halloween/ghost_no_hat.mdl"
+				"disableshadows" "1"
+				"origin" "-1785 -272 498"
+			}
+			prop_dynamic
+			{
+				"angles" "0 126 0"
+				"model" "models/props_halloween/candle.mdl"
+				"disableshadows" "1"
+				"origin" "-652 11 176"
+			}
+			prop_dynamic
+			{
+				"angles" "0 0 0"
+				"model" "models/props_viaduct_event/ghost_cards01.mdl"
+				"disableshadows" "1"
+				"rendercolor" "125 175 255"
+				"origin" "632 1582 233"
+			}
+			prop_dynamic
+			{
+				"angles" "0 100 0"
+				"model" "models/props_viaduct_event/ghost_cards01.mdl"
+				"disableshadows" "1"
+				"rendercolor" "125 175 255"
+				"origin" "284 2944 154"
+			}
+			prop_dynamic
+			{
+				"angles" "0 200 0"
+				"model" "models/props_viaduct_event/ghost_cards01.mdl"
+				"disableshadows" "1"
+				"rendercolor" "125 175 255"
+				"origin" "-1200 3581 121"
+			}
+			prop_dynamic
+			{
+				"angles" "0 130 0"
+				"model" "models/props_viaduct_event/ghost_cards01.mdl"
+				"disableshadows" "1"
+				"rendercolor" "125 175 255"
+				"origin" "-2325 2712 159"
+			}
+			prop_dynamic
+			{
+				"angles" "0 250 0"
+				"model" "models/props_viaduct_event/ghost_cards01.mdl"
+				"disableshadows" "1"
+				"rendercolor" "125 175 255"
+				"origin" "-2804 1621 518"
+			}
+			prop_dynamic
+			{
+				"angles" "0 300 0"
+				"model" "models/props_viaduct_event/ghost_cards01.mdl"
+				"disableshadows" "1"
+				"rendercolor" "125 175 255"
+				"origin" "-2635 226 408"
+			}
+			prop_dynamic
+			{
+				"angles" "0 300 0"
+				"model" "models/props_viaduct_event/ghost_cards01.mdl"
+				"disableshadows" "1"
+				"rendercolor" "125 175 255"
+				"origin" "-1709 3274 170"
+			}
+			prop_dynamic
+			{
+				"angles" "0 300 0"
+				"model" "models/props_viaduct_event/ghost_cards01.mdl"
+				"disableshadows" "1"
+				"rendercolor" "125 175 255"
+				"origin" "546 3448 170"
+			}
+		}
+		main
+		{
+			//// fake soundscape ////
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsound1"
+				"message" "ambient/desert_life.wav"
+				"health" "3"
+				"pitch" "50"
+				"pitchstart" "100"
+				"spawnflags" "1"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsound2"
+				"message" "ambient/hallowloop.wav"
+				"health" "10"
+				"pitch" "100"
+				"pitchstart" "100"
+				"spawnflags" "1"
+			}
+
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr1_1"
+				"message" "ambient_mp3/owl1.mp3"
+				"health" "8"
+				"pitch" "88"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr1_2"
+				"message" "ambient_mp3/owl2.mp3"
+				"health" "8"
+				"pitch" "88"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr1_3"
+				"message" "ambient_mp3/owl3.mp3"
+				"health" "8"
+				"pitch" "88"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr1_4"
+				"message" "ambient_mp3/wolf01.mp3"
+				"health" "8"
+				"pitch" "88"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr1_5"
+				"message" "ambient_mp3/wolf02.mp3"
+				"health" "8"
+				"pitch" "88"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr1_6"
+				"message" "ambient_mp3/wolf03.mp3"
+				"health" "8"
+				"pitch" "88"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr2_1"
+				"message" "ambient_mp3/crow1.mp3"
+				"health" "5"
+				"pitch" "70"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr2_2"
+				"message" "ambient_mp3/crow2.mp3"
+				"health" "5"
+				"pitch" "70"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+			
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr3_1"
+				"message" "ambient_mp3/wind_gust1.mp3"
+				"health" "8"
+				"pitch" "63"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr3_2"
+				"message" "ambient_mp3/wind_gust2.mp3"
+				"health" "8"
+				"pitch" "63"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+			
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr4_1"
+				"message" "ambient_mp3/hallow01.mp3"
+				"health" "5"
+				"pitch" "100"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr4_2"
+				"message" "ambient_mp3/hallow02.mp3"
+				"health" "5"
+				"pitch" "100"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "hsoundr4_3"
+				"message" "ambient_mp3/hallow03.mp3"
+				"health" "5"
+				"pitch" "100"
+				"pitchstart" "100"
+				"spawnflags" "49"
+			}
+			
+			logic_timer
+			{
+				"userandomtime" "1"
+				"lowerrandombound" "10"
+				"upperrandombound" "20"
+				"OnTimer" "hsoundr1_case,pickrandom,,0,-1"
+			}
+			logic_timer
+			{
+				"userandomtime" "1"
+				"lowerrandombound" "20"
+				"upperrandombound" "40"
+				"OnTimer" "hsoundr2_case,pickrandom,,0,-1"
+			}
+			logic_timer
+			{
+				"userandomtime" "1"
+				"lowerrandombound" "10"
+				"upperrandombound" "20"
+				"OnTimer" "hsoundr3_case,pickrandom,,0,-1"
+			}
+			logic_timer
+			{
+				"userandomtime" "1"
+				"lowerrandombound" "5"
+				"upperrandombound" "8"
+				"OnTimer" "hsoundr4_case,pickrandom,,0,-1"
+			}
+
+			NoFixup 1
+			logic_case
+			{
+				"targetname" "hsoundr1_case"
+				"OnCase01" "hsoundr1_1,playsound,,0,-1"
+				"OnCase02" "hsoundr1_2,playsound,,0,-1"
+				"OnCase03" "hsoundr1_3,playsound,,0,-1"
+				"OnCase04" "hsoundr1_4,playsound,,0,-1"
+				"OnCase05" "hsoundr1_5,playsound,,0,-1"
+				"OnCase06" "hsoundr1_6,playsound,,0,-1"
+			}
+			NoFixup 1
+			logic_case
+			{
+				"targetname" "hsoundr2_case"
+				"OnCase01" "hsoundr2_1,playsound,,0,-1"
+				"OnCase02" "hsoundr2_2,playsound,,0,-1"
+			}
+			NoFixup 1
+			logic_case
+			{
+				"targetname" "hsoundr3_case"
+				"OnCase01" "hsoundr3_1,playsound,,0,-1"
+				"OnCase02" "hsoundr3_2,playsound,,0,-1"
+			}
+			NoFixup 1
+			logic_case
+			{
+				"targetname" "hsoundr4_case"
+				"OnCase01" "hsoundr4_1,playsound,,0,-1"
+				"OnCase02" "hsoundr4_2,playsound,,0,-1"
+				"OnCase03" "hsoundr4_3,playsound,,0,-1"
+			}
+
+			//// forward tele ////
+			ambient_generic
+			{
+				"targetname" "fwdtele_ambient"
+				"origin" "-664 -3644 472"
+				"health" "10"
+				"pitch" "100"
+				"pitchstart" "100"
+				"message" "misc/halloween/merasmus_float.wav"
+				"radius" "1200"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "fwdtele_ambient"
+				"origin" "-664 -3644 456"
+				"health" "10"
+				"pitch" "100"
+				"pitchstart" "100"
+				"message" "misc/halloween/merasmus_float.wav"
+				"radius" "1200"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "fwdtele_ambient"
+				"origin" "-664 -3644 472"
+				"health" "10"
+				"pitch" "100"
+				"pitchstart" "100"
+				"message" "misc/halloween/merasmus_float.wav"
+				"radius" "1200"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "fwdtele_ambient"
+				"origin" "-664 -3644 456"
+				"health" "10"
+				"pitch" "100"
+				"pitchstart" "100"
+				"message" "misc/halloween/merasmus_float.wav"
+				"radius" "1200"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "fwdtele_ambient2"
+				"origin" "-664 -3644 472"
+				"health" "10"
+				"pitch" "100"
+				"pitchstart" "100"
+				"message" "misc/halloween/merasmus_float.wav"
+				"radius" "1200"
+				"spawnflags" "16"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "fwdtele_ambient2"
+				"origin" "-664 -3644 456"
+				"health" "10"
+				"pitch" "100"
+				"pitchstart" "100"
+				"message" "misc/halloween/merasmus_float.wav"
+				"radius" "1200"
+				"spawnflags" "16"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "fwdtele_ambient2"
+				"origin" "-664 -3644 472"
+				"health" "10"
+				"pitch" "100"
+				"pitchstart" "100"
+				"message" "misc/halloween/merasmus_float.wav"
+				"radius" "1200"
+				"spawnflags" "16"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "fwdtele_ambient2"
+				"origin" "-664 -3644 456"
+				"health" "10"
+				"pitch" "100"
+				"pitchstart" "100"
+				"message" "misc/halloween/merasmus_float.wav"
+				"radius" "1200"
+				"spawnflags" "16"
+			}
+			NoFixup 1
+			logic_timer
+			{
+				"targetname" "fwdtele_ambient_timer"
+				"refiretime" "22"
+				"OnTimer" "fwdtele_ambient,playsound,,0,-1"
+				"OnTimer" "fwdtele_ambient2,stopsound,,0,-1"
+				"OnTimer" "fwdtele_ambient2,playsound,,11,-1"
+				"OnTimer" "fwdtele_ambient,stopsound,,11,-1"
+			}
+			NoFixup 1
+			prop_dynamic
+			{
+				"targetname" "fwdtele"
+				"origin" "-656 -3624 464"
+				"angles" "0 180 0"
+				"model" "models/props_lakeside_event/wof_plane2.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1700"
+				"fademindist" "1200"
+				"rendercolor" "255 65 65"
+				"disableshadows" "1"
+				"modelscale" "0.7"
+			}
+			NoFixup 1
+			prop_dynamic
+			{
+				"targetname" "fwdtele"
+				"origin" "-656 -3624 464"
+				"angles" "45 180 0"
+				"model" "models/props_lakeside_event/wof_plane2.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1700"
+				"fademindist" "1200"
+				"rendercolor" "255 65 65"
+				"disableshadows" "1"
+				"modelscale" "0.7"
+			}
+			NoFixup 1
+			prop_dynamic
+			{
+				"targetname" "fwdtele"
+				"origin" "-656 -3624 464"
+				"angles" "90 180 0"
+				"model" "models/props_lakeside_event/wof_plane2.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1700"
+				"fademindist" "1200"
+				"rendercolor" "255 65 65"
+				"disableshadows" "1"
+				"modelscale" "0.7"
+			}
+			NoFixup 1
+			prop_dynamic
+			{
+				"targetname" "fwdtele"
+				"origin" "-656 -3624 464"
+				"angles" "135 180 0"
+				"model" "models/props_lakeside_event/wof_plane2.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1700"
+				"fademindist" "1200"
+				"rendercolor" "255 65 65"
+				"disableshadows" "1"
+				"modelscale" "0.7"
+			}
+			NoFixup 1
+			prop_dynamic
+			{
+				"targetname" "fwdtele"
+				"origin" "-656 -3624 464"
+				"angles" "180 180 0"
+				"model" "models/props_lakeside_event/wof_plane2.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1700"
+				"fademindist" "1200"
+				"rendercolor" "255 65 65"
+				"disableshadows" "1"
+				"modelscale" "0.7"
+			}
+			NoFixup 1
+			prop_dynamic
+			{
+				"targetname" "fwdtele"
+				"origin" "-656 -3624 464"
+				"angles" "225 180 0"
+				"model" "models/props_lakeside_event/wof_plane2.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1700"
+				"fademindist" "1200"
+				"rendercolor" "255 65 65"
+				"disableshadows" "1"
+				"modelscale" "0.7"
+			}
+			NoFixup 1
+			prop_dynamic
+			{
+				"targetname" "fwdtele"
+				"origin" "-656 -3624 464"
+				"angles" "270 180 0"
+				"model" "models/props_lakeside_event/wof_plane2.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1700"
+				"fademindist" "1200"
+				"rendercolor" "255 65 65"
+				"disableshadows" "1"
+				"modelscale" "0.7"
+			}
+			NoFixup 1
+			prop_dynamic
+			{
+				"targetname" "fwdtele"
+				"origin" "-656 -3624 464"
+				"angles" "315 180 0"
+				"model" "models/props_lakeside_event/wof_plane2.mdl"
+				"fadescale" "1"
+				"fademaxdist" "1700"
+				"fademindist" "1200"
+				"rendercolor" "255 65 65"
+				"disableshadows" "1"
+				"modelscale" "0.7"
+			}
+			NoFixup 1
+			trigger_teleport
+			{
+				"targetname" "fwdtele"
+				"target" "fwdtele_dest"
+				"origin" "-656 -3740 460"
+				"mins" "-128 -36 -76"
+				"maxs" "128 100 76"
+				"spawnflags" "1"
+				"OnStartTouch" "!activator,$PlaySoundToSelf,misc/halloween/spell_teleport.wav,0,-1"
+			}
+			NoFixup 1
+			info_teleport_destination
+			{
+				"targetname" "fwdtele_dest"
+				"origin" "-1768 296 288"
+			}
+			NoFixup 1
+			info_particle_system
+			{
+				"targetname" "fwdtele_p"
+				"origin" "-1768 296 260"
+				"effect_name" "npc_boss_bomb_alert"
+				"start_active" "1"
+			}
+
+			//// collect money inside props ////
+			trigger_hurt
+			{
+				"origin" "-1216 2176 -120"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1024 2288 -152"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-320 2064 -130"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "96 1520 -104"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1712 1216 200"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-2016 -144 280"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-48 464 -8"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-320 736 -8"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "112 608 232"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-544 -416 280"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-944 -592 392"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1664 -560 280"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1744 -1056 312"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1744 -1392 312"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1184 -1248 344"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-544 -1520 232"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-400 -1504 344"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-272 -1488 456"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1160 -2224 408"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1184 -1152 280"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-784 -576 280"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "576 -2016 344"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "160 -272 136"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "96 -864 200"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "64 1104 -8"
+				"mins" "-48 -48 -24"
+				"maxs" "48 48 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-240 784 232"
+				"mins" "-32 -48 -24"
+				"maxs" "32 48 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1664 1696 200"
+				"mins" "-64 -48 -24"
+				"maxs" "64 48 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1824 984 200"
+				"mins" "-48 -40 -24"
+				"maxs" "48 40 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1944 632 200"
+				"mins" "-24 -40 -24"
+				"maxs" "24 40 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-864 -64 280"
+				"mins" "-32 -48 -24"
+				"maxs" "32 48 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-200 792 -8"
+				"mins" "-72 -40 -24"
+				"maxs" "72 40 24"
+			}
+			trigger_hurt
+			{
+				"origin" "528 -736 232"
+				"mins" "-48 -32 -24"
+				"maxs" "48 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "340 -352 232"
+				"mins" "-36 -64 -24"
+				"maxs" "32 64 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-568 -280 280"
+				"mins" "-56 -24 -24"
+				"maxs" "56 24 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-2016 144 280"
+				"mins" "-32 -112 -24"
+				"maxs" "32 112 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-128 -1280 344"
+				"mins" "-64 -48 -24"
+				"maxs" "64 48 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-280 -1304 344"
+				"mins" "-24 -24 -24"
+				"maxs" "24 24 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1792 -536 280"
+				"mins" "-16 -24 -24"
+				"maxs" "16 24 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-328 -488 280"
+				"mins" "-40 -24 -24"
+				"maxs" "40 24 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-712 -1464 232"
+				"mins" "-40 -40 -24"
+				"maxs" "40 40 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-174 -1496 344"
+				"mins" "-40 -40 -24"
+				"maxs" "40 40 24"
+			}
+			trigger_hurt
+			{
+				"origin" "544 -1864 344"
+				"mins" "-64 -40 -24"
+				"maxs" "64 40 24"
+			}
+			trigger_hurt
+			{
+				"origin" "424 -2368 344"
+				"mins" "-56 -32 -24"
+				"maxs" "56 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "440 -2536 408"
+				"mins" "-40 -72 -24"
+				"maxs" "40 72 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-520 -1960 408"
+				"mins" "-56 -40 -24"
+				"maxs" "56 40 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1744 -2448 408"
+				"mins" "-48 -48 -24"
+				"maxs" "48 48 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-2016 -560 280"
+				"mins" "-32 -48 -24"
+				"maxs" "32 48 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-2032 -680 280"
+				"mins" "-16 -72 -24"
+				"maxs" "16 72 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-96 -2920 408"
+				"mins" "-24 -24 -24"
+				"maxs" "24 24 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-2000 920 200"
+				"mins" "-32 -24 -24"
+				"maxs" "32 24 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-552 1312 29"
+				"mins" "-40 -64 -24"
+				"maxs" "40 64 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1760 -216 264"
+				"mins" "-64 -40 -24"
+				"maxs" "64 40 24"
+			}
+			trigger_hurt
+			{
+				"origin" "224 -336 152"
+				"mins" "-64 -40 -24"
+				"maxs" "64 40 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-872 -2392 408"
+				"mins" "-40 -72 -24"
+				"maxs" "40 72 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-792 -2400 486"
+				"mins" "-32 -32 -24"
+				"maxs" "32 32 24"
+			}
+			trigger_hurt
+			{
+				"origin" "-1992 304 306"
+				"mins" "-80 -64 -50"
+				"maxs" "80 64 50"
+			}
+
+			//// misc ////
+			logic_relay
+			{
+				"OnSpawn" "nav_prefer_final_alt,kill,,0,-1"
+				"OnSpawn" "nav_prefer_final_flank_right,kill,,0,-1"
+				"OnSpawn" "nav_prefer_final_main,kill,,0,-1"
+				"OnSpawn" "nav_prefer_left,kill,,0,-1"
+				"OnSpawn" "nav_prefer_right,kill,,0,-1"
+				"OnSpawn" "item_healthkit_small,$setmodeloverride,models/props_halloween/halloween_medkit_small.mdl,0,-1"
+				"OnSpawn" "item_healthkit_medium,$setmodeloverride,models/props_halloween/halloween_medkit_medium.mdl,0,-1"
+				"OnSpawn" "item_healthkit_full,$setmodeloverride,models/props_halloween/halloween_medkit_large.mdl,0,-1"
+				"OnSpawn" "cap_hatch_glasswindow,kill,,0,-1"
+				"OnSpawn" "wave_start_relay,addoutput,OnTrigger fwdtele:disable::0:-1,0,-1"
+				"OnSpawn" "wave_start_relay,addoutput,OnTrigger fwdtele_p:stop::0:-1,0,-1"
+				"OnSpawn" "wave_start_relay,addoutput,OnTrigger fwdtele_ambient:volume:0:0:-1,0,-1"
+				"OnSpawn" "wave_start_relay,addoutput,OnTrigger fwdtele_ambient2:volume:0:0:-1,0,-1"
+				"OnSpawn" "wave_start_relay,addoutput,OnTrigger fwdtele_ambient_timer:disable::0:-1,0,-1"
+				"OnSpawn" "wave_start_relay,addoutput,OnTrigger potiontrigger&*:enable::0:-1,0,-1"
+				"OnSpawn" "wave_start_relay,addoutput,OnTrigger potionmodel&*:enable::0:-1,0,-1"
+				"OnSpawn" "wave_start_relay,addoutput,OnTrigger potionrespawn&*:playsound::0:-1,0,-1"
+				"OnSpawn" "wave_start_relay,addoutput,OnTrigger potionrespparticle_timer&*:disable::0:-1,0,-1"
+				"OnSpawn" "wave_finished_relay,addoutput,OnTrigger fwdtele:enable::0:-1,0,-1"
+				"OnSpawn" "wave_finished_relay,addoutput,OnTrigger fwdtele_p:start::0:-1,0,-1"
+				"OnSpawn" "wave_finished_relay,addoutput,OnTrigger fwdtele_ambient:volume:10:0:-1,0,-1"
+				"OnSpawn" "wave_finished_relay,addoutput,OnTrigger fwdtele_ambient2:volume:10:11:-1,0,-1"
+				"OnSpawn" "wave_finished_relay,addoutput,OnTrigger fwdtele_ambient_timer:enable::0:-1,0,-1"
+				"OnSpawn" "wave_finished_relay,addoutput,OnTrigger potiontrigger&*:disable::0:-1,0,-1"
+				"OnSpawn" "wave_finished_relay,addoutput,OnTrigger potionmodel&*:disable::0:-1,0,-1"
+				"OnSpawn" "wave_finished_relay,addoutput,OnTrigger potionrespparticle_timer&*:enable::0:-1,0,-1"
+				"OnSpawn" "wave_finished_relay,addoutput,OnTrigger potionresp_timer&*:disable::0:-1,0,-1"
+				"OnSpawn" "fwdtele_ambient,stopsound,,11,-1"
+				"OnSpawn" "fwdtele_ambient2,playsound,,11,-1"
+			}
+			NoFixup 1
+			info_teleport_destination
+			{
+				"targetname" "potion_goto"
+				"origin" "-656 -3520 410"
+				"angles" "0 90 0"
+			}
+			NoFixup 1
+			env_fog_controller
+			{
+				"targetname" "potion_fog_controller"
+				"fogenable" "1"
+				"fogstart" "0"
+				"fogend" "512"
+				"fogmaxdensity" "1"
+				"fogcolor" "0 0 0"
+				"foglerptime" "2"
+			}
+			func_forcefield
+			{
+				"origin" "-1992 314 306"
+				"mins" "-80 -54 -50"
+				"maxs" "80 54 50"
+				"rendermode" "10"
+				"teamnum" "2"
+			}
+			NoFixup 1
+			info_particle_system
+			{
+				"targetname" "end_pit_destroy_particle"
+				"origin" "-576 -2496 -640"
+				"effect_name" "bonzo_vomit_purple"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "pit_explosion_wav"
+				"health" "10"
+				"pitch" "100"
+				"pitchstart" "100"
+				"message" "misc/bonzo_vomit01.wav"
+				"spawnflags" "49"
+			}
+		}
+		megasmasher
+		{
+			NoFixup 1
+			sky_camera // let me see props in the skybox please
+			{
+				"targetname" "sky_camera2"
+				"fogcolor" "16 18 20"
+				"fogcolor2" "255 255 255"
+				"fogdir" "1 0 0"
+				"fogenable" "1"
+				"fogstart" "3000"
+				"fogend" "8000"
+				"fogmaxdensity" "1"
+				"scale" "16"
+				"origin" "5920 0 0"
+			}
+
+			NoFixup 1
+			prop_dynamic
+			{
+				"targetname" "hammer_arm"
+				"model" "models/props_halloween/hammer_mechanism.mdl"
+				"origin" "5992 576 50"
+				"angles" "0 210 0"
+				"disablebonefollowers" "1"
+				"disablereceiveshadows" "1"
+				"disableshadows" "1"
+				"modelscale" "0.75"
+				"rendercolor" "0 0 0"
+			}
+			NoFixup 1
+			info_target
+			{
+				"targetname" "hammer_arm_light"
+				"origin" "-800 450 325"
+			}
+			NoFixup 1
+			prop_dynamic
+			{
+				"targetname" "hammer_vol"
+				"model" "models/effects/vol_light128x128.mdl"
+				"origin" "5648 352 -16"
+				"angles" "0 225 -180"
+				"disablereceiveshadows" "1"
+				"disableshadows" "1"
+				"modelscale" "1.5"
+				"startdisabled" "1"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "sound_vol"
+				"health" "10"
+				"message" "ambient/lightson.wav"
+				"pitch" "75"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "sound_vol"
+				"health" "10"
+				"message" "ambient/lightson.wav"
+				"pitch" "75"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "sound_voloff"
+				"health" "10"
+				"message" "ambient/lightsoff.wav"
+				"pitch" "75"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "sound_voloff"
+				"health" "10"
+				"message" "ambient/lightsoff.wav"
+				"pitch" "75"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			logic_relay
+			{
+				"targetname" "wave_init_smasher_relay"
+				"OnTrigger" "hammer_vol,enable,,5.6,-1"
+				"OnTrigger" "sound_vol,playsound,,5.6,-1"
+				"OnTrigger" "hammer_arm,color,255 255 255,5.6,-1"
+				"OnTrigger" "hammer_arm,setlightingorigin,hammer_arm_light,5.6,-1"
+			}
+			NoFixup 1
+			logic_relay
+			{
+				"targetname" "wave_start_smasher_relay"
+				"OnTrigger" "wave_start_relay,trigger,,0,-1"
+				"OnTrigger" "megasmash_timer,enable,,0,-1"
+			}
+			NoFixup 1
+			logic_relay
+			{
+				"targetname" "wave_finished_smasher_relay"
+				"OnTrigger" "wave_finished_relay,trigger,,0,-1"
+				"OnTrigger" "megasmash_timer,disable,,0,-1"
+				"OnTrigger" "hammer_vol,disable,,5.6,-1"
+				"OnTrigger" "sound_voloff,playsound,,5.6,-1"
+				"OnTrigger" "hammer_arm,color,0 0 0,5.6,-1"
+				"OnTrigger" "hammer_arm,setlightingorigin,,5.6,-1"
+			}
+			NoFixup 1
+			logic_timer
+			{
+				"targetname" "megasmash_timer"
+				"refiretime" "30"
+				"startdisabled" "1"
+				"OnTimer" "sound_bell,playsound,,0,-1"
+				"OnTimer" "hammer_ring,start,,0,-1"
+				"OnTimer" "hammer_ring,stop,,1.5,-1"
+
+				"OnTimer" "sound_crank,playsound,,1,-1"
+				"OnTimer" "hammer_arm,setanimation,smash,1,-1"
+				"OnTimer" "hammer_arm,setplaybackrate,0.75,1.01,-1"
+				"OnTimer" "sound_crank2,playsound,,1.67,-1"
+				"OnTimer" "sound_swing,playsound,,2.33,-1"
+				"OnTimer" "sound_button_smash,playsound,,2.73,-1"
+				"OnTimer" "megaimpulse,applyimpulse,,2.73,-1"
+				"OnTimer" "hammer_shake,startshake,,2.73,-1"
+				"OnTimer" "sound_crank_reset,playsound,,5.53"
+				"OnTimer" "hammer_shake,stopshake,,6.73,-1"
+			}
+			NoFixup 1
+			info_particle_system
+			{
+				"origin" "5888 -16 230"
+				"targetname" "hammer_ring"
+				"effect_name" "powerup_supernova_explode_blue"
+			}
+			NoFixup 1
+			env_shake
+			{
+				"targetname" "hammer_shake"
+				"amplitude" "16"
+				"duration" "4"
+				"frequency" "40"
+				"spawnflags" "5"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "sound_bell"
+				"health" "10"
+				"message" "misc/halloween/strongman_bell_01.wav"
+				"pitch" "75"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "sound_crank"
+				"health" "10"
+				"message" "misc/halloween/strongman_fast_swing_01.wav"
+				"pitch" "75"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "sound_crank2"
+				"health" "10"
+				"message" "misc/halloween/strongman_fast_swing_01.wav"
+				"pitch" "53"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "sound_swing"
+				"health" "10"
+				"message" "misc/halloween/strongman_fast_whoosh_01.wav"
+				"pitch" "75"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "sound_crank_reset"
+				"health" "10"
+				"message" "doors/vent_open2.wav"
+				"pitch" "75"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "sound_button_smash"
+				"health" "10"
+				"message" "ambient/explosions/explode_1.wav"
+				"pitch" "65"
+				"spawnflags" "49"
+			}
+			NoFixup 1
+			ambient_generic
+			{
+				"targetname" "sound_button_smash"
+				"health" "10"
+				"message" "misc/halloween/strongman_fast_impact_01.wav"
+				"pitch" "65"
+				"spawnflags" "49"
+			}
+			trigger_apply_impulse
+			{
+				"targetname" "megaimpulse"
+				"origin" "-448 224 448"
+				"mins" "-2496 -4768 -1088"
+				"maxs" "2496 4768 1088"
+				"filtername" "filter_redteam"
+				"force" "700" // 1400 were like blast soldiers you cannot dodge, apologies
+				"impulse_dir" "300 330 0"
+				"spawnflags" "1"
+			}
+		}
+		meraspotion
+		{
+			prop_dynamic
+			{
+				"targetname" "potionmodel"
+				"origin" "0 0 8"
+				"model" "models/props_halloween/hwn_flask_vial.mdl"
+				"defaultanim" "idle"
+				"startdisabled" "1"
+			}
+			trigger_multiple
+			{
+				"targetname" "potiontrigger"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+
+				"OnStartTouch" "!self,Disable,,0,-1"
+				"OnStartTouch" "potioncase,PickRandom,,0,-1"
+				"OnStartTouch" "potionmodel,Disable,,0,-1"
+				"OnStartTouch" "!activator,$PlaySoundToSelf,player/pl_scout_dodge_can_drink.wav,0,-1"
+				"OnStartTouch" "potionparticle,Start,,0,-1"
+				"OnStartTouch" "potionresp_particle,start,,0,-1"
+				"OnStartTouch" "potionresp_particle,stop,,0.5,-1"
+				"OnStartTouch" "potionresp_timer,enable,,0,-1"
+				"OnStartTouch" "potionrespparticle_timer,enable,,0,-1"
+			}
+			logic_timer
+			{
+				"targetname" "potionresp_timer"
+				"refiretime" "50"
+				"OnTimer" "potionrespparticle_timer,disable,,0,-1"
+				"OnTimer" "potionskincase,PickRandomShuffle,,0,-1"
+				"OnTimer" "potiontrigger,Enable,,0,-1"
+				"OnTimer" "potionrespawn,PlaySound,,0,-1"
+				"OnTimer" "potionmodel,Enable,,0,-1"
+				"OnTimer" "!self,disable,,0,-1"
+				"startdisabled" "1"
+			}
+			logic_timer
+			{
+				"targetname" "potionrespparticle_timer"
+				"refiretime" "1"
+				"OnTimer" "potionresp_particle,start,,0,-1"
+				"OnTimer" "potionresp_particle,stop,,0.5,-1"
+			}
+			info_particle_system
+			{
+				"targetname" "potionresp_particle"
+				"origin" "0 0 2"
+				"effect_name" "ping_circle"
+			}
+			ambient_generic
+			{
+				"targetname" "potionrespawn"
+				"origin" "0 0 16"
+				"message" "items/spawn_item.wav"
+				"health" "10"
+				"radius" "1024"
+				"spawnflags" "48"
+				"pitch" "100"
+				"pitchstart" "100"
+			}
+			info_particle_system
+			{
+				"targetname" "potionparticle"
+				"origin" "0 0 16"
+				"effect_name" "blood_impact_backscatter_ring"
+			}
+			logic_case
+			{
+				"targetname" "potionskincase"
+				"OnCase01" "potionmodel,skin,0,0,-1"
+				"OnCase02" "potionmodel,skin,1,0,-1"
+				"OnCase03" "potionmodel,skin,2,0,-1"
+				"OnCase04" "potionmodel,skin,3,0,-1"
+				"OnCase05" "potionmodel,skin,4,0,-1"
+				"OnCase06" "potionmodel,skin,5,0,-1"
+				"OnCase07" "potionmodel,skin,6,0,-1"
+			}
+			logic_relay
+			{
+				"OnSpawn" "potionskincase,PickRandom,,0,-1"
+			}
+			logic_case
+			{
+				"targetname" "potioncase"
+				"OnCase01" "potion_positive,pickrandomshuffle,,0,-1"
+				"OnCase02" "potion_positive,pickrandomshuffle,,0,-1"
+				"OnCase03" "potion_negative,pickrandomshuffle,,0,-1"
+			}
+			logic_case
+			{
+				"targetname" "potion_positive"
+
+				"OnCase01" "potion_aoeheal,enable,,0,-1"
+				"OnCase01" "potion_aoeheal,disable,,0.1,-1"
+				"OnCase01" "!activator,$DisplayTextCenter,Effect: Amputator Healing,0,-1"
+				"OnCase02" "potion_backup,enable,,0,-1"
+				"OnCase02" "potion_backup,disable,,0.1,-1"
+				"OnCase02" "!activator,$DisplayTextCenter,Effect: Battalion,0,-1"
+				"OnCase03" "potion_buff,enable,,0,-1"
+				"OnCase03" "potion_buff,disable,,0.1,-1"
+				"OnCase03" "!activator,$DisplayTextCenter,Effect: Mini-crits,0,-1"
+				"OnCase12" "potion_aoeheal,enable,,0,-1"
+				"OnCase12" "potion_aoeheal,disable,,0.1,-1"
+				"OnCase12" "!activator,$DisplayTextCenter,Effect: Amputator Healing,0,-1"
+				"OnCase13" "potion_backup,enable,,0,-1"
+				"OnCase13" "potion_backup,disable,,0.1,-1"
+				"OnCase13" "!activator,$DisplayTextCenter,Effect: Battalion,0,-1"
+				"OnCase14" "potion_buff,enable,,0,-1"
+				"OnCase14" "potion_buff,disable,,0.1,-1"
+				"OnCase14" "!activator,$DisplayTextCenter,Effect: Mini-crits,0,-1"
+
+				"OnCase08" "potion_heal,enable,,0,-1"
+				"OnCase08" "potion_heal,disable,,0.1,-1"
+				"OnCase08" "!activator,$DisplayTextCenter,Effect: Overheal,0,-1"
+				"OnCase09" "potion_bulletvac,enable,,0,-1"
+				"OnCase09" "potion_bulletvac,disable,,0.1,-1"
+				"OnCase09" "!activator,$DisplayTextCenter,Effect: Bullet Immunity,0,-1"
+				"OnCase10" "potion_blastvac,enable,,0,-1"
+				"OnCase10" "potion_blastvac,disable,,0.1,-1"
+				"OnCase10" "!activator,$DisplayTextCenter,Effect: Blast Immunity,0,-1"
+				"OnCase11" "potion_firevac,enable,,0,-1"
+				"OnCase11" "potion_firevac,disable,,0.1,-1"
+				"OnCase11" "!activator,$DisplayTextCenter,Effect: Fire Immunity,0,-1"
+			}
+			logic_case
+			{
+				"targetname" "potion_negative"
+				"OnCase01" "potion_jarate,enable,,0,-1"
+				"OnCase01" "potion_jarate,disable,,0.1,-1"
+				"OnCase01" "!activator,$DisplayTextCenter,Effect: Jarate,0,-1"
+				"OnCase06" "potion_milk,enable,,0,-1"
+				"OnCase06" "potion_milk,disable,,0.1,-1"
+				"OnCase06" "!activator,$DisplayTextCenter,Effect: Milk,0,-1"
+				"OnCase09" "potion_fog,enable,,0,-1"
+				"OnCase09" "potion_fog,disable,,0.1,-1"
+				"OnCase09" "!activator,$DisplayTextCenter,Effect: Fog,0,-1"
+				"OnCase10" "potion_bleed,enable,,0,-1"
+				"OnCase10" "potion_bleed,disable,,0.1,-1"
+				"OnCase10" "!activator,$DisplayTextCenter,Effect: Bleed,0,-1"
+				"OnCase11" "potion_bomb,enable,,0,-1"
+				"OnCase11" "potion_bomb,disable,,0.1,-1"
+				"OnCase11" "!activator,$DisplayTextCenter,Effect: Bomb Head,0,-1"
+				"OnCase12" "potion_gravity,enable,,0,-1"
+				"OnCase12" "potion_gravity,disable,,0.1,-1"
+				"OnCase12" "potion_gravity2,enable,,15,-1"
+				"OnCase12" "potion_gravity2,disable,,120,-1"
+				"OnCase12" "!activator,$DisplayTextCenter,Effect: Strong Gravity,0,-1"
+			}
+			trigger_add_tf_player_condition
+			{
+				"targetname" "potion_jarate"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"condition" "24"
+				"duration" "20"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_add_tf_player_condition
+			{
+				"targetname" "potion_backup"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"condition" "26"
+				"duration" "25"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_add_tf_player_condition
+			{
+				"targetname" "potion_aoeheal"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"condition" "55"
+				"duration" "25"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_add_tf_player_condition
+			{
+				"targetname" "potion_milk"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"condition" "27"
+				"duration" "30"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_multiple
+			{
+				"targetname" "potion_fog"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"OnStartTouch" "!activator,setfogcontroller,potion_fog_controller,0,-1"
+				"OnStartTouch" "!activator,setfogcontroller,fog_controller,10,-1"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_multiple
+			{
+				"targetname" "potion_bleed"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"OnStartTouch" "!activator,bleedplayer,15,0,-1"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_add_tf_player_condition
+			{
+				"targetname" "potion_bomb"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"condition" "53"
+				"duration" "4"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_add_tf_player_condition
+			{
+				"targetname" "potion_heal"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"condition" "73"
+				"duration" "5"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_add_tf_player_condition
+			{
+				"targetname" "potion_bulletvac"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"condition" "67"
+				"duration" "15"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_add_tf_player_condition
+			{
+				"targetname" "potion_blastvac"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"condition" "68"
+				"duration" "15"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_add_tf_player_condition
+			{
+				"targetname" "potion_firevac"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"condition" "69"
+				"duration" "15"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_add_tf_player_condition
+			{
+				"targetname" "potion_buff"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"condition" "16"
+				"duration" "25"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_gravity
+			{
+				"targetname" "potion_gravity"
+				"origin" "0 0 16"
+				"mins" "-16 -16 -16"
+				"maxs" "16 16 16"
+				"gravity" "3"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+			trigger_gravity
+			{
+				"targetname" "potion_gravity2"
+				"origin" "-448 224 448"
+				"mins" "-2496 -4768 -1088"
+				"maxs" "2496 4768 1088"
+				"gravity" "1"
+				"filtername" "filter_redteam"
+				"spawnflags" "1"
+				"startdisabled" "1"
+			}
+		}
+	}
+	SpawnTemplate "allprops_sky"
+	SpawnTemplate "allprops"
+	SpawnTemplate "main"
+	SpawnTemplate "megasmasher"
+	SpawnTemplate
+	{
+		Name "meraspotion"
+		Origin "-1512 1488 176"
+	}
+	SpawnTemplate
+	{
+		Name "meraspotion"
+		Origin "-120 960 -32"
+	}
+	SpawnTemplate
+	{
+		Name "meraspotion"
+		Origin "248 -416 256"
+	}
+	SpawnTemplate
+	{
+		Name "meraspotion"
+		Origin "-1968 -600 256"
+	}
+	SpawnTemplate
+	{
+		Name "meraspotion"
+		Origin "-628 -1464 320"
+	}
+	SpawnTemplate
+	{
+		Name "meraspotion"
+		Origin "-1472 -2560 384"
+	}
+	SpawnTemplate
+	{
+		Name "meraspotion"
+		Origin "-776 128 176"
+	}
+	Mission
+	{
+		Objective	Sniper
+		Where	spawnbot
+		InitialCooldown	30
+		CooldownTime	30
+		DesiredCount	2
+		BeginAtWave	1
+		RunForThisManyWaves	1
+		TFBot
+		{
+			Template	T_TFBot_Sniper
+		}
+	}
+        Mission
+	{
+		Objective	Sniper
+		Where	spawnbot
+		InitialCooldown	30
+		CooldownTime	30
+		DesiredCount	2
+		BeginAtWave	4
+		RunForThisManyWaves	1
+		TFBot
+		{
+			Template	T_TFBot_Sniper
+		}
+	}
+	Mission
+	{
+		Objective	DestroySentries
+		Where	spawnbot
+		InitialCooldown	30
+		CooldownTime	30
+		DesiredCount	1
+		BeginAtWave	1
+		RunForThisManyWaves	6
+		TFBot
+		{
+			Template	T_TFBot_SentryBuster
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+                Explanation  
+		{
+			Line ""
+			Line "{yellow}Potions {9C70FF}will be scattered around the map during each wave!"
+                        Line "{9C70FF}Drinking a potion has a chance to reward you with a {green}Buff {9C70FF}or a {red}Handicap."
+			Line "{green}Medics can heal buildings."
+                }
+		WaveSpawn
+		{
+			Name	1
+			Where	spawnbot_left
+			TotalCurrency	200
+			TotalCount	9
+			MaxActive	3
+			SpawnCount	3
+			WaitBeforeStarting	0
+                        WaitBetweenSpawns	0
+                        Squad
+                        {
+                        	TFBot
+				{
+                                	Name "Giant Skullcutter Knight"
+					Class Demoman
+					ClassIcon demoknight_skullcutter_lite
+					Skill Expert
+					Health 3300
+					Item	"the scotsman's skullcutter"
+					Item "The Chargin' Targe"
+					Item	"ethereal hood"
+					WeaponRestrictions MeleeOnly
+					Attributes MiniBoss
+					CharacterAttributes
+					{
+						"move speed bonus" 0.5
+						"damage force reduction" 0.5
+						"airblast vulnerability multiplier" 0.5
+						"override footstep sound set" 4
+                                        }
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_left
+			TotalCurrency	102
+			TotalCount	2
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	6
+			WaitForAllDead	1
+			WaitBetweenSpawns	5
+			TFBot
+			{
+				Template	T_TFBot_Giant_Soldier_Crit
+			}
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot
+			TotalCurrency	200
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	10
+			WaitForAllSpawned	2	
+			FirstSpawnOutput                                                                                                                                                            
+	                {
+		                Target boss_spawn_relay                                            
+		                Action Trigger                         
+	                }
+                        Tank
+			{
+				Health	18000
+				Name	"tankboss"
+				Speed	75
+				SpawnTemplate "gibustank"
+				StartingPathTrackNode	boss_path_1
+                                Model "models/bots/boss_bot/boss_tank_color.mdl"
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot_middle
+			TotalCurrency	100
+			TotalCount	3
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	15
+			WaitForAllDead	2
+			WaitBetweenSpawns	15
+                        TFBot
+			{
+                	ClassIcon scout_pop
+				Class Scout
+                                Name "Super Soda Popper Scout"
+                                Item "the soda popper"
+			        Skill Expert
+			        Item "The Bolt Boy"
+			        Health 1200
+			        Attributes MiniBoss
+			        Attributes HoldFireUntilFullReload
+			        Skill Expert
+			        MaxVisionRange 1200
+
+			        ItemAttributes
+			        {
+				        ItemName "The Force-a-Nature"
+				        //"clip size bonus" 2
+				        "bullets per shot bonus" 2
+				        "fire rate bonus" 0.5
+				        "faster reload rate" 1.7 
+				        "damage penalty" 0.35		
+				        "weapon spread bonus" 0.4
+			        }
+			        CharacterAttributes
+			        {
+				        "move speed bonus"	1.1
+				        "damage force reduction" 0.7
+				        "airblast vulnerability multiplier" 0.7
+				        "override footstep sound set" 5
+			        }
+			}
+		}
+		WaveSpawn
+		{
+			Name	1
+			Where	spawnbot
+			TotalCurrency	36
+			TotalCount	56
+			MaxActive	8
+			SpawnCount	4
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	2
+                        RandomChoice
+                        {
+                       		TFBot
+				{
+					Health	125
+					Skill	Normal
+					Name	Scout
+					Class	Scout
+				}
+                        	TFBot
+				{
+					Health	125
+					Skill	Easy
+					Name	Scout
+					Class	Scout
+                                }
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_right
+			TotalCurrency	30
+			TotalCount	21
+			MaxActive	6
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitForAllDead	1
+			WaitBetweenSpawns	2
+			TFBot
+			{
+				Template	T_TFBot_Demoman
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_left
+			TotalCurrency	32
+			TotalCount	29
+			MaxActive	8
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitForAllDead	1
+			WaitBetweenSpawns	1
+			TFBot
+			{
+				Template	T_TFBot_Pyro_Flaregun
+			}
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot
+			TotalCurrency	0
+			TotalCount	999
+			MaxActive	12
+			SpawnCount	4
+			WaitBeforeStarting	0
+			WaitForAllDead	2
+			WaitBetweenSpawns	2
+			Support	1
+			RandomChoice
+			{
+				TFBot
+				{
+                                ClassIcon pan_golden_lite
+					WeaponRestrictions	MeleeOnly
+					Health	125
+					Skill	Expert
+					Name	Scout
+					Class	Scout
+					Item "Gold Frying Pan"
+					WeaponRestrictions MeleeOnly
+					VoiceCommand  
+                			{
+                    				Delay 2
+                    				Cooldown 9
+                    				IfSeeTarget 0
+                    				Type "Battle Cry"
+                			}
+					ItemAttributes
+					{
+						ItemName "Gold Frying Pan"
+						"item style override" 0
+					}
+				}
+				TFBot
+				{
+                                ClassIcon pan_golden_lite
+					WeaponRestrictions	MeleeOnly
+					Health	200
+					Skill	Expert
+					Name	Soldier
+					Class	Soldier
+					Item "Gold Frying Pan"
+					WeaponRestrictions MeleeOnly
+					VoiceCommand  
+                			{
+                    				Delay 4
+                    				Cooldown 13
+                    				IfSeeTarget 0
+                    				Type "Battle Cry"
+                			}
+					ItemAttributes
+					{
+						ItemName "Gold Frying Pan"
+						"item style override" 0
+					}
+				}
+				TFBot
+				{
+                                ClassIcon pan_golden_lite
+					WeaponRestrictions	MeleeOnly
+					Health	175
+					Skill	Expert
+					Name	Pyro
+					Class	Pyro
+					Item "Gold Frying Pan"
+					WeaponRestrictions MeleeOnly
+					VoiceCommand  
+                			{
+                    				Delay 6
+                    				Cooldown 12
+                    				IfSeeTarget 0
+                    				Type "Battle Cry"
+                			}
+					ItemAttributes
+					{
+						ItemName "Gold Frying Pan"
+						"item style override" 0
+					}
+				}
+				TFBot
+				{
+                                ClassIcon pan_golden_lite
+					WeaponRestrictions	MeleeOnly
+					Health	175
+					Skill	Expert
+					Name	Demoman
+					Class	Demoman
+					Item "Gold Frying Pan"
+					WeaponRestrictions MeleeOnly
+					VoiceCommand  
+                			{
+                    				Delay 5
+                    				Cooldown 15
+                    				IfSeeTarget 0
+                    				Type "Battle Cry"
+                			}
+					ItemAttributes
+					{
+						ItemName "Gold Frying Pan"
+						"item style override" 0
+					}
+				}
+				TFBot
+				{
+                                ClassIcon pan_golden_lite
+					WeaponRestrictions	MeleeOnly
+					Health	125
+					Skill	Expert
+					Name	Heavy
+					Class	HeavyWeapons
+					Item "Gold Frying Pan"
+					WeaponRestrictions MeleeOnly
+					VoiceCommand  
+                			{
+                    				Delay 5
+                    				Cooldown 15
+                    				IfSeeTarget 0
+                    				Type "Battle Cry"
+                			}
+					ItemAttributes
+					{
+						ItemName "Gold Frying Pan"
+						"item style override" 0
+					}
+				}
+				TFBot
+				{
+                                ClassIcon pan_golden_lite
+					WeaponRestrictions	MeleeOnly
+					Health	125
+					Skill	Expert
+					Name	Engineer
+					Class	Engineer
+                                        Action FetchFlag  
+					Item "Gold Frying Pan"
+					WeaponRestrictions MeleeOnly
+					VoiceCommand  
+                			{
+                    				Delay 6
+                    				Cooldown 12
+                    				IfSeeTarget 0
+                    				Type "Battle Cry"
+                			}
+					ItemAttributes
+					{
+						ItemName "Gold Frying Pan"
+						"item style override" 0
+					}
+					CharacterAttributes
+					{
+						"kill forces attacker to laugh"	1
+					}
+				}
+				TFBot
+				{
+                                ClassIcon pan_golden_lite
+					WeaponRestrictions	MeleeOnly
+					Health	150
+					Skill	Expert
+					Name	Medic
+					Class	Medic
+                                        Action FetchFlag  
+					Attributes 	DisableDodge
+					BehaviorModifiers Push
+					Item "Gold Frying Pan"
+					WeaponRestrictions MeleeOnly
+					VoiceCommand  
+                			{
+                    				Delay 2
+                    				Cooldown 11
+                    				IfSeeTarget 0
+                    				Type "Battle Cry"
+                			}
+					ItemAttributes
+					{
+						ItemName "Gold Frying Pan"
+						"item style override" 0
+					}
+				}
+				TFBot
+				{
+                                ClassIcon pan_golden_lite
+					WeaponRestrictions	MeleeOnly
+					Health	125
+					Skill	Expert
+					Name	Sniper
+					Class	Sniper
+					Item "Gold Frying Pan"
+					WeaponRestrictions MeleeOnly
+					VoiceCommand  
+                			{
+                    				Delay 4
+                    				Cooldown 13
+                    				IfSeeTarget 0
+                    				Type "Battle Cry"
+                			}
+					ItemAttributes
+					{
+						ItemName "Gold Frying Pan"
+						"item style override" 0
+					}
+				}
+				TFBot
+				{
+                                ClassIcon pan_golden_lite
+					WeaponRestrictions	MeleeOnly
+					Health	125
+					Skill	Expert
+					Name	Spy
+					Class	Spy
+                                        Action FetchFlag  
+					BehaviorModifiers Push
+					Item "Gold Frying Pan"
+					WeaponRestrictions MeleeOnly
+					VoiceCommand  
+                			{
+                    				Delay 3
+                    				Cooldown 12
+                    				IfSeeTarget 0
+                    				Type "Battle Cry"
+                			}
+					ItemAttributes
+					{
+						ItemName "Gold Frying Pan"
+						"item style override" 0
+					}
+                                        CharacterAttributes
+			                {
+				                "cannot disguise"	1
+			                }
+				}
+			}
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	1
+			Where	spawnbot_right
+			TotalCurrency	252
+			TotalCount	6
+			MaxActive	2
+			SpawnCount	2
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+                        Squad
+                        {
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier_Extended_Concheror
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+                        }
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_left
+			TotalCurrency	128
+			TotalCount	2
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	5
+			WaitForAllDead	1
+			WaitBetweenSpawns	5
+			TFBot
+			{
+				Template	T_TFBot_Giant_Demo_RapidFire
+			}
+		}
+		WaveSpawn
+		{
+			Name	2.5
+			Where	spawnbot_right
+			TotalCurrency	150
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	3
+			WaitBeforeStarting	5
+			WaitForAllSpawned	2
+			WaitBetweenSpawns	3
+                        Squad
+                        {
+                        	TFBot
+				{
+                        	ClassIcon pyro_dragon_fury_swordstone
+					Name	"Giant Dragon's Fury Pyro"
+					Template	T_TFBot_Giant_Pyro
+                                	Item    "The Dragon's Fury"
+                                	CharacterAttributes 
+                                	{
+						"airblast disabled" 1
+                                	}
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+				}
+                        } 
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot_left
+			TotalCurrency	120
+			TotalCount	2
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitForAllDead	2.5
+			WaitBetweenSpawns	0
+                        TFBot
+			{
+                        ClassIcon pyro_dragon_fury_swordstone
+				Name	"Giant Dragon's Fury Pyro"
+				Template	T_TFBot_Giant_Pyro
+                                Item    "The Dragon's Fury"
+                                CharacterAttributes 
+                                {
+					"airblast disabled" 1
+                                }
+			}
+		}
+		WaveSpawn
+		{
+			Name	1
+			Where	spawnbot_right
+			TotalCurrency	40
+			TotalCount	48
+			MaxActive	10
+			SpawnCount	2
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	1
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Shotgun
+				}
+				TFBot
+				{
+                                ClassIcon spy_enforcer_nys
+					WeaponRestrictions	PrimaryOnly
+					Name	"Enforcer Spy"
+					Skill Normal
+					Class Spy
+                                        Health 125
+					Item	"the enforcer"
+					Item	"fancy fedora"
+				        Action FetchFlag  
+					CharacterAttributes
+					{
+						"cannot disguise"	1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_right
+			TotalCurrency	30
+			TotalCount	24
+			MaxActive	6
+			SpawnCount	3
+			WaitBeforeStarting	0
+			WaitForAllDead	1
+			WaitBetweenSpawns	2
+			TFBot
+			{
+				Template	T_TFBot_Pyro
+                                CharacterAttributes 
+                                {
+					"airblast disabled" 1
+                                }
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_left
+			TotalCurrency	20
+			TotalCount	24
+			MaxActive	6
+			SpawnCount	2
+			WaitBeforeStarting	3
+			WaitForAllDead	1
+			WaitBetweenSpawns	2
+			TFBot
+			{
+                        ClassIcon soldier_bison
+				Health	200
+				Name	"Bison Soldier"
+				Class	Soldier
+				Skill	Normal
+				WeaponRestrictions	SecondaryOnly
+				Item	"the righteous bison"
+				Item	"defiant spartan"
+			}
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot
+			TotalCurrency	30
+			TotalCount	42
+			MaxActive	8
+			SpawnCount	2
+			WaitBeforeStarting	2
+			WaitForAllDead	2
+			WaitBetweenSpawns	2
+                        TFBot
+			{
+                        ClassIcon scout_pistol
+				WeaponRestrictions	SecondaryOnly
+				Health	125
+				Skill	Easy
+				Name	"Pistol Scout"
+				Class	Scout
+				Item	"flipped trilby"	
+			}
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot_left
+			TotalCurrency	30
+			TotalCount	32
+			MaxActive	6
+			SpawnCount	2
+			WaitBeforeStarting	6
+			WaitForAllDead	2
+			WaitBetweenSpawns	2
+			TFBot
+			{
+				Template	T_TFBot_Sniper_Huntsman
+			}
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	1
+			Where	spawnbot_left
+			TotalCurrency	100
+			TotalCount	3
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			TFBot
+			{
+				Template	T_TFBot_Giant_Soldier_Spammer
+			}
+		}
+		WaveSpawn
+		{
+			Name	1
+			Where	spawnbot_middle
+			TotalCurrency	50
+			TotalCount	3
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	2
+			WaitBetweenSpawns	2
+			TFBot
+			{
+				Template	T_TFBot_Giant_DemoMan_PrinceTavish 
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_left
+			TotalCurrency	218
+			TotalCount	6
+			MaxActive	3
+			SpawnCount	3
+			WaitBeforeStarting	0
+			WaitForAllDead	1
+			WaitBetweenSpawns	5
+                        Squad
+                        {
+				TFBot
+				{
+					Template	T_TFBot_Giant_Pyro
+					Attributes	"AlwaysCrit"
+                                	CharacterAttributes 
+                                	{
+						"airblast disabled" 1
+                                	}
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot_middle
+			TotalCurrency	200
+			TotalCount	6
+			MaxActive	3
+			SpawnCount	3
+			WaitBeforeStarting	5
+			WaitBetweenSpawns	3
+			WaitForAllSpawned	2
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Demo_Burst
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot_left
+			TotalCurrency	100
+			TotalCount	3
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	5
+			WaitBetweenSpawnsAfterDeath	5
+			WaitForAllSpawned	2
+			TFBot
+			{
+                        ClassIcon scout_bat
+				WeaponRestrictions	MeleeOnly
+                                Name "Giant Bat Scout"
+				Template	T_TFBot_Giant_Scout
+				Attributes	"AlwaysCrit"
+			}
+		}
+		WaveSpawn
+		{
+			Name	1
+			Where	spawnbot
+			TotalCurrency	32
+			TotalCount	30
+			MaxActive	6
+			SpawnCount	3
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	2
+                        RandomChoice
+                        {
+				TFBot
+				{
+					Skill	Normal
+					Template	T_TFBot_Demoman
+                                }
+				TFBot
+				{
+					Skill	Hard
+					Template	T_TFBot_Demoman
+                                }
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_right
+			TotalCurrency	100
+			TotalCount	30
+			MaxActive	6
+			SpawnCount	3
+			WaitBeforeStarting	0
+			WaitForAllDead	1
+			WaitBetweenSpawns	2
+			TFBot
+			{
+				Health	200
+				Name	Soldier
+				Class	Soldier
+				Skill	Normal
+			}
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot
+			TotalCurrency	0
+			TotalCount	999
+			MaxActive	8
+			SpawnCount	2
+			WaitBeforeStarting	0
+			WaitForAllDead	2
+			WaitBetweenSpawns	1
+                        Support 1
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+                                ClassIcon sniper_smg_tind
+					WeaponRestrictions	SecondaryOnly
+					Health	125
+					Skill	Normal
+					Name	"Smg Sniper"
+					Class	Sniper
+					Item	"the anger"
+				}
+                                TFBot
+				{
+                                ClassIcon spy_goldengun
+			                Class Spy
+					WeaponRestrictions	PrimaryOnly
+					Name	"Golden Gun Spy"
+                                        Skill Hard
+                                        Health 125
+					Item    "The Ambassador"
+					Item	"Fancy Fedora"
+				        Action FetchFlag  
+                                        ItemAttributes
+			                {				
+				                ItemName "The Ambassador"
+				                "item style override" 1
+				                "is australium item" 1
+				                "loot rarity" 1
+                                        }
+                                        CharacterAttributes
+			                {
+				                "cannot disguise"	1
+			                }
+				}
+			}
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	1.1
+			Where	spawnbot
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			FirstSpawnOutput                                                                                                                                                            
+	                {
+		                Target boss_spawn_relay                                            
+		                Action Trigger                         
+	                }	
+			Tank
+			{
+				Health	20000
+				Name	"tankboss"
+				Speed	75
+				SpawnTemplate "gibustank"
+				StartingPathTrackNode	boss_path_1
+                                Model "models/bots/boss_bot/boss_tank_color.mdl"
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	1.2
+			Where	spawnbot
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			WaitForAllDead	1.1
+                        FirstSpawnMessage "{FF4646}C{FF872F}O{FFEB61}L{76FF7C}O{76FFE7}R{525AFF}S"
+			FirstSpawnOutput                                                                                                                                                            
+	                {
+		                Target boss_spawn_relay                                            
+		                Action Trigger                         
+	                }	
+			Tank
+			{
+				Health	22000
+				Name	"rngtankboss"
+				Speed	75
+                                Skin 1
+                                Model "models/bots/boss_bot/boss_tank_color.mdl"
+                                SpawnTemplate "RNGTank"
+				StartingPathTrackNode	boss_path_1
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	1
+			Where	spawnbot_right
+			TotalCurrency	100
+			TotalCount	6
+			MaxActive	2
+			SpawnCount	2
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+                        TFBot
+			{
+                        ClassIcon pyro_dragon_fury_swordstone
+				Name	"Giant Dragon's Fury Pyro"
+				Template	T_TFBot_Giant_Pyro
+                                Item    "The Dragon's Fury"
+                                CharacterAttributes 
+                                {
+					"airblast disabled" 1
+                                }
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_right
+			TotalCurrency	100
+			TotalCount	4
+			MaxActive	2
+			SpawnCount	2
+			WaitBeforeStarting	3
+			WaitForAllDead	1
+			WaitBetweenSpawns	3
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Heavyweapons_Deflector
+				}
+				TFBot
+				{
+                                ClassIcon medic_shield_lite
+					Name	"Shield Medic"
+					Template	T_TFBot_Medic_BigHeal
+                                        Tag bot_squad_member
+                                        Attributes 	"ProjectileShield"
+                                        Attributes	"SpawnWithFullCharge"
+					Attributes	"IgnoreEnemies"
+					ItemAttributes
+                			{
+                    				ItemName "The Quick-Fix"
+                   				"generate rage on heal" 2
+                    				"increase buff duration" 101
+                			}
+					CharacterAttributes
+                			{
+                 			        "bot medic uber deploy delay duration" 500
+                    				"dmg penalty vs players" 1.25
+              				}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot_left
+			TotalCurrency	244
+			TotalCount	9
+			MaxActive	3
+			SpawnCount	3
+			WaitBeforeStarting	6
+			WaitForAllSpawned	2
+			WaitBetweenSpawns	0
+                        Squad
+                        {
+				TFBot
+				{
+				ClassIcon soldier_burstfire_incendiary_nys
+                                	Name "Giant Burst Ignite Soldier"
+					Class Soldier
+					Health 3800
+					Skill Expert
+					WeaponRestrictions PrimaryOnly
+					Attributes MiniBoss
+					Attributes HoldFireUntilFullReload
+					ItemAttributes
+					{
+						ItemName "concealedkiller_rocketlauncher_sandcannon"
+                                		"Set DamageType Ignite"	1
+						"projectile trail particle" superrare_burning1
+						"faster reload rate" 0.6
+						"fire rate bonus" 0.1
+						"clip size upgrade atomic" 5.0
+						"Projectile speed increased" 0.65
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.5
+						"damage force reduction" 0.4
+						"airblast vulnerability multiplier" 0.4
+						"override footstep sound set" 3
+					}
+					Item "concealedkiller_rocketlauncher_sandcannon"
+                                	Item "All Hallows' Hatte"
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	1
+			Where	spawnbot_left
+			TotalCurrency	36
+			TotalCount	36
+			MaxActive	6
+			SpawnCount	3
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	2
+			TFBot
+			{
+				Class Soldier
+				Name "Bazooka Soldier"
+				ClassIcon soldier_bazooka
+				Skill Hard
+				Item "The Beggar's Bazooka"
+				WeaponRestrictions PrimaryOnly
+				Attributes HoldFireUntilFullReload
+				Item	"stainless pot"
+				ItemAttributes
+				{
+					ItemName "The Beggar's Bazooka"
+					"auto fires full clip" 0
+					"can overload" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_right
+			TotalCurrency	48
+			TotalCount	32
+			MaxActive	8
+			SpawnCount	4
+			WaitBeforeStarting	0
+			WaitForAllDead	1
+			WaitBetweenSpawns	2
+			TFBot
+			{
+                        ClassIcon pyro
+				Health	175
+				Skill	Easy
+				Name	"Pyro"
+				Class	Pyro
+				Attributes	"AlwaysFireWeapon"
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_middle
+			TotalCurrency	12
+			TotalCount	12
+			MaxActive	3
+			SpawnCount	3
+			WaitBeforeStarting	0
+			WaitForAllDead	1
+			WaitBetweenSpawns	0
+			TFBot
+			{
+				Template	T_TFBot_Heavyweapons_Fist
+				CharacterAttributes
+				{
+				        "voice pitch scale"	0.5
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot_right
+			TotalCurrency	30
+			TotalCount	24
+			MaxActive	8
+			SpawnCount	4
+			WaitBeforeStarting	3
+			WaitForAllDead	2
+			WaitBetweenSpawns	2
+			TFBot
+			{
+				Template	T_TFBot_Heavyweapons_Shotgun
+			}
+		}
+                WaveSpawn
+		{
+			Name	3
+			Where	spawnbot_middle
+			TotalCurrency	30
+			TotalCount	24
+			MaxActive	6
+			SpawnCount	3
+			WaitBeforeStarting	2
+			WaitForAllDead	2
+			WaitBetweenSpawns	2
+			TFBot
+			{
+				Template	T_TFBot_Demo_Burst
+			}
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	1
+			Where	spawnbot_left
+			TotalCurrency	164
+			TotalCount	4
+			MaxActive	2
+			SpawnCount	2
+			WaitBetweenSpawns	5
+			Squad
+			{
+				TFBot
+				{
+					ClassIcon	soldier_nuker
+					WeaponRestrictions	PrimaryOnly
+					Health	4200
+					Skill	Expert
+					Name	"Giant Nuclear Soldier"
+					Class	Soldier
+					Attributes	"HoldFireUntilFullReload"
+					Attributes	"MiniBoss"
+					Attributes	"AlwaysCrit"
+					Item	"the black box"
+					RocketCustomParticle	flare_glow
+					ItemAttributes
+					{
+						ItemName	"the black box"
+						"damage bonus"	2.25
+						"fire rate bonus"	2.5
+						"Projectile speed increased"	0.45
+						"Blast radius increased"	1.5
+					}
+					CharacterAttributes
+					{
+						"override footstep sound set"	3
+						"move speed bonus"	0.5
+						"airblast vulnerability multiplier"	0.4
+						"damage force reduction"	0.4
+					}
+					Item	"the whirly warrior"
+				}
+                                TFBot
+				{
+                                	Template	T_TFBot_Giant_Medic_Regen
+                                }
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_middle
+			TotalCurrency	203
+			TotalCount	6
+			MaxActive	3
+			SpawnCount	3
+			WaitBeforeStarting	0
+			WaitForAllDead	1
+			WaitBetweenSpawns	0
+                        Squad
+                        {
+				TFBot
+				{
+                                	Template	T_TFBot_Giant_Soldier_SlowBarrage
+                                	Attributes	AlwaysCrit
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+				}
+                       }
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot_left
+			TotalCurrency	300
+			TotalCount	4
+			MaxActive	2
+			SpawnCount	2
+			WaitBeforeStarting	4
+			WaitBetweenSpawns	4
+			WaitForAllDead	2
+			Squad
+			{
+				TFBot
+				{
+                                ClassIcon	demo_scatter_giant
+			        	Health	3300
+			        	Name	"Giant Scatter Demoman"
+			        	Class	Demoman
+			        	Skill	Expert
+			        	WeaponRestrictions	PrimaryOnly
+			        	Attributes	"HoldFireUntilFullReload"
+			        	Attributes	"MiniBoss"
+                                        Item	"warbird_grenadelauncher_butcherbird"
+			        	ItemAttributes
+			        	{
+				        	ItemName	"warbird_grenadelauncher_butcherbird"
+                                                "set_item_texture_wear"    0.2 
+				        	"clip size upgrade atomic"	28
+				        	"faster reload rate"	0.25
+				        	"fire rate bonus"	0.1
+				        	"projectile speed increased"	0.8
+				        	"projectile spread angle penalty"	6
+			        	}
+			        	CharacterAttributes
+			        	{
+				        	"airblast vulnerability multiplier"	0.5
+				        	"airblast vertical vulnerability multiplier"	0.5
+				        	"damage force reduction"	0.5
+				        	"move speed bonus"	0.5
+				        	"override footstep sound set"	4
+			        	}
+		        	}
+                                TFBot
+				{
+                                	Template	T_TFBot_Giant_Medic_Regen
+                                }
+			}
+		}
+		WaveSpawn
+		{
+			Name	1
+			Where	spawnbot_left
+			Where	spawnbot_middle
+			TotalCurrency	32
+			TotalCount	36
+			MaxActive	9
+			SpawnCount	3
+			WaitBeforeStarting	4
+			WaitBetweenSpawns	2
+                        TFBot
+			{
+                                Name "Heavy"
+                                Skill Easy
+                        	Class HeavyWeapons
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_right
+			TotalCurrency	55
+			TotalCount	20
+			MaxActive	5
+			SpawnCount	1
+			WaitBeforeStarting	0
+			WaitForAllDead	1
+			WaitBetweenSpawns	1
+			TFBot
+			{
+				Template	T_TFBot_Demo_Burst
+			}
+		}
+		WaveSpawn
+		{
+			Name	2
+			Where	spawnbot_middle
+			TotalCurrency	80
+			TotalCount	9
+			MaxActive	3
+			SpawnCount	3
+			WaitBeforeStarting	0
+			WaitForAllDead	1
+			WaitBetweenSpawns	0
+			TFBot
+			{
+                        ClassIcon medic_syringe_milk2
+				Health	750
+				Name	"Milk Syringe Medic"
+				Class	Medic
+                                Scale 1.35
+				Skill	Normal
+				WeaponRestrictions	PrimaryOnly
+				Action FetchFlag
+				Item	"das hazmattenhatten"
+				Item	"the angel of death"
+                                CharacterAttributes
+			        {
+					"mad milk syringes"	5
+				        "voice pitch scale"	0.5
+                                }
+			}
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot_left
+			TotalCurrency	66
+			TotalCount	42
+			MaxActive	8
+			SpawnCount	4
+			WaitBeforeStarting	0
+			WaitForAllDead	2
+			WaitBetweenSpawns	3
+                        RandomChoice
+                        {
+				TFBot
+				{
+                        	ClassIcon scout_blaster_nys
+					Health	125
+					Skill	Normal
+					Name	"Baby Face Blaster Scout"
+					Class	Scout
+					Item	"baby face's blaster"
+					Item	"the fed-fightin' fedora" 
+                                }
+				TFBot
+				{
+                        	ClassIcon scout_blaster_nys
+					Health	125
+					Skill	Hard
+					Name	"Baby Face Blaster Scout"
+					Class	Scout
+					Item	"baby face's blaster"
+					Item	"the fed-fightin' fedora" 
+                                }
+			}
+		}
+		WaveSpawn
+		{
+			Name	3
+			Where	spawnbot_middle
+			TotalCurrency	100
+			TotalCount	8
+			MaxActive	2
+			SpawnCount	2
+			WaitBeforeStarting	0
+			WaitForAllDead	2
+			WaitBetweenSpawns	0
+			TFBot 
+                        {
+                                Health 900
+				Class Pyro
+				Skill Easy
+                                Scale 1.4
+				Name "Gas Passer Pyro"
+				ClassIcon pyro_gascann
+				WeaponRestrictions SecondaryOnly
+                                Item "brim of fire"
+				Item "The Gas Passer"
+				ItemAttributes 
+				{
+					ItemName "The Gas Passer"
+					"item_meter_charge_rate" 4
+				}
+				CharacterAttributes
+				{
+				        "voice pitch scale"	0.5
+				}
+			}
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_smasher_relay
+			Action	Trigger
+		}
+        	InitWaveOutput
+        	{
+            		Target wave_init_smasher_relay
+            		Action Trigger
+        	}
+		DoneOutput
+		{
+			Target	wave_finished_smasher_relay
+			Action	Trigger
+		}
+                Explanation  
+		{
+			Line "{9C70FF}This wave's Giant Necro Smasher will launch {red}reds {9C70FF}and moderately lift them into the air every 30 seconds!"
+			Line "{9C70FF}This boss has 2 phases, 1st phase is rapid fire homing, 2nd phase is bison laser!"
+			Line "{9C70FF}Boss switches to his 2nd phase when his down too half of his health!"
+                }
+                WaveSpawn
+		{
+			Name	boss
+			Where	spawnbot_left
+			TotalCurrency	1
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			WaitBeforeStarting	3
+			WaitBetweenSpawns	0
+                        FirstSpawnWarningSound "ui\halloween_boss_summoned_fx.wav"
+                        DoneWarningSound "ui\halloween_boss_defeated_fx.wav"
+			TFBot
+			{
+			ClassIcon soldier_bison_spammer_homing_nys
+                                Class Soldier
+				Name "Hellbent Soldier"
+				Health 50000
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes MiniBoss
+				Attributes AlwaysCrit
+                                Attributes UseBossHealthBar
+				Item	"The Righteous Bison"
+				Item	"The Hellmet"
+				RocketCustomParticle 	eyeboss_projectile 
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"custom projectile model"	models/props_halloween/eyeball_projectile.mdl
+					"faster reload rate" -0.8
+					"fire rate bonus" 0.43
+				}
+                                ItemAttributes
+				{
+					ItemName	"The Righteous Bison"
+					"dmg bonus vs buildings"      1.3
+					"set item tint RGB"	49151
+					"fire rate bonus"	0.12
+					"faster reload rate"	0.0
+					"clip size upgrade atomic"	36.0
+				}
+      				WeaponSwitch  
+				{
+					Delay 0
+					Cooldown 0.3 
+					Repeats 1
+					Type "Secondary"
+					IfHealthBelow 25000
+				}
+				CharacterAttributes
+				{
+					"move speed bonus"	0.35
+					"damage force reduction" 0.4
+					"airblast vulnerability multiplier" 0.4
+					"override footstep sound set" 3
+				}
+				Item	"batter's bracers"
+				Item	"the killer's kit"
+				Item	"ghoul gibbin' gear"
+			        HomingRockets
+			        {
+				        IgnoreDisguisedSpies 1
+				        IgnoreStealthedSpies 1
+                                        AimTime 2
+                                        RocketSpeed 0.5
+				        TurnPower 75
+				        MaxAimError 75 
+			        }
+                        }
+                }
+                WaveSpawn
+		{
+			WaitBeforeStarting 29
+                        Support 1
+			FirstSpawnWarningSound "vo/halloween_boss/knight_laugh01.mp3"
+		}
+                WaveSpawn
+		{
+			WaitBeforeStarting 32
+                        Support 1
+			FirstSpawnWarningSound "vo/halloween_boss/knight_attack02.mp3"
+		}
+                WaveSpawn
+		{
+			WaitBeforeStarting 59
+                        Support 1
+			FirstSpawnWarningSound "vo/halloween_boss/knight_laugh02.mp3"
+		}
+                WaveSpawn
+		{
+			WaitBeforeStarting 62
+                        Support 1
+			FirstSpawnWarningSound "vo/halloween_boss/knight_attack01.mp3"
+		}
+                WaveSpawn
+		{
+			WaitBeforeStarting 89
+                        Support 1
+			FirstSpawnWarningSound "vo/halloween_boss/knight_laugh03.mp3"
+		}
+                WaveSpawn
+		{
+			WaitBeforeStarting 92
+                        Support 1
+			FirstSpawnWarningSound "vo/halloween_boss/knight_attack03.mp3"
+		}
+                WaveSpawn
+		{
+			Name	support
+			Where	spawnbot
+			TotalCurrency	49
+			TotalCount	32
+			MaxActive	3
+			SpawnCount	3
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	10
+                        Support 1
+			TFBot
+			{
+                        ClassIcon pyro_dragon_fury_swordstone
+				Health	175
+				Skill	Easy
+				Name	"Dragon's Fury Pyro"
+				Class	Pyro
+				Attributes	"AlwaysCrit"
+				Item	"The Dragon's Fury"
+				Item	"brigade helm"
+                                CharacterAttributes 
+                                {
+					"airblast disabled" 1
+                                }
+                        }
+		}
+                WaveSpawn	
+		{
+			Name merasmuslookaspellbook
+			WaitForAllDead nofuckyousoldier	
+			TotalCount 1
+			SpawnCount 0
+			Support 1				
+			TFBot
+			{
+				ClassIcon	mallet_lite
+			}
+		}
+	}
+}
