@@ -1,0 +1,2039 @@
+WaveSchedule 
+{
+	PointTemplates [$SIGSEGV] 
+	{
+		mainrelay 
+		{
+			NoFixup 1
+			logic_auto
+			{
+				"origin" "338 334 231" //for sentry killer
+				"spawnflags" "1"
+				//cleanup
+				"OnMapSpawn" "item_ammopack*,Kill,,0,-1" 
+				
+				//remove randomplacement sentryguns from the front
+				"OnMapSpawn" "@bb-1000 -1000 -1000 1000 1000 1000@obj_sentrygun,Kill,,0,-1" 
+				
+				//resupply
+				// "OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger func_regenerate:Disable:0:-1"
+				// "OnMapSpawn" "wave_finished_relay,AddOutput,OnTrigger func_regenerate:Enable:0:-1"
+				
+				//2 bombs
+				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger intel_2:Enable:0:-1,0,-1"
+				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger failsafe_timer:Trigger:0:-1,0,-1"
+				"OnMapSpawn" "boss_deploy_relay,AddOutput,OnTrigger failsafe_timer:CancelPending:0:-1,0,-1"
+				"OnMapSpawn" "intel_2,SetTeam,3,0,-1"
+				"OnMapSpawn" "intel_2,AddOutput,OnPickupTeam2 intel_2:SetTeam:0:0:-1"
+				"OnMapSpawn" "intel_2,AddOutput,OnDrop intel_2:SetTeam:3:0:-1"
+				"OnMapSpawn" "intel_2,AddOutput,OnReturn intel_2:SetTeam:0:0.01:-1"
+				
+				//jump-pads
+				"OnMapSpawn" "filter_redteam,Kill,,0,-1"	
+				
+				//speed boost
+				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger booster:Enable::15:-1,0,-1"
+				"OnMapSpawn" "wave_finished_relay,AddOutput,OnTrigger booster:Disale::0:-1,0,-1"
+				
+				//trigger_playermovement bug: dying or resetting the wave while inside of one forces you into a broken half-crouched state until you touch it again
+				"OnMapSpawn" "boss_deploy_relay,AddOutput,OnTrigger trigger_playermovement:DisableAndEndTouch::1:-1,0,-1"	
+				
+				//some obscure thing I'm too lazy to fix correctly: props sometimes disappears on wave start, disabling/enabling quickly on wave init seems to fix it
+				"OnMapSpawn" "upgradestation*,Disable,,0.01,-1"
+				"OnMapSpawn" "upgradestation*,Enable,,0.03,-1"				
+				"OnMapSpawn" "tree,Disable,,0.01,-1"
+				"OnMapSpawn" "tree,Enable,,0.03,-1"
+			}
+			logic_relay //meant to force red bots out of spawn, can also sorta work as a shitty hacky anti-grief
+			{
+				"targetname" "failsafe_timer"
+				"OnTrigger" "trigger_push,Enable,,180,-1"
+			}
+			filter_activator_tfteam
+			{
+				"Negated" "Allow entities that match criteria"
+				"targetname" "filter_red_new"
+				"TeamNum" "2"
+			}
+			func_regenerate
+            {
+                "targetname" "regenerate"
+                "associatedmodel" "locker_model"
+                "TeamNum" "3"
+                "mins" "-700 -200 -150"
+                "maxs" "700 100 2000"
+                "origin" "118.780525 -481.869904 569.174133"
+            } 
+			func_regenerate
+            {
+                "targetname" "regenerate"
+                "associatedmodel" "locker_model"
+                "TeamNum" "3"
+                "mins" "-200 -200 -200"
+                "maxs" "200 200 100"
+                "origin" "-594.532471 1198.356323 542.885803"
+            }
+	        prop_dynamic
+            {
+                "targetname" "locker_model" //need a locker model to stop server console spam
+				"model"      "models/props_gameplay/resupply_locker.mdl"
+                "solid"      "0"
+				"origin" "0 0 -9999" //into the void with you
+                "disableshadows" "1"
+            }
+
+			logic_relay //objective display
+			{
+				"targetname" "hudhintloop"
+				"OnTrigger" "hudhint,ShowHudHint,,0,-1"
+				"OnTrigger" "hudhint,HideHudHint,,10,-1"
+				"OnTrigger" "hudhintloop2,Trigger,,10.01,-1"
+			}
+			logic_relay
+			{
+				"targetname" "hudhintloop2"
+				"OnTrigger" "hudhintloop,Trigger,,0,-1"
+				"OnSpawn" "wave_start_relay,AddOutput,OnTrigger hudhintloop:Trigger:1:-1,1,-1"
+				"OnSpawn" "wave_finished_relay,AddOutput,OnTrigger hudhintloop:CancelPending:0:-1,0,-1"
+			}
+			logic_relay
+			{
+				"targetname" "capturewarehouse"
+				"OnTrigger" "hudhint,$SetKey$message,OBJECTIVE: Destroy RED robots and take control of the hatch,0,-1"
+				"OnTrigger" "periodicspawn,Enable,,0,-1"
+			}
+			trigger_playermovement
+			{
+				"targetname" "forcecrouch"
+				"filtername" "filter_red_new"
+				"spawnflags" "2049"
+				"origin" "6014.660156 -1649.305176 449.01913"
+				"maxs" "50 50 50"
+				"mins" "-50 -50 -50"
+			}
+			trigger_playermovement
+			{
+				"targetname" "forcecrouch"
+				"filtername" "filter_red_new"
+				"spawnflags" "2049"
+				"origin" "6643.061035 -1489.768311 225.41677"
+				"maxs" "50 50 50"
+				"mins" "-50 -50 -50"
+			}
+			trigger_playermovement
+			{
+				"targetname" "forcecrouch"
+				"filtername" "filter_red_new"
+				"spawnflags" "2049"
+				"origin" "3104.325439 -141.924545 483.718872"
+				"maxs" "50 50 50"
+				"mins" "-50 -50 -50"
+			//	"OnStartTouch" "!activator,$AddCond,75,0,-1"
+				"OnTrigger" "!activator,$AddCond,32,0,-1"
+				"OnEndTouchAll" "!activator,$RemoveCond,32,0,-1"
+			}
+			trigger_add_tf_player_condition //speed boost stolen from numeratotr
+			{
+				"targetname" "booster"
+				"condition" "32"
+				"duration" "16"
+				"filtername" "filter_blueteam"
+				"startdisabled" "1"
+				"origin" "27.627510 -1177.038696 450.88946"
+				"mins" "-912 -470 -320"
+				"maxs" "912 670 320"
+				"spawnflags" "1"
+			}
+			trigger_add_tf_player_condition
+			{
+				"targetname" "booster"
+				"condition" "32"
+				"duration" "16"
+				"filtername" "filter_blueteam"
+				"startdisabled" "1"
+				"origin" "-1506.899902 991.871948 795.2078256"
+				"mins" "-512 -470 -320"
+				"maxs" "512 470 320"
+				"spawnflags" "1"
+			}
+		}
+		station
+		{
+			NoFixup 1
+			prop_dynamic //upgrade station
+			{
+				"targetname" "upgradestation"
+				"model" "models/props_mvm/mvm_upgrade_blu.mdl"
+				"modelscale" "1.0"
+				"PerformanceMode" "0"
+				"physdamagescale" "1.0"
+				"pressuredelay" "0"
+				"RandomAnimation" "0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"renderfx" "0"
+				"SetBodyGroup" "0"
+				"skin" "0"
+				"solid" "0"
+				"spawnflags" "0"
+				"DisableBoneFollowers" "1"
+				"disablereceiveshadows" "1"
+				"disableshadows" "1"
+				"ExplodeDamage" "0"
+				"ExplodeRadius" "0"
+				"fademaxdist" "0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"maxdxlevel" "0"
+				"MinAnimTime" "5"
+				"mindxlevel" "0"
+				
+			}
+			func_upgradestation
+			{
+				"mins" "-100 -100 0" 
+				"maxs" "90 60 100"
+				"parentname" "upgradestation"
+			}
+			prop_dynamic
+			{
+				
+				"targetname" "shopcollision"
+				"angles" "0 -90 0"
+				"DisableBoneFollowers" "1"
+				"disablereceiveshadows" "1"
+				"model" "models/props_vehicles/train_flatcar_container.mdl"
+				"disableshadows" "1"
+				"rendermode" "10"
+				"renderamt" "0"
+				"CollisionGroup" "5"
+				"solid" "6"
+					
+			}		
+		}
+		forcefields
+		{
+            NoFixup 1
+			func_forcefield
+			{
+				
+                "disablereceiveshadows" "0"
+				"targetname" "forcefield1"
+				"origin" "136.815201 -291.219696 577.232483"	
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "rendermode" "10"
+                "TeamNum" "2"
+                "mins" "-1000 -120 -1000"
+                "maxs" "1000 1200 1000"
+				
+			}
+			func_forcefield
+			{
+				
+                "disablereceiveshadows" "0"
+				"targetname" "forcefield2"
+				"origin" "-599.987671 1185.066406 632.134583"	
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "rendermode" "10"
+                "TeamNum" "2"
+                "mins" "-100 -1200 -1000"
+                "maxs" "1000 1200 1000"
+				
+			}		
+			logic_auto
+			{
+				
+				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger forcefield*:Disable:0:-1"
+				"OnMapSpawn" "wave_finished_relay,AddOutput,OnTrigger forcefield*:Enable:0:-1"
+				"spawnflags" "1"
+			}		
+		}
+		annotation
+		{
+			NoFixup 1
+			training_annotation
+			{
+			  "targetname"   "onelife"
+			  "display_text" "Do not let them destroy you..."
+			  "lifetime"     "10"
+			  "origin" "644.894775 1180.305786 352.942444"	
+			}
+			training_annotation
+			{
+			  "targetname"   "stormmessage"
+			  "display_text" "Primary power is down! Switching to emergency generators..."
+			  "lifetime"     "6"
+			  "origin" "644.894775 1180.305786 352.942444"	
+			}
+			training_annotation
+			{
+			  "targetname"   "stormmessage2"
+			  "display_text" "Get to the hatch before we lose power!"
+			  "lifetime"     "45"
+			  "origin" "644.894775 1180.305786 352.942444"	
+			}
+			training_annotation //obsolete
+			{
+			  "targetname"   "stormmessage3"
+			  "display_text" "Primary generator exhausted! Switching to secondary..."
+			  "lifetime"     "10"
+			  "origin" "644.894775 1180.305786 352.942444"	
+			}
+			training_annotation
+			{
+			  "targetname"   "stormmessage4"
+			  "display_text" "Upgrade stations will disable in 45 seconds to conserve power"
+			  "lifetime"     "25"
+			  "origin" "644.894775 1180.305786 352.942444"	
+			}
+			training_annotation
+			{
+			  "targetname"   "turretmessage"
+			  "display_text" "Destroy the control stations to take down the turret!"
+			  "lifetime"     "30"
+			  "origin" "6208.843750 -866.860229 338.170410"	
+			}
+			training_annotation //obsolete
+			{
+			  "targetname"   "stormmessage5"
+			  "display_text" "Get back to the carrier tank!"
+			  "lifetime"     "10"
+			  "origin" "644.894775 1180.305786 352.942444"	
+			}
+			training_annotation
+			{
+			  "targetname"   "escapetunnel"
+			  "display_text" "Escape! (Giants cannot fit here)"
+			  "lifetime"     "120"
+			  "origin" "-325.750946 2146.255615 330.205536"	
+			}
+			training_annotation
+			{
+			  "targetname"   "escapetunnel2"
+			  "display_text" "Escape!"
+			  "lifetime"     "60"
+			  "origin" "533.181213 -276.173767 168.805023"	
+			}
+			training_annotation
+			{
+			  "targetname"   "hackmessage"
+			  "display_text" "Make your way into RED spawn to activate the rocket!"
+			  "lifetime"     "45"
+			  "origin" "6285.507813 -1520.707642 455.665527"	
+			}
+			env_hudhint
+			{
+				"targetname" "hudhint"
+				"message" "OBJECTIVE: Destroy RED Robots and take control of the warehouse"
+				"spawnflags" "1"
+			}
+		}
+		nogodspots
+		{
+		//	NoFixup 1
+			trigger_push
+			{
+				"targetname" "godspotpush"
+				"pushdir" "0 90 0"
+				"speed" "300"
+				"spawnflags" "1"
+				"mins" "-100 -100 -100"
+				"maxs" "100 100 100"
+			}
+		}
+		dynamicspawns //most of this has been scrapped
+		{
+			NoFixup 1
+			trigger_once //parent info_target to !activator and target with InterruptAction, attacks spies regardless of cloak/disguise
+			{
+				"targetname" "antirush1"
+				
+				"spawnflags" "4097"
+				"origin" "2369.160645 1155.318970 533.916809"
+				"maxs" "50 500 5000"
+				"mins" "-200 -5000 -500"
+				"filtername" "filter_bluteam"
+				"OnStartTouch" "antirush_activator,$TeleportToEntity,!activator,0,-1" //teleport info_target to player
+				"OnStartTouch" "antirush_activator,SetParent,!activator,0.1,-1" //parents info_target to player
+				"OnStartTouch" "antirush_activator,SetParentAttachment,flag,0.2,-1" //attach info_target to torso/back area
+				"OnStartTouch" "spawnbot_antirush1*,Enable,,0.3,-1" //probably no need for this delay but whatever
+				"OnStartTouch" "antirush_activator,Kill,,240,-1" //failsafe
+				
+				"OnStartTouch" "antirushwall,Kill,,0,-1"
+				"$OnKilled" "antirushwall,Kill,,0,-1"
+			}
+			trigger_once
+			{
+				"targetname" "antirush2"
+				
+				"spawnflags" "4097"
+				"origin" "4030.108887 378.009674 391.031372"
+				"maxs" "200 5000 5000"
+				"mins" "-200 -5000 -5000"
+				"filtername" "filter_bluteam"
+				"OnStartTouch" "antirush_activator2,$TeleportToEntity,!activator,0,-1"
+				"OnStartTouch" "antirush_activator2,SetParent,!activator,0.1,-1"
+				"OnStartTouch" "spawnbot_antirush2*,Enable,,0.2,-1"
+				"OnStartTouch" "antirush_activator2,SetParentAttachment,flag,0.3,-1"
+				"OnStartTouch" "antirush_activator2,Kill,,360,-1" //failsafe
+				
+				"OnStartTouch" "antirushwall2,Kill,,0,-1"
+				"$OnKilled" "antirushwall2,Kill,,0,-1"
+			}
+			info_target
+			{
+				
+				"targetname" "antirush_activator"
+			}
+			info_target
+			{
+				
+				"targetname" "antirush_activator2"
+			}	
+			prop_dynamic
+			{
+				
+				"targetname" "antirushwall"
+				"angles" "-10 -180 0"
+				"parentname" "antirush"
+				"DisableBoneFollowers" "1"
+				"disablereceiveshadows" "1"
+				"modelscale" "1.5"
+				"model" "models/props_mvm/mvm_player_shield2.mdl"
+				"origin" "2172.875488 1598.925659 273.172028"	
+			}		
+			prop_dynamic
+			{
+				
+				"targetname" "antirushwall"
+				"angles" "-10 -180 0"
+				"parentname" "antirush"
+				"DisableBoneFollowers" "1"
+				"disablereceiveshadows" "1"
+				"modelscale" "1.5"
+				"model" "models/props_mvm/mvm_player_shield2.mdl"
+				"origin" "2177.913818 686.463074 268.00726"	
+			}
+			prop_dynamic
+			{
+				
+				"targetname" "antirushwall2"
+				"angles" "-12 -180 0"
+				"parentname" "antirush2"
+				"DisableBoneFollowers" "1"
+				"disablereceiveshadows" "1"
+				"modelscale" "1.5"
+				"model" "models/props_mvm/mvm_player_shield2.mdl"
+				"origin" "3655.395996 355.625427 274.416077"	
+			}
+			prop_dynamic
+			{
+				
+				"targetname" "antirushwall2"
+				"angles" "-10 -180 0"
+				"parentname" "antirush2"
+				"DisableBoneFollowers" "1"
+				"disablereceiveshadows" "1"
+				"modelscale" "1.5"
+				"model" "models/props_mvm/mvm_player_shield2.mdl"
+				"origin" "3671.317627 917.026428 271.514404"	
+			}		
+			info_player_teamspawn
+			{
+			"origin" "3791.389893 346.310791 391.031372"
+			"TeamNum" "2"
+			"targetname" "spawnbot_antirush1"
+			"StartDisabled" "1"
+			"spawnflags" "511"
+			"angles" "0 90 0"
+			}
+			info_player_teamspawn
+			{
+			"origin" "4259.474121 911.478638 465.031372"
+			"TeamNum" "2"
+			"targetname" "spawnbot_antirush1"
+			"StartDisabled" "1"
+			"spawnflags" "511"
+			"angles" "0 90 0"
+			}
+			info_player_teamspawn
+			{
+			"origin" "4391.366211 -1097.905029 519.031372"
+			"TeamNum" "2"
+			"targetname" "spawnbot_antirush2"
+			"StartDisabled" "1"
+			"spawnflags" "511"
+			"angles" "0 90 0"
+			}
+			info_player_teamspawn
+			{
+			"origin" "5115.481934 -648.416077 295.03137"
+			"TeamNum" "2"
+			"targetname" "spawnbot_antirush2"
+			"StartDisabled" "1"
+			"spawnflags" "511"
+			"angles" "0 90 0"
+			}
+			info_player_teamspawn
+			{
+			"origin" "5491.597656 -174.773010 535.031372"
+			"TeamNum" "2"
+			"targetname" "spawnbot_antirush2"
+			"StartDisabled" "1"
+			"spawnflags" "511"
+			"angles" "0 90 0"
+			}
+			info_player_teamspawn
+			{
+			"origin" "438.105682 -1551.721802 368.531372"
+			"TeamNum" "3"
+			"targetname" "periodicspawn"
+			"StartDisabled" "1"
+			"spawnflags" "511"
+			"angles" "0 90 0"
+			}
+			OnParentKilledOutput
+			{
+				Target antirushwall*
+				Action Kill
+			}
+		}
+		autogun
+		{
+			NoFixup 1
+			math_counter
+			{
+				"targetname" "autogun_counter"
+				"startvalue" "4"
+				"min" "0"
+				"max" "4"
+				"OnHitMin" "boss_deploy_relay,Trigger,,0,-1"
+				"OnHitMin" "AutoGun*,SetHealth,0,0,-1"
+			}
+			logic_relay
+			{
+				"targetname" "autogun_relay"
+				"OnTrigger" "autogun_counter,Subtract,1,0,-1"
+				"OnSpawn" "autogun_counter,SetValueNoFire,4,0.01,-1"
+				"OnSpawn" "hudhint,$SetKey$message,OBJECTIVE: Destroy the Tank!,0,-1"
+			}
+		}		
+		timertest //final wave timer
+		{
+			NoFixup 1
+			math_counter
+			{
+				"targetname" "timer_counter"
+				"startvalue" "255"
+				"min" "0"
+				"max" "255"
+				"OutValue" "monster_resource,$SetProp$m_iBossHealthPercentageByte,,0,-1"
+				"OnHitMin" "timerfail_relay,Trigger,,0,-1" 
+			}
+			logic_relay
+			{
+				"targetname" "showtimer"
+				"OnTrigger" "monster_resource,$SetProp$m_iBossHealthPercentageByte,255,0,-1"
+				"OnTrigger" "player,$DisplayTextChat,{FF0000}2 minutes until power is lost!,360,-1"
+				"OnTrigger" "player,$PlaySoundToSelf,ambient/alarms/klaxon1.wav,360,-1"
+				"OnTrigger" "player,$DisplayTextChat,{FF0000}30 SECONDS UNTIL POWER IS LOST!,450,-1"
+				"OnTrigger" "player,$DisplayTextCenter,30 SECONDS UNTIL POWER IS LOST!,450,-1"
+				"OnTrigger" "player,$PlaySoundToSelf,ambient/alarms/klaxon1.wav,450,-1"
+			}
+  			logic_relay
+			{
+				"targetname" "timer_relay"
+				"OnTrigger" "timer_counter,Subtract,1,0,-1"
+				"OnTrigger" "timer_relay2,Trigger,,2.133333333333333,-1" //8 mins
+			}
+			logic_relay //relay loops are less resource intensive than logic_timers according to https://developer.valvesoftware.com/wiki/Logic_timer
+			{
+				"targetname" "timer_relay2"
+				"OnTrigger" "timer_relay,Trigger,,0,-1"
+			}
+			logic_relay
+			{
+				"targetname" "timerfail_relay"
+				"OnTrigger" "fade,Fade,,0,-1"
+				"OnTrigger" "overlayrobo*,StopOverlays,,2,-1"
+				"OnTrigger" "bots_win_red,RoundWin,,3,-1"
+				"OnTrigger" "blizzardstop_relay,Trigger,,3.1,-1"
+				"OnTrigger" "player,$DisplayTextCenter,Wave Failed...,0,-1"
+			}
+		}
+		blizzard
+		{
+			NoFixup 1
+			//logic
+			logic_relay
+			{
+				"targetname" "blizzard_relay"
+				
+				//misc
+				"OnTrigger" "obj_sentrygun,Kill,,0,-1" //wrangler engi built sentries only
+				"OnTrigger" "antirushwall*,Kill,,0,-1" //no antirush shit on w5
+				"OnTrigger" "bombpath_arrows_clear_relay,Trigger,,0,-1" //no antirush shit on w5
+			//	"OnTrigger" "wave_start_relay,AddOutput,OnTrigger stormmessage2:Show:0:-1"
+			
+			
+				//explanation
+				"OnTrigger" "hudhint,$SetKey$message,OBJECTIVE: Get to the hatch,0,-1"
+				"OnTrigger" "blizzardtext*,Display,,9,-1"
+				"OnTrigger" "wave_start_relay,AddOutput,OnTrigger generatortext:Display:0:-1,0,-1"
+		
+				//fog
+				"OnTrigger" "fogbox,Enable,,0,-1" 
+				"OnTrigger" "mist,TurnOn,0.02,-1"
+				"OnTrigger" "fogeffect,Trigger,,0,-1"
+				
+				//sound effects
+				"OnTrigger" "blizzardwind1,PlaySound,,0,-1"
+				"OnTrigger" "blizzardwind2,PlaySound,,0,-1"
+				"OnTrigger" "blizzardwind3,PlaySound,,0.02,-1"
+				"OnTrigger" "blizzardwind4,PlaySound,,1,-1"
+				"OnTrigger" "blizzardwind5,PlaySound,,1.01,-1"
+				"OnTrigger" "blizzardwind6,PlaySound,,12,-1"
+				"OnTrigger" "explosionsound*,PlaySound,,3,-1"
+				"OnTrigger" "explosionsound*,StopSound,,8,-1"
+				"OnTrigger" "stormalarm*,PlaySound,,3,-1"
+				"OnTrigger" "stormalarm,StopSound,,57,-1"
+				"OnTrigger" "windsounds,Trigger,,12,-1" //start shuffling random sounds after intro wind
+			//	"OnTrigger" "stormmessage,Show,,3,-1"
+			
+				"OnTrigger" "radio*,PlaySound,,8,-1"
+				
+				//disable upgrade station, removed 
+			//	"OnTrigger" "func_upgradestation,Disable,,57,-1"
+				"OnTrigger" "upgradedisable,PlaySound,,57,-1"
+		//		"OnTrigger" "stormmessage4,Show,,9,-1"
+				
+				//snow
+				"OnTrigger" "info_particle_system,Stop,,0,-1" //disable the smokestacks
+				"OnTrigger" "snow*,Start,,0.1,-1"
+				"OnTrigger" "particle_rain*,Start,,0.1,-1"
+				
+				//fade
+				"OnTrigger" "fade,Fade,,0,-1" //obsolete 
+				"OnTrigger" "fade2,Fade,,3,-1"
+				
+				"OnTrigger" "player*,SetHUDVisibility,0,0,-1"
+				"OnTrigger" "player*,SetHUDVisibility,1,8,-1"
+				
+			//	"OnTrigger" "overlayrobo,StopOverlays,,0,-1"
+			//	"OnTrigger" "overlayrobo,StartOverlays,,6,-1"
+				
+				"OnTrigger" "shakeit2,StopShake,,0,-1" //reset shake on retrigger
+				"OnTrigger" "shakeit2,StartShake,,0.01,-1"
+				
+				"OnTrigger" "ropewind,Enable,,0.02,-1" //funky
+				
+				"OnTrigger" "wave_finished_relay,AddOutput,OnTrigger blizzardstop_relay:Trigger:0:-1"
+			}
+			logic_relay
+			{
+				"targetname" "blizzardstop_relay"
+				
+				"OnTrigger" "blizzard_relay,CancelPending,,0,-1"
+				"OnTrigger" "ambient_generic,StopSound,,0,-1"
+				"OnTrigger" "snow*,Stop,,0,-1"
+				"OnTrigger" "overlayrobo*,StopOverlays,,0,-1"
+				"OnTrigger" "shakeit2,StopShake,,0,-1"
+				"OnTrigger" "mist*,TurnOff,0.01,-1"
+				"OnTrigger" "fogbox,Disable,,0,-1"
+				"OnTrigger" "fogeffect*,CancelPending,,0,-1"
+				"OnTrigger" "windsounds*,CancelPending,,0,-1"
+			//	"OnTrigger" "camera*,$DisableAll,,0,-1"
+			}
+			logic_relay 
+			{
+				"targetname" "preblizzard"
+				
+				"OnTrigger" "fogbox,Enable,,0,-1"
+				"OnTrigger" "blizzardwind3,Playsound,,0,-1"
+				"OnTrigger" "snow1,Start,,0,-1"
+				"OnTrigger" "snow2,Start,,0,-1"
+				"OnTrigger" "snow3,Start,,0,-1"
+				"OnTrigger" "snow*,Stop,,30,-1"
+			}
+			//Fade effect
+			env_fade
+			{
+				"targetname" "fade" //obsolete
+				
+				"duration" "3"
+				"holdtime" "9"
+				"renderamt" "0"
+				"rendercolor" "161 169 181"
+				"spawnflags" "2"
+			}
+			env_fade
+			{
+				"targetname" "fade2"
+				
+				"duration" "30"
+				"holdtime" "999"
+				"renderamt" "1"
+				"rendercolor" "161 169 181"
+				"spawnflags" "2"
+			}
+			//Fog
+			filter_tf_class //sniper gets to see
+			{
+				"Negated" "1"
+				"targetname" "filter_sniper_nofog"
+				"tfclass" "2"
+			}
+			env_fog_controller
+			{
+				"farz"          "-1"
+				"fogblend"      "0"
+				"fogcolor"      "161 169 181"
+				"fogcolor2"     "161 169 181"
+				"fogdir"        "1 0 0"
+				"fogenable"     "0"
+				"fogend"        "750"
+				"foglerptime"   "2"
+				"fogmaxdensity" "1"
+				"fogstart"      "100"
+				"spawnflags" 	"0"
+				"targetname"    "mist"
+			}
+			env_fog_controller
+			{
+				"farz"          "-1"
+				"fogblend"      "0"
+				"fogcolor"      "161 169 181"
+				"fogcolor2"     "161 169 181"
+				"fogdir"        "1 0 0"
+				"fogenable"     "1"
+				"fogend"        "2250"
+				"foglerptime"   "2"
+				"fogmaxdensity" "1"
+				"fogstart"      "100"
+				"spawnflags" 	"0"
+				"targetname"    "indoormist"
+			}
+			trigger_multiple //outdoor, spawn
+			{
+				"targetname"    "fog_system"
+				"origin"        "689.685120 1153.352783 338.118256"
+				"filtername" 	"filter_sniper_nofog"
+				// "mins"          "-2700 -2700 -2000"
+				// "maxs"          "1000 3000 2000"
+				"mins" "-9999 -9999 -9999"
+				"maxs" "9999 9999 9999"
+				"StartDisabled" "1"
+				"spawnflags"    "4097"
+				"OnStartTouch"  "!activator,SetFogController,mist,0.01,-1"
+				"OnStartTouch"  "fade2,Fade,,0,-1"
+			}
+			trigger_multiple //indoor
+			{
+				"targetname"    "fog_system2"
+				"origin"        "2442.705078 1144.455200 523.031311"
+				"filtername" 	"filter_sniper_nofog"
+				"mins"          "-1000 -1400 -2000"
+				"maxs"          "1000 600 2000"
+				"StartDisabled" "1"
+				"spawnflags"    "4097"
+				"OnStartTouch"  "!activator,SetFogController,indoormist,0.01,-1"
+				"OnEndTouch"    "!activator,SetFogController,mist,0.01,-1"
+			}
+			trigger_multiple //outdoor, hatch
+			{
+				"targetname"    "fog_system3"
+				"origin"        "5471.926270 -764.536133 295.279755"
+				"filtername" 	"filter_sniper_nofog"
+				"mins"          "-750 -1800 -2000"
+				"maxs"          "2000 1100 2000"
+				"StartDisabled" "1"
+				"spawnflags"    "4097"
+				"OnStartTouch"  "!activator,SetFogController,indoormist,0.01,-1"
+				"OnEndTouch"    "!activator,SetFogController,mist,0.01,-1"
+			}
+			//Snow effects
+			info_particle_system
+			{
+				"targetname" "snow1"
+				"effect_name" "env_snow_stormfront_001"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "-16.461910 323.430267 199.549988"
+				"angles" "45 0 0"
+			}
+			info_particle_system
+			{
+				"targetname" "snow2"
+				"effect_name" "env_snow_stormfront_001"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "560.718811 1641.463501 -10.534058"
+				"angles" "45 0 0"
+			}
+			info_particle_system
+			{
+				"targetname" "snow3"
+				"effect_name" "env_snow_stormfront_001"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "4875.279297 395.267303 129.165955"
+				"angles" "-45 0 0"
+			}
+			info_particle_system
+			{
+				"targetname" "snow4"
+				"effect_name" "env_snow_stormfront_001"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "4481.220947 -1006.735962 230.637695"
+				"angles" "-45 35 0"
+			}
+			info_particle_system
+			{
+				"targetname" "snow5"
+				"effect_name" "env_snow_stormfront_001"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "-473.567688 -1002.078003 283.850220"
+				"angles" "45 0 0"
+			}
+			info_particle_system
+			{
+				"targetname" "snow6"
+				"effect_name" "env_snow_stormfront_001"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "-473.567688 -602.078003 283.850220"
+				"angles" "45 0 0"
+			}
+			info_particle_system
+			{
+				"targetname" "snow7"
+				"effect_name" "env_snow_stormfront_001"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "4976.512207 -932.774353 289.543243"
+				"angles" "45 0 0"
+			}			
+			info_particle_system
+			{
+				"targetname" "snow8"
+				"effect_name" "env_snow_stormfront_001"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "-770.321533 920.655334 425.140137"
+				"angles" "-45 0 0"
+			}
+			//screenshake
+			env_shake
+			{
+				"classname" "env_shake"
+				"amplitude" "0.8"
+				"duration" "999"
+				"frequency" "40"
+				"radius" "50000"
+				"spawnflags" "21"
+				"targetname" "shakeit2"
+				"origin" "-189.888 17.0933 65"
+			}				
+			//overlay
+			env_screenoverlay
+            {
+                "targetname" "overlayrobo"
+                "OverlayName1" "effects/stealth_overlay.vmt"
+                "OverlayTime1" "-1"
+            }
+			env_screenoverlay
+            {
+                "targetname" "overlayrobo2"
+                "OverlayName1" "effects/combine_binocoverlay"
+                "OverlayTime1" "-1"
+            }
+			//sounds
+			logic_case
+			{
+				"targetname" "windshuffle"
+				"OnCase01" "blizzardwind1,PlaySound,,5,-1"
+				"OnCase02" "blizzardwind2,PlaySound,,10,-1"
+				"OnCase03" "blizzardwind3,PlaySound,,0,-1"
+				"OnCase04" "blizzardwind5,PlaySound,,10,-1"
+			}
+  			logic_relay
+			{
+				"targetname" "windsounds"
+				"OnTrigger" "windshuffle,PickRandomShuffle,,0,-1"
+				"OnTrigger" "windsounds2,Trigger,,10,-1"
+			}
+			logic_relay
+			{
+				"targetname" "windsounds2"
+				"OnTrigger" "windsounds,Trigger,,0,-1"
+			}
+			ambient_generic //wind
+            {
+               "targetname" "blizzardwind1"
+               "origin" "440 48 128"
+               "volstart" "10"
+               "spawnflags" "17"
+               "radius" "99999"
+               "preset" "0"
+               "message" "ambient/atmosphere/terrain_rumble1.wav"
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "10"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }
+			ambient_generic
+            {
+               "targetname" "blizzardwind2"
+               "origin" "440 48 128"
+               "volstart" "10"
+               "spawnflags" "17"
+               "radius" "99999"
+               "preset" "0"
+               "pitch" "100"
+               "message" "ambient/wind_gust1.wav"
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "10"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }
+			ambient_generic
+            {
+               "targetname" "blizzardwind3"
+               "origin" "440 48 128"
+               "volstart" "10"
+               "spawnflags" "17"
+               "radius" "99999"
+               "preset" "0"
+               "pitch" "100"
+               "message" "ambient/forest_high_wind.wav"
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "10"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }
+			ambient_generic
+            {
+               "targetname" "blizzardwind5"
+               "origin" "440 48 128"
+               "volstart" "10"
+               "spawnflags" "17"
+               "radius" "99999"
+               "preset" "0"
+               "pitch" "100"
+               "message" "ambient/wind/windgust_strong.wav"
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "10"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }
+			ambient_generic //loop
+            {
+               "targetname" "blizzardwind6"
+               "origin" "440 48 128"
+               "volstart" "10"
+               "spawnflags" "17"
+               "radius" "99999"
+               "preset" "0"
+               "pitch" "100"
+               "message" "ambient/desert_wind_high.wav"
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "10"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }			
+			ambient_generic //explodey sounds
+            {
+               "targetname" "explosionsound1"
+               "origin" "440 48 128"
+               "volstart" "10"
+               "spawnflags" "17"
+               "radius" "99999"
+               "preset" "0"
+               "pitch" "100"
+               "message" "ambient/machines/wall_crash1.wav"
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "10"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }
+			ambient_generic
+            {
+               "targetname" "explosionsound2"
+               "origin" "440 48 128"
+               "volstart" "10"
+               "spawnflags" "17"
+               "radius" "99999"
+               "preset" "0"
+               "pitch" "100"
+               "message" "ambient/energy/weld2.wav"
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "10"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }
+			ambient_generic //alarm
+            { 
+               "targetname" "stormalarm"
+               "origin" "440 48 128"
+               "volstart" "3"
+               "spawnflags" "17"
+               "radius" "99999"
+               "preset" "0"
+               "pitch" "100"
+               "message" "#ambient/alarms/city_siren_loop2.wav"
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "3"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }			
+			// ambient_generic //alarm
+            // {
+               // "targetname" "stormalarm2"
+               // "origin" "440 48 128"
+               // "volstart" "10"
+               // "spawnflags" "17"
+               // "radius" "99999"
+               // "preset" "0"
+               // "pitch" "100"
+               // "message" "npc/attack_helicopter/aheli_damaged_alarm1.wav"
+               // "lfotype" "0"
+               // "lforate" "0"
+               // "lfomodvol" "0"
+               // "lfomodpitch" "0"
+               // "health" "10"
+               // "fadeoutsecs" "0"
+               // "fadeinsecs" "0"
+               // "cspinup" "0"
+            // }			
+			ambient_generic //upgrade station
+            {
+               "targetname" "upgradedisable"
+               "origin" "440 48 128"
+               "volstart" "10"
+               "spawnflags" "17"
+               "radius" "300"
+               "preset" "0"
+               "pitch" "100"
+               "message" "npc/turret_floor/die.wav"
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "10"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }
+			//Wind for power lines
+			env_wind
+			{
+				
+				"targetname" "ropewind"
+				"gustdirchange" "60"
+				"gustduration" "10"
+				"maxgust" "750"
+				"maxgustdelay" "3"
+				"maxwind" "500"
+				"mingust" "300"
+				"mingustdelay" "3"
+				"minwind" "200"
+				"origin" "496.709381 1087.655396 870.725525"
+			}
+			//sky whiteout
+			prop_dynamic
+			{
+				"targetname" "fogbox"
+				"model" "models/props_skybox/fogbox_cyberia.mdl"
+				"rendercolor" "161 169 181"
+				"startdisabled" "1"
+				"disableshadows" "1"
+			}
+			prop_dynamic
+			{
+				"targetname" "fogbox"
+				"origin" "3712 0 192"
+				"model" "models/props_skybox/fogbox_cyberia.mdl"
+				"rendercolor" "161 169 181"
+				"setbodygroup" "3"
+				"startdisabled" "1"
+				"disableshadows" "1"
+			}
+			//fog system loop
+			logic_relay
+			{
+				"targetname" "fogeffect"
+				"OnTrigger" "fog_system*,Enable,,0,-1"
+				"OnTrigger" "fade2,Fade,,0.01,-1"
+				"OnTrigger" "fogeffect2,Trigger,,1,-1"
+			}
+			logic_relay
+			{
+				"targetname" "fogeffect2"
+				"OnTrigger" "fogeffect,Trigger,,0.01,-1"
+				"OnTrigger" "fog_system*,Disable,,0,-1"
+			}
+		}
+		redtank
+		{	
+			NoFixup 1
+			logic_relay
+			{
+				"targetname" "redtank_deploy_relay"
+				
+			//	"OnSpawn" "redtankpath_1,AddOutput,OnPass tankbossred:SetTeam:2:0:-1" //set to red on spawn
+				"OnSpawn" "redtankpath_2,AddOutput,OnPass Barricade_Destroy_Relay:Trigger:0:-1" //break barricades
+				"OnSpawn" "redtankpath_4,AddOutput,OnPass tank_bust_relay:Trigger:0:-1" //break barricades
+				
+				"OnTrigger" "bots_win_red,RoundWin,,0,-1"
+				"OnTrigger" "pit_explosion_wav,PlaySound,,0,-1"
+				"OnTrigger" "kaboom,Start,,0,-1"
+			}	
+			logic_relay
+			{
+				"targetname" "redtank_dead_relay"
+				"OnTrigger" "hudhint,$SetKey$message,OBJECTIVE: Destroy the control stations to disable the AutoGun!,0,-1"
+			}
+			game_round_win
+			{
+				
+				"TeamNum" "2"
+				"targetname" "bots_win_red"
+				"switch_teams" "0"
+				"force_map_reset" "1"
+			}
+			info_particle_system
+			{
+				"targetname" "kaboom"
+				"effect_name" "firesmoke_collumnP"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "515.436646 -821.968750 134.929688"
+				"angles" "0 90 0"
+			}
+		}
+		hatchsentries 
+		{
+			logic_auto
+			{
+				
+				"OnMapSpawn" "obj_sentrygun,Disable,,0,-1"
+				"OnMapSpawn" "obj_sentrygun,Sethealth,432,0.01,-1"
+				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger obj_sentrygun:Show:0:-1"
+				"spawnflags" "1"
+			}
+			obj_sentrygun
+			{
+				"origin" "5717.452637 -108.858025 180.781372"
+				"defaultupgrade" "2"
+				"spawnflags" "8"
+				"teamnum" "2"
+			}
+			obj_sentrygun
+			{
+				"origin" "4732.192871 -1025.492798 180.084656"
+				"defaultupgrade" "2"
+				"spawnflags" "8"
+				"teamnum" "2"
+			}
+			obj_sentrygun
+			{
+				"origin" "6402.188965 -1320.744385 225.010223"
+				"defaultupgrade" "2"
+				"spawnflags" "8"
+				"teamnum" "2"
+			}
+			obj_sentrygun
+			{
+				"origin" "6652.576172 -214.559326 274.73980"
+				"defaultupgrade" "2"
+				"spawnflags" "8"
+				"teamnum" "2"
+			}
+		}
+		decoration
+		{	
+			NoFixup 1
+	        prop_dynamic
+            {
+                "targetname" "tree"
+                "model"      "models/props_foliage/tree_pine_small_snow.mdl"
+				"origin" "-56.465446 -1020.034424 266.208405"
+                "solid" "6"
+                "angles" "-3.9047 285.796 1.3115"
+                "disableshadows" "0"
+				"disablereceiveshadows" "0"
+            }
+			prop_dynamic
+			{
+				"model" "models/props_forest/cliff_wall_02.mdl"
+				"origin" "-1785.443604 815.287781 718.462524"
+				"angles" "-1.591 -5.895 7.576"
+				"skin" "2"
+				"solid" "6"
+                "disableshadows" "0"
+				"disablereceiveshadows" "0"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_forest/cliff_wall_10a.mdl"
+				"origin" "-1852.278564 733.816467 778.929382"
+				"angles" "-0.830 -67.959 -2.516"
+				"skin" "2"
+				"solid" "6"
+                "disableshadows" "0"
+				"disablereceiveshadows" "0"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_forest/cliff_wall_10.mdl"
+				"origin" "-1855.109497 1355.615112 669.548828"
+				"angles" "4.354 -14.043 -13.849"
+				"skin" "2"
+				"solid" "0" //clips with spawn
+                "disableshadows" "0"
+				"disablereceiveshadows" "0"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_forest/cliff_wall_08.mdl"
+				"origin" "-1642.978638 1496.986938 615.206848"
+				"angles" "-6.705 -1.048 -4.553"
+				"skin" "2"
+				"solid" "0" //clips with spawn
+                "disableshadows" "0"
+				"disablereceiveshadows" "0"
+			}
+		}
+		carrierescape //escape logic
+		{
+			NoFixup 1
+			//props for collision
+			prop_dynamic
+			{
+				"model" "models/props_mvm/mine_elevator_door.mdl"
+				"origin" "-14.979572 -1870.651489 405.805237"
+				"angles" "0.000 -134.991 90.000"
+				"solid" "6"
+				"fademindist" "0.00001"
+				"rendermode" "10"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_mvm/mine_elevator_door.mdl"
+				"origin" "139.626495 -2042.170410 402.854126"
+				"angles" "0.000 -134.991 90.000"
+				"solid" "6"
+				"fademindist" "0.00001"
+				"rendermode" "10"
+			}
+			prop_dynamic //wall
+			{
+				"model" "models/props_mvm/mine_elevator_door.mdl"
+				"origin" "101.260033 -2266.301514 407.564880"
+				"angles" "0.002 132.058 -0.250"
+				"solid" "6"
+				"fademindist" "0.00001"
+				"rendermode" "10"
+			}
+			prop_dynamic //back wall
+			{
+				"model" "models/props_mvm/mine_elevator_door.mdl"
+				"origin" "-58.647766 -2385.339111 409.616577"
+				"angles" "0 45 0"
+				"solid" "6"
+				"fademindist" "0.00001"
+				"rendermode" "10"
+			}
+			prop_dynamic //back wall
+			{
+				"model" "models/props_mvm/mine_elevator_door.mdl"
+				"origin" "-293.181427 -2145.464600 409.626221"
+				"angles" "0 45 0"
+				"solid" "6"
+				"fademindist" "0.00001"
+				"rendermode" "10"
+			}
+			prop_dynamic //wall
+			{
+				"model" "models/props_mvm/mine_elevator_door.mdl"
+				"origin" "-268.276733 -1883.463989 406.858887"
+				"angles" "0 -45 0"
+				"solid" "6"
+				"fademindist" "0.00001"
+				"rendermode" "10"
+			}
+			prop_dynamic //gate
+			{
+				"model" "models/props_mvm/mine_elevator_door.mdl"
+				"origin" "-14.979572 -1870.651489 405.805237"
+				"angles" "0 -138 0"
+				"solid" "6"
+				"fademindist" "0.00001"
+				"rendermode" "10"
+			}
+			prop_dynamic //gate
+			{
+				"model" "models/props_mvm/mine_elevator_door.mdl"
+				"origin" "139.626495 -2042.170410 402.854126"
+				"angles" "0 -138 0"
+				"solid" "6"
+				"fademindist" "0.00001"
+				"rendermode" "10"
+			}
+			prop_dynamic //roof
+			{
+				"model" "models/props_farm/building001.mdl"
+				"origin" "-227.384796 -2221.763428 841.391724"
+				"angles" "0 133 0"
+				"solid" "6"
+				"fademindist" "0.00001"
+				"rendermode" "10"
+			}
+			prop_dynamic //floor
+			{
+				"model" "models/props_farm/building001.mdl"
+				"origin" "-356.577332 -1899.739014 161.224365"
+				"angles" "-0.000 -136.911 -90.000"
+				"solid" "6"
+				"fademindist" "0.00001"
+				"rendermode" "10"
+			}
+			prop_dynamic //front gate
+			{
+				"targetname" "carriergate"
+				"model" "models/bots/boss_bot/carrier_parts.mdl"
+				"origin" "375.526459 -1661.923706 20.534611"
+				"angles" "-57.147 -137.855 -179.589"
+				"renderamt" "255"
+				"DisableBoneFollowers" "1"
+				"disablereceiveshadows" "1"
+				"disableshadows" "1"
+				"renderamt" "255"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"solid" "0"
+				"StartDisabled" "1"
+			}
+			prop_dynamic
+			{
+				"targetname" "pushfix"
+				"model" "models/props_2fort/sniper_fence01.mdl"
+				"origin" "-148.219849 -861.734314 393.316132"
+				"angles" "1.752 -167.734 0.000"
+				"renderamt" "255"
+				"DisableBoneFollowers" "1"
+				"disablereceiveshadows" "1"
+				"disableshadows" "1"
+				"renderamt" "0"
+				"fademindist" "0.001"
+				"fadescale" "1"
+				"solid" "6"
+			}
+			ambient_generic
+			{
+				"origin" "-106.081276 -2063.704102 598.126892"
+				"targetname" "radio"
+				"volstart" "10"
+				"radius" "9999"
+				"spawnflags" "17"
+				"preset" "0"
+				"message" "music/hl2_song6.mp3"
+				"lfotype" "0"
+				"lforate" "0"
+				"lfomodvol" "0"
+				"lfomodpitch" "0"
+				"health" "10"
+				"fadeoutsecs" "0"
+				"fadeinsecs" "0"
+				"cspinup" "0"
+			}
+			ambient_generic
+			{
+				"origin" "0 0 0"
+				"targetname" "radio2"
+				"volstart" "10"
+				"radius" "9999"
+				"spawnflags" "17"
+				"preset" "0"
+				"message" "music/hl2_song6.mp3"
+				"lfotype" "0"
+				"lforate" "0"
+				"lfomodvol" "0"
+				"lfomodpitch" "0"
+				"health" "10"
+				"fadeoutsecs" "0"
+				"fadeinsecs" "0"
+				"cspinup" "0"
+			}
+			info_target
+			{
+				"origin" "-175.028275 -2090.030762 417.91912"
+				"targetname" "escapenode"
+			}
+			info_target
+			{
+				"origin"  "4556.546875 -1595.435059 519.335144"
+				"targetname" "respawnnode"
+			}
+			//filters
+			filter_tf_class
+			{
+				"Negated" "Allow entities that match criteria"
+				"targetname" "filter_scout"
+				"tfclass" "1"
+			}
+			filter_tf_class
+			{
+				"Negated" "Allow entities that match criteria"
+				"targetname" "filter_engi"
+				"tfclass" "9"
+			}
+			filter_tf_class
+			{
+				"Negated" "Allow entities that match criteria"
+				"targetname" "filter_sniper"
+				"tfclass" "2"
+			}
+			filter_tf_class
+			{
+				"Negated" "Allow entities that match criteria"
+				"targetname" "filter_spy"
+				"tfclass" "8"
+			}
+			filter_tf_class
+			{
+				"Negated" "1"
+				"targetname" "filter_notspy"
+				"tfclass" "8"
+			}
+			filter_tf_condition
+			{
+				"condition" "12"
+				"Negated" "Allow entities that match criteria"
+				"targetname" "filter_shortstop"
+			}
+			filter_multi
+			{
+				"Filter01" "filter_engi"
+				"Filter02" "filter_sniper"
+				"Filter03" "filter_spy"
+				"Filter04" "filter_shortstop"
+				"filtertype" "1"
+				"targetname" "filter_smallescape"
+			}
+			filter_multi
+			{
+				"Filter01" "filter_notspy"
+				"Filter02" "filter_bluteam"
+				"filtertype" "0"
+				"targetname" "filter_antirush"
+			}
+			logic_case // 1 in 16 chance of skipping the rocket hacking objective
+			{
+				"targetname" "escaperng"
+				"OnCase01" "hackrocket,Trigger,,5,-1"
+				"OnCase02" "hackrocket,Trigger,,5,-1"
+				"OnCase03" "hackrocket,Trigger,,5,-1"
+				"OnCase04" "hackrocket,Trigger,,5,-1"
+				"OnCase05" "hackrocket,Trigger,,5,-1"
+				"OnCase06" "hackrocket,Trigger,,5,-1"
+				"OnCase07" "hackrocket,Trigger,,5,-1"
+				"OnCase08" "hackrocket,Trigger,,5,-1"
+				"OnCase09" "hackrocket,Trigger,,5,-1"
+				"OnCase10" "hackrocket,Trigger,,5,-1"
+				"OnCase11" "hackrocket,Trigger,,5,-1"
+				"OnCase12" "hackrocket,Trigger,,5,-1"
+				"OnCase13" "hackrocket,Trigger,,5,-1"
+				"OnCase14" "rocketfx_relay,Trigger,,5,-1"
+				"OnCase15" "hackrocket,Trigger,,5,-1"
+				"OnCase16" "hackrocket,Trigger,,5,-1"
+			}
+			logic_relay
+			{
+				"targetname" "forcerarefinale"
+				"OnTrigger" "escaperng,Kill,,0,-1"
+				"OnTrigger" "rocketfx_relay,Trigger,,2,-1"
+			}
+			logic_relay
+			{
+				"targetname" "hackrocket"
+				"OnTrigger" "hudhint,$SetKey$message,OBJECTIVE: Enter RED spawn and activate the rocket,0,-1"
+				"OnTrigger" "func_respawnroomvisualizer,Kill,,0,-1"
+				"OnTrigger" "hackmessage,Show,,0,-1"
+				"OnTrigger" "cap_master2,AddOutput,custom_position_x 0.40,0,-1"
+				"OnTrigger" "cap_master2,RoundSpawn,,0.1,-1"
+				"OnTrigger" "blutele*,Enable,,0,-1"
+				"OnTrigger" "spawnpush,Enable,,0,-1"
+		//		"OnTrigger" "filter_redteam,Kill,,0,-1"
+			}
+			trigger_teleport //small escape tele
+			{
+				"targetname" "escapetele"
+				"filtername" "filter_smallescape"
+				"origin" "-453.982025 2158.761719 226.113190"
+				"spawnflags" "1"
+				"solid" "0"
+				"StartDisabled" "1"
+				"maxs" "150 50 50"
+				"mins" "-50 -50 -50"
+				"target" "escapenode"
+			}
+			trigger_teleport //big escape tele
+			{
+				"targetname" "escapetele2"
+				"filtername" "filter_bluteam"
+				"origin" "522.175720 -679.857361 67.902077"
+				"spawnflags" "1"
+				"solid" "0"
+				"StartDisabled" "1"
+				"maxs" "50 400 50"
+				"mins" "-50 -50 -50"
+				"target" "escapenode"
+			}
+			trigger_teleport //escape tele
+			{
+				"targetname" "redtele"
+			//	"filtername" "filter_redteam"
+				"origin" "4388.613770 -351.372955 616.155884"
+				"spawnflags" "1"
+				"solid" "0"
+				"StartDisabled" "1"
+				"maxs" "1800 2000 2000"
+				"mins" "-3000 -3000 -3000"
+				"target" "spawnbot_front"
+			}
+			trigger_teleport //blu spawn tele
+			{
+				"targetname" "blutele"
+				"filtername" "filter_bluteam"
+				"origin" "175.796127 -392.667999 576.48632"
+				"spawnflags" "4097"
+				"solid" "0"
+				"StartDisabled" "1"
+				"maxs" "1800 0 2000"
+				"mins" "-1800 -1200 -3000"
+				"target" "respawnnode"
+				"OnTrigger" "func_forcefield,Kill,,0,-1"
+			}
+			trigger_teleport //blu spawn tele
+			{
+				"targetname" "blutele"
+				"filtername" "filter_bluteam"
+				"origin" "-1238.370117 1040.916016 768.774353"
+				"spawnflags" "4097"
+				"solid" "0"
+				"StartDisabled" "1"
+				"maxs" "500 500 500"
+				"mins" "-500 -500 -500"
+				"target" "respawnnode"
+				"OnTrigger" "func_forcefield,Kill,,0,-1"
+			}
+			logic_relay //all important escape logic
+			{
+				"targetname" "escapecam"
+				"origin" "0 100 0"
+				"OnTrigger" "red_player_teamspawn*,Disable,,0,-1"
+				"OnTrigger" "tankdoor*,Open,,1,-1"
+				"OnTrigger" "escapetele,Enable,,10,-1"
+			//	"OnTrigger" "redtele*,Enable,,0,-1"
+			//	"OnTrigger" "redtele*,Disable,,5,-1"
+				"OnTrigger" "carriergate,Disable,,0.01,-1"
+				"OnTrigger" "carriergate,Enable,,0.04,-1"
+				"OnTrigger" "cap_master,AddOutput,custom_position_x 0.35,0,-1"
+				"OnTrigger" "cap_master,RoundSpawn,,0.1,-1"
+				"OnTrigger" "blutele,Enable,,3,-1"
+				"OnTrigger" "spawnpush,Enable,,3,-1"
+			//	"OnTrigger" "stormmessage5,Show,,0,-1"
+				"OnTrigger" "escapetunnel,Show,,30,-1"
+			}
+			logic_relay //final final boss kill
+			{
+				"targetname" "escapebosskill"
+				"OnTrigger" "tank_bust_relay,Trigger,,0,-1"
+				"OnTrigger" "escapetele2,Enable,,0,-1"
+				"OnTrigger" "escapetunnel2,Show,,0,-1"
+				"OnTrigger" "spawnpush*,Disable,,0,-1"
+				
+			}
+			trigger_push
+			{
+				"targetname" "spawnpush"
+				"origin" "69.461342 -669.269287 561.85101"
+				"pushdir" "0 90 0"
+				"speed" "300"
+				"spawnflags" "1"
+				"mins" "-2000 -1500 -150"
+				"maxs" "2000 520 2000"
+				"StartDisabled" "1"
+			}
+			trigger_push
+			{
+				"targetname" "spawnpush"
+				"origin" "-1367.054810 976.180969 780.16076"
+				"pushdir" "0 0 0"
+				"speed" "300"
+				"spawnflags" "1"
+				"mins" "-800 -1500 -1800"
+				"maxs" "1100 1800 1800"
+				"StartDisabled" "1"
+			}
+		}
+		escapecinematics
+		{
+			NoFixup 1
+			// point_playermoveconstraint
+			// {
+				// "radius" "1296"
+				// "speedfactor" "0"
+				// "targetname" "escapeconstraint"
+				// "width" "1024"
+				// "origin" "5343.5 -789.523 185"
+			// }
+			// prop_dynamic
+			// {
+				// "targetname" "constraintborder"
+				// "origin" "4830.345215 302.072021 229.225174"
+				// "angles" "2.071 138.274 0.330"
+				// "modelscale" "2.21"
+				// "model" "models/props_mvm/mvm_player_shield2.mdl"
+				// "skin" "1"
+				// "StartDisabled" "1"
+                // "disableshadows" "0"
+				// "disablereceiveshadows" "0"
+			// }
+			// prop_dynamic
+			// {
+				// "targetname" "constraintborder"
+				// "origin" "4171.892578 -1414.487549 387.639709"
+				// "angles" "0.104 -165.933 1.401"
+				// "modelscale" "2.21"
+				// "model" "models/props_mvm/mvm_player_shield2.mdl"
+				// "skin" "1"
+				// "StartDisabled" "1"
+                // "disableshadows" "0"
+				// "disablereceiveshadows" "0"
+			// }
+			// logic_relay
+			// {
+				// "targetname" "constraintloop"
+				// "OnTrigger" "escapeconstraint,TurnOn,,0,-1"
+				// "OnTrigger" "constraintborder*,Enable,,0,-1"
+				// "OnTrigger" "constraintloop2,Trigger,,3,-1"
+			// }
+			// logic_relay
+			// {
+				// "targetname" "constraintloop2"
+			// //	"OnTrigger" "escapeconstraint,TurnOff,,0,-1"
+				// "OnTrigger" "constraintloop,Trigger,,0.01,-1"
+			// }
+			// logic_relay
+			// {
+				// "targetname" "stopconstraint"
+				// "OnTrigger" "constraintloop*,CancelPending,,0,-1"
+				// "OnTrigger" "escapeconstraint,TurnOff,,0.1,-1"
+				// "OnTrigger" "escapeconstraint,Kill,,1,-1"
+				// "OnTrigger" "constraintborder*,Kill,,1,-1"
+			// }
+			info_particle_system
+			{
+				"targetname" "escapexplosion"
+				"effect_name" "cinefx_goldrush"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "5966.007813 -889.186768 1132.775635"
+				"angles" "0 0 180"
+			}
+			info_particle_system
+			{
+				"targetname" "escapexplosion2"
+				"effect_name" "hightower_explosion"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "5967.007813 -889.186768 932.775635"
+				"angles" "180 0 0"
+			}
+			info_particle_system
+			{
+				"targetname" "rockettrail"
+				"effect_name" "smoke_rocket_steam"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "6110.638672 -1007.267578 539.483337"
+				
+			}
+			info_particle_system
+			{
+				"targetname" "rockettrail"
+				"effect_name" "smoke_rocket_steam"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "6279.302734 -898.820251 561.651855"
+				"angles" "0 120 0"
+			}
+			info_particle_system
+			{
+				"targetname" "rockettrail"
+				"effect_name" "smoke_rocket_steam"
+				"flag_as_weather" "0"
+				"start_active" "0"
+				"origin" "6115.237305 -794.111694 566.01770"
+				"angles" "180 45 0"
+			}
+			env_shake
+			{
+				"amplitude" "30"
+				"duration" "5"
+				"frequency" "40"
+				"radius" "50000"
+				"spawnflags" "21"
+				"targetname" "shakeit3"
+				"origin" "5916.805176 -962.169312 997.574890"
+			}
+			prop_dynamic
+			{
+				"targetname" "debris"
+				"origin" "5916.805176 -962.169312 997.574890"
+				"angles" "1.873 123.453 27.339"
+				"model" "models/props_forest/tree_pine_singlelog.mdl"
+				"StartDisabled" "1"
+			}
+			ambient_generic
+            {
+               "targetname" "rocketalarm"
+               
+               "volstart" "10"
+               "spawnflags" "17"
+               "radius" "99999"
+               "preset" "0"
+               "message" "npc/attack_helicopter/aheli_megabomb_siren1.wav"
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "10"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }
+			ambient_generic
+            {
+               "targetname" "rocketalarm2"
+               
+               "volstart" "10"
+               "spawnflags" "17"
+               "radius" "99999"
+               "preset" "0"
+               "message" "ambient/siren.wav"
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "10"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }
+			ambient_generic
+            {
+               "targetname" "rocketwarmup"
+               
+               "volstart" "10"
+               "spawnflags" "17"
+               "radius" "99999"
+               "preset" "0"
+               "message" "misc/doomsday_cap_open.wav"
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "10"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }
+			ambient_generic
+            {
+               "targetname" "rocketboom"
+               
+               "volstart" "10"
+               "spawnflags" "17"
+               "radius" "99999"
+               "preset" "0"
+               "message" "ambient/explosions/explode_9.wav" 
+               "lfotype" "0"
+               "lforate" "0"
+               "lfomodvol" "0"
+               "lfomodpitch" "0"
+               "health" "10"
+               "fadeoutsecs" "0"
+               "fadeinsecs" "0"
+               "cspinup" "0"
+            }
+			logic_relay
+			{
+				"targetname" "rocketfx_relay"
+				
+				"OnTrigger" "escapecam,Trigger,,6,-1"
+				"OnTrigger" "cap_area2,Kill,,0,-1"
+				"OnTrigger" "cap_point2,Kill,,0,-1"
+				"OnTrigger" "cap_master2,Kill,,0,-1"
+				"OnTrigger" "escapexplosion*,Start,,0,-1"
+				"OnTrigger" "debris,Enable,,0,-1"
+				"OnTrigger" "shakeit3,StartShake,,0,-1"
+				"OnTrigger" "rocketboom,PlaySound,,0,-1"
+				"OnTrigger" "explosionsound1,PlaySound,,0,-1"
+				"OnTrigger" "rocketalarm,PlaySound,,3,-1"
+				"OnTrigger" "shakeit3,Kill,,6,-1"
+				"OnTrigger" "hudhint,$SetKey$message,OBJECTIVE: ESCAPE!,0,-1"
+				"OnTrigger" "player,$DisplayTextCenter,THE ROCKET HAS BEEN DESTROYED BY STORM DEBRIS! ESCAPE AS SOON AS POSSIBLE,3,-1"
+				"OnTrigger" "player,$DisplayTextChat,{FF0000}GET BACK TO THE CARRIER TANK,3,-1"
+				"OnTrigger" "player,$DisplayTextChat,{FF0000}GET BACK TO THE CARRIER TANK,3,-1"
+				"OnTrigger" "player,$DisplayTextChat,{FF0000}GET BACK TO THE CARRIER TANK,3,-1"
+				"OnTrigger" "player,$DisplayTextChat,{FF0000}GET BACK TO THE CARRIER TANK,3,-1"
+				"OnTrigger" "player,$DisplayTextChat,{FF0000}GET BACK TO THE CARRIER TANK,3,-1"
+				"OnTrigger" "player,$DisplayTextChat,{FF0000}GET BACK TO THE CARRIER TANK,3,-1"
+				"OnTrigger" "player,$DisplayTextChat,{FF0000}GET BACK TO THE CARRIER TANK,3,-1"
+				"OnTrigger" "player,$DisplayTextChat,{FF0000}GET BACK TO THE CARRIER TANK,3,-1"
+				"OnTrigger" "player,$DisplayTextChat,{FF0000}GET BACK TO THE CARRIER TANK,3,-1"
+			}
+			logic_relay
+			{
+				"targetname" "rocketfx2_relay"
+				"OnTrigger" "rocketwarmup,PlaySound,,0,-1"
+				"OnTrigger" "shakeit3,StartShake,,0,-1"
+				"OnTrigger" "rocketalarm2,PlaySound,,3,-1"
+				"OnTrigger" "rockettrail*,Start,,0,-1"
+				"OnTrigger" "hudhint,$SetKey$message,OBJECTIVE: ESCAPE!,0,-1"
+			}
+		}
+		hackcontrolpoint
+		{
+			NoFixup 1
+			
+			trigger_capture_area //control point
+			{
+				"area_cap_point" "cap_point2"
+				"area_time_to_cap" "15"
+				
+				"targetname" "cap_area2"
+				"team_cancap_2" "0"  				//setting this number to 0 disables red team from recapturing, 1 enables red team to recapture 
+				"team_cancap_3" "1"					//1 enables blu team to cap
+				"team_numcap_2" "99"  				//changing this number will change the number of red players required to stand on the point to finish capturing
+				"team_numcap_3" "1"					//changing this number will change the number of blu players required to stand on the point to finish capturing
+				"team_spawn_2" "0"
+				"team_spawn_3" "0"
+				"team_startcap_2" "99"				//changing this number will change the number of red players required to stand on the point to begin capturing
+				"team_startcap_3" "1"				//changing this number will change the number of blu players required to stand on the point to begin capturing
+
+				"mins" "-100 -100 -100"
+				"maxs" "100 100 100"
+				"origin" "6285.507813 -1520.707642 455.665527"	
+				
+				"OnCapTeam2" "rocketfx2_relay,Trigger,,0,-1"
+				"OnCapTeam2" "door_red_large*,Open,,0.01,-1"
+				"OnCapTeam2" "door_red_large*,Kill,,1,-1"
+				"OnCapTeam2" "rocketfx2_relay,Trigger,,0,-1"
+				"OnCapTeam2" "cap_master2,Kill,,3,-1"
+				"OnCapTeam2" "cap_point2,Kill,,3,-1"
+				"OnCapTeam2" "cap_area2,Kill,,3,-1"
+				"OnCapTeam2" "player,$DisplayTextCenter,ROCKET ACTIVATED! ESCAPE TO THE CARRIER TANK,0,-1"
+				//"OnCapTeam1" "cap_base,Skin,1,0,-1" 		//set the first number to 0 for neutral, 1 for red, 2 for blu
+			}
+			team_control_point
+			{
+				
+				"point_default_owner" "0"
+				"point_group" "0"
+				"point_index" "2"	
+				"point_printname" "the rocket!"
+				"point_start_locked" "0"
+				"point_warn_on_cap" "0"
+				"point_warn_sound" "misc/null.wav"
+				"random_owner_on_restart" "0"
+				"spawnflags" "4"
+				"targetname" "cap_point2"
+				"team_bodygroup_0" "3"
+				"team_bodygroup_2" "1"
+				"team_bodygroup_3" "1"
+				"team_icon_0" "sprites/obj_icons/icon_obj_neutral"
+				"team_icon_2" "sprites/obj_icons/icon_obj_red"
+				"team_icon_3" "sprites/obj_icons/icon_obj_blu"
+				"team_model_0" "models/effects/cappoint_hologram.mdl"
+				"team_model_2" "models/effects/cappoint_hologram.mdl"
+				"team_model_3" "models/effects/cappoint_hologram.mdl"
+				// "team_model_0" "models/props_gameplay/cap_square_512.mdl"
+				// "team_model_2" "models/props_gameplay/cap_square_512.mdl"
+				// "team_model_3" "models/props_gameplay/cap_square_512.mdl"
+				"team_previouspoint_3_0" "cap_point2"
+				"team_timedpoints_2" "0"
+				"team_timedpoints_3" "0"
+				"origin" "-60.706001 -2106.440430 392.092560"
+			}
+
+			team_control_point_master
+            {
+                "cpm_restrict_team_cap_win" "1"
+				"custom_position_x" "2"
+                "caplayout" "2,0 1"
+             //   "custom_position_y" "0.91"
+                "partial_cap_points_rate" "0"
+                "play_all_rounds" "0"
+                "score_style" "0"
+                "switch_teams" "0"
+                "targetname" "cap_master2"
+                "team_base_icon_2" "sprites/obj_icons/icon_base_red"
+                "team_base_icon_3" "sprites/obj_icons/icon_base_blu"
+            }
+			trigger_multiple
+			{
+				"targetname" "escaperoom"
+				"origin" "-175.028275 -2090.030762 417.91912"
+				"mins" "-50 -50 -50"
+				"maxs" "50 50 50"
+				"OnStartTouch" "!activator,SetFogController,fogcont,0.01,-1"
+				"OnEndTouch" "!activator,SetFogController,fogcont,0.01,-1"
+			}
+			OnSpawnOutput
+			{
+				Target cap_area2
+				Action SetControlPoint
+				Param cap_point2
+			}
+			OnSpawnOutput
+			{
+				Target cap_master2
+				Action RoundSpawn
+			}
+		}
+		escapecontrolpoint
+		{
+			NoFixup 1
+			
+			trigger_capture_area //control point
+			{
+				"area_cap_point" "cap_point"
+				"area_time_to_cap" "55"
+				
+				"targetname" "cap_area"
+				"team_cancap_2" "0"  				//setting this number to 0 disables red team from recapturing, 1 enables red team to recapture 
+				"team_cancap_3" "1"					//1 enables blu team to cap
+				"team_numcap_2" "99"  				//changing this number will change the number of red players required to stand on the point to finish capturing
+				"team_numcap_3" "1"					//changing this number will change the number of blu players required to stand on the point to finish capturing
+				"team_spawn_2" "0"
+				"team_spawn_3" "0"
+				"team_startcap_2" "99"				//changing this number will change the number of red players required to stand on the point to begin capturing
+				"team_startcap_3" "1"				//changing this number will change the number of blu players required to stand on the point to begin capturing
+
+				"mins" "-275 -275 -175"
+				"maxs" "500 175 175"
+				"origin" "-145.706001 -2106.440430 392.092560"
+				
+				"OnCapTeam2" "timer_relay*,CancelPending,,0,-1"
+				"OnCapTeam2" "boss_deploy_relay,Trigger,,5,-1"
+				"OnCapTeam2" "blizzardstop_relay,Trigger,,10,-1"
+				"OnStartTeam2" "blizzardwind*,FadeOut,2,0,-1"
+				//"OnCapTeam1" "cap_base,Skin,1,0,-1" 		//set the first number to 0 for neutral, 1 for red, 2 for blu
+			}
+			team_control_point
+			{
+				
+				"point_default_owner" "0"
+				"point_group" "0"
+				"point_index" "2"	
+				"point_printname" "the escape!"
+				"point_start_locked" "0"
+				"point_warn_on_cap" "0"
+				"point_warn_sound" "misc/null.wav"
+				"random_owner_on_restart" "0"
+				"spawnflags" "6"
+				
+				"targetname" "cap_point"
+				"team_bodygroup_0" "3"
+				"team_bodygroup_2" "1"
+				"team_bodygroup_3" "1"
+				"team_icon_0" "sprites/obj_icons/icon_obj_neutral"
+				"team_icon_2" "sprites/obj_icons/icon_obj_red"
+				"team_icon_3" "sprites/obj_icons/icon_obj_blu"
+				"team_model_0" "models/effects/cappoint_hologram.mdl"
+				"team_model_2" "models/effects/cappoint_hologram.mdl"
+				"team_model_3" "models/effects/cappoint_hologram.mdl"
+				"team_timedpoints_2" "0"
+				"team_timedpoints_3" "0"
+				"origin" "-60.706001 -2106.440430 392.092560"
+			}
+
+			team_control_point_master
+            {
+                "cpm_restrict_team_cap_win" "1"
+				"custom_position_x" "2"
+                "caplayout" "2,0 1"
+             //   "custom_position_y" "0.91"
+                "partial_cap_points_rate" "0"
+                "play_all_rounds" "0"
+                "score_style" "0"
+                
+                "switch_teams" "0"
+                "targetname" "cap_master"
+                "team_base_icon_2" "sprites/obj_icons/icon_base_red"
+                "team_base_icon_3" "sprites/obj_icons/icon_base_blu"
+            }
+			trigger_multiple
+			{
+				"targetname" "escaperoom"
+				"origin" "-175.028275 -2090.030762 417.91912"
+				"mins" "-150 -150 -150"
+				"maxs" "150 150 150"
+				"OnStartTouch" "!activator,SetFogController,indoormist,0.01,-1"
+			}
+			OnSpawnOutput
+			{
+				Target cap_area 
+				Action SetControlPoint 
+				Param cap_point 
+			}
+			OnSpawnOutput
+			{
+				Target cap_master 
+				Action RoundSpawn
+			}
+		}
+	}
+}
+//fin

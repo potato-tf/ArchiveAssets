@@ -1,0 +1,8000 @@
+//Advanced Mission made by MIKObscura: https://steamcommunity.com/id/MIKObscura/
+//A lot of the logic and PointTemplates made by Braindawg: https://steamcommunity.com/id/HahaMoreLikeBraindead
+#base robot_giant_red.pop
+#base robot_standard_red.pop
+#base robot_standard.pop
+#base robot_giant.pop
+//#base robot_brain_swirltele2.pop
+
+//i woke up one day with the idea of making a reverse
+//at first it was supposed to be a sort of gimmicky ctf mission with a neutral flag but i abandonned the idea because i couldn't make it work
+//then i had the idea of a player destruction mission, but apparently in doesn't work in the current version of rafmod so maybe another time, who knows
+//then i just said "screw this" and decided to make a regular reverse without fancy pvp objectives
+
+//
+//
+// Starting Currency: 1500
+//
+// +----------+----------+----------+
+// | Wave     | Currency | A+       |
+// +----------+----------+----------+
+// | Wave 1   | 1200     | 1300     |
+// | Wave 2   | 1000     | 1100     |
+// | Wave 3   | 1100     | 1200     |
+// | Wave 4   | 1200     | 1300     |
+// | Wave 5   | 1000     | 1100     |
+// | Wave 6   | 1000     | 1100     |
+// | Wave 7   | 1500     | 1600     |
+// +----------+----------+----------+
+// | Total    | 8000     | 8700     |
+// +----------+----------+----------+
+//
+//
+
+eludehcSevaW //haha got it? it's WaveSchedule but reversed haha i'm so funny (kill me pls)
+{
+    StartingCurrency 1500
+    CanBotsAttackWhileInSpawnRoom Yes
+    RespawnWaveTime 3
+	RespawnWaveTimeBlue 5 
+	FixedRespawnWaveTimeBlue 1 
+	BotsRandomCrit 1 
+    Advanced 1
+    BluHumanFlagCapture 1  //Can blu humans capture the flag
+	BluHumanFlagPickup 1  //Can blu humans pickup flags
+	BluHumanInfiniteAmmo 1  //Enable infinite ammo for blu humans (default: 1)
+    HumansMustJoinTeam blue  //Set to blue to force players join the blu team
+    RedPlayersAreRobots 1  //If set, red players use robot models
+    ReverseWinConditions 1  //Player team wins if bots deliver the bomb. Half broken
+    AllowJoinTeamBlue 1 
+    SetCreditTeam 3		
+	RemoveBluVelocityLimit 1	
+	RobotLimit 26 
+	FlagCarrierMovementPenalty 1 
+	SniperAllowHeadshots 1 	//sniper and amby don't work without this, use AimAt Body  if you don't want your snipers headshotting
+	NoRomevisionCosmetics 1  //romevision is ugly, just like your mom
+	DisplayRobotDeathNotice 1 
+	BluPlayersAreRobots 1 
+	MedigunShieldDamage 1 
+	NoRedBotsRandomCrit 1
+	BotsUsePlayerTeleporters 0 
+	SendBotsToSpectatorImmediately 1 
+	TextPrintTime 0 	
+    PrecacheModel "models/props_mvm/mvm_upgrade_blu.mdl" 		 
+	PrecacheModel "models/props_mvm/mvm_upgrade_blu_tools.mdl" 	
+	PrecacheModel "models/props_owo/sign001.mdl" 	
+    PrecacheModel "models/bots/boss_bot/boss_tankred.mdl"
+    PrecacheModel "models/bots/boss_bot/boss_tankred_damage1.mdl"
+    PrecacheModel "models/bots/boss_bot/boss_tankred_damage2.mdl"
+    PrecacheModel "models/bots/boss_bot/boss_tankred_damage3.mdl"
+    PrecacheModel "models/bots/boss_bot/boss_tankred_part1_destruction.mdl"
+	PrecacheModel "models/bots/boss_bot/tankred_track_l.mdl"
+	PrecacheModel "models/bots/boss_bot/tankred_track_r.mdl"
+	PrecacheModel "models/mvm/barrier/barrier_spawn_blue1.mdl"
+	PrecacheModel "models/props_mvm/hatch_shield.mdl"
+	PrecacheModel "models/bots/boss_bot/boss_tank_color.mdl"
+	DisallowUpgrade "maxammo primary increased" 
+	DisallowUpgrade "maxammo metal increased" 
+	DisallowUpgrade "maxammo secondary increased"
+	DisallowUpgrade "metal regen"
+	PlayerAttributes
+	{
+		Engineer
+		{
+			"Construction rate increased" 1.5
+			"upgrade rate decrease" 1.8
+			"max health additive bonus" 150
+		}
+	}
+	ItemAttributes 
+	{
+		ClassName "tf_weapon_knife"
+		"provide on active" 1
+		"cannot pick up intelligence" 1
+	}
+	ItemAttributes
+	{
+		ItemName "The Rescue Ranger"
+		"max health additive bonus" -75
+	}
+	ItemAttributes 
+	{
+		ItemName "The Short Circuit"
+		"fire rate penalty" 2.5
+	}
+	ItemAttributes
+	{
+		ItemName "The Widowmaker"
+		"damage penalty" 1.25
+	}
+    PointTemplates
+    {
+		baseLogic
+		{	
+			NoFixup 1
+			logic_auto 
+			{
+				"origin" "0 0 0" 
+				"targetname" "mainrelay"
+				"OnMapSpawn" "item_ammopack*,Kill,,0,-1"
+				"OnMapSpawn" "tank_entrance*,Kill,,0,-1"
+
+				"OnMapSpawn" "wave_start_relay*,AddOutput,OnTrigger spawnbarrier*:Disable:0:-1,0,-1"
+				"OnMapSpawn" "wave_init*,AddOutput,OnTrigger spawnbarrier*:Enable:0:-1,0,-1"
+				"OnMapSpawn" "bot_stun_*,Kill,,0,-1"  //some gates may stun players	 
+				"OnMapSpawn" "gate1_alarm*,Kill,,0,-1"
+				"OnMapSpawn" "gate2_alarm*,Kill,,0,-1"
+				"OnMapSpawn" "spawnbot_chief*,Kill,,0,-1" //bad respawnroom
+				"OnMapSpawn" "filter_gatebot*,Kill,,0,-1" //killing filters and func_nav_prerequisite to make players able to cap
+				"OnMapSpawn" "prereq_low_point*,Kill,,0,-1"
+				"OnMapSpawn" "prereq_up_point*,Kill,,0,-1"
+				"OnMapSpawn" "blu_respawnroom*,Kill,,0,-1"
+				"OnMapSpawn" "func_flagdetectionzone*,Kill,,0,-1"
+				"OnMapSpawn" "func_respawnroomvisualizer*,Disable,,0,-1"
+				"OnMapSpawn" "point_populator_interface,Kill,,0,-1"
+				"OnMapSpawn" "ambush_door*,Kill,,0,-1"
+				"OnMapSpawn" "move_rope,Kill,,0,-1"
+				"OnMapSpawn" "keyframe_rope,Kill,,0,-1"
+				"OnMapSpawn" "cap_trigger*,AddOutput,OnCapTeam2 antistuck*:Disable:0:-1,0,-1"
+				"OnMapSpawn" "spawnbot*,Kill,,0,-1" 
+				"OnMapSpawn" "wave_start*,AddOutput,OnTrigger spawn_blu_first:Enable:0:-1,0,-1"
+				"OnMapSpawn" "wave_start*,AddOutput,OnTrigger spawn_blu_up:Disable:0:-1,0,-1"
+				"OnMapSpawn" "wave_start*,AddOutput,OnTrigger spawn_blu_low:Disable:0:-1,0,-1"
+				"OnMapSpawn" "cap_trigger_up,AddOutput,OnCapTeam2 spawn_blu_up:Enable:0:-1,0,-1"
+				"OnMapSpawn" "cap_trigger_up,AddOutput,OnCapTeam2 spawn_blu_first:Disable:0:-1,0,-1"
+				"OnMapSpawn" "cap_trigger_low,AddOutput,OnCapTeam2 spawn_blu_low:Enable:0:-1,0,-1"
+				"OnMapSpawn" "cap_trigger_low,AddOutput,OnCapTeam2 spawn_blu_first:Disable:0:-1,0,-1"
+				"OnMapSpawn" "wave_reset_relay,AddOutput,OnTrigger spawnbot*:FireUser1:0:-1,0,-1"
+				"OnMapSpawn" "wave_start*,AddOutput,OnTrigger no_flank_gate:Disable:0:-1,0,-1"
+				"OnMapSpawn" "cap_trigger_up,AddOutput,OnCapTeam2 no_flank_gate:Enable:0:-1,0,-1"
+				"OnMapSpawn" "wave_start*,AddOutput,OnTrigger capturezone_blue:Disable:0:-1,0,-1"
+				"OnMapSpawn" "wave_start*,AddOutput,OnTrigger fuckyougate*:Disable:0:-1,0,-1"
+				"OnMapSpawn" "fuckyougate*,Enable,,0,-1"
+				"OnMapSpawn" "func_capturezone,AddOutput,OnCapture kill_relay:Trigger:0:-1,0,-1"
+			}
+			logic_relay //trigger this to kill all players and buildings
+			{
+				"targetname" "kill_relay"
+				"OnTrigger" "obj_dispenser,RemoveHealth,5000,0,-1"
+				"OnTrigger" "obj_sentrygun,RemoveHealth,5000,0,-1"
+				"OnTrigger" "obj_teleporter,RemoveHealth,5000,0,-1"
+				"OnTrigger" "player,SetHealth,-10000,0,-1"
+			}
+			logic_relay //trigger this to lose
+			{
+				"origin" "0 0 0"
+				"targetname" "redwin_relay"
+				"OnTrigger" "bots_win_red,RoundWin,,0,-1"
+				"OnTrigger" "pit_explosion_wav,PlaySound,,0,-1" //map dependent
+				"OnTrigger" "spawn_blu_first,Enable,,0,-1"
+				"OnTrigger" "spawn_blu_up,Disable,,0,-1"
+				"OnTrigger" "spawn_blu_low,Disable,,0,-1"
+			}	
+			game_round_win //do not interact with this
+			{
+				"origin" "0 0 0"
+				"TeamNum" "2"
+				"targetname" "bots_win_red"
+				"switch_teams" "0"
+				"force_map_reset" "1"
+				"classname" "game_round_win"
+			}
+		}
+		station
+		{
+			NoFixup 1
+			func_upgradestation
+			{
+				"mins" "-105 -100 0" 
+				"maxs" "105 100 242"
+				"solid" "0"
+			}
+			prop_dynamic
+			{
+				"targetname" "upgradestation"
+				"angles" "0 0 0"
+				"DisableBoneFollowers" "0"
+				"disablereceiveshadows" "0"
+				"disableshadows" "1"
+				"ExplodeDamage" "0"
+				"ExplodeRadius" "0"
+				"fademaxdist" "0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"maxdxlevel" "0"
+				"MinAnimTime" "5"
+				"mindxlevel" "0"
+				"model" "models/props_mvm/mvm_upgrade_blu.mdl"
+				"modelscale" "1"
+				"PerformanceMode" "0"
+				"pressuredelay" "0"
+				"RandomAnimation" "0"
+				"renderamt" "255"
+				"renderfx" "0"
+				"rendermode" "0"
+				"SetBodyGroup" "0"
+				"skin" "0"
+				"solid" "0"
+				"spawnflags" "0"
+				"origin" "0 0 0"
+			}
+			prop_dynamic
+			{
+				"targetname" "upgradestation1"
+				"angles" "0 0 0"
+				"DisableBoneFollowers" "0"
+				"disablereceiveshadows" "0"
+				"disableshadows" "1"
+				"ExplodeDamage" "0"
+				"ExplodeRadius" "0"
+				"fademaxdist" "0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"maxdxlevel" "0"
+				"MinAnimTime" "5"
+				"mindxlevel" "0"
+				"model" "models/props_mvm/mvm_upgrade_blu_tools.mdl"
+				"modelscale" "1"
+				"PerformanceMode" "0"
+				"pressuredelay" "0"
+				"RandomAnimation" "0"
+				"renderamt" "255"
+				"renderfx" "0"
+				"rendermode" "0"
+				"SetBodyGroup" "0"
+				"skin" "0"
+				"solid" "0"
+				"spawnflags" "0"
+				"origin" "0 0 0"
+			}
+			func_upgradestation
+			{
+				"mins" "-100 -100 0" 
+				"maxs" "90 60 100"
+				"parentname" "upgradestation"
+			}
+			prop_dynamic
+			{
+				
+				"targetname" "shopcollision"
+				"angles" "0 -90 0"
+				"DisableBoneFollowers" "1"
+				"disablereceiveshadows" "1"
+				"model" "models/props_vehicles/train_flatcar_container.mdl"
+				"disableshadows" "1"
+				"ExplodeDamage" "0"
+				"ExplodeRadius" "0"
+				"fademaxdist" "0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"maxdxlevel" "0"
+				"MinAnimTime" "5"
+				"mindxlevel" "0"
+				"modelscale" "1"
+				"PerformanceMode" "0"
+				"pressuredelay" "0"
+				"RandomAnimation" "0"
+				"renderamt" "0"
+				"renderfx" "0"
+				"rendermode" "10"
+				"SetBodyGroup" "0"
+				"skin" "0"
+				"CollisionGroup" "5"
+				"solid" "6"
+				"spawnflags" "0"
+				"StartDisabled" "0"
+				"origin" "0 0 0"	
+			}		
+		}
+		barriers //spawn blocker
+		{
+			NoFixup 1
+			func_forcefield
+			{
+				
+                "disablereceiveshadows" "0"
+                "origin" "0 0 0"
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "renderfx" "0"
+                "rendermode" "10"
+                "TeamNum" "2"
+                "targetname" "spawnbarrierA1"
+                "mins" "-500 -100 -2100"
+                "maxs" "300 100 2100"
+				"StartDisabled" "0"
+				"angles" "0 0 0"
+			}			
+		}
+		barriers_prop
+		{
+			NoFixup 1
+			prop_dynamic //prop for show
+			{
+				
+				"targetname" "spawnbarrierA"
+				"angles" "0 0 0"
+				"DisableBoneFollowers" "1"
+				"disablereceiveshadows" "1"
+				"model" "models/mvm/barrier/barrier_spawn_blue1.mdl"
+				"disableshadows" "1"
+				"origin" "0 0 0"	
+				"solid" "0"
+			}
+		}
+		antirollout //props to block a shortcut
+		{
+			NoFixup 1
+			prop_dynamic
+			{
+				"model" "models/props_mvm/wood_boards_2bridges.mdl"
+				"angles" "0 0 0"
+				"origin" "-896 1609 321.143"
+				"solid" "0"
+			}
+			func_forcefield
+			{
+				"origin" "-896 1559 321.143"
+				"mins" "-100 -50 -100"
+				"maxs" "100 50 100"
+				"TeamNum" "2"
+			}
+		}
+		robot_spawns //holograms that indicate red spawns
+		{
+			entity
+			{
+				"id" "16"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "0"
+				"targetname" "spawn_low_1"
+				"origin" "-512 2497.12 -55.8161"
+				"DefaultAnim" "idle"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 500]"
+				}
+			}
+			entity
+			{
+				"id" "26"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "0"
+				"targetname" "spawn_up_1"
+				"origin" "256 1536 136.312"
+				"DefaultAnim" "idle"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 1000]"
+				}
+			}
+			entity
+			{
+				"id" "8"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "6"
+				"targetname" "spawn_gate_up"
+				"DefaultAnim" "idle"
+				"origin" "-320 2304 319"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 500]"
+				}
+			}
+			entity
+			{
+				"id" "45"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "0"
+				"targetname" "spawn_mid"
+				"DefaultAnim" "idle"
+				"origin" "-2496 1536 322"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 2000]"
+				}
+			}
+			entity
+			{
+				"id" "54"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "0"
+				"targetname" "spawn_prefinal"
+				"DefaultAnim" "idle"
+				"origin" "-2679 704 583.56"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 2500]"
+				}
+			}
+			entity
+			{
+				"id" "48"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "0"
+				"targetname" "spawn_up_front"
+				"DefaultAnim" "idle"
+				"origin" "-893.845 1472 297.591"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 3500]"
+				}
+			}
+			entity
+			{
+				"id" "102"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "0"
+				"targetname" "spawn_hatch_first"
+				"DefaultAnim" "idle"
+				"origin" "-2944 384 575"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 6000]"
+				}
+			}
+			entity
+			{
+				"id" "111"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "0"
+				"targetname" "spawn_mid_flank"
+				"DefaultAnim" "idle"
+				"origin" "-2944 1984 447"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 6500]"
+				}
+			}
+			entity
+			{
+				"id" "132"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "0"
+				"targetname" "spawn_gate_low"
+				"DefaultAnim" "idle"
+				"origin" "-1472 2624 63"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 7000]"
+				}
+			}
+			entity
+			{
+				"id" "142"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "0"
+				"targetname" "spawn_gate_up"
+				"DefaultAnim" "idle"
+				"origin" "-1152 2816 639"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 7500]"
+				}
+			}
+			entity
+			{
+				"id" "151"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "0"
+				"targetname" "spawn_hatch_flank"
+				"DefaultAnim" "idle"
+				"origin" "-1792 0 767"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 8000]"
+				}
+			}
+			entity
+			{
+				"id" "162"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "0"
+				"targetname" "spawn_mid_flank"
+				"DefaultAnim" "idle"
+				"origin" "-1664 896 767"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 8500]"
+				}
+			}
+			entity
+			{
+				"id" "8"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "0"
+				"targetname" "spawn_up_gate"
+				"DefaultAnim" "idle"
+				"origin" "-768 1920 319"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 500]"
+				}
+			}
+			entity
+			{
+				"id" "71"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "6"
+				"DefaultAnim" "idle"
+				"targetname" "spawn_ambush_low"
+				"origin" "-1216 3264 0"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 4000]"
+				}
+			}
+			entity
+			{
+				"id" "93"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "6"
+				"DefaultAnim" "idle"
+				"targetname" "spawn_ambush_up"
+				"origin" "-1152 3072 447"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 5500]"
+				}
+			}
+			entity
+			{
+				"id" "6"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"DefaultAnim" "idle"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "6"
+				"origin" "-2112 2176 -30.002"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 0]"
+				}
+			}
+		}
+		barriersdisable
+		{	
+			NoFixup 1
+			logic_relay
+			{
+				"origin" "0 0 0"
+				"targetname" "disablebarriers"
+				"OnTrigger" "spawnbarrier*,Disable,,0,-1"
+				"OnTrigger" "point_nav_interface,RecomputeBlockers,,0.1,-1"
+			}
+		}
+		hold_up //forcefield so you kill everything before deploying
+		{
+			NoFixup 1
+			func_forcefield
+			{
+				"mins" "-170 -150 0"
+				"maxs" "170 150 150"
+				"origin" "-2944 -256 643"
+				"targetname" "forcefield_hatch"
+				"TeamNum" "2"
+			}
+			entity
+			{
+				"id" "6"
+				"classname" "prop_dynamic"
+				"targetname" "prop_forcefield_hatch"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_mvm/hatch_shield.mdl"
+				"modelscale" "1.0"
+				"renderfx" "0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				//"DefaultAnim" "Enable"
+				"skin" "0"
+				"solid" "0"
+				"origin" "-2944 -256 643"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 0]"
+				}
+			}
+		}
+		disable_hatch_forcefield
+		{
+			NoFixup 1
+			logic_relay
+			{
+				"origin" "0 0 0"
+				"targetname" "youcandeploynow"
+				"OnTrigger" "forcefield_hatch,Disable,,0,-1"
+				"OnTrigger" "prop_forcefield_hatch,Disable,,0,-1"
+				"OnTrigger" "capturezone_blue,Enable,,0,-1"
+				"OnTrigger" "hint_deploy,Show,,0,-1"
+			}
+		}
+		OwO
+		{
+			NoFixup 1
+			entity
+			{
+				"id" "49"
+				"classname" "prop_dynamic"
+				"angles" "0 90 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_owo/sign001.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "6"
+				"origin" "640 -1537.8 -20"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 2500]"
+				}
+			}
+		}
+		annotation_last
+		{
+			NoFixup 1
+			training_annotation
+			{
+				"targetname"   "hint_last_vip"
+				"display_text" "The last VIP has arrived!"
+				"lifetime"     "10"
+				"origin" "560.047 -942.517 89"	
+			}	
+		}
+		annotation_deploy
+		{
+			NoFixup 1
+			training_annotation
+			{
+				"targetname"   "hint_deploy"
+				"display_text" "The bomb can be deployed!"
+				"lifetime"     "10"
+				"origin" "-2944 -256 643"	
+			}	
+		}
+		annotation_last_tank 
+		{
+			NoFixup 1
+			training_annotation
+			{
+				"targetname"   "hint_last_tank"
+				"display_text" "The last tank has arrived!"
+				"lifetime"     "10"
+				"origin" "560.047 -942.517 89"	
+			}	
+		}
+		annotation_gate
+		{
+			NoFixup 1
+			training_annotation
+			{
+				"targetname" "hint_gate_up"
+				"display_text" "The upper gate has been enabled!"
+				"lifetime" "10"
+				"origin" "-1408 2048 576"
+ 			}
+			training_annotation
+			{
+				"targetname" "hint_gate_low"
+				"display_text" "The lower gate has been enabled!"
+				"lifetime" "10"
+				"origin" "-1408 2048 64"
+			}
+		}
+		no_forcefield 
+		{
+			NoFixup 1
+			logic_relay
+			{
+				"origin" "0 0 0"
+				"targetname" "disableforcefields"
+				"OnTrigger" "forcefield*,Disable,,0,-1"
+				"OnTrigger" "forcefield_prop*,Disable,,0,-1"
+				"OnTrigger" "prop_forcefield*,Disable,,0,-1"
+			}
+		}
+		better_relay //remaking the wave_start_relay because the relays to select path don't work
+		{
+			NoFixup 1
+			entity
+			{
+				"id" "63440"
+				"classname" "logic_relay"
+				"spawnflags" "0"
+				"StartDisabled" "0"
+				"targetname" "wave_start_relay_improved_up"
+				connections
+				{
+					"OnTrigger" "upgrade_station_door,Close,,0,-1"
+					"OnTrigger" "forward_upgrade,Disable,,0,-1"
+					"OnTrigger" "wave_prepare_relay_upper,Trigger,,0,-1"
+					"OnTrigger" "cliff_clip,Enable,,0,-1"
+					"OnTrigger" "spawnbot*,FireUser1,,0,-1"
+					"OnTrigger" "en_up_1,FireUser2,,0,-1"
+					"OnTrigger" "en_3,FireUser2,,0,-1"
+					"OnTrigger" "en_1,FireUser2,,0,-1"
+					"OnTrigger" "en_2,FireUser2,,0,-1"
+					"OnTrigger" "hologram*,Disable,,0,-1"
+					"OnTrigger" "cliff_clip,SetSolid,1,0,-1"
+					"OnTrigger" "relay_bomb_timer,Trigger,,0,-1"
+					"OnTrigger" "point_populator_interface,UnpauseBotSpawning,,0,-1"
+					"OnTrigger" "cliff_fence,Enable,,0,-1"
+					"OnTrigger" "cliff_fence,EnableCollision,,0,-1"
+					"OnTrigger" "hint_gate_up,Show,,0,-1"
+				}
+				"origin" "224 768 256"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[2000 2000]"
+				}
+			}
+			entity
+			{
+				"id" "63440"
+				"classname" "logic_relay"
+				"spawnflags" "0"
+				"StartDisabled" "0"
+				"targetname" "wave_start_relay_improved_low"
+				connections
+				{
+					"OnTrigger" "upgrade_station_door,Close,,0,-1"
+					"OnTrigger" "wave_prepare_relay_lower,Trigger,,0,-1"
+					"OnTrigger" "forward_upgrade,Disable,,0,-1"
+					"OnTrigger" "cliff_clip,Enable,,0,-1"
+					"OnTrigger" "spawnbot*,FireUser1,,0,-1"
+					"OnTrigger" "en_up_1,FireUser2,,0,-1"
+					"OnTrigger" "en_3,FireUser2,,0,-1"
+					"OnTrigger" "en_1,FireUser2,,0,-1"
+					"OnTrigger" "en_2,FireUser2,,0,-1"
+					"OnTrigger" "hologram*,Disable,,0,-1"
+					"OnTrigger" "cliff_clip,SetSolid,1,0,-1"
+					"OnTrigger" "relay_bomb_timer,Trigger,,0,-1"
+					"OnTrigger" "point_populator_interface,UnpauseBotSpawning,,0,-1"
+					"OnTrigger" "cliff_fence,Enable,,0,-1"
+					"OnTrigger" "cliff_fence,EnableCollision,,0,-1"
+					"OnTrigger" "hint_gate_low,Show,,0,-1"
+				}
+				"origin" "224 768 256"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[2000 2000]"
+				}
+			}
+		}
+		no_holograms //makes the holograms disappear
+		{
+			NoFixup 1
+			logic_relay
+			{
+				"origin" "0 0 0"
+				"targetname" "disableholo"
+				"OnTrigger" "hologram*,Disable,,0,-1"
+			}
+		}
+		cabinet
+		{  
+			NoFixup 1
+			prop_dynamic
+			{
+				"targetname" "locker_model"
+				"model"      "models/props_gameplay/resupply_locker.mdl"
+				"solid"      "6"
+				"angles"     "0 0 0"
+				"disableshadows" "1"
+			}
+			filter_tf_bot_has_tag
+			{
+				"Negated" "0"
+				"require_all_tags" "1"
+				"tags" "bot_red"
+				"targetname" "filter_redbot"
+			}
+			func_regenerate
+			{
+				"targetname" "regenerate"
+				"associatedmodel" "locker_model"
+				"TeamNum"         "3"
+				"mins"            "0 -48 0"
+				"maxs"            "40 48 128"
+				
+				"OnStartTouchAll"  "locker_model,SetAnimation,open,0,-1"
+				"OnEndTouchAll"    "locker_model,SetAnimation,close,0,-1"
+			}
+			trigger_multiple
+			{
+				"filtername" "filter_redbot"
+				"StartDisabled"    "0"
+				"targetname"    "block"
+				"mins"    "-40 -96 -40"
+				"maxs"    "80 96 168"
+				"spawnflags" "1"
+				
+				"OnStartTouch" "regenerate,Disable,,0,-1"
+				"OnEndTouchAll" "regenerate,Enable,,0,-1"
+			}
+		}
+		light_spots
+		{
+			NoFixup 1
+			point_spotlight
+            {
+                "angles" "90 270 0"
+                "HDRColorScale" "1.0"
+                "mindxlevel" "95"
+				"targetname" "light_cabinet"
+                "renderamt" "128"
+                "rendercolor" "221 205 174"
+                "spawnflags" "2"
+                "spotlightlength" "96"
+                "spotlightwidth" "32"
+            }
+            light_dynamic
+            {
+                "_light" "255 249 234 275"
+                "distance" "450"
+                "brightness" "1"
+            }
+            light_spot
+            {
+                "_cone" "60"
+                "_exponent" "1"
+                "_inner_cone" "45"
+                "targetname" "cabinet_lightpots"
+                "_light" "255 249 234 275"
+                "_lightHDR" "-1 -1 -1 1"
+                "_lightscaleHDR" "1"
+                "_quadratic_attn" "1"
+                //"angles" "-90 270 0"
+                //"pitch" "-90"
+                "spawnflags" "0"
+            }
+			logic_auto
+			{
+				"targetname" "let_there_be_light"
+				"OnMapSpawn" "light_cabinet,LightOn,,0,-1"
+			}
+		}
+	
+		colortank
+		{
+			OnSpawnOutput			{
+				Target "!activator"
+				Action "color"
+				
+				Param "255 255 255"
+			}
+		}
+		dont_enter_pls
+		{
+			NoFixup 1
+			func_forcefield
+			{
+				
+                "disablereceiveshadows" "0"
+                "origin" "-1408 1928 176"
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "renderfx" "0"
+                "rendermode" "10"
+                "TeamNum" "2"
+                "targetname" "antistuck_low"
+                "mins" "-389 -48 -352"
+                "maxs" "389 48 352"
+				"StartDisabled" "0"
+			}	
+			func_forcefield
+			{
+				
+                "disablereceiveshadows" "0"
+                "origin" "-1408 1928 1376"
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "renderfx" "0"
+                "rendermode" "10"
+                "TeamNum" "2"
+                "targetname" "antistuck_up"
+                "mins" "-394 -48 -1728"
+                "maxs" "394 48 1728"
+				"StartDisabled" "0"
+			}
+		}
+		visualize
+		{
+			NoFixup 1
+			func_forcefield
+			{
+				
+                "disablereceiveshadows" "0"
+                "origin" "-1408 1928 176"
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "renderfx" "0"
+                "rendermode" "10"
+                "TeamNum" "3"
+                "targetname" "respawnroom_blu_low"
+                "mins" "-389 -48 -352"
+                "maxs" "389 48 352"
+				"StartDisabled" "0"
+			}	
+			func_forcefield
+			{
+				
+                "disablereceiveshadows" "0"
+                "origin" "-1408 1928 1376"
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "renderfx" "0"
+                "rendermode" "10"
+                "TeamNum" "3"
+                "targetname" "respawnroom_blu_up"
+                "mins" "-394 -48 -1728"
+                "maxs" "394 48 1728"
+				"StartDisabled" "0"
+			}
+			func_forcefield
+			{
+				
+                "disablereceiveshadows" "0"
+                "origin" "544 -280 1120"
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "renderfx" "0"
+                "rendermode" "10"
+                "TeamNum" "3"
+                "targetname" "respawnroom_blu_main"
+                "mins" "-416 -80 -2368"
+                "maxs" "416 80 2368"
+				"StartDisabled" "0"
+			}
+			func_forcefield
+			{
+				
+                "disablereceiveshadows" "0"
+                "origin" "1152 320 1280"
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "renderfx" "0"
+                "rendermode" "10"
+                "TeamNum" "3"
+                "targetname" "respawnroom_blu_main_left"
+                "mins" "-128 -160 -2048"
+                "maxs" "128 160 2048"
+				"StartDisabled" "0"
+			}
+			func_forcefield
+			{
+				
+                "disablereceiveshadows" "0"
+                "origin" "-2944 -1008 992"
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "renderfx" "0"
+                "rendermode" "10"
+                "TeamNum" "2"
+                "targetname" "respawnroom_red"
+                "mins" "-992 -16 -448"
+                "maxs" "992 16 448"
+				"StartDisabled" "0"
+			}
+		}
+		sentries_hatch
+		{
+			NoFixup 1
+			entity
+			{
+				"id" "37"
+				"classname" "obj_sentrygun"
+				"targetname" "sentry_hatch"
+				"angles" "0 0 0"
+				"defaultupgrade" "1"
+				"TeamNum" "2"
+				"origin" "-2176 448 767"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 2500]"
+				}
+			}
+			entity
+			{
+				"id" "46"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "1"
+				"TeamNum" "2"
+				"origin" "-3200 -320 640"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 3000]"
+				}
+			}
+			entity
+			{
+				"id" "54"
+				"classname" "obj_sentrygun"
+				"targetname" "sentry_hatch"
+				"angles" "0 0 0"
+				"defaultupgrade" "2"
+				"TeamNum" "2"
+				"origin" "-2688 64 640"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 3500]"
+				}
+			}
+		}
+		sentry_hatch_health3
+		{
+			NoFixup 1
+			logic_relay
+			{
+				"targetname" "sentries_health"
+				"OnSpawn" "sentry_hatch,SetHealth,432,0,-1"
+			}
+		}
+		sentry_hatch_health4
+		{
+			NoFixup 1
+			logic_relay
+			{
+				"targetname" "sentries_health"
+				"OnSpawn" "sentry_hatch,SetHealth,548,0,-1"
+			}
+		}
+		sentry_hatch_health5
+		{
+			NoFixup 1
+			logic_relay
+			{
+				"targetname" "sentries_health"
+				"OnSpawn" "sentry_hatch,SetHealth,548,0,-1"
+			}
+		}
+		sentry_hatch_health6
+		{
+			NoFixup 1
+			logic_relay
+			{
+				"targetname" "sentries_health"
+				"OnSpawn" "sentry_hatch,SetHealth,664,0,-1"
+			}
+		}
+		sentries1
+		{
+			NoFixup 1
+			entity
+			{
+				"id" "19"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "0"
+				"targetname" "sentry_first"
+				"TeamNum" "2"
+				"origin" "164 2112 329"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 1500]"
+				}
+			}
+			entity
+			{
+				"id" "12"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "0"
+				"targetname" "sentry_first"
+				"TeamNum" "2"
+				"origin" "704 1792 193.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 3000]"
+				}
+			}
+			entity
+			{
+				"id" "18"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "0"
+				"TeamNum" "2"
+				"origin" "-2368 1792 347"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 4000]"
+				}
+			}
+			entity
+			{
+				"id" "24"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "0"
+				"TeamNum" "2"
+				"origin" "-1088 3072 641.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 4500]"
+				}
+			}
+			entity
+			{
+				"id" "28"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "0"
+				"TeamNum" "2"
+				"origin" "-1152 2944 -69.268"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 5000]"
+				}
+			}
+			entity
+			{
+				"id" "30"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "0"
+				"TeamNum" "2"
+				"origin" "-1728 2624 65.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 5500]"
+				}
+			}
+			entity
+			{
+				"id" "32"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"TeamNum" "2"
+				"origin" "-1152 2304 -62.75"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 6000]"
+				}
+			}
+			entity
+			{
+				"id" "8"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"TeamNum" "2"
+				"origin" "-704 2432 449.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 7000]"
+				}
+			}
+		}
+		sentries_mini
+		{
+			NoFixup 1
+			entity
+			{
+				"id" "19"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "0"
+				"targetname" "sentry_mini"
+				"modelscale" "0.75"
+				"SetBodyGroup" "1"
+				"Skin" "2"
+				"TeamNum" "2"
+				"origin" "164 2112 329"
+				"spawnflags" "72"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 1500]"
+				}
+			}
+			entity
+			{
+				"id" "12"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "0"
+				"modelscale" "0.75"
+				"targetname" "sentry_mini"
+				"Skin" "2"
+				"SetBodyGroup" "1"
+				"TeamNum" "2"
+				"origin" "704 1792 193.25"
+				"spawnflags" "72"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 3000]"
+				}
+			}
+			entity
+			{
+				"id" "18"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "0"
+				"modelscale" "0.75"
+				"targetname" "sentry_mini"
+				"Skin" "2"
+				"SetBodyGroup" "1"
+				"TeamNum" "2"
+				"origin" "-2368 1792 347"
+				"spawnflags" "72"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 4000]"
+				}
+			}
+			entity
+			{
+				"id" "24"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "0"
+				"modelscale" "0.75"
+				"targetname" "sentry_mini"
+				"Skin" "2"
+				"SetBodyGroup" "1"
+				"TeamNum" "2"
+				"origin" "-1088 3072 641.25"
+				"spawnflags" "72"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 4500]"
+				}
+			}
+			entity
+			{
+				"id" "28"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "0"
+				"modelscale" "0.75"
+				"targetname" "sentry_mini"
+				"Skin" "2"
+				"SetBodyGroup" "1"
+				"TeamNum" "2"
+				"origin" "-1152 2944 -69.268"
+				"spawnflags" "72"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 5000]"
+				}
+			}
+			entity
+			{
+				"id" "30"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "0"
+				"modelscale" "0.75"
+				"targetname" "sentry_mini"
+				"Skin" "2"
+				"SetBodyGroup" "1"
+				"TeamNum" "2"
+				"origin" "-1728 2624 65.25"
+				"spawnflags" "72"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 5500]"
+				}
+			}
+			entity
+			{
+				"id" "32"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"targetname" "sentry_mini"
+				"modelscale" "0.75"
+				"Skin" "2"
+				"SetBodyGroup" "1"
+				"TeamNum" "2"
+				"origin" "-1152 2304 -62.75"
+				"spawnflags" "72"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 6000]"
+				}
+			}
+			entity
+			{
+				"id" "8"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"targetname" "sentry_mini"
+				"modelscale" "0.75"
+				"Skin" "2"
+				"SetBodyGroup" "1"
+				"TeamNum" "2"
+				"origin" "-704 2432 449.25"
+				"spawnflags" "72"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 7000]"
+				}
+			}
+		}
+		set_health_minis
+		{
+			NoFixup 1
+			logic_relay
+			{
+				"targetname" "mini"
+				"OnSpawn" "sentry_mini,SetHealth,75,0,-1"
+			}
+		}
+		sentries2
+		{
+			NoFixup 1
+			entity
+			{
+				"id" "19"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "1"
+				"targetname" "sentry_first"
+				"TeamNum" "2"
+				"origin" "164 2112 329"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 1500]"
+				}
+			}
+			entity
+			{
+				"id" "12"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "1"
+				"targetname" "sentry_first"
+				"TeamNum" "2"
+				"origin" "704 1792 193.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 3000]"
+				}
+			}
+			entity
+			{
+				"id" "18"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "1"
+				"TeamNum" "2"
+				"origin" "-2368 1792 347"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 4000]"
+				}
+			}
+			entity
+			{
+				"id" "24"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "1"
+				"TeamNum" "2"
+				"origin" "-1088 3072 641.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 4500]"
+				}
+			}
+			entity
+			{
+				"id" "28"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "1"
+				"TeamNum" "2"
+				"origin" "-1152 2944 -69.268"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 5000]"
+				}
+			}
+			entity
+			{
+				"id" "30"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "1"
+				"TeamNum" "2"
+				"origin" "-1728 2624 65.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 5500]"
+				}
+			}
+			entity
+			{
+				"id" "32"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "1"
+				"TeamNum" "2"
+				"origin" "-1152 2304 -62.75"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 6000]"
+				}
+			}
+			entity
+			{
+				"id" "8"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "1"
+				"TeamNum" "2"
+				"origin" "-704 2432 449.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 7000]"
+				}
+			}
+		}
+		sentries3
+		{
+			NoFixup 1
+			entity
+			{
+				"id" "19"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "2"
+				"targetname" "sentry_first"
+				"TeamNum" "2"
+				"origin" "164 2112 329"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 1500]"
+				}
+			}
+			
+			entity
+			{
+				"id" "18"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "2"
+				"TeamNum" "2"
+				"origin" "-2368 1792 347"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 4000]"
+				}
+			}
+			entity
+			{
+				"id" "24"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "2"
+				"TeamNum" "2"
+				"origin" "-1088 3072 641.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 4500]"
+				}
+			}
+			entity
+			{
+				"id" "28"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "2"
+				"TeamNum" "2"
+				"origin" "-1152 2944 -69.268"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 5000]"
+				}
+			}
+			entity
+			{
+				"id" "30"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "2"
+				"TeamNum" "2"
+				"origin" "-1728 2624 65.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 5500]"
+				}
+			}
+			entity
+			{
+				"id" "32"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "2"
+				"TeamNum" "2"
+				"origin" "-1152 2304 -62.75"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 6000]"
+				}
+			}
+			//entity
+			//{
+			//	"id" "6"
+			//	"classname" "obj_sentrygun"
+			//	"angles" "0 0 0"
+			//	"defaultupgrade" "4"
+			//	"TeamNum" "2"
+			//	"origin" "-1472 2688 624.507"
+			//	editor
+			//	{
+			//		"color" "220 30 220"
+			//		"visgroupshown" "1"
+			//		"visgroupautoshown" "1"
+			//		"logicalpos" "[0 6500]"
+			//	}
+			//}
+			entity
+			{
+				"id" "8"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "2"
+				"TeamNum" "2"
+				"origin" "-704 2432 449.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 7000]"
+				}
+			}
+		}
+		sentries4
+		{
+			NoFixup 1
+			entity
+			{
+				"id" "19"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "4"
+				"targetname" "sentry_first"
+				"TeamNum" "2"
+				"origin" "-0.331133 1407.67 93.5075"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 1500]"
+				}
+			}
+			
+			entity
+			{
+				"id" "18"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "4"
+				"TeamNum" "2"
+				"origin" "-2368 1792 347"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 4000]"
+				}
+			}
+			entity
+			{
+				"id" "24"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "4"
+				"TeamNum" "2"
+				"origin" "-1088 3072 641.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 4500]"
+				}
+			}
+			entity
+			{
+				"id" "28"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "4"
+				"TeamNum" "2"
+				"origin" "-1152 2944 -69.268"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 5000]"
+				}
+			}
+			entity
+			{
+				"id" "30"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "4"
+				"TeamNum" "2"
+				"origin" "-1728 2624 65.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 5500]"
+				}
+			}
+			entity
+			{
+				"id" "32"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "4"
+				"TeamNum" "2"
+				"origin" "-1152 2304 -62.75"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 6000]"
+				}
+			}
+			entity
+			{
+				"id" "8"
+				"classname" "obj_sentrygun"
+				"angles" "0 0 0"
+				"defaultupgrade" "4"
+				"TeamNum" "2"
+				"origin" "-704 2432 449.25"
+				"spawnflags" "8"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 7000]"
+				}
+			}
+		}
+		no_uber_can 
+		{
+			NoFixup 1
+			trigger_multiple
+			{
+				"filtername" "filter_bomb"
+				"StartDisabled"    "0"
+				"targetname"    "block"
+				"mins"    "-300 -300 -300"
+				"maxs"    "300 300 300"
+				"OnStartTouch" "@c@!activator,ForceDrop,,0,-1"
+				"origin" "-2944 -256 643"
+				"spawnflags" "1"
+			}
+			filter_multi
+			{
+				"targetname" "filter_bomb"
+				"Filter01" "filter_uber"
+				"Filter02" "filter_bonk"
+				"FilterType" "1"
+			}
+			filter_tf_condition
+			{
+				"targetname" "filter_uber"
+				"condition" "52"
+			}
+			filter_tf_condition
+			{
+				"targetname" "filter_bonk"
+				"condition" "14"
+			}
+		}
+		jump
+		{
+			NoFixup 1
+			entity
+			{
+				"id" "6"
+				"classname" "prop_dynamic"
+				"angles" "0 0 0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"MinAnimTime" "5"
+				"model" "models/props_farm/concrete_block001.mdl"
+				"modelscale" "1.0"
+				"renderamt" "255"
+				"rendercolor" "255 255 255"
+				"skin" "0"
+				"solid" "6"
+				"origin" "448 -256 -64"
+				editor
+				{
+					"color" "220 30 220"
+					"visgroupshown" "1"
+					"visgroupautoshown" "1"
+					"logicalpos" "[0 0]"
+				}
+			}
+		}
+		one_blocked_message
+		{
+			NoFixup 1
+			func_nav_avoid
+			{
+				"origin" "-1920 1536 585"
+				"targetname" "no_flank_gate"
+				"tags" "noflank"
+				"team" "-2"
+				"mins" "-200 -200 -200"
+				"maxs" "200 200 200"
+				"StartDisabled" "0"
+			}
+			func_nav_avoid
+			{
+				"origin" "-896 1807 413"
+				"targetname" "no_stuck"
+				"tags" "noflank"
+				"team" "-2"
+				"mins" "-500 -500 -100"
+				"maxs" "500 500 200"
+				"StartDisabled" "0"
+			}
+		}
+		extra_spawns_blu
+		{
+			NoFixup 1
+			info_player_teamspawn
+			{
+				"angles" "0 180 0"
+				"spawnflags" "511"
+				"SpawnMode" "0"
+				"StartDisabled" "0"
+				"targetname" "spawn_blu_first"
+				"TeamNum" "3"
+				"origin" "1064 -736 144"
+			}
+			info_player_teamspawn
+			{
+				"angles" "0 180 0"
+				"spawnflags" "511"
+				"SpawnMode" "0"
+				"StartDisabled" "0"
+				"targetname" "spawn_blu_first"
+				"TeamNum" "3"
+				"origin" "1120 -736 144"
+			}
+			info_player_teamspawn
+			{
+				"angles" "0 0 0"
+				"spawnflags" "511"
+				"SpawnMode" "0"
+				"StartDisabled" "0"
+				"targetname" "spawn_blu_first"
+				"TeamNum" "3"
+				"origin" "0 -608 144"
+			}
+			info_player_teamspawn
+			{
+				"angles" "0 0 0"
+				"spawnflags" "511"
+				"SpawnMode" "0"
+				"StartDisabled" "0"
+				"targetname" "spawn_blu_first"
+				"TeamNum" "3"
+				"origin" "0 -704 144"
+			}
+			info_player_teamspawn
+			{
+				"angles" "0 90 0"
+				"spawnflags" "511"
+				"SpawnMode" "0"
+				"StartDisabled" "0"
+				"targetname" "spawn_blu_first"
+				"TeamNum" "3"
+				"origin" "1384 -79.9999 272"
+			}
+			info_player_teamspawn
+			{
+				"angles" "0 180 0"
+				"spawnflags" "511"
+				"SpawnMode" "0"
+				"StartDisabled" "0"
+				"targetname" "spawn_blu_up"
+				"TeamNum" "3"
+				"origin" "-1152 1280 628"
+			}
+			info_player_teamspawn
+			{
+				"angles" "0 180 0"
+				"spawnflags" "511"
+				"SpawnMode" "0"
+				"StartDisabled" "0"
+				"targetname" "spawn_blu_up"
+				"TeamNum" "3"
+				"origin" "-1152 1216 628"
+			}
+			info_player_teamspawn
+			{
+				"angles" "0 0 0"
+				"spawnflags" "511"
+				"SpawnMode" "0"
+				"StartDisabled" "0"
+				"targetname" "spawn_blu_up"
+				"TeamNum" "3"
+				"origin" "-1664 1344 628"
+			}
+			info_player_teamspawn
+			{
+				"angles" "0 0 0"
+				"spawnflags" "511"
+				"SpawnMode" "0"
+				"StartDisabled" "0"
+				"targetname" "spawn_blu_up"
+				"TeamNum" "3"
+				"origin" "-1664 1280 628"
+			}
+			info_player_teamspawn
+			{
+				"angles" "0 180 0"
+				"spawnflags" "511"
+				"SpawnMode" "0"
+				"StartDisabled" "0"
+				"targetname" "spawn_blu_low"
+				"TeamNum" "3"
+				"origin" "-1664 1536 80"
+			}
+			info_player_teamspawn
+			{
+				"angles" "0 180 0"
+				"spawnflags" "511"
+				"SpawnMode" "0"
+				"StartDisabled" "0"
+				"targetname" "spawn_blu_low"
+				"TeamNum" "3"
+				"origin" "-1664 1408 80"
+			}
+			info_player_teamspawn
+			{
+				"angles" "0 180 0"
+				"spawnflags" "511"
+				"SpawnMode" "0"
+				"StartDisabled" "0"
+				"targetname" "spawn_blu_low"
+				"TeamNum" "3"
+				"origin" "-1344 1472 80"
+			}
+		}
+		teleporting
+		{
+			NoFixup 1
+			trigger_teleport
+			{
+				"targetname" "fuckyougate_up"
+				"StartDisabled" "1"
+				"target" "spawned" 
+				"spawnflags" "4097"
+				"origin" "-1408 1471 585"
+				"mins" "-320 -383 0"
+				"maxs" "320 383 100"
+			}
+			trigger_teleport
+			{
+				"targetname" "fuckyougate_low"
+				"StartDisabled" "1"
+				"target" "spawned" 
+				"spawnflags" "4097"
+				"origin" "-1408 1471 73"
+				"mins" "-320 -383 0"
+				"maxs" "320 383 100"
+			}
+			trigger_teleport
+			{
+				"targetname" "fuckyougate_none"
+				"StartDisabled" "1"
+				"target" "spawned"
+				"spawnflags" "4097"
+				"origin" "-320 -704 244"
+				"mins" "-200 -200 0"
+				"maxs" "200 100 200"
+			}
+			info_teleport_destination
+			{
+				"targetname" "spawned"
+				"origin" "0 -608 144"
+			}
+		}
+    }
+	SpawnTemplate  "baseLogic"
+	SpawnTemplate  "antirollout"
+	SpawnTemplate "robot_spawns"
+	SpawnTemplate "barriersdisable"
+	SpawnTemplate "hold_up"
+	SpawnTemplate "disable_hatch_forcefield"
+	SpawnTemplate "OwO"
+	SpawnTemplate "annotation_last"
+	SpawnTemplate "annotation_deploy"
+	SpawnTemplate "annotation_last_tank"
+	SpawnTemplate "annotation_gate"
+	SpawnTemplate "no_forcefield"
+	SpawnTemplate "better_relay"
+	SpawnTemplate "no_holograms"
+	SpawnTemplate "visualize"
+	SpawnTemplate "dont_enter_pls"
+	SpawnTemplate "no_uber_can"
+	//SpawnTemplate "light_up_pls"
+	//SpawnTemplate "no_flank_allowed"
+	SpawnTemplate "jump"
+	SpawnTemplate "one_blocked_message"
+	SpawnTemplate "extra_spawns_blu"
+	//SpawnTemplate "no_bomb_spy"
+	//SpawnTemplate "capteleporter"
+	SpawnTemplate "teleporting"
+	SpawnTemplate
+	{
+		Name "cabinet"
+		"origin" "320 -896 89"
+		"angles" "0 90 0"
+	}
+	SpawnTemplate
+	{
+		Name "cabinet"
+		"origin" "64 -862 130"
+		"angles" "0 90 0"
+	}
+	SpawnTemplate
+	{
+		Name "light_spots"
+		"origin" "64 -862 130"
+		"angles" "0 90 0"
+	}
+	SpawnTemplate
+	{
+		Name "cabinet"
+		"origin" "1344 -862 130"
+		"angles" "0 90 0"
+	}
+	SpawnTemplate
+	{
+		Name "light_spots"
+		"origin" "1344 -862 130"
+		"angles" "0 90 0"
+	}
+	SpawnTemplate
+	{
+		Name "cabinet"
+		"origin" "-1408 1408 570"
+		"angles" "0 0 0"
+	}
+	SpawnTemplate
+	{
+		Name "cabinet"
+		"origin" "-1728 1472 570"
+		"angles" "0 90 0"
+	}
+	SpawnTemplate
+	{
+		Name "cabinet"
+		"origin" "-1999 1344 55"
+		"angles" "0 0 0"
+	}
+	SpawnTemplate
+	{
+		Name "cabinet"
+		"origin" "-1152 1196 64"
+		"angles" "0 90 0"
+	}
+	SpawnTemplate
+	{
+		Name "cabinet"
+		"origin" "1408 -320 256"
+		"angles" "0 90 0"
+	}
+	SpawnTemplate
+	{
+		Name "light_spots"
+		"origin" "1408 -320 256"
+		"angles" "0 90 0"
+	}
+
+	//all of the BLU upgrade stations
+	//SpawnTemplate  
+	//{
+	//	Name "station"
+	//	"origin" "1344 -896 137"
+	//	"angles" "0 0 0"
+	//}
+	//SpawnTemplate  
+	//{
+	//	Name "station"
+	//	"origin" "1344 -896 137"
+	//	"angles" "0 270 0"
+	//}
+	SpawnTemplate 
+	{
+		Name "station"
+		"origin" "560.047 -942.517 89"
+		"angles" "0 90 0"
+	}
+	SpawnTemplate 
+	{
+		Name "station"
+		"origin" "1211 -128 265"
+		"angles" "0 0 0"
+	}
+	//SpawnTemplate 
+	//{
+	//	Name "station"
+	//	"origin" "-448 -512 201"
+	//	"angles" "0 0 0"
+	//}
+	//SpawnTemplate 
+	//{
+	//	Name "station"
+	//	"origin" "-1297.48 112.047 -119"
+	//	"angles" "0 270 0"
+	//}
+	SpawnTemplate 
+	{
+		Name "station"
+		"origin" "-1408 1172 65.2333"
+		"angles" "0 90 0"
+	}
+	SpawnTemplate 
+	{
+		Name "station"
+		"origin" "-1428 1216 585"
+		"angles" "0 180 0"
+	}
+	SpawnTemplate 
+	{
+		Name "station"
+		"origin" "-1408 1216 585"
+		"angles" "0 0 0"
+	}
+	SpawnTemplate 
+	{
+		Name "station"
+		"origin" "-1728 1172 64"
+		"angles" "0 90 0"
+	}
+	//spawn barriers
+	SpawnTemplate //upper left spawn
+	{
+		Name "barriers"
+		"origin" "1408 192 265"
+		"angles" "0 0 0"
+	}
+	SpawnTemplate //upper left spawn
+	{
+		Name "barriers_prop"
+		"origin" "1508 192 265"
+		"angles" "0 90 0"
+	}
+	SpawnTemplate //main spawn
+	{
+		Name "barriers"
+		"origin" "500 -320 89"
+		"angles" "0 0 0"
+	}
+	SpawnTemplate //main spawn
+	{
+		Name "barriers_prop"
+		"origin" "500 -320 89"
+		"angles" "0 90 0"
+	}
+
+	//RED Spawnpoints
+	ExtraSpawnPoint
+	{
+		Name "spawn_final"
+		TeamNum 2
+		X "-2944"    
+		Y "-1344"
+		Z "769"
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawn_low_path_entrance"
+		TeamNum 2
+		X "-512" 
+		Y "2497.12"
+		Z "-48.8161"
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawn_low_path_gate"
+		TeamNum 2
+		X "-1472"    
+		Y "2624"
+		Z "63" 
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawn_up_path_first"
+		TeamNum 2
+		X "256"    
+		Y "1536"
+		Z "146.312" 
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawn_up_path_gate"
+		TeamNum 2
+		X "-320"       
+		Y "2304"
+		Z "329" 
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawn_mid"
+		TeamNum 2
+		X "-2944"  
+		Y "1984"
+		Z "457"
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawn_mid"
+		TeamNum 2
+		X "-1664"  
+		Y "896"
+		Z "777"
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawn_final_flank"
+		TeamNum 2
+		X "-1792"  
+		Y "0"
+		Z "777"
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawn_low_entrance"
+		TeamNum 2
+		X "-893.845"  
+		Y "1472"
+		Z "307.591"
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawn_final_flank"
+		TeamNum 2
+		X "-2944"  
+		Y "384"
+		Z "585"
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawn_up_path_gate"
+		TeamNum 2
+		X "-1152"  
+		Y "2816"
+		Z "639"
+	}
+	//ExtraSpawnPoint
+	//{
+	//	Name "spawn_final_flank"
+	//	TeamNum 2
+	//	X "-3584" //"-3714.47"  
+	//	Y "192" //"-256"
+	//	Z "649" //"570.732"
+	//}
+	ExtraSpawnPoint
+	{
+		Name "spawn_low_path_gate"
+		TeamNum 2
+		X "-1216"   
+		Y "3264"
+		Z "9"
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawn_up_path_gate"
+		TeamNum 2
+		X "-1152"  
+		Y "3072"
+		Z "457"
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawn_low_path_gate"
+		TeamNum 2
+		X "-2112"   
+		Y "2176"
+		Z "-28.002"
+	}
+	
+
+	FlagResetTime  //Overrides default bomb reset time
+	{
+		Name "intel_35" //Name of flag entity on the map
+		ResetTime 70
+	}
+
+    Templates 
+	{
+		T_TFBot_Giant_Bonk_Scattergun
+		{
+			Class Scout
+			Skill Normal
+			Name "Giant Bonk! Scout"
+			Item "Bonk! Atomic Punch"
+			Item "Bonk Helm"
+			Item "The Atomizer"
+			ClassIcon scout_bonk_nys
+			Action Mobber 
+			Health 1600
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SCATTERGUN"
+				"damage bonus" 1.5
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"override footstep sound set" 5
+				"effect bar recharge rate increased" 0.35
+			}
+		}
+		T_TFBot_Giant_Homing_Soldier
+		{
+			Template T_TFBot_Giant_Soldier 
+			Name "Giant Homing Soldier"
+			Skill Normal
+			ClassIcon soldier_homing_nys
+			HomingRockets 
+			{
+				IgnoreDisguisedSpies 1
+				IgnoreStealthedSpies 1
+				RocketSpeed 0.3 
+				TurnPower 90 
+				MaxAimError 360 
+			}
+			RocketCustomParticle eyeboss_projectile 
+		}
+		T_TFBot_Red_Plutonium_Gauntlet
+		{
+			Template T_TFBot_Red_Heavyweapons_Fist
+			Name "Plutonium Gauntlet"
+			Item "The Tungsten Toque"
+			ClassIcon heavy_steelfist
+			ItemColor
+			{
+				ItemName "Fists of Steel"
+				Red 0
+				Green 255
+				Blue 56
+			}
+			ItemAttributes
+			{
+				ItemName "Fists of Steel"
+				"dmg penalty vs players" 1.5
+				"bleeding duration" 5
+				"fire rate penalty" 1.25
+			}
+		}
+		T_TFBot_Chief_Buff
+		{
+			Class Soldier
+			Name "Giant Buff Banner Soldier"
+			Skill Expert
+			Health 3800
+			Item "Tyrant's Helm"
+			Item "The Buff Banner"
+			ClassIcon soldier_buff
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Attributes HoldFireUntilFullReload
+			Attributes SpawnWithFullCharge
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+			}
+			ItemAttributes
+			{
+				ItemName "The Buff Banner"
+				"increase buff duration" 9999
+			}
+		}
+		T_TFBot_Chief_Conch 
+		{
+			Class Soldier
+			Item "The Concheror"
+			Name "Giant Concheror Soldier"
+			Health 3800
+			Item "Soldier Samurai Hat"
+			Skill Expert
+			ClassIcon soldier_conch
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Attributes HoldFireUntilFullReload
+			Attributes SpawnWithFullCharge
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+			}
+			ItemAttributes
+			{
+				ItemName "The Concheror"
+				"increase buff duration" 9999
+			}
+		}
+		T_TFBot_Chief_Battalion
+		{
+			Attributes UseBossHealthBar
+			Class Soldier
+			Name "Giant Battalion Soldier"
+			Health 3800
+			Name "Giant Battalion Soldier"
+			Item "The Grenadier's Softcap"
+			Item "The Battalion's Backup"
+			Skill Expert
+			ClassIcon soldier_backup
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Attributes SpawnWithFullCharge
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+			}
+			ItemAttributes
+			{
+				ItemName "The Battalion's Backup"
+				"increase buff duration" 9999
+
+			}
+		}
+		T_TFBot_Red_Wallbreaker_Gauntlet
+		{
+			Template T_TFBot_Red_Heavyweapons_Fist
+			Name "Osmium Gauntlet"
+			Item "The Gridiron Guardian"
+			ClassIcon heavy_steelfist
+			ItemColor
+			{
+				ItemName "Fists of Steel"
+				Red 64
+				Green 64
+				Blue 53
+			}
+			ItemAttributes
+			{
+				ItemName "Fists of Steel"
+				"melee cleave attack" 1
+				"dmg pierces resists absorbs" 1
+				"damage bonus" 1.5
+			}
+		}
+		T_TFBot_Red_Phlog_Pyro
+		{
+			Class Pyro
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Action Mobber 
+			Item "The Phlogistinator"
+			Name "Phlogistinator Pyro"
+			Skill Expert
+			Attributes SpawnWithFullCharge
+			ClassIcon pyro_phlog
+			ItemAttributes
+			{
+				ItemName "The Phlogistinator"
+				"airblast disabled" 0
+			}
+		}
+		T_TFBot_Red_Kritz_Medic
+		{
+			Name	"Kritzkrieg Medic"
+			Class	Medic
+			Skill	Expert
+			Attributes IgnoreEnemies
+			Health	150
+			Attributes	SpawnWithFullCharge
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			ClassIcon	medic_kritz_red
+			Item	"The Kritzkrieg"
+			Item	"The Scrap Pack"
+			ItemAttributes
+			{
+				ItemName	"The Kritzkrieg"
+				"uber duration bonus"	200
+				"ubercharge rate bonus"	8.0
+			}
+			CharacterAttributes
+			{
+				"bot medic uber health threshold"	151
+				"damage force reduction" 0
+			}
+		}
+		T_TFBot_Red_Bazooka_Soldier
+		{
+			Class Soldier
+			Skill Expert
+			ClassIcon soldier_bazooka
+			UseBestWeapon 1  
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Attributes AlwaysCrit
+			Name "Bazooka Soldier"
+			Item "The Beggar's Bazooka"
+			Item "The Concheror"
+			ItemAttributes
+			{
+				ItemName "The Beggar's Bazooka"
+				"can overload" 0
+				"faster reload rate" 0.4
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0
+			}
+		}
+		T_TFBot_Red_Hibernating_Bear
+		{
+			Class Heavyweapons
+			Skill Expert
+			ClassIcon heavy_warrior_red
+			Item "Warrior's Spirit"
+			Item "Big Chief"
+			Name "Hibernating Bear"
+			WeaponRestrictions MeleeOnly
+			Action Mobber
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			ItemAttributes
+			{
+				ItemName "Warrior's Spirit"
+				"crit mod disabled" 0
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0
+			}
+		}
+		T_TFBot_Red_Phlog_Pyro_Giant 
+		{
+			Class Pyro
+			Health 3000
+			Attributes MiniBoss
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Action Mobber 
+			Item "The Phlogistinator"
+			Name "Giant Phlogistinator Pyro"
+			Skill Expert
+			Attributes SpawnWithFullCharge
+			ClassIcon pyro_phlog
+			ItemAttributes
+			{
+				ItemName "The Phlogistinator"
+				"airblast disabled" 0
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5 
+				"health from packs decreased" 0.01 
+				"voice pitch scale" 0
+				"damage force reduction" 0.6
+				"damage force reduction" 0
+				"override footstep sound set" 6
+			}
+		}
+		T_TFBot_Red_Scout_Cola
+		{
+			Class Scout
+			Health 1500
+			Attributes MiniBoss
+			ClassIcon scout_cola_nys 
+			Action Mobber
+			Name "Giant Crit-a-Cola Scout"
+			Item "The Soda Popper"
+			Item "Crit-a-Cola"
+			Item "Bonk Leadwear"
+			Item "The Caffeine Cooler"
+			AddCond  { Name TF_COND_REPROGRAMMED }
+			ItemAttributes
+			{
+				ItemName "The Caffeine Cooler"
+				"item style override" 2
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"health from packs decreased" 0.01 
+				"voice pitch scale" 0
+				"airblast vulnerability multiplier" 0.7
+				"override footstep sound set" 5
+			}
+		}
+		T_TFBot_Giant_Scout_Shortstop
+		{
+			Class Scout
+			Health 1600
+			Attributes MiniBoss
+			ClassIcon scout_shortstop
+			Name "Giant Shortstop Scout"
+			Item "The Shortstop"
+			Skill Hard
+			Action Mobber 
+			ItemAttributes
+			{
+				ItemName "The Shortstop"
+				"mod medic healed damage bonus" 1.5
+				"reload time decreased while healed" 0.5
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"health from packs decreased" 0.01 
+				"voice pitch scale" 0
+				"airblast vulnerability multiplier" 0.7
+				"override footstep sound set" 5
+			}
+		}
+		T_TFBot_Red_Soldier_Spammer 
+		{
+			Class Soldier
+			Name "Rapid Fire Soldier"
+			ClassIcon soldier_spammer
+			Scale 1.4
+			Health 600
+			Skill Expert
+			Item "The Lucky Shot"	
+			WeaponRestrictions PrimaryOnly
+			Action Mobber 
+			AddCond  { Name TF_COND_REPROGRAMMED }
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"faster reload rate" -0.8
+				"fire rate bonus" 0.5
+				"Projectile speed increased" 0.65
+			}
+		}
+		T_TFBot_Red_Soldier_Spammer_Reload 
+		{
+			Class Soldier
+			Name "Burst Fire Soldier"
+			ClassIcon Soldier_burstfire
+			Scale 1.4
+			Health 600
+			Skill Expert
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Action Mobber 
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"move speed bonus"	0.5 
+				"health from packs decreased" 0.01 
+				"voice pitch scale" 0
+				"faster reload rate" 0.6
+				"fire rate bonus" 0.1
+				"clip size upgrade atomic" 5.0
+				"Projectile speed increased" 0.65
+			}
+		}
+		T_TFBot_Red_Giant_Medic_Regen_Super //template made by Orinuse
+		{
+			Class Medic
+			Name "Super Regen Medic"
+			ClassIcon medic_giant
+			Skill Expert
+			Health 4500
+			Item "The Quick-Fix"
+			Item "The Surgeon's Stahlhelm"
+			Item "The Overdose"
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			Attributes IgnoreEnemies
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			tag bot_giant
+			tag bot_squad_member
+			ItemAttributes
+			{
+				ItemName "The Overdose"
+				"killstreak tier" 2
+				"killstreak idleeffect" 1
+			}
+			ItemAttributes
+			{
+				ItemName "The Surgeon's Stahlhelm"
+				"set item tint RGB" 3329330 // LIME
+				"attach particle effect" 70
+			}
+			ItemAttributes	// 670 self heal per uber apparently, and ~5 seconds to refill uber
+							// 670 is combined with healing penalty from under fire, guess what happens if you leave it alone
+			{
+				ItemName "The Quick-Fix"
+				"killstreak tier" 1
+				"ubercharge rate bonus" 10
+				"uber duration bonus" -7
+				"heal rate bonus" 200
+				"healing received penalty" 0.05
+				"killstreak tier" 1
+				"bot medic uber health threshold" 4501
+			}
+			CharacterAttributes
+			{
+				"move speed penalty"	0.5
+				"damage force reduction" 0.01
+				"airblast vulnerability multiplier" 0.3
+				"airblast vertical vulnerability multiplier" 0.5
+				"health drain"	-3
+				no_duck 1
+				"increased jump height" 1.5
+				"increased air control" 2
+			}
+		}
+		T_TFBot_Red_Giant_Samurai
+		{
+			Class Demoman
+			Name "Giant Samurai Demo"
+			ClassIcon demoknight_samurai
+			Skill Expert
+			Item "The Half-Zatoichi"
+			Item "The Splendid Screen"
+			ItemAttributes
+			{
+				ItemName "The Splendid Screen"
+				"Attack not cancel charge" 1
+			}
+			Item "Demo Kabuto"
+			Health 3300
+			Attributes MiniBoss
+			WeaponRestrictions MeleeOnly 
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Action Mobber 
+			ItemAttributes
+			{
+				ItemName "The Half-Zatoichi"
+				"honorbound" 0
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.5 
+				"health from packs decreased" 0.01 
+				"voice pitch scale" 0 
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4
+			}
+		}
+		T_TFBot_Red_Giant_Pyro_Dragon
+		{
+			Class Pyro
+			Skill Expert
+			Health 3000
+			ClassIcon pyro_dragon_fury
+			Name "Giant Dragon's Fury Pyro"
+			Item "The Dragon's Fury"
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Action Mobber 
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5 
+				"health from packs decreased" 0.01 
+				"voice pitch scale" 0
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+			ItemAttributes
+			{
+				ItemName "The Dragon's Fury"
+				"airblast disabled" 1
+			}
+		}
+		T_TFBot_Giant_Natascha_Heal
+		{
+			Class Heavyweapons
+			Name "Giant Regen Natascha Heavy"
+			ClassIcon heavy_healonkill
+			Item "Natascha"
+			Skill Expert
+			Health 5000
+			Action Mobber 
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "Natascha"
+				"damage bonus"	1.5
+				"heal on hit for slowfire" 12
+				"reduced_healing_from_medics" 0.15
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5 
+				"health from packs increased" 0.3
+				"voice pitch scale" 0
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+				"health regen" 40
+			}
+		}
+		T_TFBot_Red_Giant_Gauntlet
+		{
+			Class Heavyweapons
+			Skill Expert
+			WeaponRestrictions MeleeOnly
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Action Mobber 
+			Name "Radioactive Punch"
+			ClassIcon heavy_chief
+			Health 5000
+			Item "War Head"
+			Item "Fists of Steel"
+			Attributes MiniBoss
+			ItemColor
+			{
+				ItemName "Fists of Steel"
+				Red 0
+				Green 255
+				Blue 56
+			}
+			ItemAttributes
+			{
+				ItemName "Fists of Steel"
+				"fire rate bonus" 0.75
+				"critboost on kill" 3
+				"dmg penalty vs players" 3
+				"bleeding duration" 3
+				"crit mod disabled" 0
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5 
+				"health from packs increased" 0.3
+				"voice pitch scale" 0
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+			}
+		}
+		T_TFBot_Red_Giant_Grenade_Knight
+		{
+			Class Demoman
+			ClassIcon demoknight_grenade
+			Name "Giant Grenade Knight"
+			Skill Expert
+			Health 3300
+			Item "Prince Tavish's Crown"
+			Item "The Chargin' Targe"
+			Item "The Eyelander"
+			UseBestWeapon 1
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Action EscortFlag 
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "The Eyelander"
+				"critboost on kill" 3
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"faster reload rate" 0.35 
+				"fire rate bonus" 0.1
+				"clip size upgrade atomic" 7.0
+				"projectile spread angle penalty" 5
+				"Projectile speed increased"	1.1
+
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.6 
+				"cannot pick up intelligence" 1
+				"health from packs decreased" 0.01 
+				"voice pitch scale" 0 
+				"damage force reduction" 0.01
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4
+			}
+			WeaponSwitch   //Periodically switches weapon
+            {
+                Delay 10
+                Cooldown 7 //Time between each weapon switch (Default: 10)
+                Repeats 0 
+				Type "Melee" 
+			}
+			WeaponSwitch   //Periodically switches weapon
+            {
+                Delay 6.5
+                Cooldown 7 //Time between each weapon switch (Default: 10)
+                Repeats 0 
+				Type "Primary" 
+			}
+		}
+		T_TFBot_Red_Giant_Soldier_Charged_Homing
+		{
+			Class Soldier
+			Name "Giant Homing Charged Soldier"
+			ClassIcon soldier_homing_nys 
+			Skill Hard
+			Health 3800
+			Item "The Original"
+			Attributes AlwaysCrit
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Action Mobber 
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "The Original"
+				"faster reload rate" 0.2
+				"fire rate bonus" 2
+				"Projectile speed increased" 0.5
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5 
+				"health from packs decreased" 0.01 
+				"voice pitch scale" 0
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+			}
+			HomingRockets 
+			{
+				IgnoreDisguisedSpies 1
+				IgnoreStealthedSpies 1
+				RocketSpeed 0.3 
+				TurnPower 90 
+				MaxAimError 360 
+			}
+			RocketCustomParticle eyeboss_projectile 
+		}
+		T_TFBot_Red_Giant_Soldier_Spammer_Buff
+        {
+            Class Soldier
+			Name "Giant Rapid Fire Buff Soldier"
+            Item "The Buff Banner"
+			ClassIcon soldier_buff_spammer
+			Health 3800
+			Skill Expert
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Action Mobber 
+			Attributes MiniBoss
+            Attributes SpawnWithFullCharge
+			ItemAttributes
+			{
+				ItemName "The Buff Banner"
+				"increase buff duration" 6969
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"faster reload rate" -0.8
+				"fire rate bonus" 0.5
+
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5 
+				"health from packs decreased" 0.01 
+				"voice pitch scale" 0
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"Projectile speed increased" 0.65
+			}
+        }
+		T_TFBot_Red_SkullCutter_Knight
+		{
+			Class Demoman
+			Skill Expert
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Action Mobber 
+			Name "SkullCutter Knight"
+			//Scale 1.4
+			//Health 650
+			Item "The Chargin' Targe"
+			Item "Ali Baba's Wee Booties"
+			Item "The Scotsman's Skullcutter"
+			ClassIcon demoknight_skullcutter_lite
+			ItemAttributes
+			{
+				ItemName "The Chargin' Targe"
+				"attack not cancel charge" 1
+			}
+			ItemAttributes
+            {
+                ItemName "The Scotsman's Skullcutter"
+                "critboost on kill" 5
+				"crit mod disabled" 0
+            }
+		}
+		T_TFBot_Red_Scout_Winger
+        {
+            Class Scout
+            Name "Winger Scout"
+            Skill Expert
+			AimTrackingInterval 0.25
+            Scale 1.4
+            Health 650
+            Item "The Winger"
+            WeaponRestrictions SecondaryOnly
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Action Mobber 
+            ClassIcon scout_winger_lite
+			ItemAttributes
+			{
+				ItemName "The Winger"
+				"crit mod disabled" 0
+			}
+            CharacterAttributes
+			{
+				"head scale" 0.7
+				"move speed bonus" 1.25
+			}
+        }
+		T_TFBot_Red_Giant_Scout_Spammer
+		{
+			Template T_TFBot_Red_Giant_Scout
+			Name "Giant Rapidfire Scout"
+			ClassIcon scout_spammer
+			ItemAttributes
+			{
+				ItemName TF_WEAPON_SCATTERGUN
+				"crit mod disabled" 0
+				"faster reload rate" -0.8
+				"fire rate bonus" 0.5
+				"damage bonus" 1.5
+			}
+		}
+		T_TFBot_Red_Soldier_Crit
+		{
+			Class Soldier
+			Name "Charged Soldier"
+			ClassIcon soldier_crit
+			Skill Hard
+			Item "The Original"
+			Attributes AlwaysCrit
+			AddCond  { Name TF_COND_REPROGRAMMED } 
+			Action Mobber 
+			ItemAttributes
+			{
+				ItemName "The Original"
+				"faster reload rate" 0.2
+				"fire rate bonus" 2
+				"Projectile speed increased" 0.5
+			}
+		}
+	}
+	
+    Wave // Wave 1
+    {
+		StartWaveOutput
+		{
+			Target wave_start_relay_improved_low
+			Action Trigger
+		}
+		InitWaveOutput
+        {
+            Target wave_init_lower_relay
+            Action Trigger
+        }
+		Explanation 
+		{
+			Line "{blue}In this mission, you will have some ally bots to help, they are indicated in support. Some can pick up the bomb, some cannot, {red}If all of them die, you lose!"
+			Line "{blue} INFO:"
+			Line "{blue}-You have infinite ammo and metal"
+			Line "{blue}-Players can capture gates"
+			Line "{blue}-VIPs cannot be targeted by medi guns"
+			//Line "{red}-Robots drop red money" not anymore haha!
+			Line "{blue}-Bomb bots will periodically spawn to bring back the bomb after a reset, you can kill them if you want to pick up the bomb"
+			Line "--------------------------------------------"
+			Line "{green}Your VIPs this wave:"
+			Line "{blue}-1 Giant Demoknight"
+			Line "{blue}-2 Giant Homing Soldiers"
+			Line "{blue}-1 Giant Shotgun Heavy"
+			Line "--------------------------------------------"
+		}
+		SpawnTemplate "sentries_mini"
+		//SpawnTemplate "set_health_minis"
+		SpawnTemplate "sentries_hatch"
+		
+		
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//RED WaveSpawns
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn
+		{
+			Name "wave1sentries"
+			Where spawn_blu_first
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Class Scout
+				Name "Watch out for the sentries!"
+				ClassIcon mini_sentry_red_nys
+				CharacterAttributes
+				{
+					"cannot pick up intelligence" 1
+					"health regen" -125
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1a"
+			Where spawn_low_path_entrance
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Soldier
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1a"
+			Where spawn_low_path_gate
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Soldier
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1a"
+			Where spawn_up_path_first
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Heavyweapons_Fist
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "Fists of Steel"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1a"
+			Where spawn_low_path_gate
+			TotalCount 6
+			MaxActive 3
+			SpawnCount 3
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Heavyweapons_Fist
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "Fists of Steel"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1a"
+			Where spawn_low_path_gate
+			TotalCount 12
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 5
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Heavyweapons_Shotgun
+				tag noflank
+				Skill Expert
+				AimTrackingInterval 1
+				Attributes DisableDodge
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_SHOTGUN"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1b"
+			WaitForAllSpawned "wave1a"
+			Where spawn_mid
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 100
+			
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Demo_RapidFire
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_GRENADELAUNCHER"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1b"
+			WaitForAllDead "wave1a"
+			Where spawn_mid
+			TotalCount 16
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 7
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Soldier
+				Skill Hard
+				Attributes DisableDodge
+				tag noflank
+				UseBestWeapon 0 
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1b"
+			WaitForAllSpawned "wave1a"
+			Where spawn_mid
+			TotalCount 21
+			MaxActive 12
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 3
+		
+			TotalCurrency 200
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Demoman_Knight
+				tag noflank
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1c"
+			WaitForAllSpawned "wave1b"
+			Where spawn_final_flank
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Soldier
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1c"
+			WaitForAllSpawned "wave1b"
+			Where spawn_final_flank
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 150
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Scout
+				tag noflank
+				Attributes DisableDodge
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_SCATTERGUN"
+					"damage bonus" 1.5
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				} 
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1c"
+			WaitForAllSpawned "wave1b"
+			Where spawn_final_flank
+			TotalCount 10
+			MaxActive 5
+			SpawnCount 5
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 3
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Class Heavyweapons
+				Skill Expert
+				tag noflank
+				AimTrackingInterval 1
+				AddCond  { Name TF_COND_REPROGRAMMED } 
+				Action Mobber 
+				Attributes DisableDodge
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_MINIGUN"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1c"
+			WaitForAllSpawned "wave1b"
+			Where spawn_final_flank
+			TotalCount 15
+			MaxActive 9
+			SpawnCount 5
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 3
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Heavyweapons_Shotgun
+				tag noflank
+				Skill Expert
+				AimTrackingInterval 0.25
+				ItemAttributes
+				{
+					ItemName TF_WEAPON_SHOTGUN
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1last"
+			WaitForAllSpawned "wave1c"
+			Where spawn_final
+			Where spawn_final_flank
+			RandomSpawn 1
+			TotalCount 9999
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 20
+			WaitBetweenSpawns 5
+		
+			TotalCurrency 0
+			FirstSpawnOutput
+			{
+				Target youcandeploynow
+				Action Trigger
+			}
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Heavyweapons_Shotgun
+				tag noflank
+				Attributes AlwaysCrit
+				Skill Expert
+				AimTrackingInterval 1
+				ClassIcon Heavy_shotgun_red
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn //infinite shortstop scouts
+		{
+			Name "wave1last"
+			WaitForAllDead "wave1c"
+			Where spawn_final
+			Where spawn_final_flank
+			RandomSpawn 1
+			TotalCount 9999
+			MaxActive 5
+			SpawnCount 5
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 8
+		
+			TotalCurrency 0
+			//FirstSpawnOutput
+			//{
+			//	Target hint_deploy
+			//	Action Show
+			//}
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout_Shortstop
+				tag noflank
+				Skill Expert
+				AimTrackingInterval 1
+				 
+				Attributes DisableDodge
+				ItemAttributes
+				{
+					ItemName "The Shortstop"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//BLU WaveSpawns
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn 
+		{
+			Name "wave1blu1"
+			Where spawn_blu_first
+			Where spawn_blu_low
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 7
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Giant_Bonk_Scattergun
+				tag noflank
+				CharacterAttributes
+				{
+					"collect currency on kill" 1
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1bluguard1"
+			Where spawn_blu_first
+			Where spawn_blu_low
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			FirstSpawnOutput
+			{
+				Target disablebarriers
+				Action Trigger
+			}
+			LastSpawnOutput
+			{
+				Target disableholo
+				Action Trigger
+			}
+			TFBot
+			{ 
+				Template T_TFBot_Giant_DemoMan_PrinceTavish
+				tag noflank
+				AlwaysGlow 1
+				Attributes UseBossHealthBar
+				CharacterAttributes
+				{
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+					"health regen"	50
+				}
+				ItemAttributes
+				{
+					ItemName "The Eyelander"
+					"mod weapon blocks healing" 1
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1bluguard2"
+			WaitForAllDead "wave1bluguard1"
+			Where spawn_blu_first
+			Where spawn_blu_low
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Giant_Homing_Soldier
+				tag noflank
+				AlwaysGlow 1
+				//Action EscortFlag 
+				Attributes UseBossHealthBar
+				CharacterAttributes
+				{
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+					"health regen"	50
+				}
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"mod weapon blocks healing" 1
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1bluguard3"
+			WaitForAllDead "wave1bluguard2"
+			Where spawn_blu_first
+			Where spawn_blu_low
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Giant_Homing_Soldier
+				tag noflank
+				AlwaysGlow 1
+				//Action Mobber 
+				Attributes UseBossHealthBar
+				CharacterAttributes
+				{
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+					"health regen"	50
+				}
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"mod weapon blocks healing" 1
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "wave1bluguard4"
+			WaitForAllDead "wave1bluguard3"
+			Where spawn_blu_first
+			Where spawn_blu_low
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+			FirstSpawnOutput
+			{
+				Target hint_last_vip
+				Action Show
+			}
+			DoneOutput
+			{
+				Target redwin_relay
+				Action Trigger
+			}
+		
+			TFBot
+			{ 
+				Template T_TFBot_Giant_Heavyweapons_Shotgun
+				tag noflank
+				AlwaysGlow 1
+				//Action Mobber 
+				//Skill Normal
+				Attributes UseBossHealthBar
+				CharacterAttributes
+				{
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+					"health regen"	50
+				}
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_SHOTGUN"
+					"mod weapon blocks healing" 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1bomb"
+			Where spawn_blu_first
+			Where spawn_blu_low
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			WaitBeforeStarting 30
+			WaitBetweenSpawns 15
+		
+			TotalCurrency 0
+		
+			RandomChoice
+			{	
+				Squad
+				{
+					TFBot
+					{ 
+						Template T_TFBot_Scout_Melee
+						tag noflank
+						Health 1
+						//Name "Bomb Deliverer"
+						CharacterAttributes
+						{
+							"collect currency on kill" 1
+							"receive friendly fire" 1
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	Wave // Wave 2
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_improved_up
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_init_upper_relay
+			Action Trigger
+		}
+		Explanation 
+		{
+			Line "------------------------------------------------------------------"
+			Line "{green}Your VIPs this wave:"
+			Line "{blue}-2 Giant KGB Heavy"
+			Line "{blue}-1 Giant Knight"
+			Line "{blue}-1 Giant Concheror Soldier"
+			Line "------------------------------------------------------------------"
+		}
+		SpawnTemplate "sentries1"
+		SpawnTemplate "sentries_hatch"
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//RED WaveSpawns
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn
+		{
+			Name "wave2sentries"
+			Where spawn_blu_first
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Class Scout
+				ClassIcon sentry_gun_red_nys
+				CharacterAttributes
+				{
+					"cannot pick up intelligence" 1
+					"health regen" -125
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a"
+			Where spawn_up_path_first
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 50
+		
+			FirstSpawnOutput
+			{
+				Target disableholo
+				Action Trigger
+			}
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Soldier_Spammer
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a"
+			Where spawn_up_path_gate
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 13
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Soldier_Spammer
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				} 
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a"
+			Where spawn_low_path_entrance
+			TotalCount 5
+			MaxActive 5
+			SpawnCount 5
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 3
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout
+				tag noflank
+				Skill Expert
+				AimTrackingInterval 0.25
+				Attributes DisableDodge
+				UseBestWeapon 0 
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_SCATTERGUN"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a"
+			Where spawn_up_path_gate
+			TotalCount 10
+			MaxActive 7
+			SpawnCount 5
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 3
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout
+				tag noflank
+				Action FetchFlag
+				Skill Expert
+				AimTrackingInterval 0.25
+				Attributes DisableDodge
+				UseBestWeapon 0 
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_SCATTERGUN"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a"
+			Where spawn_up_path_gate
+			TotalCount 12
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 4
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Class Pyro
+				Skill Expert
+				Action FetchFlag
+				tag noflank
+				AimTrackingInterval 1
+				AddCond  { Name TF_COND_REPROGRAMMED } 
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_FLAMETHROWER"
+					"crits_become_minicrits" 1
+					"airblast disabled" 1
+					"crit mod disabled" 0
+				}
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b"
+			WaitForAllSpawned "wave2a"
+			Where spawn_mid
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 13
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Heavyweapons_Shotgun
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_SHOTGUN_HWG"
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b"
+			WaitForAllSpawned "wave2a"
+			Where spawn_mid
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 4
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Plutonium_Gauntlet
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "Fists of Steel"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b"
+			WaitForAllspawned "wave2a"
+			Where spawn_mid
+			TotalCount 18
+			MaxActive 8
+			SpawnCount 6
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 7
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout
+				UseBestWeapon 0 
+				tag noflank
+				Attributes DisableDodge
+				Skill Expert
+				AimTrackingInterval 0.25
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_SCATTERGUN"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c"
+			WaitForAllSpawned "wave2b"
+			Where spawn_final_flank
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Boxing_Heavy
+				ClassIcon heavy_champ_red
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "The Killing Gloves of Boxing"
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c"
+			WaitForAllSpawned "wave2b"
+			Where spawn_final_flank
+			TotalCount 10
+			MaxActive 5
+			SpawnCount 5
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Soldier_Extended_Concheror
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c"
+			WaitForAllSpawned "wave2b"
+			Where spawn_final_flank
+			TotalCount 20
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 6
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout
+				UseBestWeapon 0 
+				tag noflank
+				Attributes DisableDodge
+				Skill Expert
+				AimTrackingInterval 0.25
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_SCATTERGUN"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c"
+			WaitForAllspawned "wave2b"
+			Where spawn_final_flank
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 200
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Soldier_Spammer
+				tag noflank
+				ItemAttributes 
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2last"
+			WaitForAllSpawned "wave2c"
+			Where spawn_final
+			Where spawn_final_flank
+			RandomSpawn 1
+			TotalCount 9999
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 14
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 0
+			FirstSpawnOutput
+			{
+				Target youcandeploynow
+				Action Trigger
+			}
+		
+			TFBot
+			{ 
+				Class Heavyweapons
+				Skill Expert
+				tag noflank
+				AimTrackingInterval 1
+				AddCond  { Name TF_COND_REPROGRAMMED } 
+				Action Mobber 
+				Attributes DisableDodge
+				 
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_MINIGUN"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//BLU WaveSpawns
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn
+		{
+			Name "wave2guard1"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 3
+		
+			TotalCurrency 0
+		
+			FirstSpawnOutput
+			{
+				Target disablebarriers
+				Action Trigger
+			}
+			TFBot
+			{ 
+				Template T_TFBot_Giant_Boxing_Heavy
+				tag noflank
+				AlwaysGlow 1
+				//Action EscortFlag 
+				Attributes UseBossHealthBar
+				CharacterAttributes
+				{
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+					"health regen"	50
+				}
+				ItemAttributes
+				{
+					ItemName "The Killing Gloves of Boxing"
+					"mod weapon blocks healing" 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2guard2"
+			WaitForAllDead "wave2guard1"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 4
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Giant_DemoMan_PrinceTavish
+				tag noflank
+				AlwaysGlow 1
+				//Action EscortFlag 
+				Attributes UseBossHealthBar
+				ItemAttributes
+				{
+					ItemName "The Eyelander"
+					"mod weapon blocks healing" 1
+				}
+				CharacterAttributes
+				{
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+					"health regen"	50
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2guard3"
+			WaitForAllDead "wave2guard2"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+			FirstSpawnOutput
+			{
+				Target hint_last_vip
+				Action Show
+			}
+		
+			DoneOutput
+			{
+				Target redwin_relay
+				Action Trigger
+			}
+			TFBot
+			{ 
+				Template T_TFBot_Giant_Soldier_Extended_Concheror
+				tag noflank
+				AlwaysGlow 1
+				//Action Mobber 
+				Attributes UseBossHealthBar
+				CharacterAttributes
+				{
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+					"health regen"	50
+				}
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"mod weapon blocks healing" 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2bomb"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			WaitBeforeStarting 30
+			WaitBetweenSpawns 15
+		
+			TotalCurrency 0
+		
+			Squad
+			{
+				RandomChoice
+				{
+					Squad
+					{	
+						TFBot
+						{ 
+							Template T_TFBot_Scout_Melee
+							tag noflank
+							Health 1
+							//Name "Bomb Deliverer"
+							CharacterAttributes
+							{
+								"collect currency on kill" 1
+								"receive friendly fire" 1
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	Wave // Wave 3
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_improved_up
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_init_upper_relay
+			Action Trigger
+		}
+		Explanation
+		{
+			Line "{white}------------------------------------------------------------------"
+			Line "{green}Your VIPs this wave:"
+			Line "{blue}-6 Giant Banner Soldiers"
+			//Line "{red}These gauntlets can quickly shred your soldiers so watch out for them!"
+			Line "{white}------------------------------------------------------------------"
+		}
+		SpawnTemplate "sentries2"
+		SpawnTemplate "sentries_hatch"
+		SpawnTemplate "sentry_hatch_health3"
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//RED WaveSpawns
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn
+		{
+			Name "wave3sentries"
+			Where spawn_blu_first
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Class Scout 
+				ClassIcon sentry_gun_lvl2_red_lite
+				CharacterAttributes
+				{
+					"cannot pick up intelligence" 1
+					"health regen" -125
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a"
+			Where spawn_up_path_gate
+			TotalCount 15
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 9
+			TotalCurrency 50
+		
+			//FirstSpawnOutput
+			//{
+			//	Target disablegates
+			//	Action Trigger
+			//}
+			FirstSpawnOutput
+			{
+				Target disableholo
+				Action Trigger
+			}
+			TFBot
+			{ 
+				Template T_TFBot_Red_Wallbreaker_Gauntlet
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "Fists of Steel"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a"
+			Where spawn_low_path_entrance
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 8
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Demoman
+				tag noflank
+				AimTrackingInterval 0.25
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_GRENADELAUNCHER"
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a"
+			Where spawn_up_path_gate
+			TotalCount 16
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 14
+			WaitBetweenSpawns 4
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Demoman 
+				tag noflank
+				AimTrackingInterval 0.25
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_GRENADELAUNCHER"
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a"
+			Where spawn_up_path_first
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 5
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Soldier_Spammer_Reload
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a"
+			Where spawn_up_path_gate
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 5
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Soldier_Spammer_Reload
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b"
+			WaitForAllSpawned "wave3a"
+			Where spawn_mid
+			TotalCount 10
+			MaxActive 5
+			SpawnCount 5
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 150
+		
+			Squad
+			{	
+				TFBot
+				{ 
+					Template T_TFBot_Red_Giant_Soldier_SlowBarrage
+					tag noflank
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_ROCKETLAUNCHER"
+						"crits_become_minicrits" 1
+						"crit mod disabled" 0
+					}
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_QuickUber
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b"
+			WaitForAllSpawned "wave3a"
+			Where spawn_mid
+			TotalCount 12
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 8
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Wallbreaker_Gauntlet
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "Fists of Steel"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b"
+			WaitForAllSpawned "wave3a"
+			Where spawn_mid
+			TotalCount 20
+			MaxActive 12
+			SpawnCount 4
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 4
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Phlog_Pyro
+				Attributes DisableDodge
+				tag noflank
+				CharacterAttributes
+				{
+					
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3c"
+			WaitForAllSpawned "wave3b"
+			Where spawn_final_flank
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 18
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 150
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Heavyweapons_Natascha
+				ClassIcon heavy_natascha_nys
+				Name "Giant Natascha Heavy"
+				 
+				//tag noflank
+				Skill Hard
+				ItemAttributes 
+				{
+					ItemName "Natascha"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+					"slow enemy on hit" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3c"
+			WaitForAllSpawned "wave3b"
+			Where spawn_final_flank
+			TotalCount 15
+			MaxActive 8
+			SpawnCount 5
+			WaitBeforeStarting 19
+			WaitBetweenSpawns 7
+		
+			TotalCurrency 150
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout_Shortstop
+				Skill Expert
+				tag noflank
+				AimTrackingInterval 0.25
+				Attributes DisableDodge
+				ItemAttributes
+				{
+					ItemName "The Shortstop"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3c"
+			WaitForAllSpawned "wave3b"
+			Where spawn_final_flank
+			TotalCount 16
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 17
+			WaitBetweenSpawns 4
+		
+			TotalCurrency 200
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Demoman
+				tag noflank
+				AimTrackingInterval 0.25
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_GRENADELAUNCHER"
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3final"
+			WaitForAllSpawned "wave3c"
+			//Where spawn_final
+			Where spawn_final_flank
+			//RandomSpawn 1
+			TotalCount 9999
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 17
+			WaitBetweenSpawns 11
+		
+			TotalCurrency 0
+			FirstSpawnOutput
+			{
+				Target youcandeploynow
+				Action Trigger
+			}
+			//FirstSpawnOutput
+			//{
+			//	Target hint_deploy
+			//	Action Show
+			//}
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Sniper_Huntsman_Spammer
+				tag noflank
+				Skill Expert
+				AimAt Body
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3final"
+			WaitForAllSpawned "wave3c"
+			Where spawn_final 
+			Where spawn_final_flank
+			TotalCount 9999
+			MaxActive 9
+			SpawnCount 6
+			WaitBeforeStarting 20
+			WaitBetweenSpawns 12
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Demo_Burst
+			}
+		}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//BLU WaveSpawns
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn //those are hidden so we can have each banner icon separate for the healthbars and the trio icon the wavebar
+		{
+			Name "wave3guard1"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+			FirstSpawnOutput
+			{
+				Target disablebarriers
+				Action Trigger
+			}
+		
+			RandomChoice
+			{	
+				Squad
+				{
+					TFBot
+					{
+						Template T_TFBot_Chief_Battalion
+						tag noflank
+						AlwaysGlow 1
+						//ClassIcon soldier_banner_trio
+						//Action EscortFlag 
+						CharacterAttributes
+						{
+							"health from healers reduced" 0.20
+							"ubercharge rate bonus for healer" 0.25
+							"collect currency on kill" 1
+							"healing received bonus" 0.2
+							"health regen"	10
+						}
+						ItemAttributes
+						{
+							ItemName "TF_WEAPON_ROCKETLAUNCHER"
+							"mod weapon blocks healing" 1
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3guard2"
+			WaitForAllDead "wave3guard1"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			RandomChoice
+			{
+				Squad
+				{
+					TFBot
+					{
+						Template T_TFBot_Chief_Buff
+						tag noflank
+						AlwaysGlow 1
+						//ClassIcon soldier_banner_trio
+						//Action Mobber 
+						CharacterAttributes
+						{
+							"health from healers reduced" 0.20
+							"ubercharge rate bonus for healer" 0.25
+							"collect currency on kill" 1
+							"healing received bonus" 0.2
+							"health regen"	10
+						}
+						ItemAttributes
+						{
+							ItemName "TF_WEAPON_ROCKETLAUNCHER"
+							"mod weapon blocks healing" 1
+							//"cannot pick up intelligence" 1
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3guard3"
+			WaitForAllDead "wave3guard2"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+			LastSpawnOutput
+			{
+				Target hint_last_vip
+				Action Show
+			}
+			DoneOutput
+			{
+				Target redwin_relay
+				Action Trigger
+			}
+		
+			RandomChoice
+			{
+				Squad
+				{
+					TFBot
+					{
+						Template T_TFBot_Chief_Conch
+						tag noflank
+						AlwaysGlow 1
+						//ClassIcon soldier_banner_trio
+						//Action Mobber 
+						CharacterAttributes
+						{
+							"health from healers reduced" 0.20
+							"ubercharge rate bonus for healer" 0.25
+							"collect currency on kill" 1
+							"healing received bonus" 0.2
+							"health regen"	10
+						}
+						ItemAttributes
+						{
+							ItemName "TF_WEAPON_ROCKETLAUNCHER"
+							"mod weapon blocks healing" 1
+							"cannot pick up intelligence" 1
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn //dummy wavespawn to show the trio icon on the wavebar
+		{
+			Name "wave3icon"
+			Where spawn_blu_first
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Class Scout
+				//Name " "
+				ClassIcon soldier_banner_trio
+				CharacterAttributes
+				{
+					"cannot pick up intelligence" 1
+					"health regen" -125
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3bomb"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			WaitBeforeStarting 40
+			WaitBetweenSpawns 15
+		
+			TotalCurrency 0
+			
+			RandomChoice
+			{	
+				Squad
+				{	
+					TFBot
+					{ 
+						Template T_TFBot_Scout_Melee
+						tag noflank
+						Health 1
+						//Name "Bomb Deliverer"
+						CharacterAttributes
+						{
+							"collect currency on kill" 1
+							"receive friendly fire" 1
+						}
+					}
+				}
+			}
+		}
+	}
+	Wave // Wave 4
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_improved_low
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_init_lower_relay
+			Action Trigger
+		}
+		Explanation
+		{
+			Line "------------------------------------------------------------------"
+			Line "{blue}There is no bomb in this wave, you will have to defend a tank instead!"
+			Line "{blue}You only have one of them and you'll lose if it gets destroyed!"
+			Line "{blue}You will also have some Giant Shortstop Scouts to help you"
+			Line "------------------------------------------------------------------"
+		}
+		SpawnTemplate "sentries2"
+		SpawnTemplate "sentries_hatch"
+		SpawnTemplate "sentry_hatch_health4"
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//RED WaveSpawns
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn
+		{
+			Name "wave4sentries"
+			Where spawn_blu_first
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Class Scout 
+				ClassIcon sentry_gun_lvl2_red_lite
+				CharacterAttributes
+				{
+					"cannot pick up intelligence" 1
+					"health regen" -125
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a"
+			Where spawn_low_path_entrance
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 6
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 50
+			FirstSpawnOutput
+			{
+				Target disableforcefields
+				Action Trigger
+			}
+		
+			Squad
+			{	
+				TFBot
+				{ 
+					Template T_TFBot_Red_Giant_Soldier_Spammer_Buff
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						
+					}
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_ROCKETLAUNCHER"
+						"crits_become_minicrits" 1
+						"crit mod disabled" 0
+					}
+					InterruptAction  // Stop current bot ai and force the bot to move to a location
+					{
+						Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						KillAimTarget 1 // Attack aim target (Default: 0)
+						
+						Delay 5 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+						Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+						Cooldown 5 //Time between each task (Default: 10)
+						Duration 10 // How long should the ai be interrupted
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_SlowRecharge
+					Name "Slowcharge Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_SlowRecharge
+					Name "Slowcharge Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_SlowRecharge
+					Name "Slowcharge Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_SlowRecharge
+					Name "Slowcharge Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_SlowRecharge
+					Name "Slowcharge Medic"
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a"
+			Where spawn_low_path_gate
+			TotalCount 18
+			MaxActive 12
+			SpawnCount 6
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 16
+		
+			TotalCurrency 50
+		
+			Squad
+			{	
+				TFBot
+				{ 
+					Template T_TFBot_Red_Giant_Soldier_Spammer_Buff
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						
+					}
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_ROCKETLAUNCHER"
+						"crits_become_minicrits" 1
+						"crit mod disabled" 0
+					}
+					InterruptAction  // Stop current bot ai and force the bot to move to a location
+					{
+						Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						KillAimTarget 1 // Attack aim target (Default: 0)
+						
+						Delay 5 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+						Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+						Cooldown 5 //Time between each task (Default: 10)
+						Duration 10 // How long should the ai be interrupted
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_SlowRecharge
+					Name "Slowcharge Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_SlowRecharge
+					Name "Slowcharge Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_SlowRecharge
+					Name "Slowcharge Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_SlowRecharge
+					Name "Slowcharge Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Medic_SlowRecharge
+					Name "Slowcharge Medic"
+				}
+			}
+			
+		}
+		WaveSpawn
+		{
+			Name "wave4a"
+			Where spawn_low_path_gate
+			TotalCount 28
+			MaxActive 10
+			SpawnCount 4
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 7
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout
+				UseBestWeapon 0 
+				Attributes DisableDodge
+				Skill Hard
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_SCATTERGUN"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+					
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+				Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 5 //Time between each task (Default: 10)
+					Duration 10 // How long should the ai be interrupted
+				}
+			}
+			
+		}
+		WaveSpawn
+		{
+			Name "wave4a"
+			Where spawn_low_path_gate
+			TotalCount 16
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 4
+			FirstSpawnOutput
+			{
+				Target intel_35
+				Action ForceResetSilent
+			}
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Soldier
+				AimTrackingInterval 0.25
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+					
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+				Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 3 //Time between each task (Default: 10)
+					Duration 30 // How long should the ai be interrupted
+				}
+			}
+			
+		}
+		WaveSpawn
+		{
+			Name "wave4b"
+			WaitForAllSpawned "wave4a"
+			Where spawn_mid
+			TotalCount 15
+			MaxActive 8
+			SpawnCount 5
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 2
+		
+			TotalCurrency 150
+		
+				TFBot
+				{
+					Template T_TFBot_Red_Bazooka_Soldier
+					Action Mobber 
+					Attributes DisableDodge
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						 
+					}
+					InterruptAction  // Stop current bot ai and force the bot to move to a location
+					{
+						Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						KillAimTarget 1 // Attack aim target (Default: 0)
+						
+						Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+						Cooldown 3 //Time between each task (Default: 10)
+						Duration 15 // How long should the ai be interrupted
+					}
+				}
+				
+		}
+		WaveSpawn
+		{
+			Name "wave4b"
+			WaitForAllSpawned "wave4a"
+			Where spawn_mid
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 4
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Phlog_Pyro_Giant
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+					
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+				Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 5 //Time between each task (Default: 10)
+					Duration 5 // How long should the ai be interrupted
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b"
+			WaitForAllSpawned "wave4a"
+			Where spawn_mid
+			TotalCount 16
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 5
+		
+			TotalCurrency 150
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout
+				UseBestWeapon 0 
+				Attributes DisableDodge
+				Skill Expert
+				AimTrackingInterval 0.25
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_SCATTERGUN"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+					
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+				Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 5 //Time between each task (Default: 10)
+					Duration 5 // How long should the ai be interrupted
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b"
+			WaitForAllSpawned "wave4a"
+			Where spawn_mid
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout_Cola
+				Attributes DisableDodge
+				ItemAttributes
+				{
+					ItemName "The Soda Popper"
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+						
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 3 //Time between each task (Default: 10)
+					Duration 15 // How long should the ai be interrupted
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4c"
+			WaitForAllSpawned "wave4b"
+			Where spawn_final_flank
+			TotalCount 27
+			MaxActive 9
+			SpawnCount 9
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 100
+		
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Red_Giant_Demo_Burst
+					ItemAttributes
+					{
+						ItemName TF_WEAPON_GRENADELAUNCHER
+						"crit mod disabled" 0
+					}
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						 
+					}
+					InterruptAction  // Stop current bot ai and force the bot to move to a location
+					{
+						Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						KillAimTarget 1 // Attack aim target (Default: 0)
+							
+						Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+						Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+						Cooldown 3 //Time between each task (Default: 10)
+						Duration 15 // How long should the ai be interrupted
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Kritz_Medic
+					Attributes DisableDodge
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Kritz_Medic
+					Attributes DisableDodge
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Kritz_Medic
+					Attributes DisableDodge
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Kritz_Medic
+					Attributes DisableDodge
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Kritz_Medic
+					Attributes DisableDodge
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Kritz_Medic
+					Attributes DisableDodge
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Kritz_Medic
+					Attributes DisableDodge
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Kritz_Medic
+					Attributes DisableDodge
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4c"
+			WaitForAllSpawned "wave4b"
+			Where spawn_final_flank
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 6
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Soldier
+				AimTrackingInterval 0.25
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+						
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 3 //Time between each task (Default: 10)
+					Duration 15 // How long should the ai be interrupted
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4c"
+			WaitForAllSpawned "wave4b"
+			Where spawn_final_flank
+			TotalCount 20
+			MaxActive 6
+			SpawnCount 5
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 200
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout_Shortstop
+				//Attributes AlwaysCrit
+				Attributes DisableDodge
+				Skill Expert
+				AimTrackingInterval 0.25
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+						
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 8 //Time between each task (Default: 10)
+					Duration 15 // How long should the ai be interrupted
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4last"
+			WaitForAllSpawned "wave4c"
+			Where spawn_final
+			TotalCount 9999
+			MaxActive 5
+			SpawnCount 5
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 5
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Hibernating_Bear
+				Attributes AlwaysCrit
+				ClassIcon heavy_warrior_red 
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+						
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 3 //Time between each task (Default: 10)
+					Duration 15 // How long should the ai be interrupted
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4last"
+			WaitForAllSpawned "wave4c"
+			Where spawn_final_flank
+			TotalCount 9999
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 4
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Hibernating_Bear
+				Attributes AlwaysCrit
+				ClassIcon heavy_warrior_red 
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+						
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 3 //Time between each task (Default: 10)
+					Duration 15 // How long should the ai be interrupted
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4last"
+			WaitForAllDead "wave4c"
+			Where spawn_final_flank
+			TotalCount 9999
+			MaxActive 12
+			SpawnCount 5
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 3
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_SkullCutter_Knight
+				//Attributes AlwaysCrit
+				//ClassIcon demoknight
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+						
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 3 //Time between each task (Default: 10)
+					Duration 15 // How long should the ai be interrupted
+				}
+			}
+		}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//BLU WaveSpawns
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn
+		{
+			Name "wave4blusupport"
+			Where spawn_blu_first
+			Where spawn_blu_low
+			TotalCount 5
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 6.1
+			WaitBetweenSpawns 10
+			FirstSpawnOutput
+			{
+				Target intel_35
+				Action Disable
+			}
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Giant_Scout_Shortstop
+				CharacterAttributes
+				{
+					"collect currency on kill" 1
+				}
+			}
+		}
+		WaveSpawn // Tank # HP
+		{
+			Name "wave4guard1"
+			//WaitForAllDead "wave4guard2"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+			FirstSpawnOutput
+			{
+				Target disableholo
+				Action Trigger
+			}
+		
+			Tank
+			{
+				Model "models/bots/boss_bot/boss_tank_color.mdl"
+				SpawnTemplate "colortank"
+				Name "tankboss"
+				StartingPathTrackNode "path_tank_lower"
+				Health 100000
+				Speed 65
+				Skin 0
+		
+				OnKilledOutput
+				{
+					Target redwin_relay
+					Action Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+		
+	}
+	Wave // Wave 5
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_improved_up
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_init_upper_relay
+			Action Trigger
+		}
+		Explanation
+		{
+			Line "--------------------------------------------"
+			Line "{green}Your VIPs this wave:"
+			Line "{blue}-2 Giant Brass Beast Heavies"
+			Line "{blue}-2 Giant Brustfire Demos"
+			Line "{blue}-1 Giant Rapidfire Soldier"
+			Line "--------------------------------------------"
+		}
+		SpawnTemplate "sentries3"
+		SpawnTemplate "sentries_hatch"
+		SpawnTemplate "sentry_hatch_health5"
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//RED WaveSpawns
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn
+		{
+			Name "wave6sentries"
+			Where spawn_blu_first
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Class Scout 
+				ClassIcon sentry_gun_lvl3_red_lite
+				CharacterAttributes
+				{
+					"cannot pick up intelligence" 1
+					"health regen" -125
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a"
+			Where spawn_up_path_first
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Heavyweapons_Deflector
+				ItemAttributes
+				{
+					ItemName "Deflector"
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+						 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a"
+			Where spawn_up_path_gate
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 18
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Heavyweapons_Deflector
+				ItemAttributes
+				{
+					ItemName "Deflector"
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+						 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a"
+			Where spawn_up_path_gate
+			TotalCount 20
+			MaxActive 8
+			SpawnCount 5
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Soldier_Extended_Buff_Banner
+				ItemAttributes
+				{
+					ItemName TF_WEAPON_ROCKETLAUNCHER
+					"crit mod disabled" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a"
+			Where spawn_low_path_entrance
+			TotalCount 5
+			MaxActive 5
+			SpawnCount 5
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Soldier_Extended_Buff_Banner
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a"
+			Where spawn_up_path_gate
+			TotalCount 20
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 6
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout_Winger
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b"
+			WaitForAllSpawned "wave5a"
+			Where spawn_mid
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 14
+		
+			TotalCurrency 100
+		
+			TFBot
+			{
+				Template T_TFBot_Red_Giant_Soldier_Spammer_Reload
+				tag noflank
+				//Attributes AlwaysCrit
+				ItemAttributes
+				{
+					ItemName TF_WEAPON_ROCKETLAUNCHER
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+						 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b"
+			WaitForAllSpawned "wave5a"
+			Where spawn_mid
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 12
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Scout_Spammer
+				tag noflank
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+						 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b"
+			WaitForAllSpawned "wave5a"
+			Where spawn_mid
+			TotalCount 24
+			MaxActive 9
+			SpawnCount 6
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 13
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Demoman
+				tag noflank
+				ItemAttributes
+				{
+					ItemName TF_WEAPON_GRENADELAUNCHER
+					"crit mod disabled" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5c"
+			WaitForAllSpawned "wave5b"
+			Where spawn_final_flank
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Heavyweapons_Heater
+				tag noflank
+				Name "Giant Heater Heavy"
+				ItemAttributes
+				{
+					ItemName "The Huo Long Heatmaker"
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+						 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5c"
+			WaitForAllSpawned "wave5b"
+			Where spawn_final_flank
+			Where spawn_final
+			TotalCount 28
+			MaxActive 10
+			SpawnCount 7
+			WaitBeforeStarting 14
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Soldier_Crit
+				tag noflank
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5c"
+			WaitForAllSpawned "wave5b"
+			Where spawn_final
+			Where spawn_final_flank
+			TotalCount 20
+			MaxActive 12
+			SpawnCount 5
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 12
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Phlog_Pyro
+				tag noflank
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5final"
+			WaitForAllSpawned "wave5c"
+			Where spawn_final_flank
+			TotalCount 9999
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 14
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 0
+			FirstSpawnOutput
+			{
+				Target youcandeploynow
+				Action Trigger
+			}
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Heavyweapons_Shotgun
+				tag noflank
+				ItemAttributes
+				{
+					ItemName TF_WEAPON_SHOTGUN_HWG
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+						 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5final"
+			WaitForAllSpawned "wave5c"
+			Where spawn_final_flank
+			Where spawn_final
+			RandomSpawn 1
+			TotalCount 9999
+			MaxActive 12
+			SpawnCount 6
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 13
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Demoman_Knight
+				tag noflank
+				Attributes AlwaysCrit
+			}
+		}
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//BLU WaveSpawns
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn
+		{
+			Name "wave5guard1"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Giant_Heavyweapons_BrassBeast
+				Attributes UseBossHealthBar
+				ClassIcon heavy_brass_nys
+				tag noflank
+				Name "Giant Brass Beast Heavy"
+				AlwaysGlow 1
+				CharacterAttributes
+				{
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+					"health regen"	50
+				}
+				ItemAttributes
+				{
+					ItemName "The Brass Beast"
+					"mod weapon blocks healing" 1
+					"damage bonus" 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5guard2"
+			WaitForAllDead "wave5guard1"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Giant_Demo_Burst
+				Attributes UseBossHealthBar
+				tag noflank
+				AlwaysGlow 1
+				CharacterAttributes
+				{
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+					"health regen"	50
+				}
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_GRENADELAUNCHER"
+					"mod weapon blocks healing" 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5guard3"
+			WaitForAllDead "wave5guard2"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+			FirstSpawnOutput
+			{
+				Target hint_last_vip
+				Action Show
+			}
+			DoneOutput
+			{
+				Target redwin_relay
+				Action Trigger
+			}
+		
+			TFBot
+			{ 
+				Template T_TFBot_Giant_Soldier_Spammer
+				tag noflank
+				Attributes UseBossHealthBar
+				AlwaysGlow 1
+				CharacterAttributes
+				{
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+					"health regen"	50
+				}
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"mod weapon blocks healing" 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5bomb"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			WaitBeforeStarting 40
+			WaitBetweenSpawns 15
+		
+			TotalCurrency 0
+			
+			RandomChoice
+			{	
+				Squad
+				{	
+					TFBot
+					{ 
+						Template T_TFBot_Scout_Melee
+						tag noflank
+						Health 1
+						//Name "Bomb Deliverer"
+						CharacterAttributes
+						{
+							"collect currency on kill" 1
+							"receive friendly fire" 1
+						}
+					}
+				}
+			}
+		}
+	}
+	Wave // Wave 6
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_improved_low
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_init_lower_relay
+			Action Trigger
+		}
+		//Explanation
+		//{
+		//	Line "------------------------------------------------------------------"
+		//	Line "{red}This wave also has tanks you have to defend"
+		//	Line "{red}You'll also have some Giant Heavies to help you"
+		//	Line "------------------------------------------------------------------"
+		//}
+		SpawnTemplate "sentries3"
+		SpawnTemplate "sentries_hatch"
+		SpawnTemplate "sentry_hatch_health5"
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//RED WaveSpawns
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn
+		{
+			Name "wave6sentries"
+			Where spawn_blu_first
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Class Scout 
+				ClassIcon sentry_gun_lvl3_red_lite
+				CharacterAttributes
+				{
+					"cannot pick up intelligence" 1
+					"health regen" -125
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a"
+			Where spawn_up_path_first
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 50
+			FirstSpawnOutput
+			{
+				Target disableforcefields
+				Action Trigger
+			}
+		
+			Squad
+			{	
+				TFBot
+				{ 
+					Template T_TFBot_Red_Giant_Demo_Burst
+					Attributes AlwaysCrit
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_GRENADELAUNCHER"
+						"crits_become_minicrits" 1
+						"crit mod disabled" 0
+					}
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						
+					}
+					InterruptAction  // Stop current bot ai and force the bot to move to a location
+					{
+						Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						KillAimTarget 1 // Attack aim target (Default: 0)
+							
+						Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+						Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+						Cooldown 8 //Time between each task (Default: 10)
+						Duration 5 // How long should the ai be interrupted
+					}
+				}
+			}
+			
+		}
+		WaveSpawn
+		{
+			Name "wave6a"
+			Where spawn_low_path_gate
+			TotalCount 8
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 100
+			
+				TFBot
+				{ 
+					Template T_TFBot_Red_Giant_Demo_Burst
+					Attributes AlwaysCrit
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_GRENADELAUNCHER"
+						"crits_become_minicrits" 1
+						"crit mod disabled" 0
+					}
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						
+					}
+					InterruptAction  // Stop current bot ai and force the bot to move to a location
+					{
+						Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						KillAimTarget 1 // Attack aim target (Default: 0)
+							
+						Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+						Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+						Cooldown 8 //Time between each task (Default: 10)
+						Duration 5 // How long should the ai be interrupted
+					}
+				}
+		}
+		WaveSpawn
+		{
+			Name "wave6a"
+			Where spawn_low_path_entrance
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 8
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 0
+			FirstSpawnOutput
+			{
+				Target intel_35
+				Action ForceResetSilent
+			}
+		
+			TotalCurrency 50
+		
+			TFBot
+			{
+				Class Scout
+				Skill Expert
+				AimTrackingInterval 0.25
+				ClassIcon scout_popper2
+				ClassIcon scout_popper2
+				AddCond  { Name TF_COND_REPROGRAMMED } 
+				Action Mobber 
+				Name "Soda Popper Scout"
+				Item "The Fed-Fightin' Fedora"
+				Item "The Bolt Boy"
+				Item "The Soda Popper"
+				MaxVisionRange 500
+				ItemAttributes
+				{
+					ItemName "The Soda Popper"
+					"faster reload rate" 1.5
+					//"scattergun knockback mult" 1.5
+					//"damage bonus" 0.65		// 35% damage reduction
+				}
+				Attributes AlwaysCrit
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+						
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 8 //Time between each task (Default: 10)
+					Duration 15 // How long should the ai be interrupted
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a"
+			Where spawn_low_path_gate
+			TotalCount 40
+			MaxActive 12
+			SpawnCount 4
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 2
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Class Scout
+				Skill Expert
+				ClassIcon scout_popper2
+				AddCond  { Name TF_COND_REPROGRAMMED } 
+				Action Mobber 
+				Name "Soda Popper Scout"
+				Item "The Fed-Fightin' Fedora"
+				Item "The Bolt Boy"
+				Item "The Soda Popper"
+				AimTrackingInterval 0.25
+				MaxVisionRange 500
+				ItemAttributes
+				{
+					ItemName "The Soda Popper"
+					"faster reload rate" 1.5
+					//"scattergun knockback mult" 1.5
+					//"damage bonus" 0.65		// 35% damage reduction
+				}
+				Attributes AlwaysCrit
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+						
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 8 //Time between each task (Default: 10)
+					Duration 15 // How long should the ai be interrupted
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a"
+			Where spawn_low_path_gate
+			TotalCount 21
+			MaxActive 9
+			SpawnCount 3
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 8
+		
+			TotalCurrency 100
+		
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Red_Soldier_Spammer
+					Attributes DisableDodge
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_ROCKETLAUNCHER"
+						"crits_become_minicrits" 1
+						"crit mod disabled" 0
+					}
+					InterruptAction  // Stop current bot ai and force the bot to move to a location
+					{
+						Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						KillAimTarget 1 // Attack aim target (Default: 0)
+							
+						Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+						Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+						Cooldown 8 //Time between each task (Default: 10)
+						Duration 5 // How long should the ai be interrupted
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Soldier_Spammer
+					Attributes DisableDodge
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_ROCKETLAUNCHER"
+						"crits_become_minicrits" 1
+						"crit mod disabled" 0
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Soldier_Spammer
+					Attributes DisableDodge
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_ROCKETLAUNCHER"
+						"crits_become_minicrits" 1
+						"crit mod disabled" 0
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Soldier_Spammer
+					Attributes DisableDodge
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_ROCKETLAUNCHER"
+						"crits_become_minicrits" 1
+						"crit mod disabled" 0
+					}
+					InterruptAction  // Stop current bot ai and force the bot to move to a location
+					{
+						Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						KillAimTarget 1 // Attack aim target (Default: 0)
+							
+						Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+						Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+						Cooldown 8 //Time between each task (Default: 10)
+						Duration 5 // How long should the ai be interrupted
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Soldier_Spammer
+					Attributes DisableDodge
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_ROCKETLAUNCHER"
+						"crits_become_minicrits" 1
+						"crit mod disabled" 0
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Soldier_Spammer_Reload
+					Attributes DisableDodge
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_ROCKETLAUNCHER"
+						"crits_become_minicrits" 1
+						"crit mod disabled" 0
+					}
+					InterruptAction  // Stop current bot ai and force the bot to move to a location
+					{
+						Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						KillAimTarget 1 // Attack aim target (Default: 0)
+							
+						Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+						Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+						Cooldown 8 //Time between each task (Default: 10)
+						Duration 15 // How long should the ai be interrupted
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6b"
+			WaitForAllSpawned "wave6a"
+			Where spawn_mid
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 18
+		
+			TotalCurrency 100
+		
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Red_Soldier_BurstFire
+					ClassIcon Soldier_burstfire_hyper_lite
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						
+					}
+					InterruptAction  // Stop current bot ai and force the bot to move to a location
+					{
+						Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+						KillAimTarget 1 // Attack aim target (Default: 0)
+							
+						Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+						Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+						Cooldown 8 //Time between each task (Default: 10)
+						Duration 10 // How long should the ai be interrupted
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Giant_Medic_Regen_Super
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6b"
+			WaitForAllSpawned "wave6a"
+			Where spawn_mid
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 2
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 3
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Class Heavyweapons
+				Item "The Brass Beast"
+				Name "Brass Beast Heavy"
+				Skill Expert
+				ClassIcon heavy_brass_nys
+				AddCond  { Name TF_COND_REPROGRAMMED } 
+				Action Mobber 
+				Attributes DisableDodge
+				ItemAttributes
+				{
+					ItemName "The Brass Beast"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6b"
+			WaitForAllSpawned "wave6a"
+			Where spawn_mid
+			TotalCount 32
+			MaxActive 16
+			SpawnCount 4
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 4
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Class Scout
+				Skill Expert
+				ClassIcon scout_popper2
+				AddCond  { Name TF_COND_REPROGRAMMED } 
+				Action Mobber 
+				Name "Soda Popper Scout"
+				Item "The Fed-Fightin' Fedora"
+				Item "The Bolt Boy"
+				Item "The Soda Popper"
+				AimTrackingInterval 0.25
+				MaxVisionRange 500
+				ItemAttributes
+				{
+					ItemName "The Soda Popper"
+					"faster reload rate" 1.5
+				}
+				Attributes AlwaysCrit
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+						
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 8 //Time between each task (Default: 10)
+					Duration 15 // How long should the ai be interrupted
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6c"
+			WaitForAllSpawned "wave6b"
+			Where spawn_final_flank
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 9
+		
+			TotalCurrency 150
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Samurai
+				Attributes AlwaysCrit
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave6c"
+			WaitForAllSpawned "wave6b"
+			Where spawn_final_flank
+			Where spawn_final
+			TotalCount 32
+			MaxActive 16
+			SpawnCount 8
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 8
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Soldier
+				Skill Hard
+				Attributes AlwaysCrit
+				UseBestWeapon 0
+				Attributes DisableDodge
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+						
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 8 //Time between each task (Default: 10)
+					Duration 5 // How long should the ai be interrupted
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6c"
+			WaitForAllSpawned "wave6b"
+			Where spawn_final_flank
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Heavyweapons
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+				ItemAttributes 
+				{
+					ItemName "TF_WEAPON_MINIGUN"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6final"
+			WaitForAllSpawned "wave6c"
+			Where spawn_final_flank
+			TotalCount 9999
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 18
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_DemoMan_PrinceTavish
+				Attributes AlwaysCrit
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+						
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 8 //Time between each task (Default: 10)
+					Duration 15 // How long should the ai be interrupted
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6final"
+			WaitForAllSpawned "wave6c"
+			Where spawn_final
+			Where spawn_final_flank
+			RandomSpawn 1
+			TotalCount 9999
+			MaxActive 12
+			SpawnCount 5
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 5
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Soldier
+				UseBestWeapon 0
+				Attributes AlwaysCrit
+				InterruptAction  // Stop current bot ai and force the bot to move to a location
+				{
+					Target "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					AimTarget "tank_boss" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					KillAimTarget 1 // Attack aim target (Default: 0)
+						
+					Delay 1 // Time before the first task starts. Must be above 0, or it will not execute (Default: 10)
+					Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+					Cooldown 8 //Time between each task (Default: 10)
+					Duration 15 // How long should the ai be interrupted
+				}
+			}
+		}
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//BLU WaveSpawns
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn // Tank # HP
+		{
+			Name "wave6tank1"
+			//WaitForAllDead "wave6tank2"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			FirstSpawnOutput
+			{
+				Target disableholo
+				Action Trigger
+			}
+			Tank
+			{
+				Name "tankboss"
+				StartingPathTrackNode "path_tank_lower"
+				Model "models/bots/boss_bot/boss_tank_color.mdl"
+				SpawnTemplate "colortank"
+				Health 115000
+				Speed 65
+				Skin 1
+		
+				OnKilledOutput {
+					Target redwin_relay
+					Action Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+			
+		}
+		WaveSpawn
+		{
+			Name "wave6support"
+			Where spawn_blu_first
+			Where spawn_blu_low
+			TotalCount 5
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 5.1
+			WaitBetweenSpawns 0
+			FirstSpawnOutput
+			{
+				Target intel_35
+				Action Disable
+			}
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Template T_TFBot_Giant_Natascha_Heal
+				CharacterAttributes
+				{
+					"collect currency on kill" 1
+				}
+			}
+		}
+	}
+	Wave // Wave 7
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_improved_up
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_init_upper_relay
+			Action Trigger
+		}
+		//Explanation
+		//{
+		//	Line "------------------------------------------------------------------"
+		//	Line "{red}The three bosses of Mecha Engine need your help! Protect them so they can send those red bots back to hell!"
+		//	Line "{red}Only Captain Punch can pick up the bomb!"
+		//	Line "------------------------------------------------------------------"
+		//}
+		SpawnTemplate "sentries4"
+		SpawnTemplate "sentries_hatch"
+		SpawnTemplate "sentry_hatch_health6"
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//RED WaveSpawns
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn
+		{
+			Name "wave7sentries"
+			Where spawn_blu_first
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Class Scout 
+				ClassIcon sentry_gun_lvl3_red_lite
+				CharacterAttributes
+				{
+					"cannot pick up intelligence" 1
+					"health regen" -125
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a1"
+			Where spawn_up_path_first
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 100
+		
+			Squad
+			{	
+				TFBot
+				{ 
+					Template T_TFBot_Red_Giant_Grenade_Knight
+					Action FetchFlag
+					Attributes AlwaysCrit
+					tag noflank
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						"cannot pick up intelligence" 1
+						
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Giant_Medic
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a"
+			WaitForAllDead "wave7a1"
+			Where spawn_up_path_gate
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 25
+		
+			TotalCurrency 200
+		
+			Squad
+			{	
+				TFBot
+				{ 
+					Template T_TFBot_Red_Giant_Grenade_Knight
+					Action FetchFlag
+					Attributes AlwaysCrit
+					tag noflank
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						"cannot pick up intelligence" 1
+						
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Giant_Medic
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a"
+			Where spawn_low_path_entrance
+			TotalCount 10
+			MaxActive 10
+			SpawnCount 10
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout
+				Skill Expert
+				tag noflank
+				//UseBestWeapon 0
+				Attributes DisableDodge
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_SCATTERGUN"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a"
+			Where spawn_up_path_gate
+			TotalCount 24
+			MaxActive 10
+			SpawnCount 8
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 8
+		
+			TotalCurrency 250
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Scout
+				Skill Expert
+				tag noflank
+				//UseBestWeapon 0
+				Attributes DisableDodge
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_SCATTERGUN"
+					"crits_become_minicrits" 1
+					"crit mod disabled" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a"
+			Where spawn_up_path_gate
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 150
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Soldier_Charged_Homing
+				tag noflank
+				Skill Expert
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7b"
+			WaitForAllSpawned "wave7a"
+			Where spawn_mid
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 16
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Gauntlet
+				tag noflank
+				ItemAttributes
+				{
+					ItemName "The Fists of Steel"
+					"crit mod disabled" 0
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7b"
+			WaitForAllSpawned "wave7a"
+			Where spawn_mid
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 150
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Pyro_Dragon
+				//Attributes AlwaysCrit
+				tag noflank
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name "wave7b"
+			WaitForAllSpawned "wave7a"
+			Where spawn_mid
+			TotalCount 40
+			MaxActive 16
+			SpawnCount 4
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 5
+		
+			TotalCurrency 100
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Demoman_Knight
+				Attributes AlwaysCrit
+				tag noflank
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7c"
+			WaitForAllSpawned "wave7b"
+			Where spawn_final_flank
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 13
+			WaitBetweenSpawns 10
+		
+			TotalCurrency 50
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Giant_Soldier_Charged_Homing
+				tag noflank
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+					 
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7c"
+			WaitForAllSpawned "wave7b"
+			Where spawn_final_flank
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 20
+			WaitBetweenSpawns 23
+		
+			TotalCurrency 200
+		
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Red_Giant_Heavyweapons_BrassBeast
+					ClassIcon heavy_brass_nys
+					 
+					Name "Giant Brass Beast Heavy"
+					tag noflank
+					ItemAttributes
+					{
+						ItemName "The Brass Beast"
+						"crits_become_minicrits" 1
+						"crit mod disabled" 0
+					}
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Giant_Medic_Regen
+					CharacterAttributes
+					{
+						"damage force reduction" 0
+						
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7c"
+			WaitForAllSpawned "wave7b"
+			Where spawn_final_flank
+			TotalCount 32
+			MaxActive 16
+			SpawnCount 4
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 4
+		
+			TotalCurrency 150
+		
+			TFBot
+			{ 
+				Template T_TFBot_Red_Demoman_Knight
+				Attributes AlwaysCrit
+				tag noflank
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7final"
+			WaitForAllSpawned "wave7c"
+			Where spawn_final
+			Where spawn_final_flank
+			RandomSpawn 1
+			TotalCount 9999
+			MaxActive 12
+			SpawnCount 8
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 14
+		
+			TotalCurrency 0
+		
+			FirstSpawnOutput
+			{
+				Target youcandeploynow
+				Action Trigger
+			}
+			TFBot
+			{ 
+				Template T_TFBot_Red_Heavyweapons_Fist
+				tag noflank
+				Attributes DisableDodge
+				ItemAttributes
+				{
+					ItemName "The Fists of Steel"
+					"crit mod disabled" 0
+				}
+			}
+		}
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//BLU WaveSpawns
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		WaveSpawn
+		{
+			Name "wave7blu1"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+			FirstSpawnOutput
+			{
+				Target disableholo
+				Action Trigger
+			}
+		
+			TFBot
+			{ 
+				Class Heavyweapons
+				Skill Expert
+				AlwaysGlow 1
+				WeaponRestrictions MeleeOnly
+				tag noflank
+				Name "Captain Punch"
+				ClassIcon Heavy_chief
+				Health 15000
+				Scale 1.9
+				Item "War Head"
+				Item "Fists of Steel"
+				Attributes MiniBoss
+				Attributes UseBossHealthBar
+				ItemAttributes
+				{
+					ItemName "Fists of Steel"
+					"fire rate bonus" 0.6
+					"damage bonus" 3
+					"mod weapon blocks healing" 1
+				}
+				CharacterAttributes
+				{
+					"move speed bonus"	0.4
+					"damage force reduction" 0.3
+					"airblast vulnerability multiplier" 0.3
+					"override footstep sound set" 2
+					"airblast vertical vulnerability multiplier" 0.1
+					"rage giving scale" 0.1
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+				} 
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7blu2"
+			WaitForAllDead "wave7blu1"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+		
+			TFBot
+			{ 
+				Class Soldier
+				Skill Expert
+				AlwaysGlow 1
+				WeaponRestrictions PrimaryOnly
+				Name "Sergeant Crits"
+				tag noflank
+				ClassIcon soldier_sergeant_crits
+				Health 17000
+				Scale 1.9
+				Item "Tyrant's Helm"
+				Attributes MiniBoss
+				//Attributes IgnoreFlag
+				//Action EscortFlag
+				Attributes UseBossHealthBar
+				Attributes HoldFireUntilFullReload
+				Attributes AlwaysCrit
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"damage bonus" 1.25
+					"fire rate bonus" 0.2
+					"clip size upgrade atomic" 7.0
+					"Projectile speed increased" 1.3
+					"mod weapon blocks healing" 1
+					"cannot pick up intelligence" 1
+				}
+				CharacterAttributes
+				{
+					"move speed bonus"	0.5
+					"damage force reduction" 0.4
+					"airblast vulnerability multiplier" 0.4
+					"override footstep sound set" 3
+					"airblast vertical vulnerability multiplier" 0.1
+					"rage giving scale" 0.1
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7blu3"
+			WaitForAllDead "wave7blu2"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+		
+			TotalCurrency 0
+			FirstSpawnOutput
+			{
+				Target hint_last_vip
+				Action Show
+			}
+			DoneOutput
+			{
+				Target redwin_relay
+				Action Trigger
+			}
+		
+			TFBot
+			{ 
+				Class Demoman
+				Name "Major Bomber"
+				AlwaysGlow 1
+				ClassIcon demo_bomber
+				tag noflank
+				Skill Normal
+				Health 17000
+				Item "Prince Tavish's Crown"
+				Attributes AlwaysCrit
+				WeaponRestrictions PrimaryOnly
+				Attributes MiniBoss
+				//Attributes IgnoreFlag
+				//Action EscortFlag
+				Attributes UseBossHealthBar
+				Attributes HoldFireUntilFullReload
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_GRENADELAUNCHER"
+					"fire rate bonus" 0.2
+					"faster reload rate" 0.5
+					"clip size penalty" 3.0
+					"Projectile speed increased" 1.5
+					"mod weapon blocks healing" 1
+					"cannot pick up intelligence" 1
+				}
+				CharacterAttributes
+				{
+					"move speed bonus"	0.5
+					"damage force reduction" 0.7
+					"airblast vulnerability multiplier" 0.3
+					"override footstep sound set" 4
+					"airblast vertical vulnerability multiplier" 0.1
+					"rage giving scale" 0.1
+					"health from healers reduced" 0.20
+					"ubercharge rate bonus for healer" 0.25
+					"collect currency on kill" 1
+					"healing received bonus" 0.2
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7bomb"
+			Where spawn_blu_first
+			Where spawn_blu_up
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			WaitBeforeStarting 30
+			WaitBetweenSpawns 15
+		
+			TotalCurrency 0
+		
+			RandomChoice
+			{	
+				Squad
+				{
+					TFBot
+					{ 
+						Template T_TFBot_Scout_Melee
+						tag noflank
+						Health 1
+						//Name "Bomb Deliverer"
+						CharacterAttributes
+						{
+							"collect currency on kill" 1
+							"receive friendly fire" 1
+						}
+					}
+				}
+			}
+		}
+	}
+}

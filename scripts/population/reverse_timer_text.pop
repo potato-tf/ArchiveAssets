@@ -1,0 +1,95 @@
+// lite
+// adds a 15 minute text timer for all waves by using #base reverse_timer_text.pop
+// send cancelpending to realtimer if you want to pause the timer
+// send trigger instead if you want to continue the timer
+
+WaveSchedule
+{
+	SpawnTemplate textualtimer
+	PointTemplates
+	{
+		textualtimer
+		{
+			OnSpawnOutput
+			{
+				Param 14 // change the value for minutes
+
+				Target minutehand
+				Action SetValue
+			}
+			OnSpawnOutput
+			{
+				Param 60 // change the value for seconds
+
+				Target secondhand
+				Action SetValue
+			}
+			logic_relay
+			{
+				"targetname" "loserelay"
+				"startdisabled" "1"
+				"ontrigger" "bots_win_red,RoundWin,,2,-1"
+				"ontrigger" "realtimer,cancelpending,,2,-1"
+				"onspawn" "wave_start*,addoutput,ontrigger realtimer:trigger::0:-1,0,-1"
+				"onspawn" "wave_finish*,addoutput,ontrigger realtimer:cancelpending::0:-1,0,-1"
+				"onspawn" "wave_finish*,addoutput,ontrigger loserelay:cancelpending::0:-1,0,-1"
+			}
+
+			NoFixup 1
+			math_counter
+			{
+				"targetname" "minutehand"
+				"max" "9999"
+				"outvalue" "timerformat,$setkey$case01,,0,-1"
+				"onhitmin" "loserelay,enable,,1,-1"
+			}
+			math_counter
+			{
+				"targetname" "secondhand"
+				"max" "60"
+				"outvalue" "timerformat,$setkey$case02,,0,-1"
+				"outvalue" "zerocompare,setvaluecompare,,0,-1"
+				"onhitmin" "loserelay,trigger,,0,-1"
+				"onhitmin" "!self,setvalue,60,1,-1"
+				"onhitmin" "minutehand,subtract,1,1,-1"
+			}
+			logic_compare
+			{
+				"targetname" "zerocompare"
+				"comparevalue" "9"
+				"onequalto" "timerformat,$setkey$case16,%:0%,0,-1"
+				"ongreaterthan" "timerformat,$setkey$case16,%:%,0,-1"
+			}
+			logic_case
+			{
+				"targetname" "timerformat"
+				"case16" "%:%"
+				"ondefault" "timertext,$setkey$message,,0,-1"
+				"ondefault" "timertext,display,0,0,-1"
+			}
+			game_text
+			{
+				"targetname" "timertext"
+				"color" "65 155 255"
+				"holdtime" "2"
+				"spawnflags" "1"
+				"x" "0.7"
+				"y" "0.9"
+			}
+			logic_relay
+			{
+				"targetname" "realtimer"
+				"spawnflags" "2"
+				"ontrigger" "timerformat,$format,,0.01,-1"
+				"ontrigger" "secondhand,subtract,1,0,-1"
+				"ontrigger" "!self,trigger,,1,-1"
+			}
+			game_round_win
+			{
+				"teamnum" "2"
+				"targetname" "bots_win_red"
+				"force_map_reset" "1"
+			}
+		}
+	}
+}

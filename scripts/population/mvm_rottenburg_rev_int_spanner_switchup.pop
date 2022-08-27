@@ -1,0 +1,3308 @@
+#base robot_randomguy_default.pop
+// based off of the Reverse MvM example mission for Potato's Custom MvM Servers, Made by Braindawg
+WaveSchedule
+{
+	Templates
+	{
+		T_TFBot_Giant_Sniper
+		{
+			Class Sniper
+			Name "Giant Sniper"
+			Skill Easy
+			Health 2500
+			Attributes MiniBoss
+			Tag bot_giant
+			Action Sniper
+			MaxVisionRange 3500
+
+			ItemAttributes
+			{
+				ItemName TF_WEAPON_CLUB
+				"damage bonus" 1.54	// 100.1 damage. close enough.
+			}
+
+			CharacterAttributes
+			{
+				"move speed bonus" 0.5
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4
+				"head scale" 0.7
+			}
+
+			AddCond
+			{
+				Name TF_COND_REPROGRAMMED
+			}
+		}
+
+		T_TFBot_Boss_W5
+		{
+			Class Demoman
+			Name "Chief Of All Demomen"
+			ClassIcon demo_scatter_red
+			Health 30000
+			Scale 5
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Item "The Dark Falkirk Helm"
+			Item "The Dark Age Defender"
+			Item "The Sole Saviors"
+			Attributes MiniBoss
+			Tag bot_giant
+			Attributes UseBossHealthBar
+			Attributes HoldFireUntilFullReload
+			Attributes AlwaysFireWeapon
+			Attributes AlwaysCrit
+			MaxVisionRange 1200
+
+			AddCond
+			{
+				Name TF_COND_REPROGRAMMED
+			}
+
+			ItemAttributes
+			{
+				ItemName TF_WEAPON_GRENADELAUNCHER
+				"faster reload rate" 0
+				"fire rate bonus" -1
+				"clip size upgrade atomic" 36
+				"projectile spread angle penalty" 10
+				"no self blast dmg" 2
+			}
+
+			CharacterAttributes
+			{
+				"move speed bonus" 0.5
+				"damage force reduction" 0.0
+				"airblast vulnerability multiplier" 0.0
+				"override footstep sound set" 4
+				no_jump 1
+				"rage giving scale" 0.1
+			}
+		}
+	}
+	// ItemAttributes	// too powerful with infinite ammo
+	// {
+	// Itemname "The Short Circuit"
+	// "fire rate penalty" 2
+	// "cannot be upgraded" 1
+	// }
+	PlayerAttributes	// Player attributes appied for the whole mission
+	{
+		"cancel falling damage" 1
+
+		Spy
+		{
+			"cannot pick up intelligence" 1
+		}
+	}
+
+	ForceItem	// naked merks bad, pyro and spy are bad with demopants though
+	{
+		Demoman
+		{
+			Item EOTL_demopants
+		}
+	}
+	StartingCurrency 1600
+	CanBotsAttackWhileInSpawnRoom Yes	// keep this so companion bots can combat spawn camping
+	RespawnWaveTimeBlue 1	// replaces the normal respawn kv's
+	FixedRespawnWaveTimeBlue 1
+	// Essential stuff
+	ReverseWinConditions 1
+	AllowJoinTeamBlueMax 6
+	AllowJoinTeamBlue 1
+	HumansMustJoinTeam Blue
+	SetCreditTeam 3
+	SniperAllowHeadshots 1	// sniper and amby un-exist without this
+	// Optional stuff
+	ImprovedAirblast 0
+	SendBotsToSpectatorImmediately 1	// keeps the populator less clogged, bot projectiles vanish on death + causes weird killcams
+	BluHumanInfiniteAmmo 1
+	FlagCarrierMovementPenalty 1	// (default: 0.5)
+	BluHumanFlagCapture 1
+	BluHumanFlagPickup 1
+	BluPlayersAreRobots 1
+	NoRomevisionCosmetics 1
+	WaveStartCountdown 1
+	TextPrintTime 0
+	RobotLimit 26 [$SIGSEGV]
+	BotsUsePlayerTeleporters 0 [$SIGSEGV]
+	DisallowUpgrade "maxammo primary increased"	// players have infinite ammo
+	DisallowUpgrade "maxammo secondary increased"	// players have infinite ammo
+	DisallowUpgrade "maxammo metal increased"	// players have infinite ammo
+	DisallowUpgrade "metal regen"	// players have infinite ammo
+	// Engi-bot style teleporter.  Not recommended for gatebot, highly recommended for non-gatebot
+	// Entrances will also act like bot tele exits
+	BotTeleportUberDuration 1
+	BluHumanTeleportOnSpawn 1
+	BotPushaway 0	// helpful for tele's but clumps squads into a ball
+	// Precache all custom models and sounds
+	PrecacheModel models/props_mvm/mvm_upgrade_blu.mdl
+    PrecacheModel "models/bots/boss_bot/boss_tankred.mdl"
+    PrecacheModel "models/bots/boss_bot/boss_tankred_damage1.mdl"
+    PrecacheModel "models/bots/boss_bot/boss_tankred_damage2.mdl"
+    PrecacheModel "models/bots/boss_bot/boss_tankred_damage3.mdl"
+    PrecacheModel "models/bots/boss_bot/boss_tankred_part1_destruction.mdl"
+	PrecacheModel "models/bots/boss_bot/tankred_track_l.mdl"
+	PrecacheModel "models/bots/boss_bot/tankred_track_r.mdl"
+	// Disable Sounds
+	DisableSound music.mvm_end_last_wave
+	DisableSound music.mvm_end_mid_wave
+	DisableSound music.mvm_end_tank_wave
+	DisableSound music.mvm_end_wave
+	DisableSound music.mvm_lost_wave
+	DisableSound music.mvm_start_last_wave
+	DisableSound music.mvm_start_mid_wave
+	DisableSound music.mvm_start_tank_wave
+	DisableSound music.mvm_start_wave
+	DisableSound Announcer.MVM_Spy_Alert
+	DisableSound Announcer.mvm_spybot_death
+	DisableSound Announcer.mvm_spybot_death_all
+	DisableSound Announcer.MVM_First_Wave_Start
+	DisableSound Announcer.MVM_Wave_Start
+	DisableSound Announcer.MVM_Wave_End
+	DisableSound Announcer.MVM_Wave_Lose
+	DisableSound Announcer.MVM_Final_Wave_Start
+	DisableSound Announcer.MVM_Final_Wave_End
+	DisableSound Announcer.MVM_Robots_Planted
+	DisableSound Announcer.MVM_All_Dead
+	DisableSound Announcer.MVM_Bomb_Alert_Entered
+	DisableSound Announcer.MVM_Bomb_Alert_Near_Hatch
+	DisableSound Announcer.MVM_Bomb_Alert_Deploying
+	DisableSound Announcer.MVM_Sentry_Buster_Alert
+	DisableSound Announcer.MVM_Sentry_Buster_Alert_Another
+	DisableSound Announcer.MVM_General_Wave_Start
+	DisableSound Announcer.MVM_Game_Over_Loss
+	DisableSound Announcer.MVM_Tank_Planted
+	DisableSound Announcer.MVM_Tank_Alert_Spawn
+	DisableSound Announcer.MVM_Tank_Alert_Another
+	DisableSound Announcer.MVM_Tank_Alert_Multiple
+	DisableSound Announcer.MVM_Tank_Alert_Halfway
+	DisableSound Announcer.MVM_Tank_Alert_Halfway_Multiple
+	DisableSound Announcer.MVM_Tank_Alert_Near_Hatch
+	DisableSound Announcer.MVM_Tank_Alert_Deploying
+	// override some sounds
+	OverrideSounds
+	{
+		MVM.GiantCommonExplodes ambient/explosions/explode_3.wav
+		Announcer.MVM_Spy_Alert empty.wav
+		Announcer.mvm_spybot_death empty.wav
+		Announcer.mvm_spybot_death_all empty.wav
+		Announcer.MVM_All_Dead empty.wav
+	}
+	// PrecacheSound "combine_bank_alarm.mp3"
+	// Entities make up every part of a source engine map.
+	// Ambient sounds, gates and doors, the stuff that tells gates and doors to open, etc.
+	// All of it is a tangible "thing" that can be spawned, interacted with, or daisy-chained together like virtual lego blocks.
+	// PointTemplates are a way to spawn custom entities in your mission, as well as modify existing map entities
+	// There are certainly limits to what can be spawned this way.  Many brush ents like func_door will not work, but otherwise the sky is the limit.
+	// Decompile your map using BSPSource and open the resulting .vmf file in notepad.  Ctrl + F is your new best friend
+	// You can also make all of your custom logic and ents in hammer and copy/paste the results from the .vmf to this popfile with only small formatting changes, however hammer scares me.
+	// Obvious reminder: compiling and republishing these maps without the authors consent is wrong and you will be criticized for doing so
+	// Alternatively, load the map in singleplayer and type  "ent_messages <entity class>" and "developer 1" in console to show targetnames as floating text in the world
+	// i.e. ent_messages info_player_teamspawn
+	// Digging through decompiled .vmf's will better teach you how certain relays/entities work, many parts of a vmf look exactly like this
+	PointTemplates
+	{
+		spawnpoints	// put this stuff in your pointtemplates area
+		{
+			// models
+			NoFixup 1
+
+			prop_dynamic	// tunnelspawn
+			{
+				targetname spawnpoint_hologram
+				model models/props_mvm/robot_spawnpoint.mdl
+				disableshadows 1
+				defaultanim idle
+				origin "1530 199 -430"
+				angles "0 0 0"
+				skin 3
+			}
+
+			prop_dynamic	// towerspawn
+			{
+				targetname spawnpoint_hologram
+				model models/props_mvm/robot_spawnpoint.mdl
+				disableshadows 1
+				defaultanim idle
+				origin "1534 770 -213"
+				angles "0 0 0"
+				skin 3
+			}
+
+			prop_dynamic	// towerspawn 2
+			{
+				targetname spawnpoint_hologram
+				model models/props_mvm/robot_spawnpoint.mdl
+				disableshadows 1
+				defaultanim idle
+				origin "1535 1306 -213"
+				angles "0 0 0"
+				skin 3
+			}
+
+			prop_dynamic	// redspawn giant
+			{
+				targetname spawnpoint_hologram
+				model models/props_mvm/robot_spawnpoint.mdl
+				disableshadows 1
+				defaultanim idle
+				origin "-1231 2213 -130"
+				angles "0 0 0"
+				skin 3
+			}
+			// on logic, turns on the hologram when logic is activated
+			NoFixup 1
+
+			logic_relay	// i don't understand why the thing adrew set
+			{
+				targetname red1a_on_logic
+				OnSpawn spawnpoint_hologram,skin,0,0,-1
+			}
+		}
+		// FirstSpawnOutput	// add this for the first bots that spawn in that location, use FirstSpawnOutput/LastSpawnOutput
+		// {
+		// Target red1a_on_logic
+		// Action Trigger
+		// }
+		corelogic	// all the things we want to automatically run when the popfile reloads.  Use this the most to avoid spaghetti
+		{
+			NoFixup 1
+
+			logic_auto
+			{
+				origin "0 0 0"
+				targetname mainrelay
+				OnMapSpawn filter_blue_bombhat,Kill,,0,-1	// gatebot maps will need their capture filter deleted for players to cap
+				OnMapSpawn gate1_alarm*,Kill,,0,-1	// gets spammed by both red and blu team
+				OnMapSpawn bot_stun_*,Kill,,0,-1	// some gates may stun players
+				OnMapSpawn item_ammopack*,Kill,,0,-1	// might want to comment this out if players have limited ammo
+				OnMapSpawn Barricade*,Kill,,0,-1	// rottenburg specific, deletes front tank barricade
+				OnMapSpawn move_rope,Kill,,0,-1
+				OnMapSpawn keyframe_rope,Kill,,0,-1
+				OnMapSpawn "wave_start_relay*,AddOutput,OnTrigger spawnbarrier*:Disable:0:-1"
+				// OnMapSpawn "wave_start_relay*,AddOutput,OnTrigger ironman_mode_inte*:Enable:0:-1"
+				OnMapSpawn "wave_finished_relay,AddOutput,OnTrigger spawnbarrier*:Enable:0:-1"
+				OnMapSpawn "wave_start*,AddOutput,OnTrigger func_capturezone:Disable:0:-1,0,-1"
+				OnMapSpawn "wave_start*,AddOutput,OnTrigger func_flagdetectionzone:Disable:0:-1,0,-1"
+				OnMapSpawn "tankpath1_1,AddOutput,OnPass red_tank_relay:Trigger:0:-1"
+			}
+			NoFixup 1
+
+			logic_relay	// trigger this to kill all players and buildings
+			{
+				targetname kill_relay
+				OnTrigger obj_dispenser,RemoveHealth,5000,0,-1
+				OnTrigger obj_sentrygun,RemoveHealth,5000,0,-1
+				OnTrigger obj_teleporter,RemoveHealth,5000,0,-1
+				OnTrigger player,SetHealth,-10000,0,-1
+			}
+			NoFixup 1
+
+			logic_relay	// trigger this to enable hatch
+			{
+				targetname hatchguard_death_relay
+				OnTrigger func_capturezone,Enable,,0,-1
+				OnTrigger func_flagdetectionzone,Enable,,0,-1
+				OnTrigger bomb_antigrief_on,Trigger,,0,-1
+			}
+			NoFixup 1
+
+			logic_relay	// trigger this to lose
+			{
+				origin "0 0 0"
+				targetname redwin_relay
+				OnTrigger bots_win_red,RoundWin,,0,-1
+				OnTrigger pit_explosion_wav,PlaySound,,0,-1	// map dependent
+				OnTrigger failuresound,PlaySound,,0,-1	// map dependent
+			}
+			NoFixup 1
+
+			game_round_win	// do not interact with this
+			{
+				origin "0 0 0"
+				TeamNum 2
+				targetname bots_win_red
+				switch_teams 0
+				force_map_reset 1
+				classname game_round_win
+			}
+
+			func_nav_prerequisite	// tells bots with a tag to defend this area, like telling gatebots to stay at the gate
+			{
+				targetname towernav
+				mins "-1000 -1000 -1000"
+				maxs "1000 1000 1000"
+				Entity towerspawn
+				filtername filter_tower
+				origin "1542.488770 739.029175 -143.968689"
+				spawnflags 1
+				start_disabled 0
+				StartDisabled 0
+				Task 2
+				Value -1
+			}
+
+			filter_tf_bot_has_tag	// our tag
+			{
+				Negated 0
+				require_all_tags 1
+				tags bot_tower
+				targetname filter_tower
+			}
+
+			func_nav_prerequisite	// repeated for hatch
+			{
+				targetname hatchnav
+				mins "-100 -100 -100"
+				maxs "100 100 100"
+				Entity hatchspawn
+				filtername filter_hatch
+				origin "1542.488770 739.029175 -143.968689"
+				spawnflags 1
+				start_disabled 0
+				StartDisabled 0
+				Task 2
+				Value -1
+			}
+
+			filter_tf_bot_has_tag
+			{
+				Negated 0
+				require_all_tags 1
+				tags bot_hatch
+				targetname filter_hatch
+			}
+			NoFixup 1
+
+			logic_relay
+			{
+				targetname red_tank_relay
+				OnTrigger tankbossred,Setteam,2,0.25,-1
+				OnTrigger tankbossred,AddCaptureDestroyPostfix,destroy_mvm_cactus_valley3,0.5,-1	// cool explodey effect, doesn't work :(
+			}
+			NoFixup 1
+
+			trigger_multiple
+			{
+				targetname thirdperson
+				StartDisabled 1
+				spawnflags 3
+				origin "1542.488770 739.029175 -143.968689"
+				maxs "50 50 50"
+				mins "-50 -50 -50"
+				filtername filter_blue
+				OnStartTouch !activator,setforcedtauntcam,1,0.1,-1
+				OnStartTouch !activator,SetHUDVisibility,0,0.1,-1
+				OnStartTouch !activator,DisableDamageForces,,0,-1	// doesn't work?
+				OnEndTouch !activator,setforcedtauntcam,0,0,-1
+				OnEndTouch !activator,SetHUDVisibility,1,0,-1
+				OnEndTouch !activator,EnableDamageForces,,0,-1
+			}
+			NoFixup 1
+
+			ambient_generic
+			{
+				targetname failuresound
+				health 10
+				message vo/announcer_failure.mp3
+				pitch 100
+				pitchstart 100
+				radius 20000
+				spawnflags 49
+				origin "0 0 0"
+			}
+		}
+
+		annotations
+		{
+			NoFixup 1
+
+			training_annotation
+			{
+				targetname hint
+				display_text "Make sure to read the explanation text before the beginning of each wave!"
+				lifetime 15
+				origin "2926.356201 -3175.968750 -61.9686"
+			}
+
+			training_annotation
+			{
+				targetname tankhint
+				display_text "A tank has teleported in!"
+				lifetime 10
+				origin "0 1664 -454"
+			}
+
+			training_annotation
+			{
+				targetname tankhint_fastspawn
+				display_text "A tank has teleported in!"
+				lifetime 10
+				origin "1514.066284 305.011200 -354.974762"
+			}
+
+			training_annotation
+			{
+				targetname barrier_hint
+				display_text "Destroy the giants to open the barrier!"
+				lifetime 10
+				origin "1540 -19.171825 -350"
+			}
+
+			training_annotation
+			{
+				targetname barrier_clear_hint
+				display_text "The barrier has been removed!"
+				lifetime 5
+				origin "1540 -19.171825 -350"
+			}
+		}
+
+		antigriefbomb
+		{
+			NoFixup 1
+
+			logic_relay
+			{
+				targetname bomb_antigrief_on
+				ontrigger bombpickup_relay,enable,,0,-1
+				ontrigger bombpickup_relay,trigger,,0.01,-1
+			}
+
+			logic_relay
+			{
+				targetname bomb_antigrief_off
+				ontrigger bombpickup_relay,disable,,0,-1
+				ontrigger bombpickup_relay,cancelpending,,0,-1
+				ontrigger bombpickup,disable,,0,-1
+				ontrigger "intel,color,255 255 255,0,-1"
+			}
+
+			logic_relay
+			{
+				onspawn "intel,addoutput,onpickup1 !activator:addoutput:targetname hasbomb:0:-1,0,-1"
+				onspawn "intel,addoutput,onpickup bombpickup_relay:trigger::0.01:-1,0,-1"
+				onspawn "intel,addoutput,onpickup bombpickup_relay:cancelpending::0:-1,0,-1"
+				onspawn "intel,addoutput,ondrop1 !activator:addoutput:targetname :0:-1,0,-1"
+				onspawn "intel,addoutput,ondrop bombpickup:disable::0:-1,0,-1"
+				onspawn "intel,addoutput,ondrop !self:color:255 255 255:0:-1,0,-1"
+				onspawn bombpickup,setparentattachment,siren,0,-1
+				onspawn "hasbomb,addoutput,targetname ,0,-1"
+			}
+
+			logic_relay
+			{
+				targetname bombpickup_relay
+				startdisabled 1
+				ontrigger bombpickup,disable,,0,-1
+				ontrigger "intel,color,75 75 75,0,-1"
+				ontrigger bombpickup,enable,,5,-1
+				ontrigger "intel,color,255 255 255,5,-1"
+			}
+
+			trigger_multiple
+			{
+				targetname bombpickup
+				parentname intel
+				mins "-8 -8 -8"
+				maxs "8 8 8"
+				spawnflags 1
+				startdisabled 1
+				filtername filter_nobomb_notbot
+				onstarttouch intel,forcedrop,,0,-1
+			}
+
+			filter_activator_name
+			{
+				targetname filter_nobomb
+				filtername hasbomb
+				negated 1
+			}
+
+			$filter_sendprop
+			{
+				targetname filter_notbot
+				$name m_bIsABot
+				$value 0
+			}
+
+			filter_multi
+			{
+				targetname filter_nobomb_notbot
+				filter01 filter_nobomb
+				filter02 filter_notbot
+			}
+		}
+
+		barriers	// spawn blocker
+		{
+			NoFixup 1
+
+			func_forcefield
+			{
+				disablereceiveshadows 0
+				origin "0 0 0"
+				renderamt 255
+				rendercolor "255 255 255"
+				renderfx 0
+				rendermode 10
+				TeamNum 2
+				targetname spawnbarrierA1
+				parentname spawnbarrierA
+				mins "-400 -150 -400"
+				maxs "500 150 1200"
+				StartDisabled 0
+			}
+			NoFixup 1
+
+			prop_dynamic	// prop for show
+			{
+				targetname spawnbarrierA
+				angles "0 0 0"
+				DisableBoneFollowers 1
+				disablereceiveshadows 1
+				model models/props_vehicles/train_flatcar_container.mdl
+				disableshadows 1
+				ExplodeDamage 0
+				ExplodeRadius 0
+				fademaxdist 0
+				fademindist -1
+				fadescale 1
+				MaxAnimTime 10
+				maxdxlevel 0
+				MinAnimTime 5
+				mindxlevel 0
+				modelscale 1.5
+				PerformanceMode 0
+				pressuredelay 0
+				RandomAnimation 0
+				renderamt 0
+				renderfx 16	// hologram effect, see renderfx section on the developer wiki for more
+				rendermode 0
+				SetBodyGroup 0
+				skin 0	// set to 1 for red traincar, many props separate different variants this way
+				CollisionGroup 0
+				solid 0
+				spawnflags 0
+				StartDisabled 0
+				origin "0 0 0"
+			}
+		}
+
+		barriers2	// tunnel blocker
+		{
+			NoFixup 1
+
+			func_forcefield	// what actually blocks players
+			{
+				disablereceiveshadows 0
+				origin "-200 0 0"
+				renderamt 255
+				rendercolor "255 255 255"
+				renderfx 0
+				rendermode 10
+				TeamNum 2
+				targetname barrierB_collision
+				parentname barrierB
+				mins "-200 -100 -200"
+				maxs "550 200 200"
+				StartDisabled 1
+			}
+			NoFixup 1
+
+			prop_dynamic	// prop for show
+			{
+				targetname barrierB
+				angles "0 0 0"
+				DisableBoneFollowers 1
+				disablereceiveshadows 1
+				model models/props_vehicles/train_flatcar_container.mdl
+				disableshadows 1
+				ExplodeDamage 0
+				ExplodeRadius 0
+				fademaxdist 0
+				fademindist -1
+				fadescale 1
+				MaxAnimTime 10
+				maxdxlevel 0
+				MinAnimTime 5
+				mindxlevel 0
+				modelscale 1.5
+				PerformanceMode 0
+				pressuredelay 0
+				RandomAnimation 0
+				renderamt 0
+				renderfx 16	// hologram
+				rendermode 0
+				SetBodyGroup 0
+				skin 0
+				CollisionGroup 0
+				solid 0
+				spawnflags 0
+				StartDisabled 1
+				origin "0 0 0"
+			}
+			NoFixup 1
+
+			logic_relay	// trigger this to kill all players and buildings
+			{
+				targetname barrierB_activate_relay	// fire this to clear barrier
+				OnTrigger barrierB,Enable,,0,-1
+				OnTrigger barrierB_collision,Enable,,0,-1
+			}
+
+			logic_relay	// trigger this to kill all players and buildings
+			{
+				targetname barrierB_activate_relay_initial	// fire this to clear barrier
+				OnTrigger barrierB,Enable,,0,-1
+				OnTrigger barrierB_collision,Enable,,0,-1
+				OnTrigger classic_mode_intel,ForceResetAndDisableSilent,,0,-1
+				// OnTrigger ironman_mode_intel,ForceResetAndDisableSilent,,0,-1
+			}
+
+			logic_relay	// trigger this to kill all players and buildings
+			{
+				targetname barrierB_clear_relay	// fire this to clear barrier
+				OnTrigger barrierB,Disable,,0,-1
+				OnTrigger barrierB_collision,Disable,,0,-1
+				OnTrigger barrier_clear_hint,Show,,0,-1
+				OnTrigger classic_mode_intel,Enable,,0,-1
+				// OnTrigger ironman_mode_intel,Enable,,0,-1
+			}
+		}
+
+		station	// all-in-one upgrade station template
+		{
+			func_upgradestation
+			{
+				mins "-105 -100 0"
+				maxs "105 100 242"
+				solid 0
+			}
+			NoFixup 1
+
+			prop_dynamic
+			{
+				targetname upgradestation
+				angles "0 0 0"
+				DisableBoneFollowers 0
+				disablereceiveshadows 0
+				disableshadows 1
+				ExplodeDamage 0
+				ExplodeRadius 0
+				fademaxdist 0
+				fademindist -1
+				fadescale 1
+				MaxAnimTime 10
+				maxdxlevel 0
+				MinAnimTime 5
+				mindxlevel 0
+				model models/props_mvm/mvm_upgrade_blu.mdl
+				modelscale 1
+				PerformanceMode 0
+				pressuredelay 0
+				RandomAnimation 0
+				renderamt 255
+				renderfx 0
+				rendermode 0
+				SetBodyGroup 0
+				skin 0
+				solid 0
+				spawnflags 0
+				origin "0 0 0"
+			}
+			NoFixup 1
+
+			prop_dynamic
+			{
+				targetname upgradestation1
+				angles "0 0 0"
+				DisableBoneFollowers 0
+				disablereceiveshadows 0
+				disableshadows 1
+				ExplodeDamage 0
+				ExplodeRadius 0
+				fademaxdist 0
+				fademindist -1
+				fadescale 1
+				MaxAnimTime 10
+				maxdxlevel 0
+				MinAnimTime 5
+				mindxlevel 0
+				model models/props_mvm/mvm_upgrade_blu.mdl
+				modelscale 1
+				PerformanceMode 0
+				pressuredelay 0
+				RandomAnimation 0
+				renderamt 255
+				renderfx 0
+				rendermode 0
+				SetBodyGroup 0
+				skin 0
+				solid 0
+				spawnflags 0
+				origin "0 0 0"
+			}
+
+			func_upgradestation
+			{
+				mins "-100 -100 0"
+				maxs "90 60 100"
+				parentname upgradestation
+			}
+			// NoFixup 1
+			// prop_dynamic
+			// {
+			// "targetname" "idiot"
+			// "parentname" "upgradestation"
+			// "angles" "0 0 0"
+			// "DisableBoneFollowers" "1"
+			// "disablereceiveshadows" "0"
+			// "disableshadows" "1"
+			// "ExplodeDamage" "0"
+			// "ExplodeRadius" "0"
+			// "fademaxdist" "0"
+			// "fademindist" "-1"
+			// "fadescale" "1"
+			// "MaxAnimTime" "10"
+			// "maxdxlevel" "0"
+			// "MinAnimTime" "5"
+			// "mindxlevel" "0"
+			// "model" "models/bots/bot_worker/bot_worker_a.mdl"
+			// "modelscale" "1"
+			// "PerformanceMode" "0"
+			// "pressuredelay" "0"
+			// "RandomAnimation" "0"
+			// "DefaultAnim" "idle"
+			// "renderamt" "255"
+			// "renderfx" "0"
+			// "rendermode" "0"
+			// "SetBodyGroup" "2"
+			// "skin" "1"
+			// "solid" "0"
+			// "spawnflags" "0"
+			// "origin" "-65 50 0"
+			// }
+			NoFixup 1
+
+			prop_dynamic
+			{
+				targetname shopcollision
+				angles "0 -90 0"
+				DisableBoneFollowers 1
+				disablereceiveshadows 1
+				model models/props_vehicles/train_flatcar_container.mdl
+				disableshadows 1
+				ExplodeDamage 0
+				ExplodeRadius 0
+				fademaxdist 0
+				fademindist -1
+				fadescale 1
+				MaxAnimTime 10
+				maxdxlevel 0
+				MinAnimTime 5
+				mindxlevel 0
+				modelscale 1
+				PerformanceMode 0
+				pressuredelay 0
+				RandomAnimation 0
+				renderamt 0
+				renderfx 0
+				rendermode 10
+				SetBodyGroup 0
+				skin 0
+				CollisionGroup 5
+				solid 6
+				spawnflags 0
+				StartDisabled 0
+				origin "0 0 0"
+			}
+		}
+
+		blocker	// giant building for blocking stuff
+		{
+			NoFixup 1
+
+			prop_dynamic
+			{
+				id 3
+				targetname barrierinvis
+				classname prop_dynamic
+				angles "0 0 0"
+				DisableBoneFollowers 0
+				disablereceiveshadows 0
+				disableshadows 1
+				ExplodeDamage 0
+				ExplodeRadius 0
+				fademaxdist 0
+				fademindist -1
+				fadescale 1
+				MaxAnimTime 10
+				maxdxlevel 0
+				MinAnimTime 5
+				mindxlevel 0
+				model models/props_buildings/building_002a.mdl
+				modelscale 1
+				PerformanceMode 0
+				pressuredelay 0
+				RandomAnimation 0
+				renderamt 255
+				renderfx 0
+				rendermode 0
+				// "rendermode" "10" un-comment this and comment rendermode 0 to make it invisible
+				SetBodyGroup 0
+				skin 0
+				solid 6
+				spawnflags 0
+				origin "0 0 0"
+			}
+		}
+		rockvoid
+		{
+		    prop_dynamic
+			{
+			    "angles" "0 0 0"
+				"model" "models/props_mvm/mine_rocks03.mdl"
+				"modelscale" "1.0"
+				"rendercolor" "255 255 255"
+				"solid" 0
+				"targetname" "therock"
+				"origin" "2621 -2993 -127"
+			}
+		}
+	}
+	SpawnTemplate corelogic
+	SpawnTemplate annotations
+	SpawnTemplate spawnpoints
+	SpawnTemplate antigriefbomb
+	SpawnTemplate rockvoid
+
+	SpawnTemplate	// specify origin/angles here for templates we use multiple times
+	{
+		Name station
+		origin "2924.840088 -3275.968750 -161.96868"
+		angles "0 90 0"
+	}
+
+	SpawnTemplate
+	{
+		Name station
+		origin "1575 -3280 -50"
+		angles "0 -190 0"
+	}
+
+	SpawnTemplate
+	{
+		Name barriers	// use these if your map has no spawn door
+		origin "2724.365479 -2303.941650 -143.139458"
+		angles "0 90 0"
+	}
+
+	SpawnTemplate
+	{
+		Name barriers
+		origin "381.125824 -2462.805176 -125.37920"
+		angles "0 0 0"
+	}
+
+	SpawnTemplate
+	{
+		Name barriers2
+		origin "1650 -19.171825 -450.004791"
+		angles "0 0 0"
+	}
+
+	ExtraSpawnPoint
+	{
+		Name tunnelspawn
+		TeamNum 2	// 2 for red 3 for blu
+		X 1530
+		Y 199
+		Z -340
+	}
+
+	ExtraSpawnPoint
+	{
+		Name towerspawn_2
+		TeamNum 2
+		X 1534.326782
+		Y 770.423157
+		Z -143.968689
+	}
+
+	ExtraSpawnPoint
+	{
+		Name towerspawn
+		TeamNum 2
+		X 1535.212036
+		Y 1306.657837
+		Z -143.968689
+	}
+
+	ExtraSpawnPoint
+	{
+		Name hatchspawn
+		TeamNum 2
+		X -1377.705200
+		Y 1534.423157
+		Z -90.968689
+	}
+
+	ExtraSpawnPoint
+	{
+		Name RedSpawn_giant	// giants can't fit out of bot spawn
+		TeamNum 2
+		X -1231
+		Y 2213.423157
+		Z -60.968689
+	}
+
+	ExtraTankPath	// Adds tank path to follow
+	{
+		Name tankpath1	// name of the starting path node prefix. First tank node would be tankpath1_1
+		Node "0 1664 -454"
+		Node "1800 1648 -418.3"
+		Node "2043 1571 -420.9"
+		Node "2231 1255 -420.4"
+		Node "2184 608 -418"
+		Node "2112 552 -418"
+		Node "1514.066284 305.011200 -354.974762"
+		Node "1521.085693 -1548.762329 -535.97607"
+		Node "2456.468750 -1615.824707 -589.37457"
+	}
+
+	FlagResetTime	// Overrides default bomb reset time
+	{
+		Name ironman_mode_intel	// Name of flag entity on the map
+		ResetTime 9999999
+	}
+
+	Wave	// WAVE 1 //// CURRENCY 1000
+	{
+		InitWaveOutput
+		{
+			// showing annotations
+			Target hint
+			Action Show
+		}
+
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+
+		Explanation
+		{
+			Line "{red}You've been pushed out of Rottenburg by a rogue league of robots."
+			Line "{red}In order to reclaim it, you must push them back!"
+			Line "{red}Be careful, some might be teleported in."
+			Line "{yellow}REVERSE GAMEMODE: "
+			Line "{blue}Losing condition: timer & tank"
+			Line "{blue}After 5 minutes, a RED tank with 60K HP will teleport in."
+		}
+		// dont end wave early
+		WaveSpawn
+		{
+			Where spawnbot
+			TotalCount 0
+			MaxActive 1
+			SpawnCount 11
+			WaitBeforeStarting 6969
+
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+					}
+				}
+			}
+		}
+		// --------------------------
+		// RED WAVESPAWNS
+		// --------------------------
+		WaveSpawn
+		{
+			Name giants_tunnel
+			Where tunnelspawn
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			TotalCurrency 30
+			WaitBetweenSpawns 10
+			WaitBeforeStarting 0.5
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_tunnel
+			Where tunnelspawn
+			TotalCount 30
+			MaxActive 10
+			SpawnCount 10
+			TotalCurrency 30
+			WaitBeforeStarting 0.5
+
+			TFBot
+			{
+				Template T_TFBot_Scout
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_tower
+			Where towerspawn
+			TotalCount 10
+			MaxActive 10
+			SpawnCount 5
+			WaitBetweenSpawns 5
+			WaitForAllSpawned robots_tunnel
+			TotalCurrency 10
+
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Demoman
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+					Action Mobber
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Pyro
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+					Action Mobber
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_base
+			Where towerspawn
+			TotalCount 15
+			MaxActive 10
+			SpawnCount 5
+			WaitBetweenSpawns 5
+			WaitBeforeStarting 5
+			WaitForAllSpawned robots_tower
+			TotalCurrency 15
+
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Demoman
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+					Action Mobber
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Pyro
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+					Action Mobber
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_base2
+			Where red_player_teamspawn
+			TotalCount 35
+			MaxActive 15
+			SpawnCount 5
+			WaitBetweenSpawns 5
+			WaitBeforeStarting 10
+			WaitForAllSpawned robots_base
+			TotalCurrency 35
+
+			TFBot
+			{
+				Template T_TFBot_Demoman
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			// hatch defender
+			Name hatchdefender
+			Where hatchspawn
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			// WaitForAllDead rWave1a
+			TotalCurrency 680
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Crit
+				ClassIcon soldier_crit_spammer
+
+				ItemAttributes
+				{
+					ItemName "The Original"
+					"faster reload rate" 0
+					"fire rate bonus" 0.65
+					"Projectile speed increased" 0.5
+					"no self blast dmg" 2
+				}
+				Attributes DisableDodge
+				Tag bot_hatch	// doesn't seem to do much
+				BehaviorModifiers Push
+				Attributes IgnoreFlag
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target bomb_antigrief_off
+				Action Trigger
+			}
+
+			DoneOutput
+			{
+				Target hatchguard_death_relay
+				Action Trigger
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name dummy
+			TotalCount 1337	// nice clean 999 on the wavebar
+			MaxActive 1
+			SpawnCount 11
+			Support 1
+			WaitBeforeStarting 123456
+
+			TFBot
+			{
+				Class Scout
+				Name "Deez Nuts"
+				ClassIcon red2_lite
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name finalsupport
+			Where red_player_teamspawn
+			RandomSpawn 1
+			TotalCount 200
+			MaxActive 16
+			SpawnCount 6
+			TotalCurrency 200
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 4
+			Support 1
+			WaitForAllSpawned robots_base2
+
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Heavyweight_Champ
+					ClassIcon heavy_champ_red
+					Action Mobber
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Heavyweight_Champ
+					ClassIcon heavy_champ_red
+					Action Mobber
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Heavyweight_Champ_Fast
+					ClassIcon heavy_urgent
+					Action FetchFlag
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name redtank
+			TotalCount 1
+			Support Limited
+			MaxActive 1
+			WaitBeforeStarting 300	// 5 minutes
+			FirstSpawnWarningSound mvm/mvm_tele_deliver.wav
+
+			Tank
+			{
+				Health 60000
+				Name tankbossred
+				ClassIcon tank_red_lite
+				Model models/bots/boss_bot/boss_tankred.mdl
+				StartingPathTrackNode tankpath1_1
+				TeamNum 2
+
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+
+				OnBombDroppedOutput
+				{
+					Target redwin_relay
+					Action Trigger
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target tankhint
+				Action Show
+			}
+		}
+		// --------------------------
+		// BLU WAVESPAWNS
+		// --------------------------
+		// dummy icon
+		WaveSpawn
+		{
+			Name dummy
+			TotalCount 1337	// nice clean 999 on the wavebar
+			MaxActive 1
+			SpawnCount 11
+			Support 1
+			WaitBeforeStarting 123456
+
+			TFBot
+			{
+				Class Scout
+				Name "Deez Nuts"
+				ClassIcon blu2_lite
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name blue_giant
+			Where spawnbot
+			MaxActive 1
+			SpawnCount 1
+			RandomSpawn 1
+			Support 1
+			WaitBetweenSpawnsAfterDeath 10
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name blue_common
+			Where spawnbot
+			TotalCount 999
+			MaxActive 4
+			SpawnCount 1
+			Support Limited	// Support Limited and TotalCount 999 for RandomChoice/Squadded support
+			WaitBetweenSpawns 3
+
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Shotgun
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Demoman
+					ClassIcon demo_giant	// to avoid conflict with red mainwave
+				}
+			}
+		}
+	}
+
+	Wave	// WAVE 2 //// CURRENCY 1000
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		// dont end wave early
+		WaveSpawn
+		{
+			Where spawnbot
+			TotalCount 0
+			MaxActive 1
+			SpawnCount 11
+			WaitBeforeStarting 6969
+
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+					}
+				}
+			}
+		}
+		// --------------------------
+		// RED WAVESPAWNS
+		// --------------------------
+		WaveSpawn
+		{
+			Name robots_tower
+			Where towerspawn
+			TotalCount 20
+			MaxActive 12
+			SpawnCount 10
+			TotalCurrency 20
+			WaitBeforeStarting 0.5
+
+			TFBot
+			{
+				Template T_TFBot_Scout
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name giants_tunnel
+			Where tunnelspawn
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 20
+			WaitBetweenSpawns 5
+			WaitBeforeStarting 0.5
+
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Spammer
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+					Action Mobber
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+					Action Mobber
+				}
+			}
+
+			StartWaveOutput
+			{
+				Target barrierB_activate_relay_initial
+				Action Trigger
+			}
+
+			FirstSpawnOutPut
+			{
+				Target barrier_hint
+				Action Show
+			}
+
+			DoneOutput
+			{
+				Target barrierB_clear_relay
+				Action Trigger
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_tower
+			WaitForAllDead giants_tunnel
+			Where towerspawn
+			TotalCount 5
+			MaxActive 5
+			SpawnCount 5
+			TotalCurrency 5
+			WaitBeforeStarting 0.5
+
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_tower
+			WaitForAllDead giants_tunnel
+			Where RedSpawn_giant
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 20
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Spammer
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_base
+			WaitForAllSpawned robots_tower
+			Where red_player_teamspawn
+			TotalCount 35
+			MaxActive 10
+			SpawnCount 5
+			TotalCurrency 35
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 5
+
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_base2
+			WaitForAllSpawned robots_base
+			Where red_player_teamspawn
+			TotalCount 24
+			MaxActive 12
+			SpawnCount 6
+			TotalCurrency 24
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 5
+
+			TFBot
+			{
+				Template T_TFBot_Demoman
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_basegiant
+			WaitForAllSpawned robots_tower
+			Where RedSpawn_giant
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			TotalCurrency 30
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 20
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Demoman
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			// hatch defender
+			Name hatchdefender
+			Where hatchspawn
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 646
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Spammer
+				Attributes DisableDodge
+				Tag bot_hatch	// doesn't seem to do much
+				BehaviorModifiers Push
+				Attributes IgnoreFlag
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target bomb_antigrief_off
+				Action Trigger
+			}
+
+			DoneOutput
+			{
+				Target hatchguard_death_relay
+				Action Trigger
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name dummy
+			TotalCount 1337	// nice clean 999 on the wavebar
+			MaxActive 1
+			SpawnCount 11
+			Support 1
+			WaitBeforeStarting 123456
+
+			TFBot
+			{
+				Class Scout
+				Name "Deez Nuts"
+				ClassIcon red2_lite
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name finalsupport
+			Where red_player_teamspawn
+			RandomSpawn 1
+			TotalCount 200
+			MaxActive 10
+			SpawnCount 3
+			TotalCurrency 200
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 4
+			Support 1
+			WaitForAllSpawned robots_base
+
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Shotgun
+					ClassIcon heavy_shotgun_red
+					Action Mobber
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Shotgun
+					ClassIcon heavy_shotgun_red
+					Action Mobber
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Shotgun
+					ClassIcon heavy_shotgun_red
+					Action FetchFlag
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name redtank
+			TotalCount 2
+			Support Limited
+			MaxActive 2
+			WaitBeforeStarting 300	// 5 minutes
+			WaitBetweenSpawns 30
+			FirstSpawnWarningSound mvm/mvm_tele_deliver.wav
+
+			Tank
+			{
+				Health 60000
+				Name tankbossred
+				ClassIcon tank_red_lite
+				Model models/bots/boss_bot/boss_tankred.mdl
+				StartingPathTrackNode tankpath1_1
+				TeamNum 2
+
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+
+				OnBombDroppedOutput
+				{
+					Target redwin_relay
+					Action Trigger
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target tankhint
+				Action Show
+			}
+		}
+		// --------------------------
+		// BLU WAVESPAWNS
+		// --------------------------
+		// dummy icon
+		WaveSpawn
+		{
+			Name dummy
+			TotalCount 1337	// nice clean 999 on the wavebar
+			MaxActive 1
+			SpawnCount 11
+			Support 1
+			WaitBeforeStarting 123456
+
+			TFBot
+			{
+				Class Scout
+				Name "Deez Nuts"
+				ClassIcon blu2_lite
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name blue_giant
+			WaitForAllDead giants_tunnel
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			WaitBetweenSpawnsAfterDeath 10
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Pyro
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name blue_common
+			WaitForAllDead giants_tunnel
+			Where spawnbot
+			TotalCount 999
+			MaxActive 4
+			SpawnCount 1
+			Support Limited	// Support Limited and TotalCount 999 for RandomChoice/Squadded support
+			WaitBetweenSpawns 3
+
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Demoman_Knight
+					Health 1050
+					Name "Heavy Duty Knight"
+					Scale 1.5
+
+					CharacterAttributes
+					{
+						"move speed penalty" 0.75
+					}
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Soldier_Buff_Banner
+				}
+			}
+		}
+	}
+
+	Wave	// WAVE 3 //// CURRENCY 1000
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		// dont end wave early
+		WaveSpawn
+		{
+			Where spawnbot
+			TotalCount 0
+			MaxActive 1
+			SpawnCount 11
+			WaitBeforeStarting 6969
+
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+					}
+				}
+			}
+		}
+		// --------------------------
+		// RED WAVESPAWNS
+		// --------------------------
+		WaveSpawn
+		{
+			Name giants_start
+			Where tunnelspawn
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 10
+			WaitBeforeStarting 0.5
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Heavyweapons_Deflector
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name giants_start
+			Where RedSpawn_giant
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 30
+			WaitBetweenSpawns 15
+			WaitBeforeStarting 0.5
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Demo_Burst
+				ClassIcon demo_burst_red_giant
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_tower
+			Where towerspawn
+			TotalCount 15
+			MaxActive 9
+			SpawnCount 3
+			TotalCurrency 15
+			WaitBeforeStarting 0.5
+			WaitBetweenSpawns 2
+
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Heavyweight_Champ_Fast
+				ClassIcon heavy_urgent
+				Health 900
+				Scale 1.5
+				Name "Very Urgent Heavy"
+				Attributes AlwaysCrit
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_base
+			WaitForAllSpawned robots_tower
+			Where red_player_teamspawn
+			TotalCount 45
+			MaxActive 9
+			SpawnCount 3
+			TotalCurrency 45
+			WaitBeforeStarting 4
+			WaitBetweenSpawns 2
+
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Heavyweight_Champ_Fast
+				ClassIcon heavy_urgent
+				Health 900
+				Scale 1.5
+				Name "Very Urgent Heavy"
+				Attributes AlwaysCrit
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			// hatch defender
+			Name hatchdefender
+			Where hatchspawn
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 700
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Heavyweapons_Deflector
+				Attributes DisableDodge
+				Tag bot_hatch	// doesn't seem to do much
+				BehaviorModifiers Push
+				Attributes IgnoreFlag
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target bomb_antigrief_off
+				Action Trigger
+			}
+
+			DoneOutput
+			{
+				Target hatchguard_death_relay
+				Action Trigger
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name dummy
+			TotalCount 1337	// nice clean 999 on the wavebar
+			MaxActive 1
+			SpawnCount 11
+			Support 1
+			WaitBeforeStarting 123456
+
+			TFBot
+			{
+				Class Scout
+				Name "Deez Nuts"
+				ClassIcon red2_lite
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name finalsupport
+			Where red_player_teamspawn
+			RandomSpawn 1
+			TotalCount 200
+			MaxActive 10
+			SpawnCount 3
+			TotalCurrency 200
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 4
+			Support 1
+			WaitForAllSpawned robots_base
+
+			TFBot
+			{
+				Template T_TFBot_Demoman
+				Action FetchFlag
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name redtank
+			TotalCount 3
+			Support Limited
+			MaxActive 3
+			WaitBeforeStarting 300	// 5 minutes
+			WaitBetweenSpawns 30
+			FirstSpawnWarningSound mvm/mvm_tele_deliver.wav
+
+			Tank
+			{
+				Health 60000
+				Name tankbossred
+				ClassIcon tank_red_lite
+				Model models/bots/boss_bot/boss_tankred.mdl
+				StartingPathTrackNode tankpath1_1
+				TeamNum 2
+
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+
+				OnBombDroppedOutput
+				{
+					Target redwin_relay
+					Action Trigger
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target tankhint
+				Action Show
+			}
+		}
+		// --------------------------
+		// BLU WAVESPAWNS
+		// --------------------------
+		// dummy icon
+		WaveSpawn
+		{
+			Name dummy
+			TotalCount 1337	// nice clean 999 on the wavebar
+			MaxActive 1
+			SpawnCount 11
+			Support 1
+			WaitBeforeStarting 123456
+
+			TFBot
+			{
+				Class Scout
+				Name "Deez Nuts"
+				ClassIcon blu2_lite
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name blue_giant
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			WaitBetweenSpawnsAfterDeath 10
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_RocketPush
+				Name "Very Funny Soldier"
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name blue_common
+			Where spawnbot
+			TotalCount 999
+			MaxActive 4
+			SpawnCount 1
+			Support Limited	// Support Limited and TotalCount 999 for RandomChoice/Squadded support
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 3
+
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Scout_Bonk
+					ClassIcon scout_bonk_nys
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Soldier_Extended_Battalion
+				}
+			}
+		}
+	}
+
+	Wave	// WAVE 4 //// CURRENCY 1000
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		// dont end wave early
+		WaveSpawn
+		{
+			Where spawnbot
+			TotalCount 0
+			MaxActive 1
+			SpawnCount 11
+			WaitBeforeStarting 6969
+
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+					}
+				}
+			}
+		}
+		// --------------------------
+		// RED WAVESPAWNS
+		// --------------------------
+		WaveSpawn
+		{
+			Name start
+			Where tunnelspawn
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			TotalCurrency 30
+			WaitBetweenSpawns 10
+			WaitBeforeStarting 0.5
+
+			TFBot
+			{
+				Class Soldier
+				Name "Giant Rapid Fire Soldier"
+				ClassIcon soldier_buff_spammer_giant
+				Health 3800
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes MiniBoss
+				Tag bot_giant
+				Attributes SpawnWithFullCharge
+				Item "the buff banner"
+
+				ItemAttributes
+				{
+					ItemName TF_WEAPON_ROCKETLAUNCHER
+					"faster reload rate" -0.8
+					"fire rate bonus" 0.5
+				}
+
+				CharacterAttributes
+				{
+					"move speed bonus" 0.5
+					"damage force reduction" 0.0
+					"airblast vulnerability multiplier" 0.0
+					"override footstep sound set" 3
+					"Projectile speed increased" 0.65
+					"increase buff duration" 90.0
+					"deploy time increased" 0.5
+				}
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+
+			FirstSpawnOutPut
+			{
+				Target classic_mode_intel
+				Action ForceResetAndDisableSilent
+			}
+		}
+
+		WaveSpawn
+		{
+			Name start
+			Where tunnelspawn
+			TotalCount 45
+			MaxActive 20
+			SpawnCount 15
+			TotalCurrency 45
+			WaitBetweenSpawns 10
+			WaitBeforeStarting 5
+
+			TFBot
+			{
+				Template T_TFBot_Scout
+				Skill Normal
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name tank
+			TotalCount 1
+			SpawnCount 1
+			TotalCurrency 250
+			WaitBeforeStarting 10
+			FirstSpawnWarningSound mvm/mvm_tele_deliver.wav
+
+			Tank
+			{
+				Health 15000
+				Name tankbossred
+				ClassIcon tank_red	// _lite
+				Model models/bots/boss_bot/boss_tankred.mdl
+				StartingPathTrackNode tankpath1_7
+				TeamNum 2
+
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+
+				OnBombDroppedOutput
+				{
+					Target redwin_relay
+					Action Trigger
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target tankhint_fastspawn
+				Action Show
+			}
+
+			DoneOutput
+			{
+				Target wave_start_relay_classic
+				Action Trigger
+			}
+		}
+
+		WaveSpawn
+		{
+			Name deez
+			Where towerspawn_2
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 10
+			WaitBetweenSpawns 10
+			WaitBeforeStarting 45
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Spammer
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_tower
+			WaitForAllDead tank
+			Where towerspawn
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 6
+			TotalCurrency 12
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 2
+
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Fist
+				Attributes AlwaysCrit
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name robots_base
+			WaitForAllSpawned robots_tower
+			Where red_player_teamspawn
+			TotalCount 64
+			MaxActive 12
+			SpawnCount 8
+			TotalCurrency 64
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 2
+
+			TFBot
+			{
+				Template T_TFBot_Soldier
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			// hatch defender
+			Name hatchdefender
+			Where hatchspawn
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 389
+
+			TFBot
+			{
+				Class Soldier
+				Name "Giant Backup Rapid Fire Soldier"
+				ClassIcon soldier_infinite_backup_giant
+				Health 3800
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Attributes MiniBoss
+				Tag bot_giant
+				Attributes SpawnWithFullCharge
+				Item "the battalion's backup"
+
+				ItemAttributes
+				{
+					ItemName TF_WEAPON_ROCKETLAUNCHER
+					"faster reload rate" -0.8
+					"fire rate bonus" 0.5
+				}
+
+				CharacterAttributes
+				{
+					"move speed bonus" 0.5
+					"damage force reduction" 0.0
+					"airblast vulnerability multiplier" 0.0
+					"override footstep sound set" 3
+					"Projectile speed increased" 0.65
+					"increase buff duration" 90.0
+					"deploy time increased" 0.5
+				}
+				Attributes DisableDodge
+				Tag bot_hatch	// doesn't seem to do much
+				BehaviorModifiers Push
+				Attributes IgnoreFlag
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target bomb_antigrief_off
+				Action Trigger
+			}
+
+			DoneOutput
+			{
+				Target hatchguard_death_relay
+				Action Trigger
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name dummy
+			TotalCount 1337	// nice clean 999 on the wavebar
+			MaxActive 1
+			SpawnCount 11
+			Support 1
+			WaitBeforeStarting 123456
+
+			TFBot
+			{
+				Class Scout
+				Name "Deez Nuts"
+				ClassIcon red2_lite
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name finalsupport
+			Where red_player_teamspawn
+			RandomSpawn 1
+			TotalCount 200
+			MaxActive 14
+			SpawnCount 8
+			TotalCurrency 200
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 12
+			Support 1
+			WaitForAllSpawned robots_base
+
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons
+					Action Mobber
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons
+					Action Mobber
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Shotgun
+					ClassIcon heavy_shotgun_red
+					Action FetchFlag
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name redtank
+			TotalCount 4
+			Support Limited
+			MaxActive 4
+			WaitBeforeStarting 300	// 5 minutes
+			WaitBetweenSpawns 30
+			FirstSpawnWarningSound mvm/mvm_tele_deliver.wav
+
+			Tank
+			{
+				Health 60000
+				Name tankbossred
+				ClassIcon tank_red_lite
+				Model models/bots/boss_bot/boss_tankred.mdl
+				StartingPathTrackNode tankpath1_1
+				TeamNum 2
+
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+
+				OnBombDroppedOutput
+				{
+					Target redwin_relay
+					Action Trigger
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target tankhint
+				Action Show
+			}
+		}
+		// --------------------------
+		// BLU WAVESPAWNS
+		// --------------------------
+		// dummy icon
+		WaveSpawn
+		{
+			Name dummy
+			TotalCount 1337	// nice clean 999 on the wavebar
+			MaxActive 1
+			SpawnCount 11
+			Support 1
+			WaitBeforeStarting 123456
+
+			TFBot
+			{
+				Class Scout
+				Name "Deez Nuts"
+				ClassIcon blu2_lite
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name blue_giant
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			WaitBetweenSpawnsAfterDeath 10
+
+			TFBot
+			{
+				Template T_TFBot_Giant_DemoMan_PrinceTavish
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name blue_common
+			Where spawnbot
+			TotalCount 999
+			MaxActive 4
+			SpawnCount 1
+			Support Limited	// Support Limited and TotalCount 999 for RandomChoice/Squadded support
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 3
+
+			RandomChoice
+			{
+				TFBot
+				{
+					Class Pyro
+					ClassIcon pyro_dragon_fury_swordstone	// custom icon
+					Name "Dragon Furry"
+					Skill Expert
+					Item "The Dragon's Fury"
+
+					EventChangeAttributes	// thx seel (>w< )
+					{
+						Default	// shoot the tank
+						{
+							InterruptAction [$SIGSEGV]
+							{
+								Target tank_boss	// Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+								AimTarget tank_boss	// Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+								WaitWhenDone 1
+								Delay 0.1
+								Repeats 0
+								Cooldown 1
+								Duration 0.1
+								KillAimTarget 1
+								OnDoneChangeAttributes Bots
+							}
+						}
+
+						Bots	// shoot the leg things
+						{
+						}
+					}
+				}
+			}
+		}
+	}
+
+	Wave	// WAVE 5 //// CURRENCY 1337
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		// dont end wave early
+		WaveSpawn
+		{
+			Where spawnbot
+			TotalCount 0
+			MaxActive 1
+			SpawnCount 11
+			WaitBeforeStarting 6969
+
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+					}
+				}
+			}
+		}
+		// --------------------------
+		// RED WAVESPAWNS
+		// --------------------------
+		WaveSpawn
+		{
+			Name tower
+			Where towerspawn
+			TotalCount 15
+			MaxActive 10
+			SpawnCount 5
+			TotalCurrency 10
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 5
+
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Deflector
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name start
+			Where tunnelspawn
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			TotalCurrency 200
+
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons_Deflector
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+					Action Mobber
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+					// Action Mobber
+				}
+			}
+
+			StartWaveOutput
+			{
+				Target barrierB_activate_relay_initial
+				Action Trigger
+			}
+
+			FirstSpawnOutPut
+			{
+				Target barrier_hint
+				Action Show
+			}
+
+			DoneOutput
+			{
+				Target barrierB_clear_relay
+				Action Trigger
+			}
+		}
+
+		WaveSpawn
+		{
+			Name tower
+			WaitForAllDead start
+			Where towerspawn
+			TotalCount 10
+			MaxActive 10
+			SpawnCount 10
+			TotalCurrency 10
+
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Deflector
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+					Action Mobber
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+					// Action Mobber
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name deez
+			WaitForAllDead start
+			Where towerspawn_2
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 10
+
+			TFBot
+			{
+				Template T_TFBot_Soldier_BurstFire
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			// hatch defender
+			Name hatchdefender
+			WaitForAllDead start
+			Where hatchspawn
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 917
+
+			TFBot
+			{
+				Template T_TFBot_Boss_W5
+				Attributes DisableDodge
+				Tag bot_hatch	// doesn't seem to do much
+				BehaviorModifiers Push
+				Attributes IgnoreFlag
+
+				AddCond
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+
+				CharacterAttributes
+				{
+					"force distribute currency on death" 1
+					"crit mod disabled" 0
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target bomb_antigrief_off
+				Action Trigger
+			}
+
+			DoneOutput
+			{
+				Target hatchguard_death_relay
+				Action Trigger
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name dummy
+			TotalCount 1337	// nice clean 999 on the wavebar
+			MaxActive 1
+			SpawnCount 11
+			Support 1
+			WaitBeforeStarting 123456
+
+			TFBot
+			{
+				Class Scout
+				Name "Deez Nuts"
+				ClassIcon red2_lite
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name finalsupport
+			Where red_player_teamspawn
+			RandomSpawn 1
+			TotalCount 200
+			MaxActive 6
+			SpawnCount 4
+			TotalCurrency 200
+			WaitBetweenSpawns 5
+			Support 1
+			WaitForAllDead tower
+
+			RandomChoice
+			{
+				TFBot
+				{
+					// Name "Caber Boy"
+					// Class Demoman
+					// Skill Expert
+					// ClassIcon demo_caber_nys
+					// WeaponRestrictions MeleeOnly
+					// MaxVisionRange 400
+					// Item "Potato Hat"
+					// Item "The Ullapool Caber"
+					Action Mobber
+					Template T_TFBot_Demoman_Knight
+					Attributes AlwaysCrit
+
+					AddCond
+					{
+						Name TF_COND_REPROGRAMMED
+					}
+
+					CharacterAttributes
+					{
+						"force distribute currency on death" 1
+						"crit mod disabled" 0
+					}
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name redtank
+			TotalCount 5
+			Support Limited
+			MaxActive 5
+			WaitBeforeStarting 300	// 5 minutes
+			WaitBetweenSpawns 30
+			FirstSpawnWarningSound mvm/mvm_tele_deliver.wav
+
+			Tank
+			{
+				Health 60000
+				Name tankbossred
+				ClassIcon tank_red_lite	// _lite //so no stack with mainwave
+				Model models/bots/boss_bot/boss_tankred.mdl
+				StartingPathTrackNode tankpath1_1
+				TeamNum 2
+
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+
+				OnBombDroppedOutput
+				{
+					Target redwin_relay
+					Action Trigger
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target tankhint
+				Action Show
+			}
+		}
+		// --------------------------
+		// BLU WAVESPAWNS
+		// --------------------------
+		// dummy icon
+		WaveSpawn
+		{
+			Name dummy
+			TotalCount 1337	// nice clean 999 on the wavebar
+			MaxActive 1
+			SpawnCount 11
+			Support 1
+			WaitBeforeStarting 123456
+
+			TFBot
+			{
+				Class Scout
+				Name "Deez Nuts"
+				ClassIcon blu2_lite
+			}
+		}
+		// dummy icon
+		WaveSpawn
+		{
+			Name blue_giant
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			WaitBetweenSpawnsAfterDeath 10
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Demo_Burst
+				Attributes AlwaysCrit
+				Action Mobber
+			}
+		}
+
+		WaveSpawn
+		{
+			Name blue_common
+			WaitForAllDead start
+			Where spawnbot
+			TotalCount 999
+			MaxActive 4
+			SpawnCount 1
+			Support Limited	// Support Limited and TotalCount 999 for RandomChoice/Squadded support
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 3
+
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Fist
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Soldier_Extended_Concheror
+				}
+			}
+		}
+	}
+}

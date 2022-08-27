@@ -1,0 +1,77 @@
+//15 minute drop-in timer for any potato mission
+//made by Braindawg
+
+
+//WARNING: 																		   
+															 				   
+//Tank and Boss Health bars will render over this timer bar and cover it.  		   
+//Avoid using this timer alongside a wave with more than 1 boss/tank active at once
+
+
+
+//How to use:																							   
+
+// 1. Add #base reverse_timer.pop to the top of your popfile, above WaveSchedule
+// 2. Put SpawnTemplate "timertest"   inside WaveSchedule
+// 3. Trigger showtimer to display it on the HUD							  							   
+// 4. Trigger timer_relay to begin the countdown														  
+// 5. Send the CancelPending input to timer_relay to pause the timer, it can be restarted by re-triggering
+
+
+WaveSchedule {
+
+	PointTemplates   
+	{		
+		timertest //final wave timer
+		{
+			NoFixup 1
+			math_counter
+			{
+				"targetname" "timer_counter"
+				"origin" "0 0 0"
+				"startvalue" "255"
+				"min" "0"
+				"max" "255"
+				"OutValue" "monster_resource,$SetProp$m_iBossHealthPercentageByte,,0,-1"
+				"OnHitMin" "bots_win_red,RoundWin,,0,-1"
+				"OnHitMin" "timer_relay*,CancelPending,,1,-1"
+			}
+			logic_relay
+			{
+				"targetname" "showtimer"
+				"OnTrigger" "monster_resource,$SetProp$m_iBossHealthPercentageByte,255,0,-1"
+			//	"OnTrigger" "monster_resource,$SetProp$m_iBossState,1,0,-1" //uncomment this for green merasmus bar
+			}
+  			logic_relay
+			{
+				"targetname" "timer_relay"
+				"OnTrigger" "timer_counter,Subtract,1,0,-1"
+				
+				// Formula for changing the timer: 
+				// t / 255 = r.  t = desired seconds, r = refire interval. 
+				// 15 minutes (900 seconds) / 255 = 3.52941...
+				
+				"OnTrigger" "timer_relay2,Trigger,,3.529411764705882,-1"
+			}
+			logic_relay //relay loops are less resource intensive than logic_timers according to https://developer.valvesoftware.com/wiki/Logic_timer
+			{
+				"targetname" "timer_relay2"
+				"OnTrigger" "timer_relay,Trigger,,0,-1"
+			}
+			logic_relay
+			{
+				"targetname" "timerfail_relay"
+				"OnTrigger" "bots_win_red,RoundWin,,3,-1"
+				"OnTrigger" "player,$DisplayTextCenter,Wave Failed...,3,-1"
+			}
+			game_round_win
+			{
+				"origin" "0 0 0"
+				"TeamNum" "2"
+				"targetname" "bots_win_red"
+				"switch_teams" "0"
+				"force_map_reset" "1"
+			}
+		}
+	}
+}

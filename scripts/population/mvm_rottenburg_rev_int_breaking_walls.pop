@@ -1,0 +1,4103 @@
+//I dont know what am I doing in this reverse but if something works, I got lucky - Mudun(creator of this mission)
+//Intermediate reverse mission "Breaking Walls" made by Mudun 
+#base robot_giant.pop
+#base robot_standard.pop
+#base robot_standard_red.pop
+#base robot_giant_red.pop
+WaveSchedule
+{
+	StartingCurrency	800
+	CanBotsAttackWhileInSpawnRoom	no
+	RespawnWaveTimeBlue 			1 [$SIGSEGV]  
+	FixedRespawnWaveTimeBlue 		1 [$SIGSEGV]
+	
+	ReverseWinConditions 1 [$SIGSEGV]				 
+	AllowJoinTeamBlue 1 [$SIGSEGV]
+    BluHumanInfiniteCloak 0 [$SIGSEGV]	
+	HumansMustJoinTeam Blue [$SIGSEGV]	  	
+	SetCreditTeam 3	[$SIGSEGV]			
+	SniperAllowHeadshots 1 [$SIGSEGV]	
+	SendBotsToSpectatorImmediately 1 [$SIGSEGV]
+	
+	BluHumanFlagCapture 1 [$SIGSEGV]
+    FlagCarrierMovementPenalty 1 [$SIGSEGV]	
+	BluHumanFlagPickup 1 [$SIGSEGV]	 			 
+	BluPlayersAreRobots 1 [$SIGSEGV]
+	AllowJoinTeamBlueMax 6 [$SIGSEGV]
+    ItemBlacklist 
+	{
+	    ItemName "The Short Circuit"
+	}
+	ItemAttributes [$SIGSEGV] //doesnt screw you over
+	{
+		ClassName "tf_weapon_knife"
+		"provide on active" 1
+		"cannot pick up intelligence" 1
+	}
+    DisallowUpgrade	"maxammo primary increased"
+	DisallowUpgrade	"maxammo secondary increased"
+	DisallowUpgrade	"maxammo metal increased"
+	DisallowUpgrade	"metal regen"
+	PrecacheModel "models/props_mvm/mvm_upgrade_blu"
+	PrecacheModel "models/props_mvm/robot_spawnpoint.mdl"
+	PrecacheModel "models/props_frontline/tank_cart.mdl"
+	PrecacheModel "models/bots/boss_bot/boss_tankred.mdl"
+    PrecacheModel "models/bots/boss_bot/boss_tankred_damage1.mdl"
+    PrecacheModel "models/bots/boss_bot/boss_tankred_damage2.mdl"
+    PrecacheModel "models/bots/boss_bot/boss_tankred_damage3.mdl"
+    PrecacheModel "models/bots/boss_bot/boss_tankred_part1_destruction.mdl"
+	PrecacheModel "models/bots/boss_bot/tankred_track_l.mdl"
+	PrecacheModel "models/bots/boss_bot/tankred_track_r.mdl"
+	DisableSound "Announcer.MVM_Game_Over_Loss" 	[$SIGSEGV]
+	DisableSound "Announcer.MVM_Wave_Lose" 			[$SIGSEGV]
+	DisableSound "music.mvm_lost_wave" 				[$SIGSEGV]
+	PointTemplates [$SIGSEGV]
+    {
+	
+		corelogic 
+		{  
+            NoFixup 1
+			logic_auto 
+			{
+				"origin" "0 0 0" 
+				"targetname" "mainrelay"
+				"OnMapSpawn" "Barricade*,Kill,,0,-1" 
+				"OnMapSpawn" "wave_start_relay*,AddOutput,OnTrigger spawnbarrier*:Disable:0:-1"
+				"OnMapSpawn" "wave_finished_relay,AddOutput,OnTrigger spawnbarrier*:Enable:0:-1"
+				"OnMapSpawn" "item_ammopack*,Kill,,0,-1"
+				"OnMapSpawn" "wave_start*,AddOutput,OnTrigger func_capturezone:Disable:0:-1,0,-1"
+				"OnMapSpawn" "wave_start*,AddOutput,OnTrigger func_flagdetectionzone:Disable:0:-1,0,-1"
+				"OnMapSpawn" "tank_entrance_intact_prop*,Kill,,0,-1" 
+				"OnMapSpawn" "Tank_Tunnel_Door_In*,Kill,,0,-1" 
+			}
+			logic_relay 
+			{
+				"origin" "0 0 0"
+				"targetname" "redwin_relay"
+				"OnTrigger" "bots_win_red,RoundWin,,0,-1"
+				"OnTrigger" "pit_explosion_wav,PlaySound,,0,-1" 
+			}
+			logic_relay
+			{
+			    "origin" "0 0 0"
+				"targetname" "hatch_reveal_relay"
+				"OnTrigger" "hatch_forcefield,Disable,,0,-1"
+			}
+		}
+		annotations 
+		{
+			NoFixup 1
+			training_annotation
+			{
+			  "targetname"   "hint"
+			  "display_text" "The bomb can now be deployed!"
+			  "lifetime"     "10"
+			  "origin" "-1395 1524 -126"	
+			}	
+		}
+		textualtimer
+		{
+			OnSpawnOutput
+			{
+				Param 5 // change the value for minutes
+
+				Target minutehand
+				Action SetValue
+			}
+			OnSpawnOutput
+			{
+				Param 60 // change the value for seconds
+
+				Target secondhand
+				Action SetValue
+			}
+			logic_relay
+			{
+				"targetname" "loserelay"
+				"startdisabled" "1"
+				"ontrigger" "bots_win_red,RoundWin,,2,-1"
+				"ontrigger" "realtimer,cancelpending,,2,-1"
+				"onspawn" "wave_start*,addoutput,ontrigger realtimer:trigger::0:-1,0,-1"
+				"onspawn" "wave_finish*,addoutput,ontrigger realtimer:cancelpending::0:-1,0,-1"
+				"onspawn" "wave_finish*,addoutput,ontrigger loserelay:cancelpending::0:-1,0,-1"
+			}
+
+			NoFixup 1
+			math_counter
+			{
+				"targetname" "minutehand"
+				"max" "9999"
+				"outvalue" "timerformat,$setkey$case01,,0,-1"
+				"onhitmin" "loserelay,enable,,1,-1"
+			}
+			math_counter
+			{
+				"targetname" "secondhand"
+				"max" "60"
+				"outvalue" "timerformat,$setkey$case02,,0,-1"
+				"outvalue" "zerocompare,setvaluecompare,,0,-1"
+				"onhitmin" "loserelay,trigger,,0,-1"
+				"onhitmin" "!self,setvalue,60,1,-1"
+				"onhitmin" "minutehand,subtract,1,1,-1"
+			}
+			logic_compare
+			{
+				"targetname" "zerocompare"
+				"comparevalue" "9"
+				"onequalto" "timerformat,$setkey$case16,%:0%,0,-1"
+				"ongreaterthan" "timerformat,$setkey$case16,%:%,0,-1"
+			}
+			logic_case
+			{
+				"targetname" "timerformat"
+				"case16" "%:%"
+				"ondefault" "timertext,$setkey$message,,0,-1"
+				"ondefault" "timertext,display,0,0,-1"
+			}
+			game_text
+			{
+				"targetname" "timertext"
+				"color" "65 155 255"
+				"holdtime" "2"
+				"spawnflags" "1"
+				"x" "0.7"
+				"y" "0.9"
+			}
+			logic_relay
+			{
+				"targetname" "realtimer"
+				"spawnflags" "2"
+				"ontrigger" "timerformat,$format,,0.01,-1"
+				"ontrigger" "secondhand,subtract,0.5,0.5,-1" //it doubles for some reason lol, also second should be 0.5 not 0
+				"ontrigger" "!self,trigger,,1,-1"
+			}
+			game_round_win
+			{
+				"teamnum" "2"
+				"targetname" "bots_win_red"
+				"force_map_reset" "1"
+			}
+		}
+		station
+		{
+			NoFixup 1
+			func_upgradestation
+			{
+				"mins" "-105 -100 0" 
+				"maxs" "105 100 242"
+				"solid" "0"
+			}
+			prop_dynamic
+			{
+				"targetname" "upgradestation"
+				"angles" "0 0 0"
+				"DisableBoneFollowers" "0"
+				"disablereceiveshadows" "0"
+				"disableshadows" "1"
+				"ExplodeDamage" "0"
+				"ExplodeRadius" "0"
+				"fademaxdist" "0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"maxdxlevel" "0"
+				"MinAnimTime" "5"
+				"mindxlevel" "0"
+				"model" "models/props_mvm/mvm_upgrade_blu.mdl"
+				"modelscale" "1"
+				"PerformanceMode" "0"
+				"pressuredelay" "0"
+				"RandomAnimation" "0"
+				"renderamt" "255"
+				"renderfx" "0"
+				"rendermode" "0"
+				"SetBodyGroup" "0"
+				"skin" "0"
+				"solid" "0"
+				"spawnflags" "0"
+				"origin" "0 0 0"
+			}
+			func_upgradestation
+			{
+				"mins" "-100 -100 0" 
+				"maxs" "90 60 100"
+				"parentname" "upgradestation"
+			}
+			prop_dynamic
+			{
+				
+				"targetname" "shopcollision"
+				"angles" "0 -90 0"
+				"DisableBoneFollowers" "1"
+				"disablereceiveshadows" "1"
+				"model" "models/props_vehicles/train_flatcar_container.mdl"
+				"disableshadows" "1"
+				"ExplodeDamage" "0"
+				"ExplodeRadius" "0"
+				"fademaxdist" "0"
+				"fademindist" "-1"
+				"fadescale" "1"
+				"MaxAnimTime" "10"
+				"maxdxlevel" "0"
+				"MinAnimTime" "5"
+				"mindxlevel" "0"
+				"modelscale" "1"
+				"PerformanceMode" "0"
+				"pressuredelay" "0"
+				"RandomAnimation" "0"
+				"renderamt" "0"
+				"renderfx" "0"
+				"rendermode" "10"
+				"SetBodyGroup" "0"
+				"skin" "0"
+				"CollisionGroup" "5"
+				"solid" "6"
+				"spawnflags" "0"
+				"StartDisabled" "0"
+				"origin" "0 0 0"	
+			}		
+		}
+		nosuicidezone
+        {
+            NoFixup 1
+            func_forcefield
+            {
+                "disablereceiveshadows" "0"
+                "origin" "-432 1648 -430"
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "renderfx" "0"
+                "rendermode" "10"
+                "TeamNum" "2"
+                "targetname" "spawnbarrierA1"
+                "parentname" "spawnbarrierA"
+                "mins" "-150 -150 -150"
+                "maxs" "150 150 150"
+                "StartDisabled" "0"
+            }
+		}
+		barriers 
+        {
+            NoFixup 1
+            func_forcefield
+            {
+
+                "disablereceiveshadows" "0"
+                "origin" "0 0 0"
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "renderfx" "0"
+                "rendermode" "10"
+                "TeamNum" "2"
+                "targetname" "spawnbarrierA1"
+                "parentname" "spawnbarrierA"
+                "mins" "-200 -170 -100"
+                "maxs" "500 700 2100"
+                "StartDisabled" "0"
+            }
+            prop_dynamic 
+            {
+
+                "targetname" "spawnbarrierA"
+                "angles" "10 90 0"
+                "DisableBoneFollowers" "0"
+                "disablereceiveshadows" "0"
+                "model" "models/props_medieval/fort_wall_short.mdl"
+                "disableshadows" "1"
+                "ExplodeDamage" "0"
+                "ExplodeRadius" "0"
+                "fademaxdist" "0"
+                "fademindist" "-1"
+                "fadescale" "1"
+                "MaxAnimTime" "10"
+                "maxdxlevel" "0"
+                "MinAnimTime" "5"
+                "mindxlevel" "0"
+                "modelscale" "1.75"
+                "PerformanceMode" "0"
+                "pressuredelay" "0"
+                "RandomAnimation" "0"
+                "renderamt" "0"
+                "renderfx" "0"
+                "rendermode" "0"
+                "SetBodyGroup" "0"
+                "skin" "0" 
+                "CollisionGroup" "0"
+                "solid" "0"
+                "spawnflags" "0"
+                "StartDisabled" "0"
+                "origin" "0 0 -50"
+            }
+        }
+		//forcefield_hatch
+		//{
+		//	NoFixup 1
+		//	func_forcefield 
+		//	{
+		//		
+        //       "disablereceiveshadows" "0"
+        //        "origin" "0 0 0"
+        //        "renderamt" "255"
+        //        "rendercolor" "255 255 255"
+        //        "renderfx" "0"
+        //        "rendermode" "10"
+        //        "TeamNum" "2"
+        //       "targetname" "hatch_forcefield"
+        //        "mins" "-150 -150 -150"
+        //        "maxs" "150 150 150"
+		//		"StartDisabled" "0"
+		//	}
+        //    prop_dynamic 
+		//	{
+		//		
+		//		"targetname" "boxh"
+		//		"angles" "0 0 0"
+		//		"DisableBoneFollowers" "0"
+		//		"disablereceiveshadows" "0"
+		//		"model" "models/props_lakeside/wood_crate_01.mdl"
+		//		"disableshadows" "1"
+		//		"ExplodeRadius" "0"
+		//		"fademaxdist" "0"
+		//		"fademindist" "-1"
+		//		"fadescale" "1"
+		//		"MaxAnimTime" "10"
+		//		"maxdxlevel" "0"
+		//		"MinAnimTime" "5"
+		//		"mindxlevel" "0"
+		//		"modelscale" "1.8"
+		//		"PerformanceMode" "0"
+		//		"pressuredelay" "0"
+		//		"RandomAnimation" "0"
+		//		"renderamt" "0"
+		//		"renderfx" "0"  
+		//		"rendermode" "0"
+		//		"SetBodyGroup" "0"
+		//		"skin" "0" 
+		//		"CollisionGroup" "0"
+		//		"solid" "0"
+		//		"spawnflags" "0"
+		//		"StartDisabled" "0"
+		//		"origin" "0 0 0"	
+		//	}			
+		//}
+		hatchunblocker
+		{
+			NoFixup 1
+			logic_relay
+			{
+				
+				"targetname" "unblockhatch"
+				"OnTrigger" "func_capturezone,Enable,,0,-1"
+				"OnTrigger" "func_flagdetectionzone,Enable,,0,-1"
+				"OnTrigger" "hatchopen,Show,,0,-1"
+				"OnTrigger" "thirdperson,Enable,,0,-1"
+			}		
+		}
+		bot_spawns
+        {
+            prop_dynamic
+            {
+                "angles" "0 0 0"
+                "model" "models/props_mvm/robot_spawnpoint.mdl"
+                "modelscale" "1.0"
+                "rendercolor" "255 255 255"
+                "solid" "0"
+                "targetname" "tunnelp"
+                "origin" "1530 199 -420"
+            }
+		}
+		bot_spawns
+        {
+            prop_dynamic
+            {
+                "angles" "0 0 0"
+                "model" "models/props_mvm/robot_spawnpoint.mdl"
+                "modelscale" "1.0"
+                "rendercolor" "255 255 255"
+                "solid" "0"
+                "targetname" "upgrade_stationp"
+                "origin" "1888 -208 -417"
+            }
+		}
+		bot_spawns
+        {
+            prop_dynamic
+            {
+                "angles" "0 0 0"
+                "model" "models/props_mvm/robot_spawnpoint.mdl"
+                "modelscale" "1.0"
+                "rendercolor" "255 255 255"
+                "solid" "0"
+                "targetname" "towerp"
+                "origin" "1537 959 -211"
+            }
+		}
+		bot_spawns
+        {
+            prop_dynamic
+            {
+                "angles" "0 0 0"
+                "model" "models/props_mvm/robot_spawnpoint.mdl"
+                "modelscale" "1.0"
+                "rendercolor" "255 255 255"
+                "solid" "0"
+                "targetname" "tower2p"
+                "origin" "688 1040 -213"
+            }
+		}
+		bot_spawns
+        {
+            prop_dynamic
+            {
+                "angles" "0 0 0"
+                "model" "models/props_mvm/robot_spawnpoint.mdl"
+                "modelscale" "1.0"
+                "rendercolor" "255 255 255"
+                "solid" "0"
+                "targetname" "tower3p"
+                "origin" "2458 1616 -429"
+            }
+		}
+		bot_spawns
+        {
+            prop_dynamic
+            {
+                "angles" "0 0 0"
+                "model" "models/props_mvm/robot_spawnpoint.mdl"
+                "modelscale" "1.0"
+                "rendercolor" "255 255 255"
+                "solid" "0"
+                "targetname" "hatchp"
+                "origin" "-200 2184 -126"
+            }
+		}
+		bot_spawns
+        {
+            prop_dynamic
+            {
+                "angles" "0 0 0"
+                "model" "models/props_mvm/robot_spawnpoint.mdl"
+                "modelscale" "1.0"
+                "rendercolor" "255 255 255"
+                "solid" "0"
+                "targetname" "hatch2p"
+                "origin" "-546 180 -169"
+            }
+		}
+		rock
+		{
+		    prop_dynamic
+			{
+			    "angles" "0 90 0"
+				"model" "models/props_forest/cliff_wall_10.mdl"
+				"modelscale" "1.0"
+				"rendercolor" "255 255 255"
+				"solid" 0
+				"targetname" "therock"
+				"origin" "2912 -3458 -200"
+			}
+		}
+		rockvoid
+		{
+		    prop_dynamic
+			{
+			    "angles" "0 0 0"
+				"model" "models/props_mvm/mine_rocks03.mdl"
+				"modelscale" "1.0"
+				"rendercolor" "255 255 255"
+				"solid" 0
+				"targetname" "therock"
+				"origin" "2621 -2993 -127"
+			}
+		}
+		SmallTankTurretRed
+		{
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "rendermode 1"
+				Delay 0.0
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "alpha"
+				Param "0"
+				Delay 0.0
+			}
+            OnSpawnOutput
+			{
+				Target "tank_turret_shoot_relay"
+				Action "trigger"
+				Param ""
+				Delay 5
+			}
+            OnSpawnOutput
+			{
+				Target "spawntr"
+				Action "trigger"
+				Param ""
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnHealthBelow60Percent tank_turret_shoot_relay_super:trigger::0:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnHealthBelow20Percent tank_turret_shoot_relay_super:trigger::0:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "tank_turret_particle"
+				Action "SetParentAttachment"
+				Param "light"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnUser4 tank_turret_prop_bomb:enable::0:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnUser4 tank_turret_prop_bomb:SetAnimation:deploy:0.01:-1"
+				Delay 1
+			}
+            prop_dynamic
+            {
+                "targetname" "tank_turret_prop"
+                "model" "models/props_frontline/tank_cart.mdl"
+				"skin" 1
+                "solid" "0"
+                "angles" "0 180 0"
+                "DefaultAnim" "idle"
+            }
+            prop_dynamic
+            {
+                "targetname" "tank_turret_prop_bomb"
+                "model" "models/bots/boss_bot/bomb_mechanism.mdl"
+				"skin" 1
+                "startdisabled" "1"
+                "solid" "0"
+                "DefaultAnim" "idle"
+                "modelscale" "0.5"
+                "angles" "0 0 0"
+                "origin" "-8 0 -16"
+            }
+            info_particle_system
+            {
+                "targetname" "tank_turret_particle"
+                "effect_name" "cart_flashinglight"
+                "parentname" "tank_turret_prop"
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_n"
+                "angles" "3 0 0"
+                "origin" "68 0 76"
+                "Damage" "120"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+				"TeamNum" 2
+                "onuser1" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_w"
+                "angles" "3 90 0"
+                "origin" "-16 62 76"
+                "Damage" "120"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+				"TeamNum" 2
+                "onuser1" "tank_turret_prop,setanimation,shoot_W,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_W,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_nw"
+                "angles" "3 45 0"
+                "origin" "40 62 76"
+                "Damage" "120"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+				"TeamNum" 2
+                "onuser1" "tank_turret_prop,setanimation,shoot_NW,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_NW,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_e"
+                "angles" "3 -90 0"
+                "origin" "-16 -62 76"
+                "Damage" "120"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+				"TeamNum" 2
+                "onuser1" "tank_turret_prop,setanimation,shoot_E,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_E,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_ne"
+                "angles" "3 -45 0"
+                "origin" "40 -62 76"
+                "Damage" "120"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+				"TeamNum" 2
+                "onuser1" "tank_turret_prop,setanimation,shoot_NE,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_NE,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            logic_relay
+            {
+                "targetname" "tank_turret_shoot_effect_relay"
+                "ontrigger" "!parent,addoutput,solid 1,0.0,-1"
+                "ontrigger" "!parent,addoutput,solid 2,0.12,-1"
+                "ontrigger" "!parent,$playsound,MVM.GiantSoldierRocketShoot,0,-1"
+                "spawnflags" "2"
+            }
+            logic_relay
+            {
+                "targetname" "tank_turret_shoot_relay"
+                "ontrigger" "tank_turret_shooter_n,fireuser1,,0,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser1,,2,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser1,,4,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser1,,6,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser1,,8,-1"
+
+                "ontrigger" "!self,trigger,,12,-1"
+                "spawnflags" "2"
+            }
+            logic_relay
+            {
+                "targetname" "tank_turret_shoot_relay_super"
+                "ontrigger" "tank_turret_particle,Start,,0,-1"
+                "ontrigger" "tank_turret_prop,$playsound,MVM.GiantHeavyGunWindUp,0,-1"
+                "ontrigger" "tank_turret_shoot_relay,cancelpending,,1,-1"
+                "ontrigger" "tank_turret_shooter_n,fireuser3,,1,-1"
+                "ontrigger" "tank_turret_shooter_n,fireuser3,,1.5,-1"
+                "ontrigger" "tank_turret_shooter_n,fireuser3,,2,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser3,,3,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser3,,3.5,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser3,,4,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser3,,5,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser3,,5.5,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser3,,6,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser3,,7,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser3,,7.5,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser3,,8,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser3,,9,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser3,,9.5,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser3,,10,-1"
+                "ontrigger" "tank_turret_particle,Stop,,12,-1"
+
+                "ontrigger" "tank_turret_shoot_relay,trigger,,13,-1"
+                "spawnflags" "2"
+            }
+		}
+	}
+	SpawnTemplate [$SIGSEGV] "annotations" 
+	SpawnTemplate [$SIGSEGV] "corelogic"
+	SpawnTemplate [$SIGSEGV] textualtimer
+	SpawnTemplate [$SIGSEGV] bot_spawns
+	SpawnTemplate [$SIGSEGV] rock
+	SpawnTemplate [$SIGSEGV] rockvoid
+	SpawnTemplate [$SIGSEGV] hatchunblocker
+	SpawnTemplate [$SIGSEGV] nosuicidezone
+	SpawnTemplate [$SIGSEGV] 
+    {
+        Name "station"
+        "origin" "2968 -3115 -161"
+        "angles" "0 90 0"
+    }
+    SpawnTemplate [$SIGSEGV] 
+    {
+        Name "station"
+        "origin" "290 -2980 -101"
+        "angles" "0 45 0"
+    }
+	SpawnTemplate [$SIGSEGV]
+	{ 
+		Name "barriers" 
+		"origin" "2724.365479 -2303.941650 -143.139458"
+		"angles" "0 90 0"
+	}
+	SpawnTemplate [$SIGSEGV] 
+	{
+		Name "barriers"
+		"origin" "381.125824 -2462.805176 -125.37920"
+		"angles" "0 0 0"
+	}
+	//SpawnTemplate [$SIGSEGV] 
+	//{
+	//	Name "forcefield_hatch"
+	//	"origin" "-1395 1524 -160"
+	//	"angles" "0 0 0"
+	//}
+	ExtraSpawnPoint [$SIGSEGV]
+    {
+        Name "tunnel"
+        TeamNum 2 
+        X	"1530"                     
+        Y	"199"                  
+        Z	"-340"        
+    }
+	ExtraSpawnPoint [$SIGSEGV]
+    {
+        Name "upgrade_station" 
+        TeamNum 2
+        X	"1888"                     
+        Y	"-208"                  
+        Z	"-387"        
+    }
+	ExtraSpawnPoint [$SIGSEGV] 
+    {
+        Name "tower"
+        TeamNum 2
+        X	"1537"                     
+        Y	"959"                  
+        Z	"-161"        
+    }
+	ExtraSpawnPoint [$SIGSEGV] 
+    {
+        Name "tower2"
+        TeamNum 2
+        X	"688"                     
+        Y	"1040"                  
+        Z	"-183"        
+    }
+	ExtraSpawnPoint [$SIGSEGV] 
+    {
+        Name "tower3"
+        TeamNum 2
+        X	"2458"                     
+        Y	"1616"                  
+        Z	"-384"        
+    }
+	ExtraSpawnPoint [$SIGSEGV] 
+    {
+        Name "hatch"
+        TeamNum 2
+        X	"-200"                     
+        Y	"2184"                  
+        Z	"-96"        
+    }
+	ExtraSpawnPoint [$SIGSEGV] 
+    {
+        Name "hatch2"
+        TeamNum 2
+        X	"-546"                     
+        Y	"180"                  
+        Z	"-139"        
+    }
+	ExtraTankPath [$SIGSEGV] //Adds tank path to follow
+	{
+		Name "tankpath1" //name of the starting path node prefix. First tank node would be tankpath1_1
+		Node "-512 2104 -516" 
+		Node "-500 1822 -533"
+		Node "-470 1701 -534"
+		Node "-408 1656 -534"
+		Node "-304 1648 -528"
+		Node "0 1664 -454"
+		Node "112 1672 -423"
+		Node "408 1672 -423"
+		Node "568 1660 -423"
+		Node "768 1648 -424"
+		Node "1288 1648 -414"
+		Node "1800 1648 -418"
+		Node "1919 1627 -420"
+		Node "2043 1571 -421"
+		Node "2127 1487 -420"
+		Node "2199 1383 -420"
+		Node "2231 1255 -420"
+		Node "2231 1031 -420"
+		Node "2232 712 -420"
+		Node "2184 608 -418"
+		Node "2112 552 -418"
+		Node "2008 520 -417"
+		Node "1648 504 -408"
+		Node "1576 472 -408"
+		Node "1528 408 -410"
+		Node "1520 328 -410"
+		Node "1520 256 -410"
+		Node "1520 36 -421"
+		Node "1520 -424 -487"
+		Node "1520 -752 -504"
+		Node "1520 -1060 -526"
+		Node "1520 -1368 -579"
+		Node "1568 -1496 -589"
+		Node "1664 -1568 -595"
+		Node "1788 -1608 -614"
+		Node "2152 -1616 -644"
+		Node "2376 -1616 -646"
+		Node "2560 -1616 -650"
+		Node "2864 -1616 -664"
+	}
+	ExtraTankPath [$SIGSEGV] //Adds tank path to follow
+	{
+		Name "tankpath2"
+		Node "-1200 1536 -155"
+		Node "-1088 1536 -158"
+		Node "-998 1502 -158"
+		Node "-916 1398 -157"
+		Node "-928 1164 -158"
+		Node "-928 916 -162"
+		Node "-928 640 -188"
+		Node "-880 544 -195"
+		Node "-720 496 -189"
+		Node "-560 544 -190"
+		Node "-512 640 -192"
+		Node "-477 2374 -192"
+		Node "-426 2466 -193"
+		Node "-335 2538 -189"
+		Node "-188 2601 -184"
+		Node "0 2632 -182"
+		Node "304 2632 -182"
+		Node "526 2600 -184"
+		Node "735 2527 -185"
+		Node "880 2415 -184"
+		Node "968 2296 -192"
+		Node "1023 2202 -192"
+		Node "1052 2064 -192"
+		Node "1056 576 -390"
+		Node "1096 520 -396"
+		Node "1164 488 -402"
+		Node "1320 456 -406"
+		Node "1472 384 -410"
+		Node "1504 256 -410"
+		Node "1520 36 -421"
+		Node "1520 -424 -487"
+		Node "1520 -752 -504"
+		Node "1520 -1060 -526"
+		Node "1520 -1368 -579"
+		Node "1568 -1496 -589"
+		Node "1664 -1568 -595"
+		Node "1788 -1608 -614"
+		Node "2152 -1616 -644"
+		Node "2376 -1616 -646"
+		Node "2560 -1616 -650"
+		Node "2864 -1616 -664"
+	}
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		Explanation [$SIGSEGV] 
+ 	 	{
+			Line "{yellow}Defeat all giant robots to deploy the bomb!"
+			Line "{yellow}You have 6 minutes to deploy the bomb!"
+		}
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1341"
+            Y    "1124"
+            Z     "-169" //-35
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Health 100 //no level
+		Ismini 1
+		Skin 2
+		Bodygroup 1
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1307"
+            Y    "1867"
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Health 100
+		Ismini 1
+		Skin 2
+		Bodygroup 1   
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1244"
+            Y    "1646"  //changed
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Health 100
+		Ismini 1
+		Skin 2
+		Bodygroup 1    
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1257"
+            Y    "1429" //changed
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Health 100
+		Ismini 1
+		Skin 2
+		Bodygroup 1    
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1500"
+            Y    "1438"
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Health 100
+		Ismini 1
+		Skin 2
+		Bodygroup 1   
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1505"
+            Y    "1641"
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Health 100
+		Ismini 1
+		Skin 2
+		Bodygroup 1    
+        }
+		WaveSpawn
+		{
+			Name "a1"
+			TotalCurrency 30
+			Where upgrade_station
+			TotalCount 15
+			MaxActive 10
+			SpawnCount 5
+			WaitBetweenSpawns 8
+			FirstSpawnOutput
+		    {
+		        Target realtimer
+			    Action Trigger
+		    }
+			TFBot
+			{
+			    Template T_TFBot_Red_Scout_FAN
+				Skill Normal
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "a2"
+			TotalCurrency 30
+			Where tunnel
+			TotalCount 12
+			MaxActive 9
+			SpawnCount 3
+			WaitBetweenSpawns 5
+			TFBot
+			{
+			    Template T_TFBot_Red_Demoman
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "a3"
+			TotalCurrency 400
+			Where tower2
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllSpawned a1
+			WaitBetweenSpawns 0
+			WaitBeforeStarting 10
+			TFBot
+			{
+				Template T_TFBot_Red_Giant_Pyro
+				Attributes DisableDodge
+				Attributes AlwaysFireWeapon
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "a4"
+			TotalCurrency 50
+			Where tower
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 4
+			WaitForAllDead a1
+			TFBot
+			{
+			    Template T_TFBot_Red_Heavyweapons_Shotgun
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "a5"
+			TotalCurrency 40
+			Where tower3
+			TotalCount 20
+			MaxActive 5
+			SpawnCount 5
+			WaitBeforeStarting 4
+			WaitForAllSpawned a1
+			TFBot
+			{
+				Template T_TFBot_Red_Demoman_Knight
+				Attributes DisableDodge 
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "a6"
+			TotalCurrency 300
+			Where hatch2
+			TotalCount 3
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead "a3"
+			TFBot
+			{
+				Template T_TFBot_Red_Giant_Soldier
+				Attributes DisableDodge 
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "a7"
+			Where hatch
+			TotalCount 20
+			MaxActive 5
+			SpawnCount 5
+			WaitForAllDead "a3"
+			TFBot
+			{
+				Template T_TFBot_Red_Pyro_Flaregun
+				ClassIcon pyro_flare_red
+				Attributes DisableDodge 
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn 
+		{
+			Name "a4h"
+			TotalCurrency 50
+			Where red_player_teamspawn
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 4
+			WaitForAllDead a3
+			TFBot
+			{
+			    Template T_TFBot_Red_Heavyweapons_Shotgun
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "a8"
+			Where red_player_teamspawn
+			RandomSpawn 1
+			TotalCount 998 
+			MaxActive 5
+			SpawnCount 3
+			WaitForAllDead "a6"
+			//FirstSpawnOutput //this was used before
+			//{
+            //    Target hatch_reveal_relay
+            //    Action Trigger
+            //}
+			FirstSpawnOutput 
+			{
+				Target unblockhatch
+				Action Trigger
+			}
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Red_Scout
+					ClassIcon red2_lite
+					WeaponRestrictions PrimaryOnly
+					Attributes DisableDodge
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+					
+				}
+				TFBot
+				{
+					Template T_TFBot_Red_Scout_Sandman
+					ClassIcon red2_lite
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "a8h" //the hint bot
+			Where red_player_teamspawn
+			RandomSpawn 1
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead "a6"
+			FirstSpawnOutput
+			{
+			    Target hint
+			    Action Show
+			}
+			//LastSpawnOutput
+            //{			
+			//	Target boxh
+			//	Action Disable
+			//}
+			TFBot
+			{
+			    Template T_TFBot_Red_Scout_Sandman
+				ClassIcon red2_lite
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "asup1"
+			Where spawnbot
+			MaxActive 1
+			SpawnCount 1
+			RandomSpawn 1
+			Support 1
+			WaitBetweenSpawnsAfterDeath 6
+			TFBot
+			{
+				Template T_TFBot_HeavyWeapons_Fist
+				Action Mobber [$SIGSEGV]
+				CharacterAttributes
+                {
+                    "cannot be teleported" 1
+                }
+			}
+		}
+		WaveSpawn
+		{
+			Name "asup2"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 3
+			SpawnCount 1
+			RandomSpawn 1
+			Support Limited  
+			WaitBetweenSpawns 3
+			TFBot 				
+			{	
+				Class Scout
+			    Skill Normal
+				CharacterAttributes
+                {
+                    "cannot be teleported" 1
+                }
+			}
+		}
+		WaveSpawn  //this only for sentry icon
+		{
+			Name "sentry1"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 3
+			SpawnCount 1
+			RandomSpawn 1
+			Support Limited  
+			WaitBetweenSpawns 3
+			WaitForAllDead a8
+			TFBot 				
+			{	
+				Class Scout
+			    Skill Normal
+				ClassIcon mini_sentry_red_nys
+			}
+		}
+	}
+	Wave
+	{
+	    SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1341"
+            Y    "1124"
+            Z     "-169" //-35
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Health 100 //no level
+		Ismini 1
+		Skin 2
+		Bodygroup 1
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1307"
+            Y    "1867"
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Health 100
+		Ismini 1
+		Skin 2
+		Bodygroup 1   
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1244"
+            Y    "1646"  //changed
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Health 100
+		Ismini 1
+		Skin 2
+		Bodygroup 1    
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1257"
+            Y    "1429" //changed
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Health 100
+		Ismini 1
+		Skin 2
+		Bodygroup 1    
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1500"
+            Y    "1438"
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Health 100
+		Ismini 1
+		Skin 2
+		Bodygroup 1   
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1505"
+            Y    "1641"
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Health 100
+		Ismini 1
+		Skin 2
+		Bodygroup 1    
+        }
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		WaveSpawn
+		{
+			Name "b1"
+			TotalCurrency 20
+			Where upgrade_station
+			TotalCount 16
+			MaxActive 6
+			SpawnCount 4
+			WaitBetweenSpawns 0
+			FirstSpawnOutput
+		    {
+		        Target realtimer
+			    Action Trigger
+		    }
+			TFBot
+			{
+			    Template T_TFBot_Red_Soldier_RocketShotgun
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "b2"
+			TotalCurrency 20
+			Where tunnel
+			TotalCount 10
+			MaxActive 3
+			SpawnCount 2
+			WaitBetweenSpawns 5
+			TFBot
+			{
+			    Template T_TFBot_Red_Heavyweapons_Fist
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "b2m"
+			TotalCurrency 0
+			Where tunnel
+			TotalCount 10
+			MaxActive 3
+			SpawnCount 2
+			WaitBetweenSpawns 5
+			TFBot
+			{
+			    Template T_TFBot_Red_Medic_QuickFix
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "b3"
+			TotalCurrency 30
+			Where tower
+			TotalCount 30
+			MaxActive 14
+			SpawnCount 10
+			WaitBetweenSpawns 0
+			WaitForAllDead b2
+			TFBot
+			{
+			    Template T_TFBot_Red_Heavyweapons_Heavyweight_Champ_Fast
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "b4" //v1
+			TotalCurrency 400
+			Where hatch2
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 2
+			WaitBetweenSpawns 0
+			WaitForAllDead b2
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Scout
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "b5"
+			TotalCurrency 200
+			Where tower3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitForAllDead b2
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Boxing_Heavy
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "b6"
+			TotalCurrency 200
+			Where hatch2
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead b4
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Demoman
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "b7"
+			TotalCurrency 30
+			Where hatch
+			TotalCount 15
+			MaxActive 5
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitForAllDead b4
+			TFBot
+			{
+				ClassIcon heavy
+				Name "Heavy"
+				Class HeavyWeapons
+			    Skill Easy
+			    AddCond [$SIGSEGV] { Name TF_COND_REPROGRAMMED } 
+			    Action Mobber [$SIGSEGV]
+			    Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "b8" 
+			TotalCurrency 0
+			Where red_player_teamspawn
+			TotalCount 998
+			MaxActive 3
+			SpawnCount 2
+			WaitForAllDead b6
+			FirstSpawnOutput 
+			{
+				Target unblockhatch
+				Action Trigger
+			}
+			TFBot
+			{
+			    Template T_TFBot_Red_Scout_Shortstop
+				Attributes DisableDodge
+				Skill Easy
+				ClassIcon red2_lite
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "b8h" 
+			TotalCurrency 0
+			Where red_player_teamspawn
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead b6
+			FirstSpawnOutput
+			{
+                Target hint
+                Action Show
+            }
+			TFBot
+			{
+			    Template T_TFBot_Red_Scout_Shortstop
+				Attributes DisableDodge
+				Skill Easy
+				ClassIcon red2_lite
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "bsup1"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 3
+			SpawnCount 3
+			RandomSpawn 1
+			Support 1
+			Support Limited 
+			WaitBetweenSpawns 8
+			TFBot
+			{
+				Template T_TFBot_Soldier_Extended_Concheror
+				CharacterAttributes
+                {
+                    "cannot be teleported" 1
+                }
+			}
+		}
+		WaveSpawn  //this only for sentry icon
+		{
+			Name "sentry2"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 3
+			SpawnCount 1
+			RandomSpawn 1
+			Support Limited  
+			WaitBetweenSpawns 3
+			WaitForAllDead b8
+			TFBot 				
+			{	
+				Class Scout
+			    Skill Normal
+				ClassIcon mini_sentry_red_nys
+			}
+		}
+	}
+	Wave
+	{
+	    SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1341"
+            Y    "1124"
+            Z     "-169" //-35
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+		Level 1
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1307"
+            Y    "1867"
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 1 
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1244"
+            Y    "1646"  //changed
+            Z     "-169"  
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 1  
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1257"
+            Y    "1429" //changed
+            Z     "-169"
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 1   
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1500"
+            Y    "1438"
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 1   
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1505"
+            Y    "1641"
+            Z     "-169"
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 1    
+        }
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		WaveSpawn
+		{
+			Name "c1"
+			TotalCurrency 100
+			Where tunnel
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBetweenSpawns 0
+			FirstSpawnOutput
+		    {
+		        Target realtimer
+			    Action Trigger
+		    }
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Heavyweapons
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "c2"
+			TotalCurrency 100
+			Where upgrade_station
+			TotalCount 8
+			MaxActive 2
+			SpawnCount 2
+			TFBot
+		    {
+			    Class Scout
+			    Name "Armored League Scout"
+			    Skill Hard
+				Health 650
+				Scale 1.3
+			    ClassIcon scout_stun_armored_red
+			    WeaponRestrictions MeleeOnly 
+			    AddCond [$SIGSEGV] { Name TF_COND_REPROGRAMMED } 
+			    Action Mobber [$SIGSEGV]
+				Attributes DisableDodge
+			    Item "The Sandman"
+			    Item "Batter's Helmet"
+			    ItemAttributes
+			    {
+				    ItemName "The Sandman"
+				    "effect bar recharge rate increased" 0.25
+			    }
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "c3"
+			TotalCurrency 200
+			Where tower
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead c1
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Heavyweapons
+				Attributes DisableDodge
+				Skill Easy
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "c3m"
+			TotalCurrency 200
+			Where tower
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead c1
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Medic_Regen
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "c4"  
+			TotalCurrency 30
+			Where tower3
+			TotalCount 16
+			MaxActive 4
+			SpawnCount 4
+			WaitForAllDead c1
+			TFBot
+			{
+			    Template T_TFBot_Red_Pyro
+				Skill Easy
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "c5" 
+			TotalCurrency 300
+			Where hatch
+			TotalCount 4
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead c3
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Demoman
+				Attributes DisableDodge
+				ClassIcon demo_spammer
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "c6"  
+			TotalCurrency 50
+			Where red_player_teamspawn
+			TotalCount 48
+			MaxActive 9
+			SpawnCount 6
+			WaitForAllDead c3
+			TFBot
+			{
+			    Template T_TFBot_Red_Scout_Melee
+				ClassIcon scout_bat
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "c7" 
+			TotalCurrency 220
+			Where tower3
+			TotalCount 5
+			MaxActive 1
+			SpawnCount 1
+			WaitBetweenSpawns 10
+			WaitBeforeStarting 10
+			WaitForAllDead c3
+			TFBot
+			{
+			    Template T_TFBot_Red_Demoman_Samurai
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "c8"
+			TotalCurrency 0
+			Where red_player_teamspawn
+			TotalCount 998
+			MaxActive 6
+			SpawnCount 4
+			WaitForAllDead c5
+			FirstSpawnOutput 
+			{
+				Target unblockhatch
+				Action Trigger
+			}
+			TFBot
+			{
+			    Template T_TFBot_Red_Demo_Burst
+				Attributes DisableDodge
+				ClassIcon red2_lite
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "c8h"
+			TotalCurrency 0
+			Where red_player_teamspawn
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead c5
+			FirstSpawnOutput
+			{
+			    Target hint
+			    Action Show
+			}
+			TFBot
+			{
+			    Template T_TFBot_Red_Demo_Burst
+				Attributes DisableDodge
+				ClassIcon red2_lite
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "csup1"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 2
+			SpawnCount 2
+			RandomSpawn 1
+			Support 1
+			Support Limited 
+			TFBot
+			{
+				Class HeavyWeapons
+				Skill Normal
+				ClassIcon heavy
+				Health 300
+				CharacterAttributes
+                {
+                    "cannot be teleported" 1
+                }
+			}
+		}
+		WaveSpawn  //this only for sentry icon
+		{
+			Name "sentry3"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 3
+			SpawnCount 1
+			RandomSpawn 1
+			Support Limited  
+			WaitBetweenSpawns 3
+			WaitForAllDead c8
+			TFBot 				
+			{	
+				Class Scout
+			    Skill Normal
+				ClassIcon sentry_gun_red_nys
+			}
+		}
+	}
+	Wave
+	{
+	    SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1341"
+            Y    "1124"
+            Z     "-169" //-35
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+		Level 1
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1307"
+            Y    "1867"
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 1 
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1244"
+            Y    "1646"  //changed
+            Z     "-169"  
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 1  
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1257"
+            Y    "1429" //changed
+            Z     "-169"
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 1   
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1500"
+            Y    "1438"
+            Z     "-169"  
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 1   
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1505"
+            Y    "1641"
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 1    
+        }
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		Explanation [$SIGSEGV] 
+ 	 	{
+			Line "{red}This is my world. You are not welcome in my world!"
+		}
+		WaveSpawn
+		{
+			Name "d1"   //soldier spam
+			TotalCurrency 200
+			Where tunnel
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitBetweenSpawns 0
+			FirstSpawnOutput
+		    {
+		        Target realtimer
+			    Action Trigger
+		    }
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Soldier_Spammer
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "d2"
+			TotalCurrency 20
+			Where upgrade_station
+			TotalCount 15
+			MaxActive 4
+			SpawnCount 3
+			TFBot
+			{
+			    Template T_TFBot_Red_Soldier
+				Attributes DisableDodge
+				WeaponRestrictions SecondaryOnly
+				Name "Shotgun Soldier"
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "d3"
+			TotalCurrency 20
+			Where tunnel
+			TotalCount 10
+			MaxActive 3
+			SpawnCount 2
+			TFBot
+			{
+			    Template T_TFBot_Red_Soldier
+				Attributes DisableDodge
+				WeaponRestrictions PrimaryOnly
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "d4"
+			TotalCurrency 20
+			Where upgrade_station
+			TotalCount 5
+			MaxActive 1
+			SpawnCount 1
+			TFBot
+			{
+			    Template T_TFBot_Red_Soldier
+				ClassIcon soldier_escapeplan
+				Attributes DisableDodge
+				WeaponRestrictions MeleeOnly
+				Name "Miner Soldier"
+				Scale 1.3
+				Health 800
+			    Item "the escape plan"
+				Item "stainless pot"
+				CharacterAttributes
+			    {
+			        "health regen" 5
+					"crit mod disabled" 0
+			    }
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "d5" 
+			TotalCurrency 200
+			Where tower
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead d1
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Soldier_Spammer_Reload
+				Attributes DisableDodge
+				WeaponRestrictions PrimaryOnly
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "d6"
+			TotalCurrency 20
+			Where upgrade_station
+			TotalCount 20
+			MaxActive 6
+			SpawnCount 5
+			WaitForAllDead d1
+			TFBot
+			{
+			    Template T_TFBot_Red_Soldier_RocketPush
+				Attributes DisableDodge
+				WeaponRestrictions PrimaryOnly
+				ClassIcon soldier
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "d7m" 
+			TotalCurrency 20
+			Where tower3
+			TotalCount 5
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead d1
+			TFBot
+			{
+			    Template T_TFBot_Red_Soldier
+				ClassIcon soldier_escapeplan
+				Attributes DisableDodge
+				WeaponRestrictions MeleeOnly
+				Name "Miner Soldier"
+				Scale 1.3
+				Health 800
+			    Item "the escape plan"
+				Item "stainless pot"
+				CharacterAttributes
+			    {
+			        "health regen" 5
+					"crit mod disabled" 0
+			    }
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "d7"
+			TotalCurrency 200
+			Where tower
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead d5
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Soldier
+				Name "Giant Shotgun Soldier"
+				Attributes DisableDodge
+				WeaponRestrictions SecondaryOnly
+				ClassIcon heavy_shotgun_red_giant
+				ItemAttributes
+			    {
+				    ItemName "tf_weapon_shotgun_soldier"
+				    "fire rate bonus" 2.5
+				    "bullets per shot bonus" 10
+				    "damage penalty" 0.5
+				    "faster reload rate" 0.1
+			    }
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "d8"
+			TotalCurrency 20
+			Where tower3
+			TotalCount 15
+			MaxActive 3
+			SpawnCount 3
+			WaitForAllDead d5
+			Squad
+			{
+			    TFBot
+			    {
+			        Template T_TFBot_Red_Soldier_Extended_Buff_Banner
+					ClassIcon soldier_banner_trio
+				    Attributes DisableDodge
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 2.7
+				    }
+			    }
+				TFBot
+			    {
+			        Template T_TFBot_Red_Soldier
+				    Attributes DisableDodge
+				    WeaponRestrictions PrimaryOnly
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+			    {
+			        Template T_TFBot_Red_Soldier
+				    Attributes DisableDodge
+				    WeaponRestrictions PrimaryOnly
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+			}
+		}
+		WaveSpawn
+		{
+		    Name "d9"
+			TotalCurrency 40
+			Where hatch2
+			TotalCount 10
+			MaxActive 5
+			SpawnCount 5
+			WaitForAllDead d7
+			TFBot
+			{
+			    Template T_TFBot_Red_Soldier
+				Attributes DisableDodge
+				WeaponRestrictions MeleeOnly
+				ClassIcon soldier_escapeplan
+				Name "Miner Soldier"
+				Scale 1.3
+				Health 800
+			    Item "the escape plan"
+				Item "stainless pot"
+				CharacterAttributes
+			    {
+			        "health regen" 5
+					"crit mod disabled" 0
+			    }
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "d10"
+			TotalCurrency 20
+			Where hatch
+			TotalCount 15
+			MaxActive 3
+			SpawnCount 3
+			WaitForAllDead d7
+			Squad
+			{
+			    TFBot
+			    {
+			        Template T_TFBot_Red_Soldier_Extended_Battalion
+				    Attributes DisableDodge
+				    WeaponRestrictions PrimaryOnly
+					ClassIcon soldier_banner_trio
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 2.7
+				    }
+			    }
+				TFBot
+			    {
+			        Template T_TFBot_Red_Soldier
+				    Attributes DisableDodge
+				    WeaponRestrictions PrimaryOnly
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+			    {
+			        Template T_TFBot_Red_Soldier
+				    Attributes DisableDodge
+				    WeaponRestrictions PrimaryOnly
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+			}
+		}
+		WaveSpawn
+		{
+		    Name "d11"
+			TotalCurrency 200
+			Where hatch2
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead d9
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Soldier_Crit
+				Attributes DisableDodge
+				WeaponRestrictions PrimaryOnly
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "d12" 
+			TotalCurrency 20
+			Where red_player_teamspawn
+			TotalCount 15
+			MaxActive 3
+			SpawnCount 3
+			WaitForAllDead d9
+			Squad
+			{
+			    TFBot
+			    {
+			        Template T_TFBot_Red_Soldier_Extended_Concheror
+				    Attributes DisableDodge
+				    WeaponRestrictions PrimaryOnly
+					ClassIcon soldier_banner_trio
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 2.7
+				    }
+			    }
+				TFBot
+			    {
+			        Template T_TFBot_Red_Soldier
+				    Attributes DisableDodge
+				    WeaponRestrictions PrimaryOnly
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+			    {
+			        Template T_TFBot_Red_Soldier
+				    Attributes DisableDodge
+				    WeaponRestrictions PrimaryOnly
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+			}
+		}
+		WaveSpawn
+		{
+			Name "d13"
+			TotalCurrency 0
+			Where red_player_teamspawn
+			TotalCount 998
+			MaxActive 5
+			SpawnCount 4
+			WaitForAllDead d11
+			FirstSpawnOutput 
+			{
+				Target unblockhatch
+				Action Trigger
+			}
+			TFBot
+			{
+			    Template T_TFBot_Red_Soldier
+				Attributes DisableDodge
+				ClassIcon red2_lite
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "d13h"
+			TotalCurrency 0
+			Where red_player_teamspawn
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead d11
+			FirstSpawnOutput
+			{
+			    Target hint
+			    Action Show
+			}
+			TFBot
+			{
+			    Template T_TFBot_Red_Soldier
+				Attributes DisableDodge
+				ClassIcon red2_lite
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "dsup1"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 1
+			SpawnCount 1
+			RandomSpawn 1
+			Support 1
+			Support Limited 
+			WaitBetweenSpawns 15
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier
+				Action Mobber [$SIGSEGV]
+				CharacterAttributes
+                {
+                    "cannot be teleported" 1
+                }
+			}
+		}
+		WaveSpawn
+		{
+			Name "dsup2"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 2
+			SpawnCount 2
+			RandomSpawn 1
+			Support 1
+			Support Limited 
+			TFBot
+			{
+				Class Soldier
+				Health 200
+				Skill Hard
+				WeaponRestrictions SecondaryOnly
+				ClassIcon heavy_shotgun
+				CharacterAttributes
+                {
+                    "cannot be teleported" 1
+                }
+			}
+		}
+		WaveSpawn  //this only for sentry icon
+		{
+			Name "sentry4"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 3
+			SpawnCount 1
+			RandomSpawn 1
+			Support Limited  
+			WaitBetweenSpawnsAfterDeath 20
+			WaitForAllDead d13
+			TFBot 				
+			{	
+				Class Scout
+			    Skill Normal
+				ClassIcon sentry_gun_red_nys
+			}
+		}
+	}
+	Wave
+	{
+	    SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1341"
+            Y    "1124"
+            Z     "-169" //-35
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+		Level 2
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1307"
+            Y    "1867"
+            Z     "-169"  
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 2 
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1244"
+            Y    "1646"  //changed
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 2 
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1257"
+            Y    "1429" //changed
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 2   
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1500"
+            Y    "1438"
+            Z     "-169"  
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 2   
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1505"
+            Y    "1641"
+            Z     "-169" 
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 2   
+        }
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		WaveSpawn
+		{
+			Name "e1"
+			TotalCurrency 100
+			Where tunnel
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBetweenSpawns 0
+			FirstSpawnOutput
+		    {
+		        Target realtimer
+			    Action Trigger
+		    }
+			TFBot
+		    {
+			    Template T_TFBot_Red_Giant_Soldier_SlowBarrage
+				Attributes AlwaysCrit
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "e2"
+			TotalCurrency 20
+			Where upgrade_station
+			TotalCount 12
+			MaxActive 5
+			SpawnCount 3
+			WaitBeforeStarting 2
+			TFBot
+			{
+			    Template T_TFBot_Red_Pyro_Flaregun
+				ClassIcon pyro_flare_red
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "e3"
+			TotalCurrency 300
+			Where tower
+			TotalCount 3
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead e1
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Demo_Burst
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "e4" 
+			TotalCurrency 40
+			Where tower2
+			TotalCount 28
+			MaxActive 9
+			SpawnCount 7
+			WaitForAllDead e1
+			TFBot
+			{
+			    Template T_TFBot_Red_Demoman_Knight
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "e5" 
+			TotalCurrency 20
+			Where tower3
+			TotalCount 16
+			MaxActive 3
+			SpawnCount 2
+			WaitForAllDead e1
+			TFBot
+			{
+			    Template T_TFBot_Red_Scout
+				Attributes DisableDodge
+				Skill Easy
+				Attributes AlwaysCrit
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "e6" 
+			TotalCurrency 100
+			Where hatch
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead e3
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Heavyweapons_Shotgun
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "e7" 
+			TotalCurrency 20
+			Where hatch
+			TotalCount 15
+			MaxActive 7
+			SpawnCount 5
+			WaitForAllDead e3
+			TFBot
+			{
+			    Template T_TFBot_Red_Soldier_Extended_Concheror
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "e8"
+			TotalCurrency 50
+			Where hatch
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead e6
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Soldier_Extended_Concheror
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "e9"
+			TotalCurrency 40
+			Where hatch2
+			TotalCount 12
+			MaxActive 4
+			SpawnCount 3
+			WaitForAllDead e6
+			TFBot
+			{
+			    Template T_TFBot_Red_Heavyweapons_Fist
+				Attributes DisableDodge
+				Attributes AlwaysCrit
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "e10"
+			TotalCurrency 50
+			Where hatch2
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead e6
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Soldier_Extended_Concheror
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "e11" 
+			TotalCurrency 30
+			Where red_player_teamspawn
+			TotalCount 24
+			MaxActive 6
+			SpawnCount 4
+			WaitForAllDead e6
+			TFBot
+			{
+			    Template T_TFBot_Red_Sniper_Huntsman
+				Attributes DisableDodge
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "e12" 
+			TotalCurrency 100
+			Where hatch2
+			TotalCount 3
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead e8
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Pyro
+				Attributes DisableDodge
+				Skill Hard
+				Attributes AlwaysCrit
+				ItemAttributes
+				{
+					ItemName	tf_weapon_flamethrower
+					"airblast_destroy_projectile" 1
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+				CharacterAttributes
+				{
+					"damage force reduction" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name "e13" 
+			TotalCurrency 30
+			Where red_player_teamspawn
+			TotalCount 28
+			MaxActive 5
+			SpawnCount 4
+			WaitForAllDead e10
+			TFBot
+			{
+				ClassIcon heavy
+				Name "Heavy"
+				Class HeavyWeapons
+			    Skill Easy
+			    AddCond [$SIGSEGV] { Name TF_COND_REPROGRAMMED } 
+			    Action Mobber [$SIGSEGV]
+			    Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "e14"
+			TotalCurrency 0
+			Where red_player_teamspawn
+			TotalCount 998
+			MaxActive 8
+			SpawnCount 6
+			WaitForAllDead e12
+			FirstSpawnOutput 
+			{
+				Target unblockhatch
+				Action Trigger
+			}
+			RandomChoice
+			{
+			    TFBot
+			    {
+			        Template T_TFBot_Red_Demoman_Knight
+				    Attributes DisableDodge
+				    ClassIcon red2_lite
+					Attributes AlwaysCrit
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+			    {
+			        Template T_TFBot_Red_ScorchShot_FastShot
+				    Attributes DisableDodge
+				    ClassIcon red2_lite
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				    }
+			    }
+			}	
+		}
+		WaveSpawn
+		{
+			Name "e14h"
+			TotalCurrency 0
+			Where red_player_teamspawn
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead e12
+			FirstSpawnOutput
+			{
+			    Target hint
+			    Action Show
+			}
+			TFBot
+			{
+			    Template T_TFBot_Red_ScorchShot_FastShot
+				Attributes DisableDodge
+				ClassIcon red2_lite
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "esup1"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 2
+			SpawnCount 2
+			RandomSpawn 1
+			Support 1
+			Support Limited 
+			TFBot
+			{
+				Class Soldier
+				Health 200
+				Skill Hard
+				ClassIcon soldier_buff
+				Item "the buff banner"
+				Attributes SpawnWithFullCharge
+				CharacterAttributes
+				{
+				    "increase buff duration" 9
+					"cannot be teleported" 1
+				}
+			}
+        }
+		WaveSpawn
+		{
+			Name "esup2"
+			Where flankers
+			TotalCount 999
+			MaxActive 1
+			SpawnCount 1
+			RandomSpawn 1
+			Support 1
+			Support Limited 
+			WaitBetweenSpawnsAfterDeath 8
+			TFBot
+			{
+			    Template T_TFBot_Giant_Scout
+			    Action Mobber [$SIGSEGV]
+				CharacterAttributes
+                {
+                    "cannot be teleported" 1
+                }
+			}
+		}
+		WaveSpawn  //this only for sentry icon
+		{
+			Name "sentry5"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 3
+			SpawnCount 1
+			RandomSpawn 1
+			Support Limited  
+			WaitBetweenSpawns 3
+			WaitForAllDead e14
+			TFBot 				
+			{	
+				Class Scout
+			    Skill Normal
+				ClassIcon sentry_gun_lvl2_red_lite
+			}
+		}
+	}
+	Wave
+	{
+	    SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1341"
+            Y    "1124"
+            Z     "-169" //-35
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+		Level 2
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1307"
+            Y    "1867"
+            Z     "-169"  
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 2 
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1244"
+            Y    "1646"  //changed
+            Z     "-169"   
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 2 
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1257"
+            Y    "1429" //changed
+            Z     "-169"  
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 2   
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1500"
+            Y    "1438"
+            Z     "-169"  
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 2   
+        }
+		SentryGun [$SIGSEGV]
+        {
+        Position
+        {
+            X    "-1505"
+            Y    "1641"
+            Z     "-169"
+            Pitch   "0.00"
+            Yaw   "115"
+            Roll    "0.00"
+        }
+        TeamNum 2
+        Level 2   
+        }
+		Explanation [$SIGSEGV] 
+ 	 	{
+			Line "{yellow}Tank have arrived to destroy your base!"
+			Line "{yellow}Good luck!"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		WaveSpawn
+		{
+			Name "f1" 
+			TotalCurrency 100
+			Where tunnel
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 6
+			FirstSpawnOutput
+		    {
+		        Target realtimer
+			    Action Trigger
+		    }
+			Squad
+			{
+			    TFBot
+			    {
+				    Template T_TFBot_Red_Giant_Heavyweapons_Deflector
+				    Attributes DisableDodge
+				    CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+						"damage force reduction" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+				}
+				TFBot
+			    {
+			        Template T_TFBot_Red_Medic
+				    Attributes DisableDodge
+				    CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+			    {
+			        Template T_TFBot_Red_Medic
+				    Attributes DisableDodge
+				    CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+			    {
+			        Template T_TFBot_Red_Medic
+				    Attributes DisableDodge
+				    CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+			    {
+			        Template T_TFBot_Red_Medic
+				    Attributes DisableDodge
+				    CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+			    {
+			        Template T_TFBot_Red_Medic
+				    Attributes DisableDodge
+				    CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+			}
+		}
+        WaveSpawn
+		{
+			Name "f2" 
+			TotalCurrency 50
+			Where upgrade_station
+			TotalCount 20
+			MaxActive 5
+			SpawnCount 4
+			TFBot
+			{
+                Template T_TFBot_Red_Heavyweapons_Shotgun
+				Attributes AlwaysCrit
+				Attributes DisableDodge
+			    AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+			        Duration 1.7
+				}
+			}
+        }
+        WaveSpawn
+		{
+			Name "f3"
+			TotalCurrency 50
+			Where tower3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitForAllDead f1
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Soldier_Spammer_Reload
+				Action Mobber [$SIGSEGV]
+				Attributes AlwaysCrit
+				Attributes DisableDodge
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+				CharacterAttributes
+				{
+				    "damage force reduction" 0
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "f4"
+			TotalCurrency 50
+			Where tower
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 6
+			WaitBeforeStarting 0
+			WaitForAllDead f1
+			TFBot
+			{
+			    Template T_TFBot_Red_Pyro
+				Attributes AlwaysFireWeapon
+				Skill Hard
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+        WaveSpawn
+		{
+			Name "f3"
+			TotalCurrency 50
+			Where tower2
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitForAllDead f1
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Soldier_Spammer_Reload
+				Action Mobber [$SIGSEGV]
+				Attributes AlwaysCrit
+				Attributes DisableDodge
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+				CharacterAttributes
+				{
+				    "damage force reduction" 0
+				}
+			}
+		}	
+        WaveSpawn
+		{
+			Name "f5"
+			TotalCount 5
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 4
+			WaitForAllDead f3
+			Tank
+			{
+				Health 6000
+				Speed	100
+				TeamNum 2
+				Name "small_tank_turret"
+				SpawnTemplate "SmallTankTurretRed"
+				DisableBomb 1
+				Scale 0.5
+				MaxTurnRate 60
+				DisableSmokestack 1
+				//DisableTracks 1
+				ClassIcon tank_red_small_turret [$SIGSEGV]
+				//Model  "models/props_frontline/tank_cart.mdl" [$SIGSEGV]
+				Model
+				{
+				    LeftTrack "models/bots/boss_bot/tankred_track_l.mdl"
+					RightTrack "models/bots/boss_bot/tankred_track_r.mdl"
+				}
+				StartingPathTrackNode "tankpath1_1"
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger                         
+				}
+				OnBombDroppedOutput
+				{
+					Target	redwin_relay
+					Action	Trigger
+				}
+			}
+		}
+        WaveSpawn
+		{
+			Name "f6"
+			TotalCurrency 100
+			Where hatch2
+			Where hatch
+			RandomSpawn 1
+			TotalCount 6
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitForAllDead f3
+			TFBot
+			{
+			    Template T_TFBot_Red_Giant_Demoman
+				ClassIcon demo_spammer
+				Skill Hard
+				Attributes DisableDodge
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+					"damage force reduction" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+					Duration 1.7
+				}
+			}
+		}
+        WaveSpawn
+		{
+			Name "f7"
+			TotalCurrency 200
+			Where hatch2
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitForAllDead f5
+			DoneOutput
+			{
+			    Target unblockhatch
+				Action Trigger
+			}
+			TFBot
+		    {
+			    Template T_TFBot_Red_Chief_Demo_Atomic
+				Health 60000
+				Name "Sir Nukesalot II"
+				AlwaysGlow 1
+				Item "bruce's bonnet"
+				ClassIcon demo_atomic
+				CharacterAttributes
+				{
+				    "rage giving scale"	0.1
+				}
+			}
+		}
+        WaveSpawn
+		{
+			Name "f8"
+			TotalCount 3
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 6
+			WaitForAllDead f5
+			Tank
+			{
+				Health 5000
+				Speed	100
+				TeamNum 2
+				Name "small_tank_turret"
+				SpawnTemplate "SmallTankTurretRed"
+				DisableBomb 1
+				Scale 0.5
+				MaxTurnRate 60
+				DisableSmokestack 1
+				//DisableTracks 1
+				ClassIcon tank_red_small_turret [$SIGSEGV]
+				//Model  "models/props_frontline/tank_cart.mdl" [$SIGSEGV]
+				Model
+				{
+				    LeftTrack "models/bots/boss_bot/tankred_track_l.mdl"
+					RightTrack "models/bots/boss_bot/tankred_track_r.mdl"
+				}
+				StartingPathTrackNode "tankpath2_1"
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger                         
+				}
+				OnBombDroppedOutput
+				{
+					Target	redwin_relay
+					Action	Trigger
+				}
+			}
+		}
+        WaveSpawn
+		{
+			Name "f9" 
+			TotalCurrency 0
+			Where red_player_teamspawn
+			TotalCount 998
+			MaxActive 8
+			SpawnCount 1
+			WaitBetweenSpawns 0
+			RandomSpawn 1
+			WaitForAllDead f3
+			RandomChoice
+			{
+			    TFBot
+		        {
+			        Template T_TFBot_Red_Heavyweapons_Heavyweight_Champ_Fast
+					Attributes AlwaysCrit
+					Attributes DisableDodge
+					ClassIcon red2_lite
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+		        {
+			        Template T_TFBot_Red_Demoman
+					Attributes DisableDodge
+					ClassIcon red2_lite
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+		        {
+			        Template T_TFBot_Red_Heavyweapons_Shotgun
+					Attributes DisableDodge
+					Attributes AlwaysCrit
+					ClassIcon red2_lite
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+		        {
+			        Template T_TFBot_Red_Pyro
+					Attributes AlwaysCrit
+					Attributes DisableDodge
+					ClassIcon red2_lite
+					Skill Easy
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+		        {
+			        Template T_TFBot_Red_Sniper_Huntsman
+					Attributes DisableDodge
+					ClassIcon red2_lite
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+		        {
+			        Template T_TFBot_Red_Demoman_Knight
+					Attributes DisableDodge
+					ClassIcon red2_lite
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+				TFBot
+		        {
+			        Template T_TFBot_Red_Soldier_RocketShotgun
+					Attributes DisableDodge
+					ClassIcon red2_lite
+					CharacterAttributes
+				    {
+				        "crit mod disabled" 0
+				    }
+				    AddCond [$SIGSEGV]
+				    {
+				        Name "TF_COND_INVULNERABLE"
+					    Duration 1.7
+				    }
+			    }
+			}
+		}
+        WaveSpawn
+		{
+			Name "f10"
+			TotalCurrency 0
+			Where red_player_teamspawn
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitForAllDead f7
+			FirstSpawnOutput
+            {
+			    Target hint
+			    Action Show
+			}
+			TFBot
+		    {
+			    Template T_TFBot_Red_Demoman
+			    Attributes DisableDodge
+				ClassIcon red2_lite
+				CharacterAttributes
+				{
+				    "crit mod disabled" 0
+				}
+				AddCond [$SIGSEGV]
+				{
+				    Name "TF_COND_INVULNERABLE"
+				    Duration 1.7
+			    }
+			}
+        }
+        WaveSpawn
+		{
+			Name "fsup1"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 3
+			SpawnCount 3
+			RandomSpawn 1
+			Support 1
+			Support Limited 
+			TFBot
+			{
+			    Template T_TFBot_Sniper_Huntsman
+				Action Mobber [$SIGSEGV]
+				CharacterAttributes
+                {
+                    "cannot be teleported" 1
+                }
+			}
+		}
+		WaveSpawn
+		{
+			Name "fsup2"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 1
+			SpawnCount 1
+			RandomSpawn 1
+			Support 1
+			Support Limited
+            WaitBetweenSpawns 10			
+			TFBot
+			{
+			    Class Scout
+			    Skill Normal
+				CharacterAttributes
+                {
+                    "cannot be teleported" 1
+                }
+			}
+		}		
+		WaveSpawn  //this only for sentry icon
+		{
+			Name "sentry6"
+			Where spawnbot
+			TotalCount 999
+			MaxActive 3
+			SpawnCount 1
+			RandomSpawn 1
+			Support Limited  
+			WaitBetweenSpawns 3
+			WaitForAllDead f9
+			TFBot 				
+			{	
+				Class Scout
+			    Skill Normal
+				ClassIcon sentry_gun_lvl2_red_lite
+			}
+		}
+		
+	}
+}
+
