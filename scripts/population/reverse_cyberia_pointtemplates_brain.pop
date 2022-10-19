@@ -36,9 +36,9 @@ WaveSchedule
 				"OnMapSpawn" "wave_finished_relay,AddOutput,OnTrigger booster:Disale::0:-1,0,-1"
 				
 				//trigger_playermovement bug: dying or resetting the wave while inside of one forces you into a broken half-crouched state until you touch it again
-				"OnMapSpawn" "boss_deploy_relay,AddOutput,OnTrigger trigger_playermovement:DisableAndEndTouch::1:-1,0,-1"	
+				"OnMapSpawn" "boss_deploy_relay,AddOutput,OnTrigger trigger_playermovement:Kill::0:-1,0,-1"	
 				
-				//some obscure thing I'm too lazy to fix correctly: props sometimes disappears on wave start, disabling/enabling quickly on wave init seems to fix it
+				//some obscure thing I'm too lazy to fix correctly: props sometimes disappear, disabling/enabling quickly on wave init seems to fix it
 				"OnMapSpawn" "upgradestation*,Disable,,0.01,-1"
 				"OnMapSpawn" "upgradestation*,Enable,,0.03,-1"				
 				"OnMapSpawn" "tree,Disable,,0.01,-1"
@@ -78,6 +78,7 @@ WaveSchedule
                 "targetname" "locker_model" //need a locker model to stop server console spam
 				"model"      "models/props_gameplay/resupply_locker.mdl"
                 "solid"      "0"
+				"rendermode" "10"
 				"origin" "0 0 -9999" //into the void with you
                 "disableshadows" "1"
             }
@@ -1117,7 +1118,7 @@ WaveSchedule
 			{
 				"targetname" "redtank_deploy_relay"
 				
-			//	"OnSpawn" "redtankpath_1,AddOutput,OnPass tankbossred:SetTeam:2:0:-1" //set to red on spawn
+				"OnSpawn" "redtankpath_1,AddOutput,OnPass tankbossred:color:184 56 59:0:-1" //set to red on spawn
 				"OnSpawn" "redtankpath_2,AddOutput,OnPass Barricade_Destroy_Relay:Trigger:0:-1" //break barricades
 				"OnSpawn" "redtankpath_4,AddOutput,OnPass tank_bust_relay:Trigger:0:-1" //break barricades
 				
@@ -1241,10 +1242,9 @@ WaveSchedule
 				"disablereceiveshadows" "0"
 			}
 		}
-		carrierescape //escape logic
+		carriercollision
 		{
 			NoFixup 1
-			//props for collision
 			prop_dynamic
 			{
 				"model" "models/props_mvm/mine_elevator_door.mdl"
@@ -1366,6 +1366,11 @@ WaveSchedule
 				"fadescale" "1"
 				"solid" "6"
 			}
+		}
+		carrierescape //escape logic
+		{
+			NoFixup 1
+			//props for collision
 			ambient_generic
 			{
 				"origin" "-106.081276 -2063.704102 598.126892"
@@ -1485,12 +1490,12 @@ WaveSchedule
 				"OnCase15" "hackrocket,Trigger,,5,-1"
 				"OnCase16" "hackrocket,Trigger,,5,-1"
 			}
-			logic_relay
-			{
-				"targetname" "forcerarefinale"
-				"OnTrigger" "escaperng,Kill,,0,-1"
-				"OnTrigger" "rocketfx_relay,Trigger,,2,-1"
-			}
+			// logic_relay
+			// {
+			// 	"targetname" "forcerarefinale"
+			// 	"OnTrigger" "escaperng,Kill,,0,-1"
+			// 	"OnTrigger" "rocketfx_relay,Trigger,,2,-1"
+			// }
 			logic_relay
 			{
 				"targetname" "hackrocket"
@@ -1599,8 +1604,8 @@ WaveSchedule
 				"pushdir" "0 90 0"
 				"speed" "300"
 				"spawnflags" "1"
-				"mins" "-2000 -1500 -150"
-				"maxs" "2000 520 2000"
+				"mins" "-2000 -1600 -150"
+				"maxs" "2000 620 2000"
 				"StartDisabled" "1"
 			}
 			trigger_push
@@ -1611,7 +1616,7 @@ WaveSchedule
 				"speed" "300"
 				"spawnflags" "1"
 				"mins" "-800 -1500 -1800"
-				"maxs" "1100 1800 1800"
+				"maxs" "1100 1900 1800"
 				"StartDisabled" "1"
 			}
 		}
@@ -1869,11 +1874,13 @@ WaveSchedule
 				"OnCapTeam2" "rocketfx2_relay,Trigger,,0,-1"
 				"OnCapTeam2" "door_red_large*,Open,,0.01,-1"
 				"OnCapTeam2" "door_red_large*,Kill,,1,-1"
-				"OnCapTeam2" "rocketfx2_relay,Trigger,,0,-1"
 				"OnCapTeam2" "cap_master2,Kill,,3,-1"
 				"OnCapTeam2" "cap_point2,Kill,,3,-1"
 				"OnCapTeam2" "cap_area2,Kill,,3,-1"
 				"OnCapTeam2" "player,$DisplayTextCenter,ROCKET ACTIVATED! ESCAPE TO THE CARRIER TANK,0,-1"
+				"OnCapTeam2" "tankdoor*,Open,,1,-1"
+				"OnCapTeam2" "escapetele,Enable,,10,-1"
+				"OnCapTeam2" "escapetunnel,Show,,20,-1"
 				//"OnCapTeam1" "cap_base,Skin,1,0,-1" 		//set the first number to 0 for neutral, 1 for red, 2 for blu
 			}
 			team_control_point
