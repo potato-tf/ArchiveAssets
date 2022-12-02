@@ -1,0 +1,836 @@
+WaveSchedule
+{
+    PrecacheModel "models/props_frontline/tank_cart.mdl"  
+    Templates  
+    {
+        SmallTankTurret
+		{
+            SpawnTemplate "SmallTankTurret"
+            ClassIcon tank_small_turret
+            DisableSmokestack 1
+            DisableBomb 1
+            Scale 0.5
+        }
+        SmallTankTurretCrit
+		{
+            SpawnTemplate "SmallTankTurretCrit"
+            ClassIcon tank_small_turret_crit
+            DisableSmokestack 1
+            DisableBomb 1
+            Scale 0.5
+            IsCrit 1
+        }
+        SmallTankTurretJarate
+		{
+            SpawnTemplate "SmallTankTurretJarate"
+            ClassIcon tank_small_turret_jarate
+            DisableSmokestack 1
+            DisableBomb 1
+            Scale 0.5
+        }
+    }
+    PointTemplates  
+    {
+        SmallTankTurret
+		{
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "rendermode 1"
+				Delay 0.0
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "alpha"
+				Param "0"
+				Delay 0.0
+			}
+            OnSpawnOutput
+			{
+				Target "tank_turret_shoot_relay"
+				Action "trigger"
+				Param ""
+				Delay 5
+			}
+            OnSpawnOutput
+			{
+				Target "spawntr"
+				Action "trigger"
+				Param ""
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnHealthBelow60Percent tank_turret_shoot_relay_super:trigger::0:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnHealthBelow20Percent tank_turret_shoot_relay_super:trigger::0:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "tank_turret_particle"
+				Action "SetParentAttachment"
+				Param "light"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnUser4 tank_turret_prop_bomb:enable::0:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnUser4 tank_turret_prop_bomb:SetAnimation:deploy:0.01:-1"
+				Delay 1
+			}
+            prop_dynamic
+            {
+                "targetname" "tank_turret_prop"
+                "model" "models/props_frontline/tank_cart.mdl"
+                "solid" "0"
+                "angles" "0 180 0"
+                "DefaultAnim" "idle"
+            }
+            prop_dynamic
+            {
+                "targetname" "tank_turret_prop_bomb"
+                "model" "models/bots/boss_bot/bomb_mechanism.mdl"
+                "startdisabled" "1"
+                "solid" "0"
+                "DefaultAnim" "idle"
+                "modelscale" "0.5"
+                "angles" "0 0 0"
+                "origin" "-8 0 -16"
+            }
+            info_particle_system
+            {
+                "targetname" "tank_turret_particle"
+                "effect_name" "cart_flashinglight"
+                "parentname" "tank_turret_prop"
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_grenade"
+                "angles" "3 0 0"
+                "origin" "68 0 76"
+                "Damage" "125"
+                "SpeedMax" "170"
+                "SpeedMin" "170"
+                "SplashRadius" "250"
+                "SpreadAngle" "2"
+                "WeaponType" "3"
+                "ModelScale" "1"
+                "ModelOverride" "models/weapons/w_models/w_grenade_grenadelauncher.mdl"
+                
+                "onuser1" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "tank_turret_particle,$PlaySound,=120|mvm/giant_demoman/giant_demoman_grenade_shoot.wav,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser2" "!self,DetonateStickies,,3.1,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_n"
+                "angles" "3 0 0"
+                "origin" "68 0 76"
+                "Damage" "100"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+                "onuser1" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_w"
+                "angles" "3 90 0"
+                "origin" "-16 62 76"
+                "Damage" "100"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+                "onuser1" "tank_turret_prop,setanimation,shoot_W,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_W,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_nw"
+                "angles" "3 45 0"
+                "origin" "40 62 76"
+                "Damage" "100"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+                "onuser1" "tank_turret_prop,setanimation,shoot_NW,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_NW,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_e"
+                "angles" "3 -90 0"
+                "origin" "-16 -62 76"
+                "Damage" "100"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+                "onuser1" "tank_turret_prop,setanimation,shoot_E,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_E,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_ne"
+                "angles" "3 -45 0"
+                "origin" "40 -62 76"
+                "Damage" "100"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+                "onuser1" "tank_turret_prop,setanimation,shoot_NE,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_NE,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            logic_relay
+            {
+                "targetname" "tank_turret_shoot_effect_relay"
+                "ontrigger" "!parent,addoutput,solid 1,0.0,-1"
+                "ontrigger" "!parent,addoutput,solid 2,0.12,-1"
+                "ontrigger" "!parent,$playsound,MVM.GiantSoldierRocketShoot,0,-1"
+                "spawnflags" "2"
+            }
+            logic_relay
+            {
+                "targetname" "tank_turret_shoot_relay"
+                "ontrigger" "tank_turret_shooter_n,fireuser1,,0,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser1,,2,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser1,,4,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser1,,6,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser1,,8,-1"
+
+                "ontrigger" "tank_turret_shooter_grenade,fireuser1,,10,-1"
+                "ontrigger" "!self,trigger,,12,-1"
+                "spawnflags" "2"
+            }
+            logic_relay
+            {
+                "targetname" "tank_turret_shoot_relay_super"
+                "ontrigger" "tank_turret_particle,Start,,0,-1"
+                "ontrigger" "tank_turret_prop,$playsound,MVM.GiantHeavyGunWindUp,0,-1"
+                "ontrigger" "tank_turret_shoot_relay,cancelpending,,1,-1"
+                "ontrigger" "tank_turret_shooter_n,fireuser3,,1,-1"
+                "ontrigger" "tank_turret_shooter_n,fireuser3,,1.5,-1"
+                "ontrigger" "tank_turret_shooter_n,fireuser3,,2,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser3,,3,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser3,,3.5,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser3,,4,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser3,,5,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser3,,5.5,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser3,,6,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser3,,7,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser3,,7.5,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser3,,8,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser3,,9,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser3,,9.5,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser3,,10,-1"
+                "ontrigger" "tank_turret_shooter_grenade,fireuser3,,11,-1"
+                "ontrigger" "tank_turret_shooter_grenade,fireuser3,,11.5,-1"
+                "ontrigger" "tank_turret_shooter_grenade,fireuser3,,12,-1"
+                "ontrigger" "tank_turret_particle,Stop,,12,-1"
+
+                "ontrigger" "tank_turret_shoot_relay,trigger,,13,-1"
+                "spawnflags" "2"
+            }
+		}
+        SmallTankTurretCrit
+		{
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "rendermode 1"
+				Delay 0.0
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "alpha"
+				Param "0"
+				Delay 0.0
+			}
+            OnSpawnOutput
+			{
+				Target "tank_turret_shoot_relay"
+				Action "trigger"
+				Param ""
+				Delay 5
+			}
+            OnSpawnOutput
+			{
+				Target "spawntr"
+				Action "trigger"
+				Param ""
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnHealthBelow60Percent tank_turret_shoot_relay_super:trigger::0:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnHealthBelow20Percent tank_turret_shoot_relay_super:trigger::0:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "tank_turret_particle"
+				Action "SetParentAttachment"
+				Param "light"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnUser4 tank_turret_prop_bomb:enable::0:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnUser4 tank_turret_prop_bomb:SetAnimation:deploy:0.01:-1"
+				Delay 1
+			}
+            prop_dynamic
+            {
+                "targetname" "tank_turret_prop"
+                "model" "models/props_frontline/tank_cart.mdl"
+                "solid" "0"
+                "skin" "2"
+                "angles" "0 180 0"
+                "DefaultAnim" "idle"
+            }
+            prop_dynamic
+            {
+                "targetname" "tank_turret_prop_bomb"
+                "model" "models/bots/boss_bot/bomb_mechanism.mdl"
+                "startdisabled" "1"
+                "solid" "0"
+                "DefaultAnim" "idle"
+                "modelscale" "0.5"
+                "angles" "0 0 0"
+                "origin" "-8 0 -16"
+            }
+            info_particle_system
+            {
+                "targetname" "tank_turret_particle"
+                "effect_name" "cart_flashinglight"
+                "parentname" "tank_turret_prop"
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_grenade"
+                "angles" "3 0 0"
+                "origin" "68 0 76"
+                "Damage" "110"
+                "SpeedMax" "170"
+                "SpeedMin" "170"
+                "SplashRadius" "250"
+                "SpreadAngle" "2"
+                "WeaponType" "3"
+                "ModelScale" "1"
+                "ModelOverride" "models/weapons/w_models/w_grenade_grenadelauncher.mdl"
+                "Crits" "1"
+                "onuser1" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "tank_turret_particle,$PlaySound,=120|mvm/giant_demoman/giant_demoman_grenade_shoot.wav,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser2" "!self,DetonateStickies,,3.1,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_n"
+                "angles" "3 0 0"
+                "origin" "68 0 76"
+                "Damage" "90"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+                "Crits" "1"
+                "onuser1" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_w"
+                "angles" "3 90 0"
+                "origin" "-16 62 76"
+                "Damage" "90"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+                "Crits" "1"
+                "onuser1" "tank_turret_prop,setanimation,shoot_W,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_W,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_nw"
+                "angles" "3 45 0"
+                "origin" "40 62 76"
+                "Damage" "90"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+                "Crits" "1"
+                "onuser1" "tank_turret_prop,setanimation,shoot_NW,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_NW,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_e"
+                "angles" "3 -90 0"
+                "origin" "-16 -62 76"
+                "Damage" "90"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+                "Crits" "1"
+                "onuser1" "tank_turret_prop,setanimation,shoot_E,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_E,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "tank_turret_shooter_ne"
+                "angles" "3 -45 0"
+                "origin" "40 -62 76"
+                "Damage" "90"
+                "SpeedMax" "1800"
+                "SpeedMin" "1800"
+                "SplashRadius" "180"
+                "SpreadAngle" "2"
+                "WeaponType" "0"
+                "Crits" "1"
+                "onuser1" "tank_turret_prop,setanimation,shoot_NE,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,fireonce,,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_NE,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            logic_relay
+            {
+                "targetname" "tank_turret_shoot_effect_relay"
+                "ontrigger" "!parent,addoutput,solid 1,0.0,-1"
+                "ontrigger" "!parent,addoutput,solid 2,0.12,-1"
+                "ontrigger" "!parent,$playsound,MVM.GiantSoldierRocketShootCrit,0,-1"
+                "spawnflags" "2"
+            }
+            logic_relay
+            {
+                "targetname" "tank_turret_shoot_relay"
+                "ontrigger" "tank_turret_shooter_n,fireuser1,,0,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser1,,2,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser1,,4,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser1,,6,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser1,,8,-1"
+
+                "ontrigger" "tank_turret_shooter_grenade,fireuser1,,10,-1"
+                "ontrigger" "!self,trigger,,12,-1"
+                "spawnflags" "2"
+            }
+            logic_relay
+            {
+                "targetname" "tank_turret_shoot_relay_super"
+                "ontrigger" "tank_turret_particle,Start,,0,-1"
+                "ontrigger" "tank_turret_prop,$playsound,MVM.GiantHeavyGunWindUp,0,-1"
+                "ontrigger" "tank_turret_shoot_relay,cancelpending,,1,-1"
+                "ontrigger" "tank_turret_shooter_n,fireuser3,,1,-1"
+                "ontrigger" "tank_turret_shooter_n,fireuser3,,1.5,-1"
+                "ontrigger" "tank_turret_shooter_n,fireuser3,,2,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser3,,3,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser3,,3.5,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser3,,4,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser3,,5,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser3,,5.5,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser3,,6,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser3,,7,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser3,,7.5,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser3,,8,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser3,,9,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser3,,9.5,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser3,,10,-1"
+                "ontrigger" "tank_turret_shooter_grenade,fireuser3,,11,-1"
+                "ontrigger" "tank_turret_shooter_grenade,fireuser3,,11.5,-1"
+                "ontrigger" "tank_turret_shooter_grenade,fireuser3,,12,-1"
+                "ontrigger" "tank_turret_particle,Stop,,12,-1"
+
+                "ontrigger" "tank_turret_shoot_relay,trigger,,13,-1"
+                "spawnflags" "2"
+            }
+		}
+        JarateThrow
+		{
+            tf_projectile_jar
+            {
+                "teamnum" "3"
+            }
+        }
+        SmallTankTurretJarate
+		{
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "rendermode 1"
+				Delay 0.0
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "alpha"
+				Param "0"
+				Delay 0.0
+			}
+            OnSpawnOutput
+			{
+				Target "tank_turret_shoot_relay"
+				Action "trigger"
+				Param ""
+				Delay 5
+			}
+            OnSpawnOutput
+			{
+				Target "spawntr"
+				Action "trigger"
+				Param ""
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnHealthBelow60Percent tank_turret_shoot_relay_super:trigger::0:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnHealthBelow20Percent tank_turret_shoot_relay_super:trigger::0:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "tank_turret_particle"
+				Action "SetParentAttachment"
+				Param "light"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnUser4 tank_turret_prop_bomb:enable::0:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "addoutput"
+				Param "OnUser4 tank_turret_prop_bomb:SetAnimation:deploy:0.01:-1"
+				Delay 1
+			}
+            OnSpawnOutput
+			{
+				Target "tank_turret_jar_prop"
+				Action "SetParentAttachmentMaintainOffset"
+				Param "light"
+				Delay 0.01
+			}
+            prop_dynamic
+            {
+                "targetname" "tank_turret_jar_prop"
+                "model" "models/weapons/c_models/urinejar.mdl"
+                "solid" "0"
+                "angles" "0 0 180"
+                "origin" "-16 0 98"
+                "modelscale" "4.5"
+                "parentname" "tank_turret_prop"
+            }
+            prop_dynamic
+            {
+                "targetname" "tank_turret_prop"
+                "model" "models/props_frontline/tank_cart.mdl"
+                "solid" "0"
+                "angles" "0 180 0"
+                "DefaultAnim" "idle"
+            }
+            prop_dynamic
+            {
+                "targetname" "tank_turret_prop_bomb"
+                "model" "models/bots/boss_bot/bomb_mechanism.mdl"
+                "startdisabled" "1"
+                "solid" "0"
+                "DefaultAnim" "idle"
+                "modelscale" "0.5"
+                "angles" "0 0 0"
+                "origin" "-8 0 -16"
+            }
+            info_particle_system
+            {
+                "targetname" "tank_turret_particle"
+                "effect_name" "cart_flashinglight"
+                "parentname" "tank_turret_prop"
+            }
+            env_entity_maker
+            {
+                "targetname" "tank_turret_shooter_grenade"
+                "angles" "3 0 0"
+                "origin" "68 0 76"
+                "EntityTemplate" "JarateThrow"
+                "PostSpawnSpeed" "200"
+                "PostSpawnDirectionVariance" "0"
+                "PostSpawnInheritAngles" "1"
+                "PostSpawnDirection" "0 0 0"
+                "onuser1" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,forcespawnatentityorigin,!self,0.02,-1" 
+                "onuser2" "!self,DetonateStickies,,3.1,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            env_entity_maker
+            {
+                "targetname" "tank_turret_shooter_n"
+                "angles" "3 0 0"
+                "origin" "68 0 76"
+                "EntityTemplate" "JarateThrow"
+                "PostSpawnSpeed" "1000"
+                "PostSpawnDirectionVariance" "0"
+                "PostSpawnInheritAngles" "1"
+                "PostSpawnDirection" "0 0 0"
+                "onuser1" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,forcespawnatentityorigin,!self,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_N,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            env_entity_maker
+            {
+                "targetname" "tank_turret_shooter_w"
+                "angles" "3 90 0"
+                "origin" "-16 62 76"
+                "EntityTemplate" "JarateThrow"
+                "PostSpawnSpeed" "1000"
+                "PostSpawnDirectionVariance" "0"
+                "PostSpawnInheritAngles" "1"
+                "PostSpawnDirection" "0 0 0"
+                "onuser1" "tank_turret_prop,setanimation,shoot_W,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,forcespawnatentityorigin,!self,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_W,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            env_entity_maker
+            {
+                "targetname" "tank_turret_shooter_nw"
+                "angles" "3 45 0"
+                "origin" "40 62 76"
+                "EntityTemplate" "JarateThrow"
+                "PostSpawnSpeed" "1000"
+                "PostSpawnDirectionVariance" "0"
+                "PostSpawnInheritAngles" "1"
+                "PostSpawnDirection" "0 0 0"
+                "onuser1" "tank_turret_prop,setanimation,shoot_NW,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,forcespawnatentityorigin,!self,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_NW,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            env_entity_maker
+            {
+                "targetname" "tank_turret_shooter_e"
+                "angles" "3 -90 0"
+                "origin" "-16 -62 76"
+                "EntityTemplate" "JarateThrow"
+                "PostSpawnSpeed" "1000"
+                "PostSpawnDirectionVariance" "0"
+                "PostSpawnInheritAngles" "1"
+                "PostSpawnDirection" "0 0 0"
+                "onuser1" "tank_turret_prop,setanimation,shoot_E,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,forcespawnatentityorigin,!self,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_E,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            env_entity_maker
+            {
+                "targetname" "tank_turret_shooter_ne"
+                "angles" "3 -45 0"
+                "origin" "40 -62 76"
+                "EntityTemplate" "JarateThrow"
+                "PostSpawnSpeed" "1000"
+                "PostSpawnDirectionVariance" "0"
+                "PostSpawnInheritAngles" "1"
+                "PostSpawnDirection" "0 0 0"
+                "onuser1" "tank_turret_prop,setanimation,shoot_NE,0,-1"
+                "onuser1" "tank_turret_prop,SetPlaybackRate,0.66,0.01,-1"
+                "onuser1" "!self,fireuser2,,0.8,-1"
+                "onuser2" "tank_turret_shoot_effect_relay,trigger,,0,-1"
+                "onuser2" "!self,forcespawnatentityorigin,!self,0.02,-1" 
+                "onuser3" "tank_turret_prop,setanimation,shoot_NE,0,-1"
+                "onuser3" "!self,fireuser2,,0.5,-1" 
+            }
+            logic_relay
+            {
+                "targetname" "tank_turret_shoot_effect_relay"
+                "ontrigger" "!parent,addoutput,solid 1,0.0,-1"
+                "ontrigger" "!parent,addoutput,solid 2,0.12,-1"
+                "ontrigger" "!parent,$playsound,Weapon_Jarate.Single,0,-1"
+                "spawnflags" "2"
+            }
+            logic_relay
+            {
+                "targetname" "tank_turret_shoot_relay"
+                "ontrigger" "tank_turret_shooter_n,fireuser1,,0,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser1,,2,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser1,,4,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser1,,6,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser1,,8,-1"
+
+                "ontrigger" "tank_turret_shooter_grenade,fireuser1,,10,-1"
+                "ontrigger" "!self,trigger,,12,-1"
+                "spawnflags" "2"
+            }
+            logic_relay
+            {
+                "targetname" "tank_turret_shoot_relay_super"
+                "ontrigger" "tank_turret_particle,Start,,0,-1"
+                "ontrigger" "tank_turret_prop,$playsound,MVM.GiantHeavyGunWindUp,0,-1"
+                "ontrigger" "tank_turret_shoot_relay,cancelpending,,1,-1"
+                "ontrigger" "tank_turret_shooter_n,fireuser3,,1,-1"
+                "ontrigger" "tank_turret_shooter_n,fireuser3,,1.5,-1"
+                "ontrigger" "tank_turret_shooter_n,fireuser3,,2,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser3,,3,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser3,,3.5,-1"
+                "ontrigger" "tank_turret_shooter_e,fireuser3,,4,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser3,,5,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser3,,5.5,-1"
+                "ontrigger" "tank_turret_shooter_ne,fireuser3,,6,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser3,,7,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser3,,7.5,-1"
+                "ontrigger" "tank_turret_shooter_nw,fireuser3,,8,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser3,,9,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser3,,9.5,-1"
+                "ontrigger" "tank_turret_shooter_w,fireuser3,,10,-1"
+                "ontrigger" "tank_turret_shooter_grenade,fireuser3,,11,-1"
+                "ontrigger" "tank_turret_shooter_grenade,fireuser3,,11.5,-1"
+                "ontrigger" "tank_turret_shooter_grenade,fireuser3,,12,-1"
+                "ontrigger" "tank_turret_particle,Stop,,12,-1"
+
+                "ontrigger" "tank_turret_shoot_relay,trigger,,13,-1"
+                "spawnflags" "2"
+            }
+            
+		}
+    }
+}
