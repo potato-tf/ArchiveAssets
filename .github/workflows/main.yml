@@ -4,9 +4,11 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
+  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ main ]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -16,45 +18,43 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: [gameserverassets]
+    runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-        with:
-          lfs: true
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - uses: actions/checkout@v3
+      - name: Setup SSH Keys and known_hosts
+        env:
+            SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          for i in  "22 /" "22 pterodactyl@sgp.potato.tf:/" "22 pterodactyl@eu.potato.tf:/" "22 pterodactyl@eu2.potato.tf:/" "22 pterodactyl@sgp2.potato.tf:/"; do a=( $i );
+            ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+            ssh-add - <<< "${{ secrets.DEPLOY_KEY }}"
+        
+      - name: Create bz2 archives
+        run: |
+          find . -type f -not \( -name "*.pop" -or -name "*.nav" -or -name "*.res" -or -name "*.bz2" -or -name "*.lua" -or -name "*.nut" \) \( ! -regex '.*/\..*' \) -exec bzip2 -f -k {} +
+
+      - name: Upload to R2
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --exclude '*' --include '*.bz2' --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: fastdl-archive
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'auto'   # optional: defaults to us-east-1
+          AWS_S3_ENDPOINT: https://d7d00000029f3cf361b520329f5e69df.r2.cloudflarestorage.com
+          
+      - name: Sync with game servers
+        env:
+            SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          for i in  "22 pterodactyl@us.potato.tf" "22 pterodactyl@sgp.potato.tf" "22 pterodactyl@eu.potato.tf" "22 pterodactyl@eu2.potato.tf" "22 pterodactyl@eu9.potato.tf"; do a=( $i );
           {
-          rsync -a -e "ssh -p ${a[0]}" --delete --update --exclude=".*" --exclude="*.bz2" --exclude="tf_mvm_missioncycle.res" --exclude="mapcycle.txt" . ${a[1]}var/tf2server/tf/archive/
+          rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --delete --update --exclude=".*" --exclude="tf_mvm_missioncycle.res" --exclude="mapcycle.txt" . ${a[1]}:/var/tf2server/tf/hh2/
+          ssh -p ${a[0]} ${a[1]} mkdir -p /var/www/html/gameassets
+          ssh -p ${a[0]} ${a[1]} ln -s /var/tf2server/tf/hh2 /var/www/html/gameassets/hh2
           } &
           done
           wait
-          
-  webdownload:
-    needs: build
-    runs-on: [gameserverassets]
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-        with:
-          lfs: true
-
-      # Runs a set of commands using the runners shell
-      - name: Install web assets
-        continue-on-error: true
-        run: |
-          echo . -type f -not \( -name "*.bsp" -or -name "*.mp3" -or -name "*.nav" -or -name "*.res" -or -name ".bz2" \)  -exec pbzip2 -n 1 -f -k -4 {} +
-          find /var/www/html/ArchiveAssets/ -type f -not \( -name "*.bsp" -or -name "*.pop" -or -name "*.mp3" -or -name "*.nav" -or -name "*.res" -or -name "*.bz2" \) \( ! -regex '.*/\..*' \) -exec bzip2 -f -k {} +
-    
-          
