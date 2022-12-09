@@ -24,6 +24,9 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+        with:
+          path: tf
+
       - name: Setup SSH Keys and known_hosts
         env:
             SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -37,21 +40,18 @@ jobs:
 
       - name: Create asset pack
         run: |
-          mkdir tf
-          mv !(tf) tf
-          mv '.github/HOW TO INSTALL!.gif' .
-          zip -r archive-assets.zip * -x '.*' -x '*.bz2'
+          cd ..
+          mv 'tf/.github/HOW TO INSTALL!.gif' .
+          zip -r archive-assets.zip tf -x '.*' -x '*.bz2'
           zip archive-assets.zip 'HOW TO INSTALL!.gif'
-          zip -r archive-assets-no-maps.zip * -x '.*' -x '*.bz2' -x '*.zip' -x 'maps/*'
+          zip -r archive-assets-no-maps.zip tf -x '.*' -x '*.bz2' -x 'maps/*'
           zip archive-assets-no-maps.zip 'HOW TO INSTALL!.gif'
           rm 'HOW TO INSTALL!.gif'
-          mv tf/* .
-          rm -r tf
 
       - name: Upload to R2
         uses: jakejarvis/s3-sync-action@master
         with:
-          args: --exclude '*' --include '*.bz2' --include '*.zip' --follow-symlinks --delete
+          args: --exclude '*' --include '*.zip' --follow-symlinks --delete
         env:
           AWS_S3_BUCKET: fastdl-archive
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
