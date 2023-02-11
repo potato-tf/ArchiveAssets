@@ -4,16 +4,6 @@
 local deathCounts = {}
 local waveActive = false
 
-function OnPlayerConnected(player)
-	local handle = player:GetHandleIndex()
-
-	deathCounts[handle] = 0
-
-	player:AddCallback(ON_DEATH, function()
-		deathCounts[handle] = deathCounts[handle] + 1
-	end)
-end
-
 function OnPlayerDisconnected(player)
 	deathCounts[player:GetHandleIndex()] = nil
 end
