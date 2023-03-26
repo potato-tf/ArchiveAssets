@@ -72,6 +72,8 @@ WaveSchedule
 	LuaScriptFile "scripts/shadows.lua"						// """learning""" programming to make missions
 	ExtendedUpgradesOnly 1
 	UpgradeStationKeepWeapons 1 // stop players from losing perks
+	RespecEnabled 0 // fix refund exploit
+
 
 //	DisableSound "MVM.BotStep"
 	DisableSound "MVM.SentryBusterIntro"
@@ -504,7 +506,7 @@ WaveSchedule
 		Classname tf_weapon_rocketlauncher
 		"damage bonus HIDDEN" 6
 		"blast dmg to self increased" 0.25
-		"self dmg push force decreased" 0.5
+		"self dmg push force decreased" 0.15
 	}
 	ItemAttributes // surprisingly many weapons use this
 	{
@@ -533,14 +535,14 @@ WaveSchedule
 		Classname tf_weapon_grenadelauncher 
 		"damage bonus HIDDEN" 5.5
 		"blast dmg to self increased" 0.25
-		"self dmg push force decreased" 0.5
+		"self dmg push force decreased" 0.15
 	}
 	ItemAttributes // explosives do a lot to compensate for no headshots
 	{
 		Classname tf_weapon_pipebomblauncher
 		"damage bonus HIDDEN" 5.5
 		"blast dmg to self increased" 0.25
-		"self dmg push force decreased" 0.5
+		"self dmg push force decreased" 0.15
 	}
 	ItemAttributes // even minigun gets damage bonus
 	{
@@ -1026,7 +1028,7 @@ WaveSchedule
 			"faster reload rate" -0.8
 			"maxammo primary increased" 3
 			"blast dmg to self increased" 0.25
-			"self dmg push force decreased" 0.5
+			"self dmg push force decreased" 0
 			"custom weapon fire sound" MVM.GiantSoldierRocketShoot
 		//	"custom impact sound" MVM.GiantSoldierRocketExplode
 		}
@@ -1095,7 +1097,7 @@ WaveSchedule
 			"custom impact sound" "misc/doomsday_missile_explosion.wav"
 			"penetrate teammates" 1
 			"Blast radius increased" 2
-			"self dmg push force decreased" 0.5
+			"self dmg push force decreased" 0.15
 			"paintkit_proto_def_index" 296 
 			"set_item_texture_wear" 0
 			"cannot be upgraded" 1
@@ -1110,7 +1112,7 @@ WaveSchedule
 			"stickybomb stick to enemies" 1
 			"penetrate teammates" 1
 			"projectile spread angle penalty" 5
-			"self dmg push force decreased" 0.5
+			"self dmg push force decreased" 0.15
 			"faster reload rate" 0.65
 			"paintkit_proto_def_index" 296 
 			"set_item_texture_wear" 0
@@ -4338,6 +4340,11 @@ WaveSchedule
 				Target "relay_enemycount_add"
 				Action "trigger"
 			}
+			OnSpawnOutput
+            {
+                Target "popscript"
+                Action "$OnWaveSpawnBot"
+            }
 		//	OnSpawnOutput // money for kill
         //  {
         //      Target "!activator"
@@ -4742,10 +4749,8 @@ WaveSchedule
 				"OnTrigger" "hints_10,Show,,36,-1"
 				"OnTrigger" "hints_11,Show,,40,-1"
 				"OnTrigger" "hints_12,Show,,44,-1"
-				"OnTrigger" "hints_13,Show,,48,-1"
-				"OnTrigger" "hints_14,Show,,52,-1"
-				"OnTrigger" "hints_15,Show,,56,-1"
-                "OnTrigger" "tutorial_relay2,Trigger,,60,-1"
+				"OnTrigger" "hints_15,Show,,48,-1"
+                "OnTrigger" "tutorial_relay2,Trigger,,52,-1"
             }
             logic_relay
             {
@@ -4837,20 +4842,6 @@ WaveSchedule
 				"lifetime"     "4"
 				"origin" "328 -150 52" 
 			}
-			training_annotation
-            {
-              "targetname"   "hints_13"
-              "display_text" "You can refund your upgrades at any point during the mission."
-              "lifetime"     "4"
-              "origin" "328 -150 52"   
-            }
-			training_annotation
-            {
-              "targetname"   "hints_14"
-              "display_text" "This will revert all purchases, including Überweapon Upgrades."
-              "lifetime"     "4"
-              "origin" "328 -150 52"   
-            }
 			training_annotation
             {
               "targetname"   "hints_15"
