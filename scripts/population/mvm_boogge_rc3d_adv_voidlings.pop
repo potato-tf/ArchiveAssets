@@ -45,6 +45,40 @@ gettysburg
     CustomUpgradesFile "mvm_upgrades_gettysburg_final_fix.txt"
     PrecacheModel models/bots/boss_bot/boss_tank_color.mdl
 
+
+    //Spells and Halloween
+    SpellsEnabled 1
+    SpellDropRateCommon 0
+    SpellDropRateGiant 0
+    NoCritPumpkin 1
+
+    ExtraSpawnPoint  
+    {
+        Name boss
+        TeamNum 3
+        X	"1800"                     
+        Y	"-1400"                  
+        Z	"-220"        
+    }
+
+    ExtraSpawnPoint  
+    {
+        Name boss
+        TeamNum 3
+        X	"1600"                     
+        Y	"500"                  
+        Z	"200"        
+    }
+
+    ExtraSpawnPoint  
+    {
+        Name boss
+        TeamNum 3
+        X	"2800"                     
+        Y	"600"                  
+        Z	"150"        
+    }
+
     OverrideSounds 
 	{
         "Announcer.MVM_Get_To_Upgrade" "misc/halloween/gotohell.wav"
@@ -338,9 +372,10 @@ gettysburg
                     ClassIcon spellbook
                     Skill Hard
                     Item tf_weapon_spellbook
-                    Item "The Dead Head"
+                    Item "Bat Hat"
                     Item "The Bat Outta Hell"
-                    WeaponRestrictions MeleeOnly
+                    StripItemSlot 0
+                    StripItemSlot 1
 
                     AimAt Head
                     SpellDropRateCommon 0.2
@@ -348,10 +383,24 @@ gettysburg
                     Spell
                     {
                         Delay 0
-                        Cooldown 7
+                        Cooldown 10
                         IfSeeTarget 1
                         Charges 1
                         Type "Ball O' Bats"
+                    }
+
+                    FireWeapon
+                    {
+                        Delay 2
+                        Cooldown 2
+                        IfSeeTarget 1
+                        Type Action
+                    }
+
+                    ItemAttributes
+                    {
+                        ItemName "Bat Hat"
+                        "attach particle effect" 76
                     }
                 }
 
@@ -362,9 +411,10 @@ gettysburg
                     ClassIcon spellbook
                     Skill Hard
                     Item tf_weapon_spellbook
-                    Item "The Dead Head"
+                    Item "Horseless Headless Horseman's Head"
                     Item "The Bat Outta Hell"
-                    WeaponRestrictions MeleeOnly
+                    StripItemSlot 0
+                    StripItemSlot 1
 
                     AimAt Head
                     SpellDropRateCommon 0.2
@@ -372,10 +422,24 @@ gettysburg
                     Spell
                     {
                         Delay 0
-                        Cooldown 7
+                        Cooldown 10
                         IfSeeTarget 1
                         Charges 1
                         Type "Pumpkin MIRV"
+                    }
+
+                    FireWeapon
+                    {
+                        Delay 2
+                        Cooldown 2
+                        IfSeeTarget 1
+                        Type Action
+                    }
+
+                    ItemAttributes
+                    {
+                        ItemName "Horseless Headless Horseman's Head"
+                        "attach particle effect" 163
                     }
                 }
             }
@@ -524,12 +588,7 @@ gettysburg
     Mission //Wave 5 Trash Pandas
     {
         Objective Spy
-        Where
-        {
-            Relative Behind
-            MaxDistance 2250
-            MinDistance 1250
-        }
+        Where Behind
         DesiredCount 3
         CooldownTime 15
         BeginAtWave 5
@@ -590,8 +649,6 @@ gettysburg
     
     Wave //Wave 1 - $900
     {
-        CustomWaveNumber 1
-        CustomMaxWaveNumber 5
         StartWaveOutput
         {
             Target wave_start_relay
@@ -938,8 +995,6 @@ gettysburg
 
     Wave //Wave 2 - $900
     {
-        CustomWaveNumber 2
-        CustomMaxWaveNumber 5
         StartWaveOutput
         {
             Target wave_start_relay
@@ -972,6 +1027,9 @@ gettysburg
 
                 Action Mobber
                 Attributes DisableDodge
+
+                DesiredAttackRange 600
+                MoveBehindEnemy 1
             }
         }
 
@@ -983,7 +1041,7 @@ gettysburg
             SpawnCount 1
             MaxActive 2
 
-            WaitBetweenSpawns 12
+            WaitBetweenSpawns 9
 
             TotalCurrency 150
 
@@ -1001,6 +1059,7 @@ gettysburg
                 Tag bot_giant
 
                 AimLeadProjectileSpeed 3000
+                AimAt Head
                 
                 ItemAttributes
                 {
@@ -1319,8 +1378,6 @@ gettysburg
 
     Wave //Wave 3 - $900
     {
-        CustomWaveNumber 3
-        CustomMaxWaveNumber 5
         StartWaveOutput
         {
             Target wave_start_relay_void
@@ -1624,7 +1681,7 @@ gettysburg
             Where spawnbot_void1
             Where spawnbot_void2
             Where spawnbot_void3
-            TotalCount 33
+            TotalCount 30
             SpawnCount 3
             MaxActive 7
 
@@ -1655,6 +1712,9 @@ gettysburg
         WaveSpawn
         {
             Name 3b
+            Where spawnbot_void1
+            Where spawnbot_void2
+            Where spawnbot_void3
             Where spawnbot_void4
             TotalCount 4
             SpawnCount 1
@@ -1858,7 +1918,7 @@ gettysburg
             Where spawnbot_void1
             Where spawnbot_void3
             RandomSpawn 1
-            TotalCount 27
+            TotalCount 30
             SpawnCount 3
             MaxActive 7
             
@@ -1881,10 +1941,18 @@ gettysburg
                 
                 UseMeleeThreatPrioritization 1 
 
+                FireWeapon
+                {
+                    Type Secondary
+                    Delay 1
+                    IfSeeTarget 1
+                }
+
                 CharacterAttributes
                 {
                     "airblast vulnerability multiplier" 0.25
                     "damage force reduction" 0.25
+                    "mod rage on hit bonus" 15
                 }
             }
         }
@@ -2010,10 +2078,8 @@ gettysburg
             TFBot
             {
                 Template G_Demo_Spook
-                Health 20000
                 Attributes DisableDodge
                 UseMeleeThreatPrioritization 1 
-                FastUpdate 1
                 Action Mobber
 
                 CharacterAttributes
@@ -2026,8 +2092,6 @@ gettysburg
 
     Wave //Wave 4 - $800
     {
-        CustomWaveNumber 4
-        CustomMaxWaveNumber 5
         StartWaveOutput
         {
             Target wave_start_relay
@@ -2306,8 +2370,6 @@ gettysburg
 
     Wave //Wave 5 - $800
     {
-        CustomWaveNumber 5
-        CustomMaxWaveNumber 5
         StartWaveOutput
         {
             Target wave_start_relay
@@ -2612,6 +2674,9 @@ gettysburg
                 Action Mobber
                 NoIdleSound 1
                 StripItemSlot 0
+
+                DesiredAttackRange 100
+                UseMeleeThreatPrioritization 1
                 
                 ItemAttributes
                 {
@@ -2639,18 +2704,15 @@ gettysburg
         WaveSpawn
         {
             Name bleedsupport
-            Where
-            {
-                Relative Anywhere
-                MaxDistance 2000
-                MinDistance 1000
-            }
-            Support 1
-            SpawnCount 3
-            MaxActive 10
+            Where boss
+            Support Limited
+            TotalCount 12
+            SpawnCount 1
+            MaxActive 4
 
             WaitForAllDead 5d
             WaitBeforeStarting 3
+            WaitBetweenSpawns 1
 
             TFBot
             {
@@ -2664,13 +2726,13 @@ gettysburg
                     "mark for death" 1
                     "damage penalty" 0.25
                     "damage causes airblast" 1
-                    "reload time increased" 2
+                    "reload time increased" 3
                 }
 
                 AddCond
                 {
                     Index 66
-                    Delay 4
+                    Delay 1.5
                 }
             }
         }
