@@ -18,6 +18,11 @@ function EnableHoldFire(_, activator)
 			return
 		end
 
+		if activator.m_hActiveWeapon ~= primary then
+			primary:SetAttributeValue("no_attack", nil)
+			return
+		end
+
 		local clipBonusMult = primary:GetAttributeValueByClass("mult_clipsize", 1)
 		local clipBonusAtomic = primary:GetAttributeValueByClass("mult_clipsize_upgrade_atomic", 0)
 
