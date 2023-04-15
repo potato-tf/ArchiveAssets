@@ -6,10 +6,10 @@ WaveSchedule
 		{
 			1 1 // Max 2 upgrades on tier 1
 		}
-		OCMinigun	// heavy overclock for minigun, huo-long heater - +holster while spinning
+		OCMinigun
 		{
 			Name "Unstable Module: Hurricane Module"
-			Description "+Replaces Bullets with guided rockets +No Falloff -275% slower firing speed -No Rampup"
+			Description "(i)Replaces Bullets with guided rockets +No Falloff -275% slower firing speed -No Rampup -50% max ammo"
 			AllowPlayerClass HeavyWeapons
 			AllowedWeapons
 			{
@@ -19,7 +19,7 @@ WaveSchedule
 			{
 				"override projectile type" 2
 				"mini rockets" 1
-				"fire rate penalty" 2.75
+				"fire rate penalty" 2.40
 				"centerfire projectile" 1
 				"mod projectile heat follow crosshair" 1
 				"mod projectile heat seek power" 360
@@ -27,12 +27,17 @@ WaveSchedule
 				"projectile detonate time" 2.8
 				"damage bonus HIDDEN" 3
 				"crit mod disabled" 0
-				"mult crit dmg" 0.35
+//				"mult crit dmg" 0.35
 				"dont count damage towards crit rate" 1
 				"custom projectile model" "models\weapons\w_models\w_repair_claw.mdl"
 				"projectile trail particle" "~flaregun_trail_red"
 				"alt-fire disabled" 1
-				"no damage falloff" 1
+//				"no damage falloff" 1
+				"mult dmg vs tanks" 9.0
+				"mult dmg vs giants" 1.0
+				"hidden primary max ammo bonus" -0.5
+				"dmg pierces resists absorbs" 1
+				"throwable damage" 1
 			}
 			DisallowedWeapons
 			{
@@ -40,6 +45,14 @@ WaveSchedule
 				ItemName	"The Brass Beast"
 				ItemName	"Tomislav"
 				ItemName "The Huo Long Heatmaker"
+			}
+			OnApply
+			{
+				Output "popscript,$KnockbackRageStart,,0.1"
+			}
+			OnDowngrade
+			{
+				Output "popscript,$KnockbackRageStop,,0"
 			}
 			Cost 0
 			Attribute "mod minigun can holster while spinning"
@@ -101,7 +114,7 @@ WaveSchedule
 			{
 				"dmg pierces resists absorbs" 1
 				"aiming movespeed increased" 1.5
-				"hidden primary max ammo bonus" -0.25
+				"hidden primary max ammo bonus" -0.5
 			}
 			Description "+Attacks pierce damage resistances +no movement penalty when spun-up -25% max ammo" 
 			Tier 1
@@ -121,36 +134,40 @@ WaveSchedule
 			{
 				"uses ammo while aiming" 3
 				"damage penalty" 0.1
+				"throwable fire speed" 1
 			}
-			Description "+10% damage bonus -200% faster ammo drain" 
+			Description "+10% damage bonus +Rage now applies afterburn -200% faster ammo drain" 
 			Tier 1
 			AllowedWeapons
 			{
 				ItemName "The Huo Long Heatmaker"
 			}
+			OnApply
+			{
+				Output "popscript,$KnockbackRageStart,,0.1"
+			}
+			OnDowngrade
+			{
+				Output "popscript,$KnockbackRageStop,,0"
+			}
 		}
 		FBA
 		{
-			Name "Unstable Mod: Sandvich Blast"
+			Name "Unstable Mod: Defensive Blast"
 			Attribute "damage returns as health"
-			Cap 1.5
-			Increment 0.5
+			Cap 1.75
+			Increment 0.75
 			Cost 0
-			Description "+On hit: 50% of all damage returned as health -10% damage" 
+			Description "+On hit: 75% of all damage returned as health +Destroy Projectiles -10% damage" 
 			Tier 1
 			SecondaryAttributes
 			{
-				"uses ammo while aiming" 3
-				"damage penalty" -0.1
+				"attack projectiles"	2
+				"damage penalty"		-0.1
 			}
 			AllowedWeapons
 			{
 				ItemName "The Family Business"
-				ClassName "TF_WEAPON_SHOTGUN_HWG"
-			}
-			DisallowedWeapons // Disallow those weapons
-			{
-				ItemName "Panic Attack Shotgun"
 			}
 		}
 ///STEAK
@@ -252,7 +269,7 @@ WaveSchedule
 			{
 				"mod_maxhealth_drain_rate" -10
 				"damage penalty" 0.3
-				"dmg taken increased" 0.10
+				"dmg taken increased" 0.15
 			}
 			Description "+Removed hp drain +30% damage bonus +Crits when minicrits -15% damage vulnerability" 
 			Tier 1
