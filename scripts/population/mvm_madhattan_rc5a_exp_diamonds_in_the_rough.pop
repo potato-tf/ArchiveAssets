@@ -10,6 +10,7 @@
 #base overclock_cactus_heavy.pop
 #base overclock_cactus_engineer.pop
 #base overclock_cactus_medic.pop
+#base overclock_cactus_sniperspy.pop
 
 //CREDITS
 
@@ -28,25 +29,53 @@
 
 WaveSchedule
 {
-    StartingCurrency 1800
+    StartingCurrency 2200
     RespawnWaveTime 4
     FixedRespawnWaveTime Yes
     CanBotsAttackWhileInSpawnRoom No
 
     Advanced 1
 	ForceHoliday 2
-    //CustomUpgradesFile "mvm_upgrades_damno_v1.txt" // cant use it wtf night
-    //EventPopFile Halloween                 
-    NoRomevisionCosmetics 1  // gay cosmetics on zombies            
+    NoRomevisionCosmetics 1          
     MedigunShieldDamage 1           
-    SentryBusterFriendlyFire 0           
-    //SniperHideLasers 1 // kinda bad xd               
-    //SniperAllowHeadshots 1 // disabled for obvious reasons lololololol 
-    //FixHuntsmanDamageBonus 0 // Yea i love when Mo top dmgs
-    NoMvMDeathTune 1      
-    //RedPlayersAreRobots 1 // love this but strechy cosmetics :(           
+    NoMvMDeathTune 1              
     ImprovedAirblast 1  
     PlayerRobotsUsePlayerAnimation 1
+
+    PrecacheSound "mvm/mvm_used_powerup.wav"  
+	PrecacheSound "mvm/mvm_tank_start.wav"  
+	SpawnTemplate GateTankManager // From Int 
+    PointTemplates
+    {  
+        GateTankManager
+        {
+            logic_auto // Important, also by Yuugi
+            {
+                "onmapspawn" "gate2_relay,AddOutput,OnTrigger lights_on:Disable:0:0:-1,0,-1"
+                "onmapspawn" "gate2_relay,AddOutput,OnTrigger lights_off:Enable:0:0:-1,0,-1"
+            }
+        }
+        Gatetank_sillyhat // Made by Yuugi
+        {
+            prop_dynamic // I'm so good adding drip on the tanks :,)
+            {
+                "targetname" "lights_on"
+                "model" "models/bots/gameplay_cosmetic/light_soldier_on.mdl"
+                "angles" "0 0 0"
+				"origin" "-46 0 -142"
+				"modelscale" "4"
+            }
+            prop_dynamic
+            {
+                "targetname" "lights_off"
+                "StartDisabled" "1"
+                "model" "models/bots/gameplay_cosmetic/light_soldier_off.mdl"
+                "angles" "0 0 0"
+				"origin" "-46 0 -142"
+				"modelscale" "4"
+            }
+        }
+    }
 
     PlayerAttributes
     {
@@ -66,6 +95,22 @@ WaveSchedule
 	//		Secondary "Ali Baba's Wee Booties"
     //  }
 	//}
+
+    PointTemplates  
+	{
+		missionname1
+		{  
+			logic_auto 
+			{
+				"origin" "0 0 0" 
+				"targetname" "missionname"
+				
+				"OnMapSpawn" "tf_objective_resource,$SetClientProp$m_iszMvMPopfileName,Diamonds In The Rough,0,-1"
+			}
+		}
+    }
+
+    SpawnTemplate "missionname1"
 
     Mission
     {
@@ -152,11 +197,9 @@ WaveSchedule
 
         Explanation
         {
-            Line "{blue}All tanks are gate tanks except for last one, be careful!"
 			Line "{red}Tanks will cap the gate INSTANTLY after reaching cap area."
-            Line "{blue}Killing Chiefs will reset bombs and grant you break time."
+            Line "{blue}Killing Chiefs will reset bombs and grant you a break time."
 			//Line "{red}BLU Support Include: Demo/Scout"
-            Line "{blue}All classes have free custom upgrades that they can use!"
         }
 
         WaveSpawn
@@ -176,7 +219,7 @@ WaveSchedule
             {
                 Template T_TFGateBot_Giant_Soldier_SlowBarrage
 				//Item "Roaming Roman"
-                ClassIcon soldier
+                ClassIcon soldier_giant
             }
         }
 
@@ -282,7 +325,7 @@ WaveSchedule
             {
                 Template T_TFGateBot_Giant_Demo_Burst
 				//Item "Hawaiian Hangover"
-                ClassIcon demo
+                ClassIcon demo_giant
             }
         }
 
@@ -336,7 +379,7 @@ WaveSchedule
 			SpawnCount	1
 			WaitBeforeStarting 8
             WaitForAllSpawned "3.1"
-			FirstSpawnMessage "{blue}Gate Tank Inbound!"
+			//FirstSpawnMessage "{blue}Gate Tank Inbound!"
 			FirstSpawnOutput                                                                                                                                                            
             {
                 Target boss_spawn_relay                                            
@@ -359,6 +402,7 @@ WaveSchedule
 					Target	boss_deploy_relay
 					Action	Trigger
 				}
+                SpawnTemplate Gatetank_sillyhat // Add this to your tank
 			}
         }
 
@@ -381,7 +425,7 @@ WaveSchedule
                 Template T_TFGateBot_Giant_Soldier_Spammer_Reload
 				//Item "Panisher"
 				Name "Giant Burst Fire Soldier"
-                ClassIcon soldier
+                ClassIcon soldier_giant
             }
         }
 
@@ -424,7 +468,7 @@ WaveSchedule
                 {
                     Template T_TFGateBot_Giant_Heavyweapons_Shotgun
 					//Item "Squatter's Right"
-                    ClassIcon heavy 
+                    ClassIcon heavy_giant
                 }
                 TFBot
                 {
@@ -458,7 +502,7 @@ WaveSchedule
             TFBot
             {
                 Class Soldier
-                ClassIcon soldier
+                ClassIcon Soldier
                 Skill Normal
             }
         }
@@ -528,7 +572,7 @@ WaveSchedule
 				TFBot
 				{
 					Template T_TFGateBot_Soldier_Extended_Concheror_Normal
-					Classicon soldier
+					Classicon Soldier
 				}
 			}
         }
@@ -550,14 +594,14 @@ WaveSchedule
             TFBot
             {
                 Template T_TFGateBot_Giant_Scout
-                ClassIcon scout 
+                ClassIcon scout_giant
                 tag bot_giant
             }
         }
 
         WaveSpawn
         {
-            Name "7.1"//7.2
+            Name "7.1" //7.2
             TotalCurrency 50
             Where spawnbot_main0_short
             Where spawnbot_main1_short
@@ -659,7 +703,7 @@ WaveSchedule
 				Template T_TFBot_Giant_Soldier_Spammer
 				Item "Roaming Roman"
 				tag bot_giant
-				ClassIcon soldier
+				ClassIcon soldier_giant
 			}
 		}
 		WaveSpawn
@@ -672,7 +716,7 @@ WaveSchedule
 			WaitBeforeStarting	31
 			//WaitBetweenSpawns	30
             WaitForAllDead "7.4"
-			FirstSpawnMessage "{blue}Gate Tank Inbound!"
+			//FirstSpawnMessage "{blue}Gate Tank Inbound!"
 			FirstSpawnOutput                                                                                                                                                            
             {
                 Target boss_spawn_relay                                            
@@ -695,6 +739,7 @@ WaveSchedule
 					Target	boss_deploy_relay
 					Action	Trigger
 				}
+                SpawnTemplate Gatetank_sillyhat // Add this to your tank
 			}
         }
 
@@ -708,7 +753,7 @@ WaveSchedule
 			WaitBeforeStarting	61
 			//WaitBetweenSpawns	30
             WaitForAllDead "7.4"
-			FirstSpawnMessage "{blue}Another Gate Tank Inbound!"
+			//FirstSpawnMessage "{blue}Another Gate Tank Inbound!"
 			FirstSpawnOutput                                                                                                                                                            
             {
                 Target boss_spawn_relay                                            
@@ -731,6 +776,7 @@ WaveSchedule
 					Target	boss_deploy_relay
 					Action	Trigger
 				}
+                SpawnTemplate Gatetank_sillyhat // Add this to your tank
 			}
         }
         
@@ -750,7 +796,7 @@ WaveSchedule
             TFBot
             {
                 Template T_TFBot_Soldier_Extended_Buff_Banner
-                ClassIcon soldier
+                ClassIcon Soldier
             }
         }
 
@@ -794,7 +840,7 @@ WaveSchedule
                 {
                     Template T_TFGateBot_Giant_Soldier_Spammer_Reload
 					//Item "Roaming Roman"
-                    ClassIcon soldier
+                    ClassIcon soldier_giant
 					Name "Giant Burst Fire Soldier"
                 }
                 TFBot
@@ -869,7 +915,7 @@ WaveSchedule
             TFBot
             {
                 Template T_TFBot_Soldier_Extended_Concheror_Burst
-                ClassIcon soldier
+                ClassIcon Soldier
             }
         }
 
@@ -891,7 +937,7 @@ WaveSchedule
             {
                 Template T_TFGateBot_Giant_Heavyweapons_Deflector
 				//Item "Squatter's Right"
-                ClassIcon heavy
+                ClassIcon heavy_giant
             }
         }
 
@@ -911,7 +957,7 @@ WaveSchedule
             TFBot
             {
                 Template T_TFBot_Soldier_Extended_Battalion
-                ClassIcon soldier
+                ClassIcon Soldier
             }
         }
 
@@ -955,7 +1001,7 @@ WaveSchedule
                 {
                     Template T_TFGateBot_Giant_Demo_Burst_Crit
 					//Item "Hawaiian Hangover"
-                    ClassIcon demo
+                    ClassIcon demo_giant
                 }
 				TFBot
 				{
@@ -1003,7 +1049,7 @@ WaveSchedule
             TFBot
             {
                 Class Soldier
-				ClassIcon soldier
+				ClassIcon Soldier
 				Item "The Cow Mangler 5000"
 				Name "Burst Mangler Soldier"
 				Skill Normal
@@ -1126,7 +1172,7 @@ WaveSchedule
         WaveSpawn
         {
             Name "2.1"
-            TotalCurrency 525
+            TotalCurrency 575
             Where spawnbot_main0_short
             Where spawnbot_main1_short
             Where spawnbot_main2
@@ -1511,7 +1557,7 @@ WaveSchedule
 
         WaveSpawn
         {
-            Name "12.1"//"12.2"
+            Name "12.1" //"12.2"
             TotalCurrency 50
             Where spawnbot_main0_flank
             Where spawnbot_main1_flank
@@ -1534,7 +1580,7 @@ WaveSchedule
 
         WaveSpawn
         {
-            Name "12.1"//"12.3"
+            Name "12.1" //"12.3"
             TotalCurrency 50
             Where spawnbot_main0_short
             Where spawnbot_main1_short
@@ -1616,7 +1662,7 @@ WaveSchedule
             TFBot
             {
                 Template T_TFGateBot_Giant_Scout
-                ClassIcon scout
+                ClassIcon scout_giant
             }
         }
         WaveSpawn
@@ -1628,7 +1674,7 @@ WaveSchedule
 			SpawnCount	1
 			WaitBeforeStarting	31
 			WaitForAllDead "12.1"
-			FirstSpawnMessage "{blue}Gate Tank Inbound!"
+			//FirstSpawnMessage "{blue}Gate Tank Inbound!"
 			FirstSpawnOutput                                                                                                                                                            
             {
                 Target boss_spawn_relay                                            
@@ -1651,6 +1697,7 @@ WaveSchedule
 					Target	boss_deploy_relay
 					Action	Trigger
 				}
+                SpawnTemplate Gatetank_sillyhat // Add this to your tank
 			}
         }
 
@@ -1673,7 +1720,7 @@ WaveSchedule
             TFBot
             {
                 Template T_TFGateBot_Giant_Scout
-                ClassIcon scout
+                ClassIcon scout_giant
             }
         }
 
@@ -1721,7 +1768,7 @@ WaveSchedule
                 {
                     Template T_TFGateBot_Giant_Heavyweapons_Heater
 					//Item "Squatter's Right"
-                    ClassIcon heavy
+                    ClassIcon heavy_giant
                     Name "Giant Huo-Long Heater"
                     Attributes AlwaysCrit
                 }
@@ -1804,7 +1851,7 @@ WaveSchedule
                     Template T_TFGateBot_Giant_Soldier_RocketShotgun_DAMAGE
 					//Item "Roaming Roman"
                     Attributes AlwaysCrit
-                    ClassIcon soldier
+                    ClassIcon soldier_giant
                 }
                 TFBot
 				{
@@ -1924,7 +1971,7 @@ WaveSchedule
 			TFBot
 			{
 				Template T_TFBot_Direct_Hit
-				ClassIcon soldier
+				ClassIcon Soldier
 				Name "Direct Hit Soldier"
 			}
         }
@@ -1946,7 +1993,7 @@ WaveSchedule
             }
 			Tank
 			{
-				Health	30000
+				Health	45000
 				Name	tank_boss
                 Skin 1
 				Speed	75
@@ -2025,7 +2072,7 @@ WaveSchedule
                 Template T_TFBot_Giant_Soldier_Spammer_Reload
 				Item "Panisher"
                 attributes AlwaysCrit
-                ClassIcon soldier
+                ClassIcon soldier_giant
             }
         }
 
