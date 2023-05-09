@@ -9,6 +9,9 @@ local RAGE_OVERRIDES_APPLY = {
     end,
     ["throwable damage"] = function(activator)
         activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("rocket specialist", 1)
+    end,
+    ["tool needs giftwrap"] = function(activator)
+        activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("dmg pierces resists absorbs", 1)
     end
 }
 local RAGE_OVERRIDES_REMOVE = {
@@ -17,6 +20,9 @@ local RAGE_OVERRIDES_REMOVE = {
     end,
     ["throwable damage"] = function(activator)
         activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("rocket specialist", nil)
+    end,
+    ["tool needs giftwrap"] = function(activator)
+        activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("dmg pierces resists absorbs", nil)
     end
 }
 
