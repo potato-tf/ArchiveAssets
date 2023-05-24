@@ -56,7 +56,7 @@ WaveSchedule
 	SandmanStun 1 						[$SIGSEGV] 
 	SniperAllowHeadshots 1 				[$SIGSEGV]
 	TextPrintTime 0 					[$SIGSEGV]
-	UpgradeStationKeepWeapons 0 		[$SIGSEGV]
+	UpgradeStationKeepWeapons 1 		[$SIGSEGV]
 	WaveStartCountdown 3				[$SIGSEGV]
 
 	PrecacheSound "Breakable.Metal"										[$SIGSEGV]
@@ -1053,6 +1053,23 @@ WaveSchedule
 
 	CustomWeapon [$SIGSEGV]
 	{
+		Name "Electro Knife"
+		OriginalItemName "The Flying Guillotine"
+		"special item description" "Lowers target's friction for 5 seconds"
+		"custom item model" "models/workshop/weapons/c_models/c_switchblade/c_switchblade.mdl"
+		"custom projectile model" "models/workshop/weapons/c_models/c_switchblade/c_switchblade.mdl"
+		"mult bleeding dmg" 0
+		"add cond on hit" 32306
+		"add cond on hit duration" 5
+		"add damage type" 128
+		"alt-fire disabled" 1
+		"custom kill icon" "big_earner"
+		"dmg penalty vs players" 3.75
+		"use original class weapon animations" 1
+	}
+
+	CustomWeapon [$SIGSEGV]
+	{
 		Name "The Deflector"
 		OriginalItemName "Deflector"
 		"special item description" "Free projectile deflection; no upgrades"
@@ -1601,6 +1618,7 @@ WaveSchedule
 			Secondary "Dustbowl Eagle for Spy"
 			Secondary "Fire Retardant Suit"
 			Secondary "Budgie Booster"
+			Secondary "Electro Knife"
 			Action "Grapple Hook"
 		}
 	}
@@ -1608,7 +1626,7 @@ WaveSchedule
 	ItemAttributes [$SIGSEGV] // robot strength
 	{
 		ItemName "The Hot Hand"
-		"damage bonus" 5
+		"damage bonus" 2
 		"custom item model" "models/empty.mdl" //fix for robo arms
 	}
 	
@@ -1673,12 +1691,6 @@ WaveSchedule
 	{
 		ItemName "The Ubersaw"
 		"add uber charge on hit" 0.15
-	}
-	
-	ItemAttributes   // too bad
-	{
-		ItemName "The Amputator"
-		"dmg from ranged reduced" 0.5
 	}
 
 	ItemAttributes [$SIGSEGV] // rebuffed because valve is stoopid
@@ -1900,6 +1912,7 @@ WaveSchedule
 				"onspawn" "intel,addoutput,onpickup1 filter_isbot:testactivator::0:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup1 !activator:addoutput:targetname hasbomb:0:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup1 !activator:$addplayerattribute:self dmg push force decreased|0:-1,0,-1"
+				"onspawn" "intel,addoutput,onpickup1 !activator:$addplayerattribute:mod weapon blocks healing|1:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup bombpickup_relay:trigger::0.01:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup bombpickup_relay:cancelpending::0:-1,0,-1"
 				"onspawn" "intel,addoutput,ondrop1 !activator:addoutput:targetname :0:-1,0,-1"
@@ -1913,6 +1926,7 @@ WaveSchedule
                 "targetname" "bomb_cleanse"
                 "ontrigger" "!activator,$addplayerattribute,set bonus: health regen set bonus|0,0,-1"
 				"ontrigger" "!activator,$addplayerattribute,self dmg push force decreased|1,0,-1"
+				"ontrigger" "!activator,$addplayerattribute,mod weapon blocks healing|0,0,-1"
 				"ontrigger" "!activator,$removecond,42,0,-1"
 				"ontrigger" "!activator,$removecond,11,0,-1"
                 "onspawn" "intel,addoutput,ondrop1 undoregen:trigger:0:0:-1,0,-1"
@@ -4075,8 +4089,8 @@ WaveSchedule
 
 		Explanation [$SIGSEGV]
 		{
-			Line "{DE4BDE}Use your taunt key to {green}upgrade the bomb{DE4BDE} to gain buffs!"
-			Line "{yellow}Your team must not exceed {green}10 minutes {yellow}for this wave."
+			Line "{green}Use your taunt key to upgrade the bomb and receive powerful buffs!"
+			Line "{yellow}Your team must not exceed {e5a4ff}10 minutes {yellow}for this wave."
 		}
 
 		WaveSpawn
@@ -5002,6 +5016,11 @@ WaveSchedule
 			Action trigger
 		}
 
+		Explanation [$SIGSEGV]
+		{
+			Line "{yellow}Your team must not exceed {e5a4ff}10 minutes {yellow}for this wave."
+		}
+
 		WaveSpawn
 		{
 			Name "hatchkill"
@@ -5565,6 +5584,7 @@ WaveSchedule
 				Item "Pugilist's Protector"
 				CharacterAttributes
 				{
+					"alt-fire disabled" 1
 					"melee cleave attack" 1
 					"crit mod disabled" 0
 					"ammo regen" 1
@@ -6010,6 +6030,11 @@ WaveSchedule
 		{
 			Target wave_finished_relay
 			Action trigger
+		}
+
+		Explanation [$SIGSEGV]
+		{
+			Line "{yellow}Your team must not exceed {e5a4ff}10 minutes {yellow}for this wave."
 		}
 
 		WaveSpawn
@@ -6953,6 +6978,11 @@ WaveSchedule
 			Action trigger
 		}
 
+		Explanation [$SIGSEGV]
+		{
+			Line "{yellow}Your team must not exceed {e5a4ff}10 minutes {yellow}for this wave."
+		}
+
 		WaveSpawn
 		{
 			Name "hatchkill"
@@ -7281,7 +7311,7 @@ WaveSchedule
 			MaxActive 1
 			SpawnCount 1
 			TotalCurrency 0
-			WaitBetweenSpawnsAfterDeath 25
+			//WaitBetweenSpawnsAfterDeath 30
 			Support 1
 			
 			TFBot
@@ -8007,6 +8037,11 @@ WaveSchedule
 			Action trigger
 		}
 
+		Explanation [$SIGSEGV]
+		{
+			Line "{yellow}Your team must not exceed {e5a4ff}10 minutes {yellow}for this wave."
+		}
+
 		WaveSpawn
 		{
 			Name "hatchkill"
@@ -8537,6 +8572,10 @@ WaveSchedule
 				{
 					TF_WEAPON_KNIFE 0.35
 				}
+				WeaponResist [$SIGSEGV]
+				{
+					TF_WEAPON_CLEAVER 0.35
+				}
 				Action Mobber 					[$SIGSEGV]
 				UseBestWeapon 1 				[$SIGSEGV]
 				UseHumanModel 1 				[$SIGSEGV]
@@ -8608,6 +8647,10 @@ WaveSchedule
 				WeaponResist [$SIGSEGV]
 				{
 					TF_WEAPON_KNIFE 0.35
+				}
+				WeaponResist [$SIGSEGV]
+				{
+					TF_WEAPON_CLEAVER 0.35
 				}
 				Action Mobber 					[$SIGSEGV]
 				UseBestWeapon 1 				[$SIGSEGV]
@@ -8710,6 +8753,10 @@ WaveSchedule
 				{
 					TF_WEAPON_KNIFE 0.35
 				}
+				WeaponResist [$SIGSEGV]
+				{
+					TF_WEAPON_CLEAVER 0.35
+				}
 				Action Sniper					[$SIGSEGV]
 				//UseBestWeapon 1 				[$SIGSEGV]
 				UseHumanModel 1 				[$SIGSEGV]
@@ -8781,6 +8828,10 @@ WaveSchedule
 				WeaponResist [$SIGSEGV]
 				{
 					TF_WEAPON_KNIFE 0.35
+				}
+				WeaponResist [$SIGSEGV]
+				{
+					TF_WEAPON_CLEAVER 0.35
 				}
 				Action Mobber 					[$SIGSEGV]
 				//UseBestWeapon 1 				[$SIGSEGV]
@@ -8875,6 +8926,10 @@ WaveSchedule
 				{
 					TF_WEAPON_KNIFE 0.35
 				}
+				WeaponResist [$SIGSEGV]
+				{
+					TF_WEAPON_CLEAVER 0.35
+				}
 				Action Mobber 					[$SIGSEGV]
 				UseBestWeapon 1 				[$SIGSEGV]
 				UseHumanModel 1 				[$SIGSEGV]
@@ -8951,6 +9006,10 @@ WaveSchedule
 				WeaponResist [$SIGSEGV]
 				{
 					TF_WEAPON_KNIFE 0.35
+				}
+				WeaponResist [$SIGSEGV]
+				{
+					TF_WEAPON_CLEAVER 0.35
 				}
 				Action Mobber 					[$SIGSEGV]
 				UseBestWeapon 1 				[$SIGSEGV]
@@ -9029,6 +9088,10 @@ WaveSchedule
 				{
 					TF_WEAPON_KNIFE 0.35
 				}
+				WeaponResist [$SIGSEGV]
+				{
+					TF_WEAPON_CLEAVER 0.35
+				}
 				Action Mobber 					[$SIGSEGV]
 				UseBestWeapon 1 				[$SIGSEGV]
 				UseHumanModel 1 				[$SIGSEGV]
@@ -9088,6 +9151,10 @@ WaveSchedule
 				WeaponResist [$SIGSEGV]
 				{
 					TF_WEAPON_KNIFE 0.35
+				}
+				WeaponResist [$SIGSEGV]
+				{
+					TF_WEAPON_CLEAVER 0.35
 				}
 				Action Mobber 					[$SIGSEGV]
 				UseBestWeapon 1 				[$SIGSEGV]
@@ -9201,6 +9268,10 @@ WaveSchedule
 				{
 					TF_WEAPON_KNIFE 0.35
 				}
+				WeaponResist [$SIGSEGV]
+				{
+					TF_WEAPON_CLEAVER 0.35
+				}
 				FireWeapon [$SIGSEGV]
 				{
 					Delay 8
@@ -9286,6 +9357,10 @@ WaveSchedule
 				WeaponResist [$SIGSEGV]
 				{
 					TF_WEAPON_KNIFE 0.35
+				}
+				WeaponResist [$SIGSEGV]
+				{
+					TF_WEAPON_CLEAVER 0.35
 				}
 				FireWeapon [$SIGSEGV]
 				{
@@ -9394,6 +9469,10 @@ WaveSchedule
 				{
 					TF_WEAPON_KNIFE 0.35
 				}
+				WeaponResist [$SIGSEGV]
+				{
+					TF_WEAPON_CLEAVER 0.35
+				}
 				FireWeapon [$SIGSEGV]
 				{
 					Delay 10
@@ -9475,6 +9554,10 @@ WaveSchedule
 				WeaponResist [$SIGSEGV]
 				{
 					TF_WEAPON_KNIFE 0.35
+				}
+				WeaponResist [$SIGSEGV]
+				{
+					TF_WEAPON_CLEAVER 0.35
 				}
 				FireWeapon [$SIGSEGV]
 				{
