@@ -37,7 +37,7 @@ WaveSchedule
 	ImprovedAirblast 1					[$SIGSEGV]
 	MaxSpectators 0						[$SIGSEGV]
 	NoSapUnownedBuildings 1 			[$SIGSEGV]
-	NoMissionInfo 1						[$SIGSEGV] 
+	NoMissionInfo 0						[$SIGSEGV] 
 	NoCreditsVelocity 1 				[$SIGSEGV]
 	NoRomevisionCosmetics 1 			[$SIGSEGV]
 	NoThrillerTaunt 1 					[$SIGSEGV]
@@ -942,7 +942,6 @@ WaveSchedule
 		OriginalItemName "Festive Bonk 2014"
 		"special item description" "Battalion's Backup effect"
 		"effect cond override" 26
-		"provide on active" 1
 	}
 
 	CustomWeapon [$SIGSEGV]
@@ -1037,6 +1036,7 @@ WaveSchedule
 	{
 		Name "Dustbowl Eagle for Spy"
 		OriginalItemName "Upgradeable TF_WEAPON_PISTOL"
+		"special item description" "WARNING; overlaps sapper slot"
 		"can headshot" 1
 		"damage bonus" 3
 		"mult crit dmg" 0.48
@@ -1334,6 +1334,7 @@ WaveSchedule
 		"paintkit_proto_def_index" 226
         "set_item_texture_wear" 0
 		"rocket specialist" 4
+		"disable wrangler shield" 1
 		"mult firerocket rate" 0.25
 		"engy sentry fire rate increased" 5
 		"engy sentry radius increased" 1.5
@@ -1597,7 +1598,7 @@ WaveSchedule
 		Spy
 		{
 			Secondary "Tranquilizer"
-			//Secondary "Dustbowl Eagle for Spy"
+			Secondary "Dustbowl Eagle for Spy"
 			Secondary "Fire Retardant Suit"
 			Secondary "Budgie Booster"
 			Action "Grapple Hook"
@@ -1635,7 +1636,7 @@ WaveSchedule
 		ClassName "TF_WEAPON_MINIGUN"
 		"mod minigun can holster while spinning" 1
 	}
-	
+
 	ItemAttributes   // less bad vs sentries
 	{
 		SimilarToItem "The Liberty Launcher"
@@ -1673,7 +1674,7 @@ WaveSchedule
 		ItemName "The Ubersaw"
 		"add uber charge on hit" 0.15
 	}
-
+	
 	ItemAttributes   // too bad
 	{
 		ItemName "The Amputator"
@@ -2085,6 +2086,19 @@ WaveSchedule
 			{
 				"targetname" "sapped2"
 				"condition" "71"
+				"duration" "-1"
+				"filtername" "filter_blueteam"
+				"startdisabled" "1"
+				"origin" "0 0 0"
+				"angles" "-45 -90 0"
+				"mins" "-8000 -8000 -8000"
+				"maxs" "8000 8000 8000"
+				"spawnflags" "1"
+			}
+			trigger_add_tf_player_condition
+			{
+				"targetname" "wincond"
+				"condition" "34"
 				"duration" "-1"
 				"filtername" "filter_blueteam"
 				"startdisabled" "1"
@@ -2534,6 +2548,12 @@ WaveSchedule
 				Target capturezone_blue        
 				Action AddOutput
 				Param "OnCapture kill_buildings_relay:trigger:0:-1"
+			}
+			OnSpawnOutput
+			{
+				Target capturezone_blue        
+				Action AddOutput
+				Param "OnCapture wincond:enable:0:-1"
 			}
 			OnSpawnOutput
 			{
@@ -4055,6 +4075,7 @@ WaveSchedule
 
 		Explanation [$SIGSEGV]
 		{
+			Line "{DE4BDE}Use your taunt key to {green}upgrade the bomb{DE4BDE} to gain buffs!"
 			Line "{yellow}Your team must not exceed {green}10 minutes {yellow}for this wave."
 		}
 
@@ -4942,7 +4963,7 @@ WaveSchedule
 			MaxActive 15
 			SpawnCount 5
 			WaitForAllDead "part02"
-			WaitBetweenSpawns 12
+			WaitBetweenSpawns 15
 			TotalCurrency 0
 			RandomSpawn 1
 
@@ -4979,11 +5000,6 @@ WaveSchedule
 		{
 			Target wave_finished_relay
 			Action trigger
-		}
-
-		Explanation [$SIGSEGV]
-		{
-			Line "{yellow}Your team must not exceed {green}10 minutes {yellow}for this wave."
 		}
 
 		WaveSpawn
@@ -5911,8 +5927,8 @@ WaveSchedule
 			Where "spawnbot_big"
 			Where "spawnbot_mid"
 			TotalCount 9999
-			MaxActive 9
-			SpawnCount 3
+			MaxActive 6
+			SpawnCount 2
 			WaitForAllDead "part03"
 			WaitBetweenSpawns 12
 			TotalCurrency 0
@@ -5966,12 +5982,6 @@ WaveSchedule
 				}
 				//SIG
 			}
-			
-			TFBot
-			{
-				Template Medic_Quickuber
-				Classicon spammer
-			}
 
 			TFBot
 			{
@@ -6000,11 +6010,6 @@ WaveSchedule
 		{
 			Target wave_finished_relay
 			Action trigger
-		}
-
-		Explanation [$SIGSEGV]
-		{
-			Line "{yellow}Your team must not exceed {green}10 minutes {yellow}for this wave."
 		}
 
 		WaveSpawn
@@ -6790,6 +6795,8 @@ WaveSchedule
 				Classicon spammer
 				Item "The Huo Long Heatmaker"
 				Attributes DisableDodge
+				Attributes IgnoreFlag
+				BehaviorModifiers Push
 				Skill Expert
 				ItemAttributes
 				{
@@ -6807,8 +6814,6 @@ WaveSchedule
 				}
 				
 				//SIG
-				Action Mobber [$SIGSEGV]
-				//UseMeleeThreatPrioritization 1 [$SIGSEGV]
 				AddCond [$SIGSEGV]
 				{
 					Name TF_COND_REPROGRAMMED
@@ -6864,7 +6869,6 @@ WaveSchedule
 				
 				//SIG
 				Action Mobber [$SIGSEGV]
-				//UseMeleeThreatPrioritization 1 [$SIGSEGV]
 				AddCond [$SIGSEGV]
 				{
 					Name TF_COND_REPROGRAMMED
@@ -6916,8 +6920,6 @@ WaveSchedule
 				}
 				
 				//SIG
-				//Action Mobber [$SIGSEGV]
-				//UseMeleeThreatPrioritization 1 [$SIGSEGV]
 				AddCond [$SIGSEGV]
 				{
 					Name TF_COND_REPROGRAMMED
@@ -6949,11 +6951,6 @@ WaveSchedule
 		{
 			Target wave_finished_relay
 			Action trigger
-		}
-
-		Explanation [$SIGSEGV]
-		{
-			Line "{yellow}Your team must not exceed {green}12 minutes {yellow}for this wave."
 		}
 
 		WaveSpawn
@@ -7173,7 +7170,7 @@ WaveSchedule
 		WaveSpawn
 		{
 			Name "warning"
-			WaitBeforeStarting 660
+			WaitBeforeStarting 540
 			FirstSpawnOutput                                                                                                                                                            
 			{
 			Target warn_relay                      
@@ -7184,7 +7181,7 @@ WaveSchedule
 		{
 			Name "failure"
 			FirstSpawnWarningSound npc/attack_helicopter/aheli_megabomb_siren1.wav
-			WaitBeforeStarting 720
+			WaitBeforeStarting 600
 			FirstSpawnOutput                                                                                                                                                            
 			{
 			Target lose_relay                      
@@ -7284,7 +7281,7 @@ WaveSchedule
 			MaxActive 1
 			SpawnCount 1
 			TotalCurrency 0
-			WaitBetweenSpawnsAfterDeath 35
+			WaitBetweenSpawnsAfterDeath 25
 			Support 1
 			
 			TFBot
@@ -8008,11 +8005,6 @@ WaveSchedule
 		{
 			Target wave_finished_relay
 			Action trigger
-		}
-
-		Explanation [$SIGSEGV]
-		{
-			Line "{yellow}Your team must not exceed {green}10 minutes {yellow}for this wave."
 		}
 
 		WaveSpawn
