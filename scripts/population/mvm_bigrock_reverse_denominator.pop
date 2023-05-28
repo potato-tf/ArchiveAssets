@@ -18,7 +18,7 @@ WaveSchedule
 	AllowJoinTeamBlue 1 				[$SIGSEGV]
 	AllowMultipleSappers 0				[$SIGSEGV]
 	AllowBombBuffsForPlayerCarriers 1	[$SIGSEGV]
-	BodyPartScaleSpeed 50				[$SIGSEGV]
+	BodyPartScaleSpeed 100				[$SIGSEGV]
 	BluPlayersAreRobots 1 				[$SIGSEGV]
 	BluHumanFlagCapture 0				[$SIGSEGV]
 	BluHumanFlagPickup 1 				[$SIGSEGV]
@@ -1452,6 +1452,7 @@ WaveSchedule
 		"speed_boost_on_hit_enemy" 0
 		"melee airblast" 1
 		"damage bonus" 2
+		"taunt attack time mult" 2
 		"cannot be upgraded" 1
 		"use original class weapon animations" 1
 		"custom item model" "models/empty.mdl"
@@ -1906,7 +1907,6 @@ WaveSchedule
 				"onspawn" "intel,addoutput,onpickup1 filter_isbot:testactivator::0:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup1 !activator:addoutput:targetname hasbomb:0:-1,0,-1"
 				//"onspawn" "intel,addoutput,onpickup1 !activator:$addplayerattribute:self dmg push force decreased|0:-1,0,-1"
-				"onspawn" "intel,addoutput,onpickup1 !activator:$addplayerattribute:mod weapon blocks healing|1:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup bombpickup_relay:trigger::0.01:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup bombpickup_relay:cancelpending::0:-1,0,-1"
 				"onspawn" "intel,addoutput,ondrop1 !activator:addoutput:targetname :0:-1,0,-1"
@@ -1920,7 +1920,6 @@ WaveSchedule
                 "targetname" "bomb_cleanse"
                 "ontrigger" "!activator,$addplayerattribute,set bonus: health regen set bonus|0,0,-1"
 				//"ontrigger" "!activator,$addplayerattribute,self dmg push force decreased|1,0,-1"
-				"ontrigger" "!activator,$addplayerattribute,mod weapon blocks healing|0,0,-1"
 				"ontrigger" "!activator,$removecond,42,0,-1"
 				"ontrigger" "!activator,$removecond,11,0,-1"
                 "onspawn" "intel,addoutput,ondrop1 undoregen:trigger:0:0:-1,0,-1"
@@ -2287,6 +2286,7 @@ WaveSchedule
 				"OnTrigger" "tune,PlaySound,,0,-1"
 				"OnTrigger" "tune2,PlaySound,,0,-1"
 				"OnTrigger" "nukes,$SetProp$m_bUseBossHealthBar,1,0,-1"
+				"OnTrigger" "bomb_antigrief_loop,Trigger,0,0,-1"
 			}
 		}
 
@@ -8235,7 +8235,7 @@ WaveSchedule
 				Class Demoman
 				Classicon bot_norm_lite
 				Name "Persian Demo"
-				Health 175
+				Health 200
 				Item "Sultan's Ceremonial"	
 				Item "Ali Baba's Wee Booties"
 				Item "The Persian Persuader"
@@ -8253,7 +8253,7 @@ WaveSchedule
 				ItemAttributes
 				{
 					ItemName "Ali Baba's Wee Booties"
-					"max health additive penalty" 0
+					"max health additive bonus" 0
 				}
 				CharacterAttributes
 				{
@@ -8284,12 +8284,6 @@ WaveSchedule
 			WaitBeforeStarting 30
 			WaitForAllDead "redblimp"
 			Support 1
-
-			FirstSpawnOutput                                                                                                                                                            
-			{
-				Target bomb_antigrief_loop            
-				Action Trigger                   
-			}
 
 			TFBot
 			{ 
