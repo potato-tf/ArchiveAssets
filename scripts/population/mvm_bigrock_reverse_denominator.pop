@@ -376,7 +376,14 @@ WaveSchedule
 			Item "The Quick-Fix"
 			Attributes MiniBoss
 			Attributes DisableDodge
-			Attributes IgnoreEnemies
+			//Attributes IgnoreEnemies
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				//"always crit" 1
+				"override projectile type" 1
+				"faster reload rate" 0.01
+			}
 			CharacterAttributes
 			{
 				"damage force reduction" 0
@@ -393,12 +400,6 @@ WaveSchedule
 			}
 				
 			//SIG
-			StripItemSlot 0
-			AddCond
-			{
-				Name TF_COND_INVULNERABLE_USER_BUFF
-				Duration 2
-			}
 			AddCond
 			{
 				Name TF_COND_REPROGRAMMED
@@ -923,7 +924,6 @@ WaveSchedule
 	{
 		Name "Shotgun"
 		OriginalItemName "Upgradeable TF_WEAPON_SHOTGUN_PRIMARY"
-		"max health additive bonus" 25	//buff because it robs you of your secondary due to a bug
 		"use original class player animations" 1
 		"use original class weapon animations" 1
 		"custom view model" "models/weapons/c_models/c_demo_bot_arms.mdl"
@@ -1350,8 +1350,10 @@ WaveSchedule
 		"special item description" "Enhanced rockets on level 3 sentry; weak lvl 1-2 sentry"
 		"paintkit_proto_def_index" 226
         "set_item_texture_wear" 0
-		"rocket specialist" 4
-		"disable wrangler shield" 1
+		//"rocket specialist" 4
+		//"disable wrangler shield" 1
+		"mult sentry rocket projectile speed" 1.6
+		"blast radius increased" 1.6
 		"mult firerocket rate" 0.25
 		"engy sentry fire rate increased" 5
 		"engy sentry radius increased" 1.5
@@ -1655,13 +1657,6 @@ WaveSchedule
 		"mod minigun can holster while spinning" 1
 	}
 
-	ItemAttributes   // less bad vs sentries
-	{
-		SimilarToItem "The Liberty Launcher"
-		"damage penalty" 1.0
-		"dmg penalty vs players" 0.75
-	}
-
 	ItemAttributes [$SIGSEGV] // too awful
 	{
 		ItemName "The Flying Guillotine"
@@ -1889,29 +1884,28 @@ WaveSchedule
 		antigriefbomb
 		{
 			NoFixup 1
-
 			logic_relay
 			{
-				"targetname" "bomb_antigrief_on"
-				"ontrigger" "hudhintloop,trigger,,0,-1"
-				"ontrigger" "bombpickup_relay,enable,,0,-1"
-				"ontrigger" "antistupid,enable,,0,-1"
-				"ontrigger" "bombpickup_relay,trigger,,0.01,-1"
+				"targetname" "bomb_antigrief_loop"
+				"ontrigger" "knife_looper,kill,,0,-1"
+				"ontrigger" "intel,addoutput,ondrop1 @f@filter_player@player:$addplayerattribute:cannot pick up intelligence|1:-1,0,-1"
+				"ontrigger" "@f@filter_player@player,$addplayerattribute,cannot pick up intelligence|1,0,-1"
+				"ontrigger" "intel,forcedrop,0,0.1,1"
+				"ontrigger" "!self,trigger,0,3,-1"
+				"spawnflags" "2"
 			}
-			logic_relay
-			{
-				"targetname" "bomb_antigrief_off"
-				"ontrigger" "bombpickup_relay,disable,,0,-1"
-				"ontrigger" "bombpickup_relay,cancelpending,,0,-1"
-				"ontrigger" "antistupid,disable,,0,-1"
-				"ontrigger" "bombpickup,disable,,0,-1"
-			}
+			$filter_sendprop
+            {
+                "targetname" "filter_player"
+                "$name" "m_bIsABot"
+                "$value" "0"
+            }
 			logic_relay
 			{
 				"onspawn" "intel,addoutput,onreturn intel:$SetLocalOrigin:985 4385 352:0.01:-1,0.01,-1"
 				"onspawn" "intel,addoutput,onpickup1 filter_isbot:testactivator::0:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup1 !activator:addoutput:targetname hasbomb:0:-1,0,-1"
-				"onspawn" "intel,addoutput,onpickup1 !activator:$addplayerattribute:self dmg push force decreased|0:-1,0,-1"
+				//"onspawn" "intel,addoutput,onpickup1 !activator:$addplayerattribute:self dmg push force decreased|0:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup1 !activator:$addplayerattribute:mod weapon blocks healing|1:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup bombpickup_relay:trigger::0.01:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup bombpickup_relay:cancelpending::0:-1,0,-1"
@@ -1925,7 +1919,7 @@ WaveSchedule
             {
                 "targetname" "bomb_cleanse"
                 "ontrigger" "!activator,$addplayerattribute,set bonus: health regen set bonus|0,0,-1"
-				"ontrigger" "!activator,$addplayerattribute,self dmg push force decreased|1,0,-1"
+				//"ontrigger" "!activator,$addplayerattribute,self dmg push force decreased|1,0,-1"
 				"ontrigger" "!activator,$addplayerattribute,mod weapon blocks healing|0,0,-1"
 				"ontrigger" "!activator,$removecond,42,0,-1"
 				"ontrigger" "!activator,$removecond,11,0,-1"
@@ -1933,48 +1927,13 @@ WaveSchedule
                 "spawnflags" "2"
             }
 			logic_relay
-			{
-				"targetname" "bombpickup_relay"
-				"startdisabled" "1"
-				"ontrigger" "bombpickup,disable,,0,-1"
-				"ontrigger" "bombpickup,enable,,5,-1"
-			}
-			trigger_multiple
-			{
-				"targetname" "bombpickup"
-				"parentname" "intel"
-				"mins" "-8 -8 -8"
-				"maxs" "8 8 8"
-				"spawnflags" "1"
-				"startdisabled" "1"
-				"filtername" "filter_nobomb_notbot"
-				"onstarttouch" "intel,forcedrop,,0,-1"
-			}
-			$filter_sendprop
-			{
-				"targetname" "filter_isbot"
-				"$name" "m_bIsABot"
-				"$value" "1"
-				"onpass" "bombpickup_relay,cancelpending,,0.02,-1"
-			}
-			filter_activator_name
-			{
-				"targetname" "filter_nobomb"
-				"filtername" "hasbomb"
-				"negated" "1"
-			}
-			$filter_sendprop
-			{
-				"targetname" "filter_notbot"
-				"$name" "m_bIsABot"
-				"$value" "0"
-			}
-			filter_multi
-			{
-				"targetname" "filter_nobomb_notbot"
-				"filter01" "filter_nobomb"
-				"filter02" "filter_notbot"
-			}
+            {
+                "targetname" "tank_edge_case"
+                "ontrigger" "cargotunnel,disablecollision,0,0,-1"
+				"ontrigger" "cargotunnel,disable,0,0,-1"
+				"ontrigger" "signchat8,kill,0,0,-1"
+				"ontrigger" "kaboom2,kill,0,0,-1"
+            }
 		}
 
 		tutorial
@@ -2301,7 +2260,6 @@ WaveSchedule
                 "origin" "-64 -1984 566"
 				"mins" "-120 -120 -114"
 				"maxs" "120 120 114"
-				"startdisabled" "1"
 				"spawnflags" "1"
 				"onstarttouch" "!activator,$displaytextcenter,Only computer teammates can deploy the bomb! Press L to drop,0,-1"
             }
@@ -4392,13 +4350,7 @@ WaveSchedule
 
 			FirstSpawnOutput                                                                                                                                                            
 			{
-				Target bomb_antigrief_on                    
-				Action Trigger                   
-			}
-
-			DoneOutput
-			{
-				Target bomb_antigrief_off                    
+				Target bomb_antigrief_loop            
 				Action Trigger                   
 			}
 
@@ -5734,6 +5686,11 @@ WaveSchedule
 			TFBot
 			{				
 				Template Giant_Medic
+				AddCond
+				{
+					Name TF_COND_INVULNERABLE_USER_BUFF
+					Duration 2
+				}
 			}
 			
 			}
@@ -5958,13 +5915,7 @@ WaveSchedule
 
 			FirstSpawnOutput                                                                                                                                                            
 			{
-				Target bomb_antigrief_on                    
-				Action Trigger                   
-			}
-
-			DoneOutput
-			{
-				Target bomb_antigrief_off                    
+				Target bomb_antigrief_loop            
 				Action Trigger                   
 			}
 			
@@ -6286,6 +6237,12 @@ WaveSchedule
 				 Action Trigger                         
 			}
 		
+			DoneOutput
+			{
+				Target tank_edge_case                         
+				Action trigger                   
+			}
+
 			Tank
 			{
 				Health 30000
@@ -6482,6 +6439,21 @@ WaveSchedule
 			TFBot
 			{				
 				Template Giant_Medic
+				ExtAttr IgnorePlayers
+				Attributes IgnoreFlag
+				Attributes HoldFireUntilFullReload
+				Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+				ItemAttributes
+				{
+					ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+					"always crit" 1
+					"clip size upgrade atomic" 26.0
+					"faster reload rate" 0.22
+					"fire rate bonus" 0.2
+					"projectile spread angle penalty" 5
+					"Projectile speed increased" 0.4
+					"use original class weapon animations" 1
+				}
 				CharacterAttributes
 				{
 					"bot medic uber health threshold" 9999
@@ -6499,6 +6471,21 @@ WaveSchedule
 			TFBot
 			{				
 				Template Giant_Medic
+				ExtAttr IgnorePlayers
+				Attributes IgnoreFlag
+				Attributes HoldFireUntilFullReload
+				Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+				ItemAttributes
+				{
+					ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+					"always crit" 1
+					"clip size upgrade atomic" 26.0
+					"faster reload rate" 0.22
+					"fire rate bonus" 0.2
+					"projectile spread angle penalty" 5
+					"Projectile speed increased" 0.4
+					"use original class weapon animations" 1
+				}
 				CharacterAttributes
 				{
 					"bot medic uber health threshold" 9999
@@ -6804,13 +6791,7 @@ WaveSchedule
 
 			FirstSpawnOutput                                                                                                                                                            
 			{
-				Target bomb_antigrief_on                    
-				Action Trigger                   
-			}
-
-			DoneOutput
-			{
-				Target bomb_antigrief_off                    
+				Target bomb_antigrief_loop            
 				Action Trigger                   
 			}
 
@@ -7936,13 +7917,7 @@ WaveSchedule
 
 			FirstSpawnOutput                                                                                                                                                            
 			{
-				Target bomb_antigrief_on                    
-				Action Trigger                   
-			}
-
-			DoneOutput
-			{
-				Target bomb_antigrief_off                    
+				Target bomb_antigrief_loop            
 				Action Trigger                   
 			}
 
@@ -8224,7 +8199,7 @@ WaveSchedule
 					"Projectile speed increased" 0.9
 					"cannot pick up intelligence" 1
 					"health from packs increased" 0.25
-					"no_jump" 1
+					//"no_jump" 1
 				}
 				AddCond [$SIGSEGV]
 				{
@@ -8312,13 +8287,7 @@ WaveSchedule
 
 			FirstSpawnOutput                                                                                                                                                            
 			{
-				Target bomb_antigrief_on                    
-				Action Trigger                   
-			}
-
-			DoneOutput
-			{
-				Target bomb_antigrief_off                    
+				Target bomb_antigrief_loop            
 				Action Trigger                   
 			}
 
