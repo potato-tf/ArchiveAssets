@@ -14,6 +14,7 @@ WaveSchedule
 	FixedRespawnWaveTimeBlue 		1
 	AddSentryBusterWhenDamageDealtExceeds 0
 	
+	AllowCivilianClass 1				[$SIGSEGV]
 	AllowJoinTeamBlueMax 6 				[$SIGSEGV]
 	AllowJoinTeamBlue 1 				[$SIGSEGV]
 	AllowMultipleSappers 0				[$SIGSEGV]
@@ -32,7 +33,6 @@ WaveSchedule
 	CustomNavFile mvm_bigrock_reverse	[$SIGSEGV]
 	DisplayRobotDeathNotice 1 			[$SIGSEGV]
 	EngineerPushRange 1				    [$SIGSEGV]
-	//FlagEscortCountOffset 20			[$SIGSEGV]
 	HumansMustJoinTeam blue 			[$SIGSEGV]
 	ImprovedAirblast 1					[$SIGSEGV]
 	MaxSpectators 0						[$SIGSEGV]
@@ -67,6 +67,7 @@ WaveSchedule
 	PrecacheSound "denominator/chain_spin.wav"							[$SIGSEGV]
 	PrecacheSound "denominator/chain_wind_up.wav"						[$SIGSEGV]
 	PrecacheSound "denominator/chain_wind_down.wav"						[$SIGSEGV]
+	PrecacheSound "mvm\mvm_deploy_giant.wav"							[$SIGSEGV]
 	
 	PrecacheModel "models/buildables/skirmisher1.mdl"					[$SIGSEGV]
 	PrecacheModel "models/buildables/sentry1_uber.mdl"					[$SIGSEGV]
@@ -471,6 +472,10 @@ WaveSchedule
 		"MVM.GiantCommonExplodes"	"npc/env_headcrabcanister/explosion.wav"
 		"Player.FallGib"			"Breakable.Metal"
 		"Player.FallDamage"			"Breakable.Metal"
+		"Civilian.MVM_Death"		"Heavy.MVM_Death"
+		"Civilian.MVM_CritDeath"	"Heavy.MVM_CritDeath"
+		"Civilian.MVM_MeleeDeath"	"Heavy.MVM_MeleeDeath"
+		"Civilian.MVM_ExplosionDeath"	"Breakable.Metal"
 	}
 
 	ExtraTankPath [$SIGSEGV]
@@ -841,10 +846,25 @@ WaveSchedule
 		"increased air control" 4
 		"always allow taunt" 1
 		"can breathe under water" 1
+		"swimming mastery" 1
 		Engineer
 		{
 		"max health additive bonus" 150
 		"mult dispenser rate" 2
+		}
+		Civilian
+		{
+		"SET BONUS: max health additive bonus" 700
+		"CARD: move speed bonus" 0.92
+		"min respawn time" 9
+		"cannot upgrade" 1
+		"no resupply" 1
+		"health from packs increased" 0.5
+		"damage force reduction" 0.5
+		"no_duck" 1
+		"always gib" 1
+		"model scale" 1.5
+		"patient overheal penalty" 0
 		}
 	}
 
@@ -859,6 +879,7 @@ WaveSchedule
 		Medic "models/weapons/c_models/c_medic_bot_arms.mdl"
 		Sniper "models/weapons/c_models/c_sniper_bot_arms.mdl"
 		Spy "models/weapons/c_models/c_spy_bot_arms.mdl"
+		Civilian "models/weapons/c_models/c_heavy_bot_arms.mdl"
 	}
 
 	CustomWeapon [$SIGSEGV]
@@ -1213,7 +1234,6 @@ WaveSchedule
 		"armor piercing" -25
 		"cannot be upgraded" 1
 		"use original class weapon animations" 1
-		"provide on active" 1
 		"gesture speed increase" 2
 	}
 
@@ -1319,7 +1339,6 @@ WaveSchedule
 		OriginalItemName "The Scorch Shot"
 		"damage bonus" 3
 		"Set DamageType Ignite" 1
-		"maxammo secondary reduced"  0.75
 		"self dmg push force decreased" 3
 		"blast dmg to self increased" 3
 		"mod flaregun fires pellets with knockback" 0
@@ -1438,8 +1457,8 @@ WaveSchedule
 		Name "Krakensage"
 		OriginalItemName "Upgradeable TF_WEAPON_BONESAW"
 		"special item description" "Crits vs crit-boosted opponents"
-		"crit on cond" 2630155
-		"minicrit on cond" 2036496
+		"crit on cond" 2892299
+		"minicrit on cond" 16
 		"fire rate penalty" 1.2
 		"custom item model" "models/weapons/c_models/c_krakensage/c_krakensage.mdl"
 	}
@@ -1493,12 +1512,10 @@ WaveSchedule
 		"slow enemy on hit" 1
 		"slow enemy on hit major" 4
 		"disable buildings on hit" 4
-		"mod no reload DISPLAY ONLY" 1
-		"mod max primary clip override" -1
-		"cannot be upgraded" 1
 		"custom weapon fire sound" "=80|weapons/pistol/pistol_fire2.wav"
 		"custom kill icon" "syringegun_medic"
 		"custom item model" "models\weapons\c_models\c_tranquilizer\c_revolver.mdl"
+		"damage penalty" 0.65
 	}
 
 	CustomWeapon [$SIGSEGV]
@@ -1523,6 +1540,18 @@ WaveSchedule
 		"force weapon switch" 0
 	}
 
+	CustomWeapon [$SIGSEGV]
+	{
+		Name "Steel Fists"	
+		OriginalItemName "Fists of Steel"
+		"damage causes airblast" 1
+		"damage bonus" 1.54
+		"gesture speed increase" 2
+		"boots falling stomp" 1
+		"melee airblast" 1
+		"cosmetic taunt sound" "=95|mvm\mvm_deploy_giant.wav"
+	}
+	
 	ItemReplacement [$SIGSEGV]
 	{
 		"Wasp Launcher"
@@ -1624,6 +1653,21 @@ WaveSchedule
 			Secondary "Electro Knife"
 			Action "Grapple Hook"
 		}
+	}
+
+	ForceItem  
+	{
+		Civilian
+		{
+			Item "The Carl"
+			Item "Steel Fists"
+		}
+	}
+
+	PlayerSpawnTemplate 
+	{
+		Name "civilian_steel_gauntlet"
+		Class Civilian
 	}
 
 	ItemAttributes [$SIGSEGV] // robot strength
@@ -1840,6 +1884,28 @@ WaveSchedule
 			}
 		}
 
+		civilian_steel_gauntlet
+        {
+			logic_relay
+			{
+				"targetname" "civilian_hello"
+				"onspawn" "!parent,$displaytextcenter,You are now a Steel Gauntlet Pusher.,0,-1"
+				"onspawn" "!parent,$displaytextcenter,Soak up damage for your teammates or carry the bomb!,4,-1"
+			}
+			OnSpawnOutput
+			{
+				Target !parent
+				Action SetCustomModelWithClassAnimations
+				Param "models/bots/heavy/bot_heavy.mdl"
+			}
+			OnSpawnOutput
+			{
+				Target !parent
+				Action $setprop$m_nBotSkill
+				Param 2
+			}
+        }
+
 		LoadoutFixer
 		{
 			OnSpawnOutput
@@ -1891,6 +1957,7 @@ WaveSchedule
 				"ontrigger" "knife_looper,kill,,0,-1"
 				"ontrigger" "intel,addoutput,ondrop1 @f@filter_player@player:$addplayerattribute:cannot pick up intelligence|1:-1,0,-1"
 				"ontrigger" "@f@filter_player@player,$addplayerattribute,cannot pick up intelligence|1,0,-1"
+				"ontrigger" "antistupid,kill,,0,-1"
 				"ontrigger" "intel,forcedrop,0,0.1,1"
 				"ontrigger" "!self,trigger,0,3,-1"
 				"spawnflags" "2"
@@ -1906,7 +1973,7 @@ WaveSchedule
 				"onspawn" "intel,addoutput,onreturn intel:$SetLocalOrigin:985 4385 352:0.01:-1,0.01,-1"
 				"onspawn" "intel,addoutput,onpickup1 filter_isbot:testactivator::0:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup1 !activator:addoutput:targetname hasbomb:0:-1,0,-1"
-				//"onspawn" "intel,addoutput,onpickup1 !activator:$addplayerattribute:self dmg push force decreased|0:-1,0,-1"
+				"onspawn" "intel,addoutput,onpickup1 !activator:$addplayerattribute:self dmg push force decreased|0:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup bombpickup_relay:trigger::0.01:-1,0,-1"
 				"onspawn" "intel,addoutput,onpickup bombpickup_relay:cancelpending::0:-1,0,-1"
 				"onspawn" "intel,addoutput,ondrop1 !activator:addoutput:targetname :0:-1,0,-1"
@@ -1919,9 +1986,10 @@ WaveSchedule
             {
                 "targetname" "bomb_cleanse"
                 "ontrigger" "!activator,$addplayerattribute,set bonus: health regen set bonus|0,0,-1"
-				//"ontrigger" "!activator,$addplayerattribute,self dmg push force decreased|1,0,-1"
+				"ontrigger" "!activator,$addplayerattribute,self dmg push force decreased|1,0,-1"
 				"ontrigger" "!activator,$removecond,42,0,-1"
-				"ontrigger" "!activator,$removecond,11,0,-1"
+				"ontrigger" "!activator,$removecond,34,0,-1"
+				"ontrigger" "!activator,$removecond,11,0,-1" //failsafe who knows
                 "onspawn" "intel,addoutput,ondrop1 undoregen:trigger:0:0:-1,0,-1"
                 "spawnflags" "2"
             }
@@ -4312,6 +4380,7 @@ WaveSchedule
 			{
 				Template T_TFBot_Sniper_Huntsman
 				Skill Normal
+				AimAt Head
 				AimTrackingInterval 0.05
 				Classicon bot_norm_lite
 				ItemAttributes
@@ -5346,6 +5415,9 @@ WaveSchedule
 				Action Enable                 
 			}
 
+			RandomChoice
+			{
+
 			TFBot
 			{
 				Class Sniper
@@ -5376,6 +5448,115 @@ WaveSchedule
                     ItemName "The Razorback"
 					"item_meter_charge_rate" 5
                 }
+				ItemAttributes
+                {
+                    ItemName "The Shahanshah"
+					"provide on active" 1
+					"move speed bonus" 1300
+                    "fire rate bonus" 0.6
+                    "heal on kill" 100
+                }	
+				ItemAttributes
+                {
+                    ItemName "The Anger"
+                    "set item tint rgb" 16738740
+					"attach particle effect" 19
+                }
+				Item "Default Power Up Canteen (MvM)"
+				ItemAttributes
+                {
+                    ItemName "Default Power Up Canteen (MvM)"
+                    "critboost" 1
+                    "powerup duration" 5
+                    "powerup charges" 3
+                }
+				CharacterAttributes
+				{
+					"dmg taken from fire reduced" 0.25
+					"dmg taken from bullets reduced" 0.25
+					"dmg taken from blast reduced" 0.25
+					"dmg taken from crit reduced" 0.1
+					"health regen" 10
+					"move speed bonus" 0.001
+					//"no_jump" 1
+					"ammo regen" 1
+					"increase buff duration" 100
+					"force distribute currency on death" 0
+				}
+				
+				//SIG
+				Action Sniper [$SIGSEGV]
+				UseHumanModel 1 [$SIGSEGV]
+				AimTrackingInterval 0.05
+				//FastUpdate 1
+				UseMeleeThreatPrioritization 1 [$SIGSEGV]
+				FireWeapon [$SIGSEGV]
+				{
+					Delay 0.5
+					Cooldown 1
+					IfSeeTarget 1
+					Type "Primary"
+				}
+				VoiceCommand [$SIGSEGV]
+                {
+                    Delay 0
+                    Cooldown 30
+					IfSeeTarget 1
+                    Type "Incoming"
+                }
+				VoiceCommand [$SIGSEGV]
+                {
+                    Delay 5
+                    Cooldown 5
+					IfSeeTarget 1
+                    Type "Nice Shot"
+                }
+				FireWeapon [$SIGSEGV]
+				{
+					Delay 0
+					Cooldown 0
+					Repeats 1
+					IfSeeTarget 1
+					Duration 1
+					Type "Reload"
+				}
+				AddCond [$SIGSEGV]
+				{
+					Name TF_COND_REPROGRAMMED
+				}
+				//SIG
+			}
+
+			TFBot
+			{
+				Class Sniper
+				Name "Player"
+				tag anger
+				ClassIcon tf2_lite
+				Skill Expert
+				Attributes SpawnWithFullCharge
+				Item "The Hitman's Heatmaker"
+				Item "The Cozy Camper"
+				Item "The Shahanshah"
+				Item "Memes vs Machines Player 2019"
+				Item "The Snow Scoper"
+				Item "The Anger"
+				ItemAttributes
+                {
+                    ItemName "The Hitman's Heatmaker"
+                    "faster reload rate" 0.4
+					"sniper charge per sec" 2
+					"damage bonus" 2
+					"heal on kill" 100
+					"explosive sniper shot" 3
+					"projectile penetration" 1
+					"damage force reduction" 0
+                }	
+				ItemAttributes
+                {
+                    ItemName "The Cozy Camper"
+					"jarate backstabber" 1
+                }	
 				ItemAttributes
                 {
                     ItemName "The Shahanshah"
@@ -5453,6 +5634,8 @@ WaveSchedule
 					Name TF_COND_REPROGRAMMED
 				}
 				//SIG
+			}
+
 			}
 
 		}
@@ -5537,7 +5720,7 @@ WaveSchedule
 				CharacterAttributes
 				{
 					"alt-fire disabled" 1
-					"melee cleave attack" 1
+					//"melee cleave attack" 1
 					"crit mod disabled" 0
 					"ammo regen" 1
 					"force distribute currency on death" 0
@@ -6447,6 +6630,7 @@ WaveSchedule
 				{
 					ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
 					"always crit" 1
+					"damage bonus" 1.5
 					"clip size upgrade atomic" 26.0
 					"faster reload rate" 0.22
 					"fire rate bonus" 0.2
@@ -6479,6 +6663,7 @@ WaveSchedule
 				{
 					ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
 					"always crit" 1
+					"damage bonus" 1.5
 					"clip size upgrade atomic" 26.0
 					"faster reload rate" 0.22
 					"fire rate bonus" 0.2
@@ -9640,6 +9825,8 @@ WaveSchedule
 					"voice pitch scale" 0
 					"crit mod disabled" 0
 					"ammo regen" 1
+					"can breathe under water" 1
+					"swimming mastery" 1
 					//"health regen" 250
 					"rage giving scale" 0.1
 					"health from packs increased" 0.05
@@ -9821,7 +10008,7 @@ WaveSchedule
 			SpawnCount 2
 			WaitForAllDead "redblimp"
 			//WaitBeforeStarting 10
-			WaitBetweenSpawns 6
+			WaitBetweenSpawns 8
 			TotalCurrency 0
 			RandomSpawn 1
 
