@@ -19,7 +19,7 @@ function medigunTick()
 				player:SetAttributeValue("no_attack", nil)
 			end)
 			isValid = false
-		elseif medigun.m_bAttacking == 0 or medigun.m_bHolstered == 1 or player:InCond(TF_COND_TAUNTING) == 1 then
+		elseif medigun.m_bAttacking == 0 or medigun.m_bHolstered == 1 or player:InCond(TF_COND_TAUNTING) then
 			ResetMedigun(medigun, medigunhandle)
 			isValid = false
 			--may want some way to check m_bHealing still
@@ -42,6 +42,7 @@ function medigunTick()
 	end
 end
 
+--removes vaccinator uber from bots
 local chargeDeployedCallback = AddEventCallback("player_chargedeployed", function(eventTable)
 	local medic = ents.GetPlayerByUserId(eventTable.userid)
 	local target = ents.GetPlayerByUserId(eventTable.targetid)
@@ -119,7 +120,7 @@ function BoughtMedibeam(damage, activator)
 						timers[name] = timer.Create(.014, function() --run a trace every .1s until we hit something or key is released
 							--print("hold timer")
 							if medigun.m_bHolstered == 0 and activator.m_bRageDraining == 0 
-								and activator:InCond(TF_COND_TAUNTING) == 0 then 	
+								and not activator:InCond(TF_COND_TAUNTING) then 	
 								
 								if medigun.m_hHealingTarget and medigun.m_hHealingTarget.m_iTeamNum == 2 then --healing a friendly
 									--print(activator:GetPlayerName() .. " " .. TickCount() .. " started healing, stopping tick")
@@ -217,7 +218,7 @@ function ConnectMedigun(player, isQuickFix, damage, medigun, medigunhandle, targ
 		DamageForce = Vector(0, 0, 0),
 		ReportedPosition = targetorigin
 	}
-	local ATTRIBUTENAME = "charged airblast"
+	local ATTRIBUTENAME = "mod see enemy health"
 	local barrierCounter = 0
 	if isQuickFix then --m a g i c n u m b e r s
 		healrate = healrate * 1.4
@@ -260,29 +261,24 @@ function ConnectMedigun(player, isQuickFix, damage, medigun, medigunhandle, targ
 						player:SetAttributeValue("no_attack", nil)
 					end)
 					barrierCounter = 0 --don't think this matters since timer dies anyway
-				else
-					if isQuickFix and medigun.m_bChargeRelease == 1 then
-						damageInfo.Damage = damage * healrate * (.75 + .25 * medigun:GetAttributeValue(ATTRIBUTENAME))
-						if targetedEntity:GetConditionProvider(TF_COND_MEGAHEAL) == player then
-							targetedEntity:RemoveCond(TF_COND_MEGAHEAL)
-						end
-					elseif medigun:GetItemName() == "The Kritzkrieg" and medigun.m_bChargeRelease == 1 then
-						damageInfo.Damage = damage * 2
-					end
-					targetedEntity:TakeDamage(damageInfo)
 				end
 			else 
 				barrierCounter = 0
+			end
+			
+			if barrierCounter < 4 then
+				damageInfo.Damage = damage * healrate
 				if isQuickFix and medigun.m_bChargeRelease == 1 then
-					damageInfo.Damage = damage * healrate * (.75 + .25 * medigun:GetAttributeValue(ATTRIBUTENAME))
-					if targetedEntity:GetConditionProvider(TF_COND_MEGAHEAL) == player then
+					damageInfo.Damage = damageInfo.Damage * (.75 + .25 * medigun:GetAttributeValue(ATTRIBUTENAME))
+					if targetedEntity:GetConditionProvider(TF_COND_MEGAHEAL) == player then --occasionally no kb gets applied to bot
 						targetedEntity:RemoveCond(TF_COND_MEGAHEAL)
 					end
 				elseif medigun:GetItemName() == "The Kritzkrieg" and medigun.m_bChargeRelease == 1 then
-					damageInfo.Damage = damage * 2
+					damageInfo.Damage = damageInfo.Damage * 2
 				end
 				targetedEntity:TakeDamage(damageInfo)
 			end
+			
 			-- else --if trace was blocked
 				-- ResetMedigun(medigun, medigunhandle)
 				-- player:SetAttributeValue("no_attack", 1)

@@ -105,7 +105,16 @@ function OnWaveInit(wave)
 					p:Teleport(spawnorigin)
 				end)
 			end
-		else 
+			
+			--backup healbug remover
+			if p:InCond(TF_COND_HEALTH_BUFF) then 
+				local healer = p:GetConditionProvider(TF_COND_HEALTH_BUFF)
+				local medigun = healer:GetPlayerItemBySlot(1)
+				if medigun.m_hHealingTarget ~= p then
+					p:RemoveCond(TF_COND_HEALTH_BUFF)
+				end
+			end
+		else
 			p:RemoveAllCallbacks() --make sure no odd callbacks are getting stuck on bots
 		end	
 		p:SetName("") --clear targetnames
@@ -149,15 +158,15 @@ function SpecificWaveGameTick()
 
 	for p, datatable in pairs(players) do
 		local player = datatable.entity
-
-		if player:InCond(TF_COND_HALLOWEEN_GHOST_MODE) == 1 and not datatable.reanimstate then
+		
+		if player:InCond(TF_COND_HALLOWEEN_GHOST_MODE) and not datatable.reanimstate then
 			--if ghost but doesn't have a reanim yet
 			CreateReanim(datatable)
 			BecomeGhost(p, datatable)
 		elseif datatable.reanimstate and not datatable.reanimentity then
 			--if a reanim somehow gets destroyed, then force respawn the player
 			player:ForceRespawn()
-		elseif player:InCond(TF_COND_HALLOWEEN_GHOST_MODE) == 0 and player:IsAlive() then
+		elseif not player:InCond(TF_COND_HALLOWEEN_GHOST_MODE) and player:IsAlive() then
 			--if alive/not ghost
 			alive = alive + 1
 		end
@@ -342,7 +351,7 @@ function MimicPlayers()
 		
 		p:SetName(p:GetHandleIndex())
 		
-		if p:InCond(TF_COND_HALLOWEEN_GHOST_MODE) == 0 and p:IsAlive() then --don't aggro lock if player isn't alive
+		if not p:InCond(TF_COND_HALLOWEEN_GHOST_MODE) and p:IsAlive() then --aggro lock only if player is alive
 			SetBotAggroOnPlayer(p, bot:GetHandleIndex())
 		end
 		
@@ -491,7 +500,7 @@ function Phase1()
 		timer.Simple(1, function()
 			for _, datatable in pairs(players) do
 				local player = datatable.entity
-				if player:InCond(TF_COND_HALLOWEEN_GHOST_MODE) == 1 or player:IsAlive() == false then
+				if player:InCond(TF_COND_HALLOWEEN_GHOST_MODE) or not player:IsAlive() then
 					player:ForceRespawn()
 				end
 				player:Teleport(roof_player_warp:GetAbsOrigin(), roof_player_warp:GetAbsAngles())
