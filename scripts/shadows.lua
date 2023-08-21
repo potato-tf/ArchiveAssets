@@ -110,7 +110,7 @@ local function cashforhits(activator)
 
 		local curHealth = activator.m_iHealth
 
-		if InstakillDuration > 0 and activator.m_szNetname == "Zombie" and hitter:InCond(56) == 1 then --instakill functionality -washy
+		if InstakillDuration > 0 and activator.m_szNetname == "Zombie" and hitter:InCond(56) then --instakill functionality -washy
 			damage = curHealth
 			activator.m_iHealth = 0
 		end
@@ -176,7 +176,7 @@ local function cashforhits(activator)
 
 		local curHealth = activator.m_iHealth
 
-		if InstakillDuration > 0 and activator.m_szNetname == "Zombie" and hitter:InCond(56) == 1 then --instakill functionality -washy
+		if InstakillDuration > 0 and activator.m_szNetname == "Zombie" and hitter:InCond(56) then --instakill functionality -washy
 			damage = curHealth
 			activator.m_iHealth = 0
 		end
@@ -255,7 +255,7 @@ function playertracker(_, activator) -- the only thing here made by Sntr
 	end
 	
 	callbacks.damagetype = activator:AddCallback(ON_DAMAGE_RECEIVED_PRE, function(_, damageInfo)
-		if activator:InCond(5) == 1 then
+		if activator:InCond(5) then
 			return
 		end
 
@@ -269,7 +269,7 @@ function playertracker(_, activator) -- the only thing here made by Sntr
 		local damage = damageInfo.Damage
 		local curHealth = activator.m_iHealth
 				
-		if damage > curHealth and activator:InCond(129) == 1 then --  give full heal + uber when condition 70 is removed
+		if damage > curHealth and activator:InCond(129) then --  give full heal + uber when condition 70 is removed
 			activator:AddCond(5,2.5)
 			activator:AddHealth(300,1)
 			activator:PlaySoundToSelf("misc/halloween/merasmus_stun.wav")
@@ -549,12 +549,12 @@ function Interact(player)
 			player:Print(2,"You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_quickrevbutton" and player.m_nCurrency >= 1500 then
-		if player:InCond(70) == 0 then
+		if player:InCond(70) then
 			ents.FindByName("vm_quickrevbutton"):AcceptInput("Press",_,player)
 			if player:GetPlayerItemBySlot(1):GetClassname() ~= "tf_weapon_pipebomblauncher" then PlayViewmodelSequence(player) end
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
-		elseif player:InCond(70) == 1 then
+		elseif player:InCond(70) then
 			player:Print(2,"You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_speedbutton" and player.m_nCurrency >= 3000 then
