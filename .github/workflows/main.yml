@@ -41,10 +41,16 @@ jobs:
       - name: Create asset pack
         run: |
           mv 'tf/.github/HOW TO INSTALL!.gif' .
-          zip -r archive-assets.zip tf -x '*/.*' -x '*.bz2' -x 'tf_mvm_missioncycle.res'
-          zip archive-assets.zip 'HOW TO INSTALL!.gif'
-          zip -r archive-assets-no-maps.zip tf -x '*/.*' -x '*.bz2' -x 'tf/maps/*' -x 'tf_mvm_missioncycle.res'
-          zip archive-assets-no-maps.zip 'HOW TO INSTALL!.gif'
+          {
+            zip -r archive-assets.zip tf -x '*/.*' -x '*.bz2' -x 'tf_mvm_missioncycle.res' 
+            zip archive-assets.zip 'HOW TO INSTALL!.gif'
+          } &
+          
+          {
+            zip -r archive-assets-no-maps.zip tf -x '*/.*' -x '*.bz2' -x 'tf/maps/*' -x 'tf_mvm_missioncycle.res'
+            zip archive-assets-no-maps.zip 'HOW TO INSTALL!.gif'
+          } &
+          wait
           rm 'HOW TO INSTALL!.gif'
 
       - name: Upload to R2
@@ -61,13 +67,13 @@ jobs:
       - name: Create bz2 archives
         run: |
           cd tf
-          find . -type f -not \( -name "*.pop" -or -name "*.nav" -or -name "*.res" -or -name "*.bz2" -or -name "*.lua" -or -name "*.nut" \) \( ! -regex '.*/\..*' \) -exec bzip2 -f -k {} +
+          find . -type f -not \( -name "*.pop" -or -name "*.nav" -or -name "*.res" -or -name "*.bz2" -or -name "*.lua" -or -name "*.nut" \) \( ! -regex '.*/\..*' \) | parallel bzip2 -f -k
           
       - name: Sync with game servers
         env:
             SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          for i in "22 pterodactyl@eu9.potato.tf 40:8d:5c:77:7e:d8"; do a=( $i ); 
+          for i in "2244 pterodactyl@eu9.potato.tf a0:d3:c1:5d:16:a5"; do a=( $i ); 
           {
             ssh -o StrictHostKeyChecking=no -p ${a[0]} ${a[1]} wakeonlan ${a[2]}
           } &
