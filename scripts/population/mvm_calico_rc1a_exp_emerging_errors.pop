@@ -1,0 +1,4626 @@
+//spawnbot and spawnbot upper are valid wheres, also remember that spawnbot_mission_sniper and spawnbot_mission_spy exist
+//Mission : Emerging Errors by therealscroob/crilly
+//Map : mvm_calico_b1a
+//Difficulty : Expert
+//Used scabby subordination as a shell initially
+//credit to Royall, for devising the red bot sniper laser lua script that I changed 2 values on to get a grey laser
+//note to self, spawn the LaserOnAim template to invoke that script on any grey bots that need it
+	#base robot_standard.pop
+	#base robot_giant.pop
+	#base overclock_cactus_general.pop
+	population
+{
+	StartingCurrency 1200
+	CanBotsAttackWhileInSpawnRoom no
+	RespawnWaveTime 4
+	WaveStartCountdown 5
+	NoRomevisionCosmetics 1
+	NoRedBotsRandomCrit 1 
+	UpgradeStationKeepWeapons         1
+	NoRedSniperBotHeadshots 1
+	ImprovedAirblast 1
+	PrecacheModel "models/props_mvm/robot_spawnpoint.mdl"
+	PrecacheModel "models\bots\soldier\bot_soldier_gibby.mdl"
+	PrecacheModel "models/bots/soldier/bot_soldier_gray.mdl"
+	PrecacheModel "models/bots/heavy/bot_heavy_gray.mdl"
+	PrecacheModel "models/bots/scout/bot_scout_gray.mdl"
+	PrecacheModel "models/bots/sniper/bot_sniper_gray.mdl"
+	PrecacheModel "models/bots/demo/bot_demo_gray.mdl"
+	PrecacheModel "models/bots/pyro/bot_pyro_gray.mdl"
+	PrecacheModel "models/bots/soldier_boss/bot_soldier_gray_boss.mdl"
+	PrecacheModel "models/bots/demo_boss/bot_demo_gray_boss.mdl"
+	PrecacheModel "models/props_gameplay/cap_circle_320.mdl"
+	PrecacheModel "models/weapons/w_models/w_grenade_grenadelauncher_gray.mdl"
+	PrecacheSound "siren2.wav"
+	PrecacheSound "vo/mvm/norm/taunts/demoman_mvm_taunts14.mp3"
+	PrecacheSound "vo/mvm/norm/soldier_mvm_battlecry05.mp3"
+	PrecacheSound "consternation_cheshyre.mp3"
+	DisableSound "music.mvm_start_last_wave"					
+	DisableSound "music.mvm_start_mid_wave"						
+	DisableSound "music.mvm_start_tank_wave"					
+	DisableSound "music.mvm_start_wave"							
+		SpawnTemplate
+		{
+		Name "spawner_forward"
+		}
+		SpawnTemplate
+		{
+		Name "spawner_building"
+		}
+		SpawnTemplate
+		{
+		Name "spawner_sniper"
+		}
+		SpawnTemplate
+		{
+		Name "spawner_invasion"
+		}        
+		SpawnTemplate
+		{
+		Name "spawner_boss"
+		}	
+		Templates
+	{
+
+		T_TFBot_Engineer_Sentry_Teleporter_Mechanic_Giga
+		{
+			Class Engineer
+			Name "Teleporter Conch Engineer"
+			Skill Expert
+			Health 500
+			Item "the concheror"
+			Item "Engineer Welding Mask"
+			Item "The Idea Tube"
+			Attributes TeleportToHint
+			TeleportWhere spawnbot
+			Attributes	"SpawnWithFullCharge"
+			Classicon engineer_conch_lite
+			CharacterAttributes
+			{
+				"increase buff duration"	40.0
+				"move speed bonus" 0.65
+			}
+		}
+		T_TFBot_Scout_Cola //template ripped from a random choice block in fiber ops and slightly edited
+		{
+			ClassIcon	scout_cola_nys
+			Class	Scout
+			Skill	Normal
+			
+			ItemAttributes
+			{
+				ItemName	"Crit-a-Cola"
+				"effect bar recharge rate increased"	0.5
+				"mod_mark_attacker_for_death"	0
+			}
+			Item	"Crit-a-Cola"
+			Item "The Caffeine Cooler"
+		}
+		T_TFBot_Heater_Heavy_Giant
+		{
+			Class Heavyweapons
+			Name "Giant Heater Heavy"
+			Item "the huo long heatmaker"
+			Item "The Bunsen Brave"
+			ClassIcon heavy_heater_nys_giant
+			Tag bot_giant
+			Skill Expert
+			Health 5000
+			WeaponRestrictions PrimaryOnly
+			MaxVisionRange 1200
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "the huo long heatmaker"
+				"damage bonus"	1.5
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+			}
+		}
+		T_TFBot_Soldier_Minigiant_Burst
+		{
+			Class Soldier
+			Skill Hard
+			ClassIcon soldier_burstfire_armored_yoovy
+			Health 1200
+			Name "Armored Burst Fire Soldier"
+			"scale" 1.5
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"faster reload rate" 0.7
+				"fire rate bonus" 0.2
+				"clip size upgrade atomic" 2.0
+				"Projectile speed increased" 0.65
+			}
+			CharacterAttributes
+			{
+				"head scale" 0.7
+				"move speed bonus"	0.85
+			}
+		}
+			T_TFBot_Soldier_Direct_Hit //lifted right from goldpit, it is a nice cosmetic set for this weapon
+			{
+				Class Soldier
+				Classicon soldier_directhit_lite
+				Name "Direct Hit Soldier"
+				Skill Hard
+				Item "the direct hit"
+				Item "Soldier's Stash"
+				ItemModel 
+				{
+					ItemName "Soldier's Stash"
+					Model "models/player/items/soldier/grfs_soldier.mdl"
+				}
+				ItemAttributes
+				{
+				ItemName "Soldier's Stash"
+				"attachment size" 1.35
+				}
+			}
+			T_TFBot_Soldier_RocketPush_Reserve //A concept inspired by the Chief Pyro's Revenge, before I deleted his knockback
+			{
+				Class Soldier
+				Skill Expert		
+				Item "The Liberty Launcher"
+				Item "The Reserve Shooter"
+				Item "The Market Gardener"
+				Name "Blast Combo Soldier"
+				ClassIcon soldier_blast_combo
+				Attributes HoldFireUntilFullReload
+				UseBestWeapon 1
+				AimTrackingInterval 0.025
+				AimLeadProjectileSpeed 1
+				ItemAttributes
+				{
+					ItemName "The Liberty Launcher"
+					"damage blast push" 2.4
+					"damage bonus" .65
+					"fire rate bonus" 0.001
+					"clip size upgrade atomic" -3
+					"faster reload rate" 0.8
+					"Blast radius decreased" 0.8
+				}
+				ItemAttributes
+				{
+					ItemName "The Reserve Shooter"
+					"faster reload rate" 0.1
+					"passive reload" 1
+					"fire rate bonus" 0.7
+					"bullets per shot bonus" 3
+					"damage bonus" 0.33
+					"weapon spread bonus" 0.6
+				}
+				CharacterAttributes
+				{
+				"deploy time increased" 0.01
+				}
+				Item "Soldier's Stash"
+				ItemModel 
+				{
+					ItemName "Soldier's Stash"
+					Model "models/player/items/soldier/soldier_jeepcap.mdl"
+				}
+				ItemAttributes
+				{
+				ItemName "Soldier's Stash"
+				"attachment size" 2.3
+				"attach particle effect" 65
+				}
+			}
+		T_TFBot_Giant_Soldier_RocketPush_Reserve
+		{
+			Class Soldier
+			Skill Expert
+			Item "The Liberty Launcher"
+			Item "The Reserve Shooter"
+			Item "Jumper's Jeepcap"
+			ClassIcon soldier_blast_combo_giant
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Name "Giant Blast Combo Soldier"
+			Health 3800
+
+			ItemAttributes
+			{
+				ItemName "The Liberty Launcher"
+				"damage blast push" 3
+				"damage bonus" 0.75
+				"fire rate bonus" 0.01
+				"clip size upgrade atomic" 5
+				"faster reload rate" 0.5
+				"Blast radius decreased" 0.8
+				"projectile spread angle penalty" 4
+			}
+			ItemAttributes
+			{
+				ItemName "The Reserve Shooter"
+				"fire rate bonus" 1.5
+				"bullets per shot bonus" 10
+				"damage penalty" 0.5
+				"passive reload" 1
+				"faster reload rate" 0.1
+				"weapon spread bonus" 0.4
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"override footstep sound set" 3
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"airblast vertical vulnerability multiplier" 0.1
+				"deploy time increased" 0.01
+			}
+		}
+		T_TFBot_Giant_Soldier_Spammer_Direct
+		{
+			Class Soldier
+			Name "Giant Rapid Fire Soldier"
+			ClassIcon soldier_spammer_directhit_yoovy
+			Health 3800
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Item "The Direct Hit"
+			Item "Thousand-Yard Stare"
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "The Direct Hit"
+				"faster reload rate" -0.8
+				"fire rate bonus" 0.5
+
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"Projectile speed increased" 0.65
+			}
+		}
+		T_TFBot_Soldier_Skilled
+		{
+		Class Soldier 
+		Skill Expert
+		Name "Veteran Soldier"
+		UseCustomModel "models\bots\soldier\bot_soldier_gibby.mdl"
+		UseBestWeapon 1 
+		RocketJump 1
+		Health 150
+		AimLeadProjectileSpeed 1
+		AimTrackingInterval 0.025
+		Item "Tyrantium Helmet"
+		Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+		Item "Upgradeable TF_WEAPON_SHOTGUN_PRIMARY"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SHOTGUN_PRIMARY"
+				"faster reload rate" 0.1
+				"fire rate bonus" 2.5
+				"bullets per shot bonus" 3
+				"damage bonus" 0.33
+				"paintkit_proto_def_index" 414
+				"self mark for death" 1
+				"set_item_texture_wear" 0
+			}
+			ItemAttributes
+			{
+			ItemName "Tyrantium Helmet"
+			"attach particle effect" 65
+			}
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+				"paintkit_proto_def_index" 414
+				"set_item_texture_wear" 0
+				"self mark for death" 1
+				"passive reload" 1 //to fix a bug related to them never using their rocket launcher again
+			}
+			CharacterAttributes
+			{
+			"rocket jump damage reduction" 0
+			"cancel falling damage" 1
+			}
+		}
+		T_TFBot_Soldier_Ignite
+		{
+			Class Soldier
+			Skill Hard
+			ClassIcon soldier_fire
+			Name "Incendiary Soldier"
+			ItemAttributes
+			{
+			ItemName "TF_WEAPON_ROCKETLAUNCHER"
+			"Set DamageType Ignite" 1
+			"damage bonus" 0.75
+			"attach particle effect"	2
+			}
+			Item "Soldier's Stash"
+			ItemModel 
+			{
+				ItemName "Soldier's Stash"
+				Model "models/workshop/player/items/soldier/hwn2022_firearm_protector/hwn2022_firearm_protector.mdl"
+			}
+			ItemAttributes
+			{
+			ItemName "Soldier's Stash"
+			"attachment size" 2.3
+			}
+			CharacterAttributes
+			{
+			"head scale" 0.95
+			}
+		}
+		T_TFBot_Giant_Soldier_Incendiary
+		{
+			Class Soldier
+			Skill Expert
+			ClassIcon soldier_burstfire_incendiary_heal_giant
+			Name "Giant Burnbox Soldier"
+			Health 4200
+			
+			Item "fortunate son"
+			Item "The Hurt Locher"
+			Item "The Black Box"
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+			ItemName "The Black Box"
+			"Set DamageType Ignite" 1
+			"damage bonus" 0.75
+			"attach particle effect"	2
+			"faster reload rate" 0.6
+			"Projectile speed increased"	0.7
+			"clip size upgrade atomic" 6
+			"heal on hit for rapidfire" 200
+			"passive reload" 1
+			"paintkit_proto_def_index"    256        //number of warpaint ID
+			"set_item_texture_wear"    0.2        //sets to Factory New
+			}
+			ItemAttributes
+			{
+			ItemName "TF_WEAPON_SHOTGUN_SOLDIER"
+			"Set DamageType Ignite" 1
+			"damage bonus" 0.5
+			"bullets per shot bonus" 3
+			"attach particle effect"	2
+			"faster reload rate" 0.01
+			"heal on hit for rapidfire" 150
+			"weapon spread bonus" 0.4
+			"passive reload" 1
+			"paintkit_proto_def_index"    256        //number of warpaint ID
+			"set_item_texture_wear"    0.2        //sets to Factory New
+			}
+			UseBestWeapon 1
+			CharacterAttributes
+			{
+			"deploy time increased" 0.01
+			"move speed bonus"	0.5
+			"damage force reduction" 0.4
+			"airblast vulnerability multiplier" 0.4
+			"override footstep sound set" 3
+			}
+		}
+		T_TFBot_Soldier_Incendiary
+		{
+			Class Soldier
+			Skill Expert
+			ClassIcon soldier_burstfire_incendiary_heal
+			Name "Burnbox Soldier"
+			
+			Item "fortunate son"
+			Item "The Hurt Locher"
+			Item "The Black Box"
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+			ItemName "The Black Box"
+			"Set DamageType Ignite" 1
+			"damage bonus" 0.6
+			"attach particle effect"	2
+			"clip size upgrade atomic" 2
+			"heal on hit for rapidfire" 100
+			"Projectile speed increased"	0.7
+			"passive reload" 1
+			"paintkit_proto_def_index"    256        //number of warpaint ID
+			"set_item_texture_wear"    0.2        //sets to Factory New
+			}
+			ItemAttributes
+			{
+			ItemName "TF_WEAPON_SHOTGUN_SOLDIER"
+			"Set DamageType Ignite" 1
+			"faster reload rate" 0.1
+			"fire rate bonus" 2.5
+			"bullets per shot bonus" 3
+			"damage bonus" 0.33
+			"attach particle effect"	2
+			"heal on hit for rapidfire" 75
+			"weapon spread bonus" 0.4
+			"passive reload" 1
+			"paintkit_proto_def_index"    256        //number of warpaint ID
+			"set_item_texture_wear"    0.2        //sets to Factory New
+			}
+			ItemAttributes
+			{
+			ItemName "fortunate son"
+			"attachment size" 1.35
+			"attachment name" head
+			}
+			UseBestWeapon 1
+			CharacterAttributes
+			{
+			"deploy time increased" 0.01
+			}		
+		}
+		T_TFBot_Soldier_RocketShotgun_Conch
+		{
+			Class Soldier
+			ClassIcon soldier_blackbox_conch_lite
+			Item "The Black Box"
+			Name "Black Box Conch Soldier"
+			Skill Normal
+			WeaponRestrictions PrimaryOnly
+			Attributes HoldFireUntilFullReload
+			Attributes SpawnWithFullCharge
+			Item "The Concheror"
+			ItemAttributes
+			{
+				ItemName "The Black Box"
+				"damage bonus" 0.33
+				"fire rate bonus" 0.001
+				"clip size upgrade atomic" 0
+				"faster reload rate" 0.9
+				"blast radius increased" 1.25
+				//"Projectile speed increased" 0.4
+				"projectile spread angle penalty" 2
+				"heal on hit for rapidfire" 60
+			}
+			CharacterAttributes
+			{
+				"increase buff duration"	9.0
+			}
+		}
+		T_TFBot_Giant_Soldier_Spammer_Reload_Two_Stage
+		{
+			Class Soldier
+			Name "Giant Rapid Accelerator Soldier"
+			ClassIcon soldier_spammer
+			Item "Stahlhelm"
+			Health 3800
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"move speed bonus"	0.5
+				"faster reload rate" -0.8
+				"fire rate bonus" 0.5
+			}
+			ItemAttributes
+			{
+			ItemName "Stahlhelm"
+			"set item tint rgb" 5801378
+			}
+				HomingRockets   
+				{
+					RocketSpeed 0.7 // Multiplier of rocket speed. (Default: 1)
+					TurnPower 0 //How fast should the rocket rotate to face the target (Default: 10)
+					MaxAimError 360 //Max angle between rocket and the target (Default: 105)
+					Acceleration 2000 //Acceleration in hu (Default: 0)
+					AccelerationTime 0.5 //How long should the rocket accelerate (Default: 9999)
+					AccelerationStartTime 0.4 //Time before rockets start accelerating (Default: 0)
+				}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+			}
+		}
+		T_TFBot_Soldier_Two_Stage
+		{
+			Class Soldier
+			Skill Hard
+			Name "Accelerator Soldier"
+				Item "Soldier's Stash"
+				ItemModel 
+				{
+					ItemName "Soldier's Stash"
+					Model "models/player/items/soldier/ro_helmet.mdl"
+				}
+				ItemAttributes
+				{
+				ItemName "Soldier's Stash"
+				"attachment size" 1.45
+				"set item tint rgb" 5801378
+				}
+				HomingRockets   
+				{
+					RocketSpeed 0.7 // Multiplier of rocket speed. (Default: 1)
+					TurnPower 0 //How fast should the rocket rotate to face the target (Default: 10)
+					MaxAimError 360 //Max angle between rocket and the target (Default: 105)
+					Acceleration 2000 //Acceleration in hu (Default: 0)
+					AccelerationTime 0.5 //How long should the rocket accelerate (Default: 9999)
+					AccelerationStartTime 0.4 //Time before rockets start accelerating (Default: 0)
+				}
+				CharacterAttributes
+				{
+				"head scale" 0.95
+				}
+		}
+		T_TFBot_Giant_Pyro_Deflector
+		{
+			Class Pyro
+			Name "Giant Deflector Pyro"
+			ClassIcon pyro_deflector_scroob_giant
+			Skill Expert
+			Health 3000
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Item "The U-clank-a"
+			ItemAttributes
+			{
+			ItemName "TF_WEAPON_FLAMETHROWER"
+			"mult airblast refire time" 0.5
+			"airblast_destroy_projectile" 1
+			"airblast pushback scale" 2.0
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+		}
+		T_TFBot_Demo_Burst_Loch
+		{
+			Class Demoman
+			Name "Burst Fire Loch Demo"
+			ClassIcon demo_loch_burst
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes HoldFireUntilFullReload
+			Item "the loch-n-load"
+			ItemAttributes
+			{
+				ItemName "the loch-n-load"
+				"faster reload rate" 1.75
+				"fire rate bonus" 0.05
+				"clip size penalty" 0.5
+				"projectile spread angle penalty" 3
+			}
+		}
+		T_TFBot_Demo_Cannon
+		{
+			Class Demoman
+			Name "Cannon Demo"
+			ClassIcon demo_cannon
+			Item "The Loose Cannon"
+			Item "The Bolted Bicorne"
+			Skill Hard				
+			ItemAttributes
+			{
+				ItemName "The Loose Cannon"
+				"reload time decreased" 0.8
+				"grenade launcher mortar mode" 0
+			}					
+		}
+		T_TFBot_Giant_Demo_Burst_Ignite
+		{
+			Class Demoman
+			Name "Giant Ignite Burst Fire Demo"
+			ClassIcon demo_burst_fire_giant
+			Health 3300
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"faster reload rate" 0.85 //15% faster reload, penalty from regular gburst demo
+				"fire rate bonus" 0.1
+				"clip size upgrade atomic" 7.0
+				"projectile spread angle penalty" 5
+				"Projectile speed increased"	1.1
+				"Set damagetype ignite" 1
+				"attach particle effect"	2
+			}
+
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 4
+			}
+		}
+		T_TFBot_Demoman_Knight_Conch
+		{
+			Class Demoman
+			Name "Conch Demoknight"
+			ClassIcon demoknight_conch_lite
+			Skill Hard
+			Item "The Chargin' Targe"
+			Item "The Eyelander"
+			Item "the concheror"
+			WeaponRestrictions MeleeOnly
+			Attributes	"SpawnWithFullCharge"
+			ItemAttributes
+			{
+				ItemName "The Eyelander"
+				"critboost on kill" 3
+			}
+			CharacterAttributes
+			{
+			"increase buff duration"	40.0
+			}
+		}
+		T_TFBot_Demo_Iron
+		{
+		Class Demoman
+		Skill Hard
+		Item "The Iron Bomber"
+		}
+		T_TFBot_Giant_Pyro_Dragon
+		{
+			Class Pyro
+			Name "Giant Dragon's Fury Pyro"
+			ClassIcon pyro_dragon_fury_giant
+			Skill Expert
+			Health 3000
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Item "The Dragon's Fury"
+			ItemAttributes
+			{
+				ItemName	"The Dragon's Fury"
+				"damage bonus" 1.20
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+		}
+		T_TFBot_Giant_Pyro_Dragon_Spammer
+		{
+			Class Pyro
+			Name "Giant Rapid Fire Fury Pyro"
+			ClassIcon pyro_dragon_fury_swordstone_spammer
+			Skill Expert
+			Health 3000
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Item "The Dragon's Fury"
+			ItemAttributes
+			{
+				ItemName	"The Dragon's Fury"
+				"damage bonus" 1.20
+				"fire rate bonus" 0.6
+				"faster reload rate" 0.6
+				"mult_item_meter_charge_rate" 0.6
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+		}
+			T_TFBot_Pyro_DragonsFury
+			{
+				Class Pyro
+				MaxVisionRange 800
+				Name "Dragon's Fury Pyro"
+				Skill Normal
+				ClassIcon pyro_dragon_fury_swordstone
+				Item "The Dragon's Fury"
+				Item "Feathered Fiend"
+			}
+		T_TFBot_Giant_Pyro_Flare_Rapid
+		{
+			Class Pyro
+			Name "Giant Flare Pyro"
+			ClassIcon pyro_flare_giant
+			Skill Expert
+			Health 3000
+			Item "The flare gun"
+			Item "Old Guadalajara"
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			AimLeadProjectileSpeed 1 //I am an evil person
+			ItemAttributes
+			{
+				ItemName "The flare gun"
+				"fire rate bonus" 0.5
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+		}
+		T_TFBot_Hanami_Medic_Giant_Regen //taken from hanami, as the template would suggest
+		{
+			Class Medic
+			Name "Giant Regen Medic"
+			ClassIcon medic_giant
+			Skill Expert
+			Health 4000
+			Attributes MiniBoss
+			Item "Upgradeable TF_WEAPON_SYRINGEGUN_MEDIC"
+			Item "The Quick-Fix"
+			Item "The Surgeon's Stahlhelm"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage bonus"	2
+			}
+			ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+				"ubercharge rate bonus"	0.01
+				"heal rate bonus"		200
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"					0.5
+				"health regen"						50
+				"damage force reduction"			0.4
+				"airblast vulnerability multiplier"	0.4
+			}
+		}
+		T_TFBot_Medic_Kritz
+		{
+			Class Medic
+			Name "Kritz Medic"
+			ClassIcon medic_kritz2
+			Skill Normal
+			Attributes SpawnWithFullCharge
+			Attributes AlwaysCrit
+			Item "The Kritzkrieg"
+			ItemAttributes
+			{
+				ItemName "The Kritzkrieg"
+				"ubercharge rate bonus" 5
+				"uber duration bonus" 100
+			}
+			CharacterAttributes
+			{
+				"bot medic uber health threshold" 200
+			}
+		}
+		T_TFBot_Medic_BigHeal_Shield //lifted from robot yucatan, if it ain't broke don't fix it
+		{ //not actually a bigheal now
+			Name "Shield Medic"
+			Class Medic
+			Skill Expert
+			ClassIcon medic_shield_qf
+			Item "The Quick-Fix"
+			Attributes ProjectileShield
+			Attributes SpawnWithFullCharge
+			Attributes IgnoreEnemies
+			ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+				"generate rage on heal" 2
+				"increase buff duration" 3
+			}
+			CharacterAttributes
+			{
+			"bot medic uber health threshold" 1
+			}
+		}
+		T_TFBot_Heavy_Deflector
+		{
+			Class Heavy
+			Name "Deflector Heavy"
+			Classicon heavy_deflector
+			Skill Hard
+			Item "Deflector"
+			Item "The U-clank-a"
+			MaxVisionRange 1200
+		}
+			T_TFBot_Sniper_Carbine
+			{
+				Class Sniper
+				Skill Normal
+				Name "Carbine Sniper"
+				ClassIcon sniper_carbine
+				Item "the cleaner's carbine"
+				WeaponRestrictions SecondaryOnly	
+				FireWeapon
+				{
+					Delay 0
+					Cooldown 5
+					Repeats 0
+					IfSeeTarget 1
+					Duration 0
+					Type "Secondary"
+				}			
+			}
+	}
+	ExtraSpawnPoint 
+	//Grey Left Spawn
+    {
+        Name "spawnbot_gry_flank_left"
+        TeamNum 5
+        X	"657.73"    
+        Y	"-697.36"                  
+        Z	"198.64"             
+    }
+	ExtraSpawnPoint 
+	//Grey Right Spawn
+    {
+        Name "spawnbot_gry_flank_right"
+        TeamNum 5
+        X	"-968.32" 
+        Y	"-667.99"                  
+        Z	"11.84"        
+    }
+	ExtraSpawnPoint 
+	//Grey Building Spawn
+    {
+        Name "spawnbot_gry_building"
+        TeamNum 5
+        X	"261.48"            
+        Y	"-664.17"                  
+        Z	"202.92"        
+    }
+	ExtraSpawnPoint 
+	//Grey Sniper Spawn
+    {
+        Name "spawnbot_gry_sniper"
+        TeamNum 5
+        X	"261.48"            
+        Y	"-664.17"                  
+        Z	"202.92"     
+    }
+	ExtraSpawnPoint 
+	//Grey Sniper Spawn
+    {
+        Name "spawnbot_gry_sniper"
+        TeamNum 5
+        X	"-1375.81"         
+        Y	"-1310"                  
+        Z	"306.51"
+    }
+	ExtraSpawnPoint 
+	//Grey Sniper Spawn
+    {
+        Name "spawnbot_gry_sniper"
+        TeamNum 5
+        X	"1118.26"         
+        Y	"-2735"                  
+        Z	"146.88"
+    }
+	ExtraSpawnPoint 
+	//Grey Sniper Spawn
+    {
+        Name "spawnbot_gry_sniper"
+        TeamNum 5
+        X	"945.89"     
+        Y	"-1729.20"                  
+        Z	"157.81"
+    }
+	ExtraSpawnPoint 
+	//Grey Sniper Spawn
+    {
+        Name "spawnbot_gry_sniper"
+        TeamNum 5
+        X	"951.88"         
+        Y	"-1635.96"                  
+        Z	"-121.89"
+    }
+	ExtraSpawnPoint 
+	//Grey Patrol Boss Spawn
+    {
+        Name "spawnbot_gry_patrol"
+        TeamNum 5
+        X	"261.48"            
+        Y	"-664.17"                  
+        Z	"202.92"           
+    }
+	ExtraSpawnPoint 
+	//Grey Patrol Boss Spawn
+    {
+        Name "spawnbot_gry_patrol_upper"
+        TeamNum 5
+        X	"139.67"    
+        Y	"-2893.52"  
+        Z	"136.90"        
+    }
+	ExtraSpawnPoint 
+	//Grey Forward Spawn
+    {
+        Name "spawnbot_gry_forward"
+        TeamNum 5
+        X	"92.24"    
+        Y	"-73.51"                  
+        Z	"802.61"             
+    }
+	ExtraSpawnPoint 
+	//Grey Forward Spawn
+    {
+        Name "spawnbot_gry_forward"
+        TeamNum 5
+        X	"-956.51"            
+        Y	"1053.04"                  
+        Z	"712.19"        
+    }
+	ExtraSpawnPoint 
+	//Grey Forward Spawn
+    {
+        Name "spawnbot_gry_forward"
+        TeamNum 5
+        X	"-682.22" 
+        Y	"1678.81"                  
+        Z	"870.99"        
+    }
+	ExtraSpawnPoint
+	//Grey Forward Armored Spawn
+	{
+		Name "spawnbot_gry_forward_armored"
+		TeamNum 5
+		X "436.39"
+		Y "2310.38"
+		Z "-93.98"
+	}  
+	ExtraSpawnPoint 
+	//Grey Forward Spawn
+    {
+        Name "spawnbot_gry_forward"
+        TeamNum 5
+        X	"475.89" 
+        Y	"1247.98"                  
+        Z	"870.99"        
+    }
+	ExtraSpawnPoint 
+	//Grey Building Spawn
+    {
+        Name "spawnbot_gry_invasion"
+        TeamNum 5
+        X	"261.48"            
+        Y	"-664.17"                  
+        Z	"202.92"        
+    }
+	ExtraSpawnPoint 
+	//Grey Sniper Spawn
+    {
+        Name "spawnbot_gry_invasion"
+        TeamNum 5
+        X	"-1375.81"         
+        Y	"-1310"                  
+        Z	"306.51"
+    }
+	ExtraSpawnPoint 
+	//Grey Patrol Boss Spawn
+    {
+        Name "spawnbot_gry_invasion"
+        TeamNum 5
+        X	"657.73"    
+        Y	"-697.36"                  
+        Z	"198.64"             
+    }
+	ExtraSpawnPoint 
+	//Grey Forward Spawn
+    {
+        Name "spawnbot_gry_invasion"
+        TeamNum 5
+        X	"240.13"        
+        Y	"-688.58"                  
+        Z	"-28.2"        
+    }
+	LuaScriptFile "scripts/grey_sniper_laser.lua"
+	PointTemplates 
+	{
+		music_5
+		{
+		    NoFixup 1					
+			ambient_generic
+			{
+				"targetname" "w5_music"
+				"message" "#consternation_cheshyre.mp3"
+				"health" "10"
+				"radius" "69420"
+				"spawnflags" "17"
+			}
+			logic_relay
+			{
+			    "targetname" "w5_music"
+				"OnTrigger" "w5_music,PlaySound,,0,-1"
+			}
+			logic_relay
+			{
+			    "targetname" "w5_music_end"
+				"OnTrigger" "w5_music,Volume,0.01,0,-1"
+			}
+			OnSpawnOutput
+			{
+				Target "w5_music"
+				Action "trigger"
+				Delay 0.01
+			}
+		}
+        GreyGlows
+        {
+            OnSpawnOutput
+            {
+            target "!activator"
+            action "$setclientprop$m_bGlowEnabled"
+            param "1"
+            Delay 0.1
+            }
+            OnParentKilledOutput
+            {
+            target "!activator"
+            action "$setclientprop$m_bGlowEnabled"
+            param "0"
+            Delay 0.1
+            }
+        }
+		SpawnerRelay
+		{
+			logic_relay
+			{
+			targetname "spawnerrelay"
+			}
+		}
+		LaserOnAim
+		{
+			OnSpawnOutput
+			{
+				Target "popscript"
+				Action "$LaserOnAim"
+				Delay 0.01
+			}
+		}
+				spawner_boss
+				{
+					logic_relay
+				{
+				"targetname" "spawner_boss_relay"
+				"ontrigger" "spawner_invasion,disable,,0,-1"
+				"ontrigger" "spawner_boss,enable,,0,1"
+				"ontrigger" "tankdoor_2_relay,trigger,,0,1"
+				"ontrigger" "tankdoor_1_relay,trigger,,0,1"
+				"ontrigger" "intel,SetReturnTime,120,0,1"
+				}
+								prop_dynamic
+					{
+						"model" "models/props_mvm/robot_spawnpoint.mdl"
+						"disableshadows" 1
+						"startdisabled" 1
+						"defaultanim" "idle"
+						"angles" "0 180 0"
+						"skin" 2
+						"targetname" spawner_boss
+						"origin" "139.67 -2893.52 136.9"
+					}
+								prop_dynamic
+					{
+						"model" "models/props_mvm/robot_spawnpoint.mdl"
+						"disableshadows" 1
+						"startdisabled" 1
+						"defaultanim" "idle"
+						"angles" "0 180 0"
+						"skin" 2
+						"targetname" spawner_boss
+						"origin" "452.39 2010.03 -94.4"
+					}
+								prop_dynamic
+				{
+					"model" "models/props_gameplay/cap_circle_320.mdl"
+					"disableshadows" 1
+					"startdisabled" 1
+					"modelscale" "0.75"
+					"targetname" spawner_boss
+					"skin" 0
+					"origin" "775.54 -1200.09 -122.37"
+				}
+								prop_dynamic
+				{
+					"model" "models/props_gameplay/cap_circle_320.mdl"
+					"disableshadows" 1
+					"startdisabled" 1
+					"modelscale" "0.75"
+					"targetname" spawner_boss
+					"skin" 0
+					"origin" "-15.19 -1923.99 -118"
+				}
+												prop_dynamic
+				{
+					"model" "models/props_gameplay/cap_circle_320.mdl"
+					"disableshadows" 1
+					"startdisabled" 1
+					"modelscale" "0.75"
+					"targetname" spawner_boss
+					"skin" 0
+					"origin" "784.12 -2218.46 133.69"
+				}
+												prop_dynamic
+				{
+					"model" "models/props_gameplay/cap_circle_320.mdl"
+					"disableshadows" 1
+					"startdisabled" 1
+					"modelscale" "0.75"
+					"targetname" spawner_boss
+					"skin" 0
+					"origin" "-671.34 -850.14 100.54"
+				}
+												prop_dynamic
+				{
+					"model" "models/props_gameplay/cap_circle_320.mdl"
+					"disableshadows" 1
+					"startdisabled" 1
+					"modelscale" "0.75"
+					"targetname" spawner_boss
+					"skin" 0
+					"origin" "-1302.02 -1645.81 228.88"
+				}
+												prop_dynamic
+				{
+					"model" "models/props_gameplay/cap_circle_320.mdl"
+					"disableshadows" 1
+					"startdisabled" 1
+					"modelscale" "0.75"
+					"targetname" spawner_boss
+					"skin" 0
+					"origin" "-1392.17 -2969.67 104.31"
+				}
+			}
+				spawner_sniper
+				{
+					logic_relay
+				{
+				"targetname" "spawner_sniper_relay"
+				"ontrigger" "spawner_building,disable,,0,-1"
+				"ontrigger" "spawner_sniper,enable,,0,1"
+				"ontrigger" "tankdoor_2_relay,trigger,,0,1"
+				"ontrigger" "tankdoor_1_relay,trigger,,0,1"
+				"ontrigger" "intel,SetReturnTime,120,0,1"
+				}
+								prop_dynamic
+					{
+						"model" "models/props_mvm/robot_spawnpoint.mdl"
+						"disableshadows" 1
+						"startdisabled" 1
+						"defaultanim" "idle"
+						"angles" "0 180 0"
+						"skin" 2
+						"targetname" spawner_sniper
+						"origin" "261.48 -664.17 202.92"
+					}
+								prop_dynamic
+					{
+						"model" "models/props_mvm/robot_spawnpoint.mdl"
+						"disableshadows" 1
+						"startdisabled" 1
+						"defaultanim" "idle"
+						"angles" "0 180 0"
+						"skin" 2
+						"targetname" spawner_sniper
+						"origin" "436.39 2310.38 -93.98"
+					}
+								prop_dynamic
+					{
+						"model" "models/props_mvm/robot_spawnpoint.mdl"
+						"disableshadows" 1
+						"startdisabled" 1
+						"defaultanim" "idle"
+						"angles" "0 180 0"
+						"skin" 2
+						"targetname" spawner_sniper
+						"origin" "-1375.81 -1310 231.24"
+					}
+								prop_dynamic
+					{
+						"model" "models/props_mvm/robot_spawnpoint.mdl"
+						"disableshadows" 1
+						"startdisabled" 1
+						"defaultanim" "idle"
+						"angles" "0 180 0"
+						"skin" 2
+						"targetname" spawner_sniper
+						"origin" "1118.26 -2735 146.88"   
+					}
+								prop_dynamic
+					{
+						"model" "models/props_mvm/robot_spawnpoint.mdl"
+						"disableshadows" 1
+						"startdisabled" 1
+						"defaultanim" "idle"
+						"angles" "0 180 0"
+						"skin" 2
+						"targetname" spawner_sniper
+						"origin" "945.89 -1729.20 157.81"
+					}
+								prop_dynamic
+					{
+						"model" "models/props_mvm/robot_spawnpoint.mdl"
+						"disableshadows" 1
+						"startdisabled" 1
+						"defaultanim" "idle"
+						"angles" "0 180 0"
+						"skin" 2
+						"targetname" spawner_sniper
+						"origin" "951.88 -1635.96 -121.89"
+					}
+				}
+				spawner_building
+				{
+							logic_relay
+				{
+				"targetname" "spawner_building_relay"
+				"ontrigger" "spawner_forward,disable,,0,-1"
+				"ontrigger" "spawner_building,enable,,0,1"
+				"ontrigger" "tankdoor_2_relay,trigger,,0,1"
+				"ontrigger" "tankdoor_1_relay,trigger,,0,1"
+				"ontrigger" "intel,SetReturnTime,120,0,1"
+				}
+								prop_dynamic
+					{
+						"model" "models/props_mvm/robot_spawnpoint.mdl"
+						"disableshadows" 1
+						"startdisabled" 1
+						"defaultanim" "idle"
+						"angles" "0 180 0"
+						"skin" 2
+						"targetname" spawner_building
+						"origin" "261.48 -664.17 182.92"
+					}
+								prop_dynamic
+					{
+						"model" "models/props_mvm/robot_spawnpoint.mdl"
+						"disableshadows" 1
+						"startdisabled" 1
+						"defaultanim" "idle"
+						"angles" "0 180 0"
+						"skin" 2
+						"targetname" spawner_building
+						"origin" "436.39 2310.38 -93.98"
+					}
+				}
+				spawner_forward
+		{
+			logic_relay
+			{
+			"targetname" "spawner_forward_relay"
+			"ontrigger" "spawner_forward,enable,,0,1"
+			"ontrigger" "tankdoor_2_relay,trigger,,0,1"
+			"ontrigger" "tankdoor_1_relay,trigger,,0,1"
+			"ontrigger" "intel,SetReturnTime,120,0,1"
+			}
+								prop_dynamic
+					{
+						"model" "models/props_mvm/robot_spawnpoint.mdl"
+						"disableshadows" 1
+						"startdisabled" 1
+						"defaultanim" "idle"
+						"angles" "0 180 0"
+						"skin" 2
+						"targetname" spawner_forward
+						"origin" "436.39 2310.38 -93.98"
+					}
+		}
+				spawner_invasion
+		{
+					logic_relay
+				{
+				"targetname" "spawner_invasion_relay"
+				"ontrigger" "spawner_sniper,disable,,0,-1"
+				"ontrigger" "tankdoor_2_relay,trigger,,0,1"
+				"ontrigger" "tankdoor_1_relay,trigger,,0,1"
+				"ontrigger" "spawner_invasion,enable,,0,1"
+				"ontrigger" "intel,SetReturnTime,120,0,1"
+				}
+			prop_dynamic
+				{
+					"model" "models/props_mvm/robot_spawnpoint.mdl"
+					"disableshadows" 1
+					"startdisabled" 1
+					"defaultanim" "idle"
+					"angles" "0 180 0"
+					"skin" 2
+					"targetname" spawner_invasion
+					"origin" "261.48 -664.17 182.92"
+				}
+						prop_dynamic
+				{
+					"model" "models/props_mvm/robot_spawnpoint.mdl"
+					"disableshadows" 1
+					"startdisabled" 1
+					"defaultanim" "idle"
+					"angles" "0 180 0"
+					"skin" 2
+					"targetname" spawner_invasion
+					"origin" "240.13 -688.58 -28.2"
+				}
+												prop_dynamic
+					{
+						"model" "models/props_mvm/robot_spawnpoint.mdl"
+						"disableshadows" 1
+						"startdisabled" 1
+						"defaultanim" "idle"
+						"angles" "0 180 0"
+						"skin" 2
+						"targetname" spawner_invasion
+						"origin" "436.39 2310.38 -93.98"
+					}
+					prop_dynamic
+				{
+					"model" "models/props_mvm/robot_spawnpoint.mdl"
+					"disableshadows" 1
+					"startdisabled" 1
+					"defaultanim" "idle"
+					"angles" "0 180 0"
+					"skin" 2
+					"targetname" spawner_invasion
+					"origin" "657.73 -697.36 198.64"
+				}
+					prop_dynamic
+				{
+					"model" "models/props_mvm/robot_spawnpoint.mdl"
+					"disableshadows" 1
+					"startdisabled" 1
+					"defaultanim" "idle"
+					"angles" "0 180 0"
+					"skin" 2
+					"targetname" spawner_invasion
+					"origin" "-1375.81 -1310 231.24"
+				}
+					prop_dynamic
+				{
+					"model" "models/props_mvm/robot_spawnpoint.mdl"
+					"disableshadows" 1
+					"startdisabled" 1
+					"defaultanim" "idle"
+					"angles" "0 180 0"
+					"skin" 2
+					"targetname" spawner_invasion
+					"origin" "-968.32 -667.99 11.84"
+				}
+		}
+
+	}
+	Mission
+	{
+		Where spawnbot_sentrybuster
+		Objective DestroySentries
+		InitialCooldown 35
+		BeginAtWave 1
+		RunForThisManyWaves 7
+		CooldownTime 40
+		DesiredCount 1
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+		}
+	}
+	Mission //Blue snipers on wave 4
+	{
+		Where spawnbot_mission_sniper
+		Objective Sniper
+		InitialCooldown 35
+		CooldownTime 15
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		DesiredCount 2
+		TFBot
+		{
+			Template T_TFBot_Sniper
+		}
+	}
+	Mission //w1 engies
+	{
+	Where spawnbot
+	Objective Engineer
+	InitialCooldown 25
+	CooldownTime 40
+	BeginAtWave 1
+	RunForThisManyWaves 1
+	DesiredCount 1
+	TFBot
+		{
+			Template T_TFBot_Engineer_Sentry_Teleporter
+		}
+	}
+	Mission //w4 engies
+	{
+	Where spawnbot
+	Objective Engineer
+	InitialCooldown 60
+	CooldownTime 40
+	BeginAtWave 4
+	RunForThisManyWaves 1
+	DesiredCount 1
+	TFBot
+		{
+			Template T_TFBot_Engineer_Sentry_Teleporter
+		}
+	}
+	Mission // Engineer - wave 4
+	{
+		Objective Engineer  
+
+		InitialCooldown 60
+		Where spawnbot
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		CooldownTime 35
+		DesiredCount 1
+
+		TFBot
+		{
+			Template T_TFBot_Engineer_Sentry_Teleporter_Mechanic_Giga
+		}
+	}
+	Mission //Blue spies on wave 4
+	{
+		Where spawnbot_mission_spy
+		Objective Spy
+		InitialCooldown 25
+		CooldownTime 25
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		DesiredCount 3
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Skill Normal
+		}
+	}
+		// WAVE 1 [$300]
+	Wave
+	{
+			StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+			InitWaveOutput
+		{
+			Target spawner_forward_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+			Explanation 
+			{
+				Line "{CCFFCC}///////////BEGIN TRANSMISSION////////////////"
+				Line ""
+				Line "{CCCCCC}Neutral soldiers and demos will emerge from the tank tunnel this wave"
+				Line "{CCCCCC}Some of these robots will be armored variants with increased health and size"
+				Line "{CCCCCC}These grey bots will {FFFF00}attack the closest player of either team"
+				Line ""
+				Line "{CCFFCC}////////////END TRANSMISSION/////////////////"
+			}
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave01a1"
+			Where spawnbot
+			TotalCount 18
+			MaxActive  3
+			SpawnCount 3
+			TotalCurrency 125
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  3
+
+			TFBot 
+			{ 
+			Class Soldier
+			Skill Hard
+			WeaponRestrictions PrimaryOnly
+			}
+		}
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave01a"
+			Where spawnbot
+
+			TotalCount 6
+			MaxActive  1
+			SpawnCount 1
+			TotalCurrency 25
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  3
+
+			TFBot 
+			{ 
+			Template T_TFBot_Soldier_Skilled
+			}
+		}
+		//  [$0]
+		WaveSpawn
+		{
+			Where spawnbot_upper
+
+			TotalCount 24
+			MaxActive  3
+			SpawnCount 2
+			TotalCurrency 0
+			Support 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  9
+
+			TFBot 
+			{ 
+			Class Scout
+			Skill Normal
+			WeaponRestrictions PrimaryOnly
+			}
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave01b"
+			Where spawnbot
+
+			TotalCount 6
+			MaxActive  2
+			SpawnCount 1
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  1.5
+
+			TFBot 
+			{ 
+			Class Demoman
+			Skill Hard
+			WeaponRestrictions PrimaryOnly
+			}
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave01b"
+			Where spawnbot
+
+			TotalCount 5
+			MaxActive  1
+			SpawnCount 1
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  1.5
+
+			TFBot 
+			{ 
+			Class Demoman
+			Skill Hard
+			WeaponRestrictions PrimaryOnly
+			}
+		}
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave01c"
+			Where spawnbot
+
+			TotalCount 4
+			MaxActive  4
+			SpawnCount 4
+			TotalCurrency 100
+			WaitForAllDead     "wave01a1"
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  4
+			Squad
+			{
+				TFBot 
+				{ 
+				Template T_TFBot_Giant_Demo_Burst
+				}
+				TFBot 
+				{ 
+				Template T_TFBot_Medic
+				}
+				TFBot 
+				{ 
+				Template T_TFBot_Medic
+				}
+				TFBot 
+				{ 
+				Template T_TFBot_Medic
+				}
+			}
+		}
+		//  [$200]
+		WaveSpawn
+		{
+			Name  "wave01c"
+			Where spawnbot_upper
+
+			TotalCount 1
+			MaxActive  1
+			SpawnCount 1
+			TotalCurrency 200
+			WaitForAllDead     "wave01a1"
+			WaitBeforeStarting 20
+			WaitBetweenSpawns  3
+
+			TFBot 
+			{ 
+			Template T_TFBot_Giant_Heavyweapons_Shotgun
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave01d"
+			Where spawnbot
+
+			TotalCount 12
+			MaxActive  4
+			SpawnCount 3
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  4
+			WaitForAllDead     "wave01b"
+			Support Limited
+			TFBot 
+			{ 
+			Class Scout
+			Skill Normal
+			WeaponRestrictions PrimaryOnly
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave01e"
+			Where spawnbot
+
+			TotalCount 10
+			MaxActive  3
+			SpawnCount 3
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  1.5
+			WaitForAllDead     "wave01a"
+			Support Limited
+			TFBot 
+			{ 
+			Class Heavy
+			Skill Normal
+			}
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name  "wave01e"
+			Where spawnbot
+
+			TotalCount 2
+			MaxActive  2
+			SpawnCount 1
+			TotalCurrency 150
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  7
+			WaitForAllDead     "wave01a"
+
+			TFBot 
+			{ 
+			Template T_TFBot_Giant_Scout_FAN
+			}
+		}
+//  [$50]
+				WaveSpawn
+		{
+			Name  "wave01f"
+			Where spawnbot
+
+			TotalCount 3
+			MaxActive  3
+			SpawnCount 3
+			TotalCurrency 100
+
+			WaitBeforeStarting 6
+			WaitBetweenSpawns  20
+			WaitForAllSpawned     "wave01a"
+			Squad
+			{
+				TFBot 
+				{ 
+					Template T_TFBot_Giant_Pyro_Deflector
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_Kritz
+				}
+			}
+		}
+				WaveSpawn
+		{
+			Where spawnbot_gry_forward_armored
+			TotalCount 6
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 0
+			FirstSpawnWarningSound "#siren2.wav"
+			FirstSpawnMessage "{grey}The greys are here!"
+			WaitBeforeStarting 30
+			WaitBetweenSpawns  40
+			Support 1
+			RandomChoice
+			{
+				TFBot 
+				{ 
+				Class Soldier
+				Skill Normal
+				UseMeleeThreatPrioritization 1
+				ClassIcon gry_lite
+				Addcond { Name TF_COND_REPROGRAMMED_NEUTRAL }
+				AddCond
+				{
+					Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+					Delay 0.1
+					Duration 1
+				}
+				AddCond
+				{
+					Index 5
+					Delay 0.1
+					Duration 2
+				}
+						FireInput
+						{
+							Target !self
+							Action $PlaySound
+							Param "=85|mvm\mvm_tele_deliver.wav"
+							Delay 0
+							Repeats 1
+						}
+									FireInput
+						{
+							Target !self
+							Action $SetLocalOrigin
+							Param "436.39 1990.38 -73.98"
+							Delay 0.1
+							Repeats 1
+						}
+				CustomEyeGlowColor "255 255 255"
+				Action Passive
+				Attributes DisableDodge
+				SpawnTemplate "GreyGlows"
+				UseCustomModel "models/bots/soldier/bot_soldier_gray.mdl" 
+					ItemAttributes
+					{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"collect currency on kill" 1
+					}
+					CharacterAttributes
+					{
+					"crit mod disabled" 0
+					"not solid to players" 1
+					}
+				}
+				TFBot 
+				{ 
+				Class Demoman
+				Skill Normal
+				UseMeleeThreatPrioritization 1
+				ClassIcon gry_lite
+				SpawnTemplate "GreyGlows"
+				Addcond { Name TF_COND_REPROGRAMMED_NEUTRAL }
+				AddCond
+				{
+					Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+					Delay 0.1
+					Duration 1
+				}
+				AddCond
+				{
+					Index 5
+					Delay 0.1
+					Duration 2
+				}
+						FireInput
+						{
+							Target !self
+							Action $PlaySound
+							Param "=85|mvm\mvm_tele_deliver.wav"
+							Delay 0
+							Repeats 1
+						}
+									FireInput
+						{
+							Target !self
+							Action $SetLocalOrigin
+							Param "436.39 1990.38 -73.98"
+							Delay 0.1
+							Repeats 1
+						}
+				CustomEyeGlowColor "255 255 255"
+				Action Mobber
+				Attributes DisableDodge
+				UseCustomModel "models/bots/demo/bot_demo_gray.mdl" 
+					ItemAttributes
+					{
+					ItemName "TF_WEAPON_GRENADELAUNCHER"
+					"custom projectile model" "models/weapons/w_models/w_grenade_grenadelauncher_gray.mdl"
+					"collect currency on kill" 1
+					}
+					CharacterAttributes
+					{
+					"crit mod disabled" 0
+					"not solid to players" 1
+					}
+				}
+			}
+		}
+				WaveSpawn
+		{
+			Where spawnbot_gry_forward_armored
+			TotalCount 6
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 0
+			WaitBeforeStarting 30.1
+			WaitBetweenSpawns  42
+			Support 1
+			RandomChoice
+			{
+				TFBot 
+				{ 
+				Class Soldier
+				Skill Normal
+				UseMeleeThreatPrioritization 1
+				ClassIcon gry_lite
+				SpawnTemplate "GreyGlows"
+				Addcond { Name TF_COND_REPROGRAMMED_NEUTRAL }
+				AddCond
+				{
+					Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+					Delay 0.1
+					Duration 1
+				}
+				AddCond
+				{
+					Index 5
+					Delay 0.1
+					Duration 2
+				}
+						FireInput
+						{
+							Target !self
+							Action $PlaySound
+							Param "=85|mvm\mvm_tele_deliver.wav"
+							Delay 0
+							Repeats 1
+						}
+									FireInput
+						{
+							Target !self
+							Action $SetLocalOrigin
+							Param "436.39 1990.38 -73.98"
+							Delay 0.1
+							Repeats 1
+						}
+				CustomEyeGlowColor "255 255 255"
+				Action Passive
+				Attributes DisableDodge
+				UseCustomModel "models/bots/soldier/bot_soldier_gray.mdl" 
+					ItemAttributes
+					{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"collect currency on kill" 1
+					}
+					CharacterAttributes
+					{
+					"crit mod disabled" 0
+					"not solid to players" 1
+					}
+				}
+				TFBot 
+				{ 
+				Class Demoman
+				Skill Normal
+				UseMeleeThreatPrioritization 1
+				ClassIcon gry_lite
+				SpawnTemplate "GreyGlows"
+				Addcond { Name TF_COND_REPROGRAMMED_NEUTRAL }
+				AddCond
+				{
+					Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+					Delay 0.1
+					Duration 4
+				}
+				AddCond
+				{
+					Index 5
+					Delay 0.1
+					Duration 5
+				}
+						FireInput
+						{
+							Target !self
+							Action $PlaySound
+							Param "=85|mvm\mvm_tele_deliver.wav"
+							Delay 0
+							Repeats 1
+						}
+				CustomEyeGlowColor "255 255 255"
+				Action Mobber
+				Attributes DisableDodge
+				UseCustomModel "models/bots/demo/bot_demo_gray.mdl" 
+					ItemAttributes
+					{
+					ItemName "TF_WEAPON_GRENADELAUNCHER"
+					"custom projectile model" "models/weapons/w_models/w_grenade_grenadelauncher_gray.mdl"
+					"collect currency on kill" 1
+					}
+					CharacterAttributes
+					{
+					"crit mod disabled" 0
+					"not solid to players" 1
+					}
+				}
+			}
+		}
+				WaveSpawn
+		{
+			Where spawnbot_gry_forward_armored
+			TotalCount 6
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 0
+			FirstSpawnWarningSound "#siren2.wav"
+			WaitBeforeStarting 50
+			WaitBetweenSpawns  35
+			Support 1
+			RandomChoice
+			{
+				TFBot 
+				{ 
+				Class Soldier
+				Skill Normal
+				UseMeleeThreatPrioritization 1
+				ClassIcon gry_lite
+				SpawnTemplate "GreyGlows"
+				Addcond { Name TF_COND_REPROGRAMMED_NEUTRAL }
+				AddCond
+				{
+					Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+					Delay 0.1
+					Duration 1
+				}
+				AddCond
+				{
+					Index 5
+					Delay 0.1
+					Duration 2
+				}
+						FireInput
+						{
+							Target !self
+							Action $PlaySound
+							Param "=85|mvm\mvm_tele_deliver.wav"
+							Delay 0
+							Repeats 1
+						}
+						FireInput
+						{
+							Target !self
+							Action $SetLocalOrigin
+							Param "436.39 1980.38 -73.98"
+							Delay 0.1
+							Repeats 1
+						}
+				CustomEyeGlowColor "255 255 255"
+				Action Passive
+				Attributes DisableDodge
+				UseCustomModel "models/bots/soldier/bot_soldier_gray.mdl" 
+					ItemAttributes
+					{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"collect currency on kill" 1
+					}
+					CharacterAttributes
+					{
+					"crit mod disabled" 0
+					"not solid to players" 1
+					}
+				}
+				TFBot 
+				{ 
+				Class Demoman
+				Skill Normal
+				UseMeleeThreatPrioritization 1
+				ClassIcon gry_lite
+				SpawnTemplate "GreyGlows"
+				Addcond { Name TF_COND_REPROGRAMMED_NEUTRAL }
+				AddCond
+				{
+					Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+					Delay 0.1
+					Duration 1
+				}
+				AddCond
+				{
+					Index 5
+					Delay 0.1
+					Duration 2
+				}
+						FireInput
+						{
+							Target !self
+							Action $PlaySound
+							Param "=85|mvm\mvm_tele_deliver.wav"
+							Delay 0
+							Repeats 1
+						}
+								FireInput
+						{
+							Target !self
+							Action $SetLocalOrigin
+							Param "436.39 1995.38 -73.98"
+							Delay 0.1
+							Repeats 1
+						}
+				CustomEyeGlowColor "255 255 255"
+				Action Mobber
+				Attributes DisableDodge
+				UseCustomModel "models/bots/demo/bot_demo_gray.mdl" 
+					ItemAttributes
+					{
+					ItemName "TF_WEAPON_GRENADELAUNCHER"
+					"custom projectile model" "models/weapons/w_models/w_grenade_grenadelauncher_gray.mdl"
+					"collect currency on kill" 1
+					}
+					CharacterAttributes
+					{
+					"crit mod disabled" 0
+					"not solid to players" 1
+					}
+				}
+			}
+		}
+				WaveSpawn
+		{
+			Where spawnbot_gry_forward_armored
+			TotalCount 6
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 0
+			WaitBeforeStarting 50
+			WaitBetweenSpawns  30
+			Support 1
+			RandomChoice
+			{
+				TFBot 
+				{ 
+				Class Soldier
+				Skill Expert
+				UseMeleeThreatPrioritization 1
+				Health 650
+				Scale 1.4
+				Name "Armored Soldier"
+				SpawnTemplate "GreyGlows"
+				ClassIcon gry_lite
+				Addcond { Name TF_COND_REPROGRAMMED_NEUTRAL }
+				AddCond
+				{
+					Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+					Delay 0.1
+					Duration 2
+				}
+				AddCond
+				{
+					Index 5
+					Delay 0.1
+					Duration 3
+				}
+						FireInput
+						{
+							Target !self
+							Action $PlaySound
+							Param "=85|mvm\mvm_tele_deliver.wav"
+							Delay 0
+							Repeats 1
+						}
+						FireInput
+						{
+							Target !self
+							Action $SetLocalOrigin
+							Param "436.39 2000.38 -83.98"
+							Delay 0.1
+							Repeats 1
+						}
+				Action Passive
+				Attributes DisableDodge
+				UseCustomModel "models/bots/soldier/bot_soldier_gray.mdl" 
+					ItemAttributes
+					{
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"collect currency on kill" 1
+					}
+					CharacterAttributes
+					{
+					"crit mod disabled" 0
+					"not solid to players" 1
+					}
+				}
+				TFBot 
+				{ 
+				Class Demoman
+				Skill Expert
+				UseMeleeThreatPrioritization 1
+				SpawnTemplate "GreyGlows"
+				Health 650
+				Scale 1.4
+				Name "Armored Demoman"
+				ClassIcon gry_lite
+				Addcond { Name TF_COND_REPROGRAMMED_NEUTRAL }
+				AddCond
+				{
+					Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+					Delay 0.1
+					Duration 2
+				}
+				AddCond
+				{
+					Index 5
+					Delay 0.1
+					Duration 3
+				}
+						FireInput
+						{
+							Target !self
+							Action $PlaySound
+							Param "=85|mvm\mvm_tele_deliver.wav"
+							Delay 0
+							Repeats 1
+						}
+						FireInput
+						{
+							Target !self
+							Action $SetLocalOrigin
+							Param "436.39 2200.38 -83.98"
+							Delay 0.1
+							Repeats 1
+						}
+				Action Passive
+				Attributes DisableDodge
+				UseCustomModel "models/bots/demo/bot_demo_gray.mdl" 
+					ItemAttributes
+					{
+					ItemName "TF_WEAPON_GRENADELAUNCHER"
+					"custom projectile model" "models/weapons/w_models/w_grenade_grenadelauncher_gray.mdl"
+					"collect currency on kill" 1
+					}
+					CharacterAttributes
+					{
+					"crit mod disabled" 0
+					"not solid to players" 1
+					}
+				}
+			}
+		}
+	}
+	// WAVE 2 [$500]
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+					InitWaveOutput
+		{
+			Target spawner_building_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+			Explanation 
+			{
+				Line "{CCFFCC}///////////BEGIN TRANSMISSION////////////////"
+				Line ""
+				Line "{CCCCCC}Neutral bots have shifted spawns"
+				Line "{CCCCCC}These ones are more passive than the last group, but they'll still flank you at the front"
+				Line "{CCCCCC}These robots consist of normal AI scouts and deflector heavies, watch your back!"
+				Line ""
+				Line "{CCFFCC}////////////END TRANSMISSION/////////////////"
+			}
+//  [$75] 
+		WaveSpawn
+		{
+			Name  "wave02a"
+			Where spawnbot
+			TotalCount 6
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 75
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  4
+			Squad
+			{
+			TFBot {Template T_TFBot_Demoman_Knight }
+			TFBot {Template T_TFBot_Medic_BigHeal}
+			}
+		}
+//  [$75] 
+		WaveSpawn
+		{
+			Name  "wave02a"
+			Where spawnbot
+			TotalCount 6
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 75
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  4
+			Squad
+			{
+			TFBot {Template T_TFBot_Demoman_Knight}
+			TFBot {Template T_TFBot_Medic_BigHeal}
+			}
+		}
+//  [$75]
+		WaveSpawn
+		{
+			Name  "wave02c"
+			Where spawnbot
+
+			TotalCount 12
+			MaxActive  3
+			SpawnCount 2
+			TotalCurrency 75
+
+			WaitBeforeStarting 10
+			WaitBetweenSpawns  4
+			
+			TFBot {Template  T_TFBot_Soldier_Minigiant_Burst }
+		}
+//  [$75]
+		WaveSpawn
+		{
+			Name  "wave02c"
+			Where spawnbot
+
+			TotalCount 15
+			MaxActive  5
+			SpawnCount 3
+			TotalCurrency 75
+
+			WaitBeforeStarting 7
+			WaitBetweenSpawns  1
+			
+			TFBot {Template T_TFBot_Heavyweapons_Shotgun }
+		}
+//  [$150]
+		WaveSpawn
+		{
+			Name  "wave02d"
+			Where spawnbot
+
+			TotalCount 10
+			MaxActive  10
+			SpawnCount 5
+			TotalCurrency 175
+
+			WaitBeforeStarting 2
+			WaitBetweenSpawns  10
+			WaitForAllDead     "wave02a"
+			Squad{
+			TFBot {Template T_TFBot_Giant_Pyro_Deflector }
+			TFBot {Template  T_TFBot_Soldier_Extended_Buff_Banner }
+			TFBot {Template  T_TFBot_Soldier_Extended_Buff_Banner }
+			TFBot { Template T_TFBot_Soldier_Extended_Buff_Banner }
+			TFBot { Template T_TFBot_Soldier_Extended_Buff_Banner }
+			}
+		}
+//  [$75]
+		WaveSpawn
+		{
+			Name  "wave02d"
+			Where spawnbot
+
+			TotalCount 18
+			MaxActive  6
+			SpawnCount 3
+			TotalCurrency 75
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  5
+			WaitForAllSpawned     "wave02a"
+
+			TFBot {Template T_TFBot_Sniper_Carbine }
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name  "wave02e"
+			Where spawnbot
+
+			TotalCount 4
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 100
+
+			WaitBeforeStarting 10
+			WaitBetweenSpawns  40
+			WaitForAllSpawned     "wave02a"
+			Squad{
+						TFBot //mobo giant gauntlet with a few changes
+			{
+				Class heavyweapons
+				Name "Giant Steel Gauntlet"
+				ClassIcon heavy_steelfist_nys
+				Skill Expert
+				Scale 1.85
+				Health 6500
+				Item "Pugilist's Protector"
+				Item "Fists of Steel"
+				WeaponRestrictions MeleeOnly
+				Attributes MiniBoss
+				ItemAttributes
+				{
+					ItemName "Fists of Steel"
+					"gesture speed increase" 1.5
+					"melee cleave attack" 1
+					"alt-fire disabled" 1 //I am assuming this is here so they don't break the giant punch animations
+				}
+				ItemAttributes
+				{
+					ItemName "Pugilist's Protector"
+					"set item tint rgb" 7506594
+				}
+				CharacterAttributes
+				{
+					"move speed bonus"	0.4
+					"damage force reduction" 0.3
+					"airblast vulnerability multiplier" 0.3
+					"override footstep sound set" 2
+				}
+			
+			}
+			TFBot { Template T_TFBot_Medic }
+			}
+		}
+//  [$75]
+		WaveSpawn
+		{
+			Name  "wave02e"
+			Where spawnbot_upper
+
+			TotalCount 12
+			MaxActive  3
+			SpawnCount 2
+			TotalCurrency 75
+			WaitForAllSpawned     "wave02a"
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  1
+			
+			TFBot { Template T_TFBot_Soldier_Extended_Concheror }
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name  "wave02f"
+			Where spawnbot
+
+			TotalCount 3
+			MaxActive  3
+			SpawnCount 3
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  12
+			WaitForAllDead     "wave02e"
+			Squad
+			{
+			TFBot {Template  T_TFBot_Heater_Heavy_Giant}
+			TFBot {Template T_TFBot_Soldier_Extended_Concheror}
+			TFBot {Template T_TFBot_Soldier_Extended_Concheror}
+			}
+		}
+//  [$75]
+		WaveSpawn
+		{
+			Name  "wave02f"
+			Where spawnbot
+
+			TotalCount 3
+			MaxActive  3
+			SpawnCount 1
+			TotalCurrency 75
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  6
+			WaitForAllDead     "wave02e"
+			
+			TFBot {Template  T_TFBot_Giant_Demo_Burst}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Where spawnbot
+
+			TotalCount 16
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  3
+			WaitForAllDead     "wave02e"
+			Support Limited
+			TFBot
+			{
+			Template  T_TFBot_Soldier_Skilled
+			}
+		}
+//  [$0]
+		WaveSpawn
+		{
+			Where spawnbot
+
+			TotalCount 20
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 0
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  3
+			WaitForAllSpawned     "wave02c"
+			Support 1
+			TFBot 
+			{
+			Class Pyro
+			Skill Easy
+			}
+		}
+//  [$0]
+		WaveSpawn
+		{
+			Where spawnbot_upper
+
+			TotalCount 20
+			MaxActive  2
+			SpawnCount 1
+			TotalCurrency 0
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  3
+			WaitForAllSpawned     "wave02c"
+			Support 1
+			TFBot 
+			{
+			Class Pyro
+			Skill Expert
+			Name "Deflector Pyro"
+			Item "The U-clank-a"
+			ClassIcon "pyro_deflector_scroob"
+			ItemAttributes
+			{
+			ItemName "TF_WEAPON_FLAMETHROWER"
+			"mult airblast refire time" 0.8
+			"airblast_destroy_projectile" 1
+			}		
+			}
+		}
+	//  [$0]
+		WaveSpawn
+		{
+			Where spawnbot_gry_forward_armored
+
+			TotalCount 30
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 0
+			Support 1
+			WaitBeforeStarting 5
+			WaitBetweenSpawns  10
+				TFBot 
+				{
+					Class Heavy
+					Item "Deflector"
+					Skill Hard
+					Name "Deflector Heavy"
+					MaxVisionRange 1200
+					UseMeleeThreatPrioritization 1
+					Addcond 
+					{ 
+					Name TF_COND_REPROGRAMMED_NEUTRAL 
+					Delay 0.8
+					}
+					Addcond
+					{
+					Name TF_COND_MVM_BOT_STUN_RADIOWAVE
+					Duration 0.8
+					}
+					Addcond
+					{
+					Index 5
+					Duration 0.8
+					}
+					ItemAttributes
+					{
+					ItemName "Deflector"
+					"collect currency on kill" 1
+					}
+					Action Mobber
+					Attributes DisableDodge
+					SpawnTemplate "GreyGlows"
+					UseCustomModel "models/bots/heavy/bot_heavy_gray.mdl"
+					Item "The U-clank-a"
+					ItemAttributes
+					{
+						ItemName	"The U-clank-a"
+						"set item tint rgb" 16777215
+					}
+					FireInput
+					{
+						Target !self
+						Action $PlaySound
+						Param "=65|mvm\mvm_tele_deliver.wav"
+						Delay 0
+						Repeats 1
+					}
+							FireInput
+				{
+					Target !self
+					Action $SetLocalOrigin
+					Param "436.39 1990.38 -73.98"
+					Delay 0.1
+					Repeats 1
+				}
+				CharacterAttributes
+				{
+				"crit mod disabled" 0
+				"not solid to players" 1
+				}
+					ClassIcon gry_lite
+				}
+		}
+		//  [$0]
+		WaveSpawn
+		{
+			Where spawnbot_gry_building
+
+			TotalCount 30
+			MaxActive  4
+			SpawnCount 3
+			TotalCurrency 0
+			Support 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  15
+			FirstSpawnWarningSound "#siren2.wav"
+			FirstSpawnMessage "{grey}The greys are here!"
+
+			TFBot 
+			{  
+			Class Scout
+			Skill Normal
+			UseMeleeThreatPrioritization 1
+			MaxVisionRange 1200
+			Addcond { Name TF_COND_REPROGRAMMED_NEUTRAL }
+			CustomEyeGlowColor "255 255 255"
+			Action Mobber
+			Attributes DisableDodge
+			SpawnTemplate "GreyGlows"
+			UseCustomModel "models/bots/scout/bot_scout_gray.mdl"
+			ClassIcon gry_lite
+				ItemAttributes
+				{
+				ItemName "TF_WEAPON_SCATTERGUN"
+				"collect currency on kill" 1
+				}
+				FireInput
+				{
+					Target !self
+					Action $PlaySound
+					Param "=85|mvm\mvm_tele_deliver.wav"
+					Delay 0
+					Repeats 1
+				}
+				CharacterAttributes
+				{
+				"crit mod disabled" 0
+				"not solid to players" 1
+				}
+					InterruptAction
+					{
+						Target "261.48 -664.17 202.92"
+						Delay 0.1
+						Repeats 0
+						Cooldown 2
+						Duration 0.01
+						Distance 700
+						WaitUntilDone 1
+					}
+			}
+		}
+	}
+// WAVE 3 [$500]
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+					InitWaveOutput
+		{
+			Target spawner_sniper_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+			Explanation 
+			{
+				Line "{CCFFCC}///////////BEGIN TRANSMISSION////////////////"
+				Line ""
+				Line "{CCCCCC}Neutral Soldiers and Armored Snipers will be active this wave"
+				Line "{CCCCCC}All {CCCCFF}blue robots{CCCCCC} will also have an initial 4 second speed boost this wave"
+				Line "{CCCCCC}Yes,{FF0000} ALL OF THEM"
+				Line ""
+				Line "{CCFFCC}////////////END TRANSMISSION/////////////////"
+			}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave03a"
+			Where spawnbot
+
+			TotalCount 7
+			MaxActive  7
+			SpawnCount 7
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  0
+			Squad{
+			TFBot 
+			{ 
+			Template T_TFBot_Giant_Pyro_Dragon //This indentation with the addconds sucks absolutely, no I am not willing to fix it, it is ultimately my problem, and I am willing to deal with it.
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+			TFBot {
+				Template T_TFBot_Medic
+				AddCond
+				{
+				Index 32
+				Delay 0.1
+				Duration 4
+				}
+			}
+			TFBot {
+			Template T_TFBot_Medic
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+			TFBot {
+			Template T_TFBot_Medic
+				AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+			TFBot {
+			Template T_TFBot_Medic
+				AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+			TFBot {
+			Template T_TFBot_Medic
+				AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+			TFBot {
+			Template T_TFBot_Medic
+				AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+			}
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name  "wave03a"
+			Where spawnbot
+
+			TotalCount 12
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 100
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  3
+
+			TFBot 
+			{
+			Class Soldier
+			Skill Hard			
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave03a"
+			Where spawnbot
+
+			TotalCount 25
+			MaxActive  5
+			SpawnCount 5
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  3
+
+			TFBot
+			{ 
+				Class Scout
+				Skill Expert
+				WeaponRestrictions MeleeOnly
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave03b"
+			Where spawnbot
+
+			TotalCount 4
+			MaxActive  4
+			SpawnCount 4
+			TotalCurrency 50
+
+			WaitBeforeStarting 30
+			WaitBetweenSpawns  10
+			Squad
+			{
+			TFBot 
+			{
+				Template T_TFBot_Giant_Soldier_Spammer 
+				Attributes AlwaysCrit
+				ClassIcon soldier_spammer_crit
+				AddCond
+				{
+				Index 32
+				Delay 0.1
+				Duration 4
+				}
+			}
+			TFBot
+			{
+				Template T_TFBot_Medic
+				AddCond
+				{
+				Index 32
+				Delay 0.1
+				Duration 4
+				}
+			}
+			TFBot
+			{
+				Template T_TFBot_Medic
+				AddCond
+				{
+				Index 32
+				Delay 0.1
+				Duration 4
+				}
+			}
+			TFBot
+			{
+				Template T_TFBot_Medic
+				AddCond
+				{
+				Index 32
+				Delay 0.1
+				Duration 4
+				}
+			}
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave03b1"
+			Where spawnbot
+
+			TotalCount 2
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 50
+
+			WaitBeforeStarting 45
+			WaitBetweenSpawns  10
+			Squad
+			{
+				TFBot 
+				{
+				Template T_TFBot_Giant_Soldier_Spammer_Reload_Two_Stage 
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+				}
+				TFBot 
+				{
+				Template T_TFBot_Medic
+				AddCond
+				{
+				Index 32
+				Delay 0.1
+				Duration 4
+				}
+				}
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave03b1"
+			Where spawnbot_upper
+
+			TotalCount 2
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 50
+
+			WaitBeforeStarting 50
+			WaitBetweenSpawns  10
+			Squad
+			{
+				TFBot 
+				{
+				Template T_TFBot_Giant_Soldier_Spammer_Reload_Two_Stage 
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+				}
+				TFBot 
+				{
+				Template T_TFBot_Medic
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+				}
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave03b"
+			Where spawnbot_upper
+
+			TotalCount 1
+			MaxActive  1
+			SpawnCount 1
+			TotalCurrency 50
+			WaitForAllDead "wave03b1"
+			WaitBeforeStarting 6
+			WaitBetweenSpawns  10
+
+			TFBot 
+			{
+			Template T_TFBot_Giant_Soldier_Spammer 
+			Attributes AlwaysCrit
+			ClassIcon soldier_spammer_crit
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+		}
+//  [$75]
+		WaveSpawn
+		{
+			Name  "wave03b"
+			Where spawnbot_upper
+
+			TotalCount 8
+			MaxActive  2
+			SpawnCount 1
+			TotalCurrency 75
+
+			WaitBeforeStarting 25
+			WaitBetweenSpawns  1.2
+
+			TFBot 
+			{ 
+			Class Demoman
+			Skill Expert
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+		}
+//  [$25]
+		WaveSpawn
+		{
+			Name  "wave03d"
+			Where spawnbot_upper
+
+			TotalCount 5
+			MaxActive  2
+			SpawnCount 1
+			TotalCurrency 25
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  10
+			WaitForAllSpawned     "wave03b"
+
+			TFBot 
+			{ 
+			Template T_TFBot_Demoman_Samurai
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave03d1"
+			Where spawnbot_upper
+
+			TotalCount 4
+			MaxActive  2
+			SpawnCount 1
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  10
+			WaitForAllSpawned     "wave03b"
+			
+			TFBot 
+			{ 
+			Template T_TFBot_Giant_Scout_FAN
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+		}
+//  [$25]
+		WaveSpawn
+		{
+			Name  "wave03e"
+			Where spawnbot
+
+			TotalCount 6
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 25
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  6
+			WaitForAllSpawned "wave03b1"
+			Squad
+			{
+				TFBot 
+				{
+				Template T_TFBot_Soldier_Skilled
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+				}
+				TFBot 
+				{
+				Template T_TFBot_Medic_Kritz
+				AddCond
+				{
+				Index 32
+				Delay 0.1
+				Duration 4
+				}
+				}
+			}
+		}
+//  [$25]
+		WaveSpawn
+		{
+			Name  "wave03e"
+			Where spawnbot
+
+			TotalCount 6
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 25
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  6
+			WaitForAllSpawned "wave03b1"
+			Squad
+			{
+				TFBot 
+				{
+				Template T_TFBot_Soldier_Skilled
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+				}
+				TFBot 
+				{
+				Template T_TFBot_Medic
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+				}
+			}
+		}
+//  [$25]
+		WaveSpawn
+		{
+			Name  "wave03e"
+			Where spawnbot
+
+			TotalCount 4
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 25
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  1.5
+			WaitForAllSpawned     "wave03b"
+			Squad
+			{
+				TFBot 
+				{
+					Class Heavyweapons
+					Skill Normal
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+				}
+				TFBot 
+				{
+				Template T_TFBot_Medic_Kritz
+				AddCond
+				{
+				Index 32
+				Delay 0.1
+				Duration 4
+				}
+				}
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave03e1"
+			Where spawnbot
+
+			TotalCount 12
+			MaxActive  5
+			SpawnCount 3
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  3
+			WaitForAllSpawned     "wave03b"
+				TFBot 
+				{
+				Template T_TFBot_Pyro_DragonsFury
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+				}
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name  "wave03e"
+			Where spawnbot_upper
+
+			TotalCount 6
+			MaxActive  6
+			SpawnCount 2
+			TotalCurrency 100
+
+			WaitBeforeStarting 4
+			WaitBetweenSpawns  5
+			WaitForAllDead     "wave03b"
+			Squad
+			{
+			TFBot 
+			{
+			Template T_TFBot_Giant_Soldier_Spammer_Reload_Two_Stage
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}			
+			}
+			TFBot 
+			{
+					Template T_TFBot_Medic
+						AddCond
+					{
+					Index 32
+					Delay 0.1
+					Duration 4
+					}
+			}
+			}
+		}
+//  [$0]
+		WaveSpawn
+		{
+			Where spawnbot_upper
+
+			TotalCount 12
+			MaxActive  3
+			SpawnCount 3
+			TotalCurrency 0
+
+			WaitBeforeStarting 8
+			WaitBetweenSpawns  8
+			WaitForAllDead     "wave03b"
+			Support 1
+
+			TFBot 
+			{
+			Template T_TFBot_Soldier_Two_Stage
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}			
+			}
+		}
+//  [$0]
+		WaveSpawn
+		{
+			Where spawnbot_upper
+
+			TotalCount 12
+			MaxActive  3
+			SpawnCount 3
+			TotalCurrency 0
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  8
+			WaitForAllDead     "wave03b"
+			Support 1
+
+			TFBot 
+			{
+			Class Demoman 
+			Skill Hard
+			AddCond
+			{
+			Index 32
+			Delay 0.1
+			Duration 4
+			}
+			}
+		}
+		WaveSpawn
+		{
+		Where spawnbot_gry_forward_armored
+
+		TotalCount 20
+		MaxActive 2
+		SpawnCount 2
+		TotalCurrency 0
+		FirstSpawnWarningSound "#siren2.wav"
+		WaitBeforeStarting 15
+		FirstSpawnMessage "{grey}Watch out for those grey snipers!"
+		WaitBetweenSpawns 30
+		Support 1
+		TFBot
+		{
+		SpawnTemplate
+		{
+			Name "LaserOnAim" //fix it
+		}
+			Class Sniper //this sniper workaround was originally suggested by hellmet, yeah the mobocracy guy
+			ClassIcon gry_lite
+			Name "Armored Sniper"
+			FastUpdate 1
+			SpawnTemplate "GreyGlows"
+			Addcond { Name TF_COND_REPROGRAMMED_NEUTRAL}
+			CustomEyeGlowColor "255 255 255"
+			UseCustomModel "models/bots/sniper/bot_sniper_gray.mdl"
+			Skill Expert
+			Scale 1.4
+			Health 500
+			DesiredAttackRange "3000"
+					FireInput
+					{
+						Target !self
+						Action $AddCond
+						Param "1"
+						Delay 0.1
+						Repeats 1337
+						Cooldown 0.1
+					}
+				FireWeapon    //Periodically fires weapon
+                {
+                    Delay 0.05 //Time before the first fire input starts (Default: 10)
+                    Cooldown 3 //Time between each fire input (Default: 10)
+                    Repeats 0 //How many times should bot use the fire input in total (Default: 0 - Infinite)
+					IfSeeTarget 1 //When set to 1, this task activates only when the bot can see the target player (Default 0 - Always activate)
+                    Duration 0 //How long should the button be pressed (Default: 0.1)
+					Type "Primary" // Type of fire input, Possible values:
+				}
+				StripItemSlot 1
+				StripItemSlot 2
+				Action Mobber
+				Attributes DisableDodge
+				ItemAttributes
+				{
+				ItemName "TF_WEAPON_SNIPERRIFLE"
+				"collect currency on kill" 1
+				"sniper fires tracer" 1
+				}
+							FireInput
+				{
+					Target !self
+					Action $SetLocalOrigin
+					Param "436.39 1990.38 -73.98"
+					Delay 0.1
+					Repeats 1
+				}
+				CharacterAttributes
+				{
+				"sniper no headshots" 1
+				"crit mod disabled" 0
+				"not solid to players" 1
+				"head scale" 0.85
+				"voice pitch scale" 0.85
+				"no_jump" 1
+				}
+		}
+	}
+		WaveSpawn
+		{
+		Where spawnbot_gry_sniper
+
+		TotalCount 20
+		MaxActive 2
+		SpawnCount 2
+		TotalCurrency 0
+		FirstSpawnWarningSound "vo/mvm/norm/soldier_mvm_battlecry05"
+		FirstSpawnMessage "{grey}The greys are here!"
+		WaitBeforeStarting 13 //time this to the black mesa attack helicopter boss theme
+		WaitBetweenSpawns 30
+		Support 1
+		TFBot
+		{
+			Class Soldier
+			Skill Hard
+			ClassIcon gry_lite
+			SpawnTemplate "GreyGlows"
+			UseMeleeThreatPrioritization 1
+					Addcond 
+					{ 
+					Name TF_COND_REPROGRAMMED_NEUTRAL 
+					Delay 3
+					}
+					Addcond
+					{
+					Name TF_COND_MVM_BOT_STUN_RADIOWAVE
+					Duration 5
+					}
+					Addcond
+					{
+					Index 5
+					Duration 6
+					}
+			UseCustomModel "models/bots/soldier/bot_soldier_gray.mdl"
+			Item	"the gunboats"
+				Action Mobber
+				Attributes DisableDodge
+				ItemAttributes
+				{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"collect currency on kill" 1
+				}
+				CharacterAttributes
+				{
+				"crit mod disabled" 0
+				"not solid to players" 1	
+				}
+				FireInput
+				{
+					Target !self
+					Action $PlaySound
+					Param "=85|mvm\mvm_tele_deliver.wav"
+					Delay 0
+					Repeats 1
+				}
+		}
+	}
+}
+// WAVE 4 [$600]
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+					InitWaveOutput
+		{
+			Target spawner_invasion_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+			Explanation 
+			{
+				Line "{CCFFCC}///////////BEGIN TRANSMISSION////////////////"
+				Line ""
+				Line "{CCCCCC}Neutral bots are teleporting in absolutely everywhere, how rude!"
+				Line "{CCCCCC}These bots consist of backburner pyros and crit demoknights, {FF0000} WATCH YOUR BACK!"
+				Line ""
+				Line "{CCFFCC}////////////END TRANSMISSION/////////////////"
+			}
+//  [$25]
+		WaveSpawn
+		{
+			Where spawnbot
+			TotalCount 15
+			MaxActive  4
+			SpawnCount 4
+			TotalCurrency 25
+			Support 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  4
+
+			TFBot
+			{ 
+			Class Scout
+			Skill Normal
+			Attributes AlwaysCrit
+			}
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name  "wave04a"
+			Where spawnbot
+			TotalCount 12
+			MaxActive  4
+			SpawnCount 4
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  4
+			Support Limited
+
+			TFBot
+			{ 
+			Template T_TFBot_Soldier_Extended_Concheror
+			}
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name  "wave04a"
+			Where spawnbot
+			TotalCount 7
+			MaxActive  2
+			SpawnCount 1
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  8
+
+			TFBot
+			{ 
+			Template T_TFBot_Heavy_IronFist_Airblast
+			}
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name  "wave04b"
+			Where spawnbot
+
+			TotalCount 12
+			MaxActive  8
+			SpawnCount 4
+			TotalCurrency 100
+
+			WaitBeforeStarting 30
+			WaitBetweenSpawns  15
+			Squad
+			{
+				TFBot
+				{Template T_TFBot_Giant_Demoman ClassIcon demo_spammer_giant}
+				TFBot {Template T_TFBot_Medic_Kritz}
+				TFBot {Template T_TFBot_Medic_Kritz}
+				TFBot {Template T_TFBot_Medic_Kritz}
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave04b" //grey knight screen
+			Where spawnbot
+
+			TotalCount 4
+			MaxActive  2
+			SpawnCount 1
+			TotalCurrency 50
+
+			WaitBeforeStarting 30
+			WaitBetweenSpawns  10
+				TFBot
+				{
+				Template T_TFBot_Giant_DemoMan_PrinceTavish
+				Attributes AlwaysCrit
+				}
+		}
+		
+//  [$100]
+		WaveSpawn
+		{
+			Name  "wave04b"
+			Where spawnbot_upper
+
+			TotalCount 20
+			MaxActive  5
+			SpawnCount 5
+			TotalCurrency 100
+
+			WaitBeforeStarting 25
+			WaitBetweenSpawns  4
+
+			TFBot
+			{
+			Template T_TFBot_Demo_Burst
+			}
+		}
+//  [$225]
+		WaveSpawn
+		{
+			Name  "wave04b1"
+			Where spawnbot_upper
+
+			TotalCount 4
+			MaxActive  2
+			SpawnCount 1
+			TotalCurrency 225
+			WaitBeforeStarting 15
+			WaitBetweenSpawns  35
+
+			TFBot
+			{
+			Template T_TFBot_Giant_Soldier_Incendiary
+			}
+		}
+//  [$75]
+		WaveSpawn
+		{
+			Name  "wave04b"
+			Where spawnbot_upper
+
+			TotalCount 15
+			MaxActive  5
+			SpawnCount 3
+			TotalCurrency 75
+
+			WaitBeforeStarting 20
+			WaitBetweenSpawns  2
+
+			TFBot
+			{
+			Template T_TFBot_Soldier_Incendiary
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave04b"
+			Where spawnbot_upper
+
+			TotalCount 10
+			MaxActive  3
+			SpawnCount 3
+			TotalCurrency 50
+
+			WaitBeforeStarting 20
+			WaitBetweenSpawns  2
+
+			TFBot
+			{
+			Template T_TFBot_Demoman_Knight
+			Attributes AlwaysCrit
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave04e"
+			Where spawnbot
+
+			TotalCount 4
+			MaxActive  4
+			SpawnCount 4
+			TotalCurrency 200
+			WaitForAllSpawned "wave04b"
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  0
+			Squad 
+			{
+				TFBot {Template T_TFBot_Giant_Pyro_Dragon_Spammer}
+				TFBot {Template T_TFBot_Medic}
+				TFBot {Template T_TFBot_Medic}
+				TFBot {Template T_TFBot_Medic}
+			}
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Where spawnbot
+
+			TotalCount 9
+			MaxActive  4
+			SpawnCount 4
+			TotalCurrency 200
+			WaitForAllSpawned "wave04b"
+			WaitBeforeStarting 4
+			WaitBetweenSpawns  13
+			Support 1
+
+			TFBot
+			{Template T_TFBot_Soldier_Extended_Concheror}
+		}
+// DUMMY
+				WaveSpawn
+		{
+			TotalCount 0
+			SpawnCount 0
+
+			WaitBeforeStarting 38
+
+			FirstSpawnWarningSound "mvm\mvm_tele_deliver.wav"
+		}
+		WaveSpawn
+		{
+			Where spawnbot_gry_invasion
+			TotalCount 30
+			MaxActive  4
+			SpawnCount 4
+			TotalCurrency 0
+			WaitBeforeStarting 40
+			WaitBetweenSpawns  20
+			FirstSpawnWarningSound "vo/mvm/norm/taunts/demoman_mvm_taunts14.mp3"
+			Support 1
+			TFBot 
+			{
+				Class Demoman
+				Name "Demoknight"
+				Skill Expert
+				UseMeleeThreatPrioritization 1
+				Item "The Chargin' Targe"
+				Item "The Eyelander"
+				WeaponRestrictions MeleeOnly
+				Action Mobber
+				Attributes DisableDodge
+				Skill Expert // increased to improve ability to hit with melee
+				ItemAttributes
+				{
+				ItemName "The Eyelander"
+				"collect currency on kill" 1
+				"add cond when active" 36
+				"crit vs burning players" 1
+				"crit vs non burning players" 1
+				}
+				ItemAttributes
+				{
+				ItemName "The Chargin' Targe"
+				"collect currency on kill" 1
+				}
+				CharacterAttributes
+				{
+				"crit mod disabled" 0
+				"not solid to players" 1
+				}
+				AddCond
+				{
+					Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+					Delay 0.1
+					Duration 4
+				}
+				AddCond
+				{
+					Index 5
+					Delay 0.1
+					Duration 5
+				}
+				Addcond { Name TF_COND_REPROGRAMMED_NEUTRAL }
+				UseCustomModel "models/bots/demo/bot_demo_gray.mdl"
+				SpawnTemplate "GreyGlows"
+				ClassIcon gry_lite
+			}
+		}
+			// DUMMY
+		WaveSpawn
+		{
+			TotalCount 0
+			SpawnCount 0
+			FirstSpawnWarningSound "#siren2.wav"
+			WaitBeforeStarting 35
+		}
+		WaveSpawn
+		{
+			Where spawnbot_gry_invasion
+			TotalCount 30
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 0
+			WaitBeforeStarting 40
+			WaitBetweenSpawns  25
+			FirstSpawnWarningSound "mvm\mvm_tele_deliver"
+			FirstSpawnMessage "{grey}The greys are here!"
+			Support 1
+			TFBot 
+			{
+				Class Pyro
+				Skill Expert
+				Item "The Backburner"
+				Name "Backburner Pyro"
+				Action Mobber
+				Attributes DisableDodge
+				MoveBehindEnemy 1
+				UseMeleeThreatPrioritization 1
+				ItemAttributes
+				{
+				ItemName "The Backburner"
+				"collect currency on kill" 1
+				"airblast disabled" 1
+				}
+				CharacterAttributes
+				{
+				"crit mod disabled" 0
+				"not solid to players" 1
+				}
+				CustomEyeGlowColor "255 255 255"
+				AddCond
+				{
+					Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+					Delay 0.1
+					Duration 4
+				}
+				AddCond
+				{
+					Index 5
+					Delay 0.1
+					Duration 5
+				}
+				Addcond 
+				{ 
+				Name TF_COND_REPROGRAMMED_NEUTRAL 
+				Delay 0.8
+				}
+				UseCustomModel "models/bots/pyro/bot_pyro_gray.mdl"
+				ClassIcon gry_lite
+				SpawnTemplate "GreyGlows"
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_gry_forward_armored
+			TotalCount 30
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 0
+			WaitBeforeStarting 40
+			WaitBetweenSpawns  20
+			Support 1
+			TFBot 
+			{
+				Class Pyro
+				Skill Expert
+				Item "The Backburner"
+				Name "Backburner Pyro"
+				Action Mobber
+				Attributes DisableDodge
+				MoveBehindEnemy 1
+				UseMeleeThreatPrioritization 1
+				ItemAttributes
+				{
+				ItemName "The Backburner"
+				"collect currency on kill" 1
+				"airblast disabled" 1
+				}
+				CharacterAttributes
+				{
+				"crit mod disabled" 0
+				"not solid to players" 1
+				}
+				CustomEyeGlowColor "255 255 255"
+				AddCond
+				{
+					Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+					Delay 0.1
+					Duration 2
+				}
+				AddCond
+				{
+					Index 5
+					Delay 0.1
+					Duration 3
+				}
+				Addcond 
+				{ 
+				Name TF_COND_REPROGRAMMED_NEUTRAL 
+				Delay 0.8
+				}
+				UseCustomModel "models/bots/pyro/bot_pyro_gray.mdl"
+				ClassIcon gry_lite
+				SpawnTemplate "GreyGlows"
+				FireInput
+				{
+					Target !self
+					Action $SetLocalOrigin
+					Param "436.39 1990.38 -73.98"
+					Delay 0.1
+					Repeats 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_gry_forward_armored
+			TotalCount 30
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 0
+			WaitBeforeStarting 40
+			WaitBetweenSpawns  20
+			Support 1
+			TFBot 
+			{
+				Class Demoman
+				Name "Demoknight"
+				Skill Expert
+				UseMeleeThreatPrioritization 1
+				Item "The Chargin' Targe"
+				Item "The Eyelander"
+				WeaponRestrictions MeleeOnly
+				Action Mobber
+				Attributes DisableDodge
+				Skill Expert // increased to improve ability to hit with melee
+				ItemAttributes
+				{
+				ItemName "The Eyelander"
+				"collect currency on kill" 1
+				"add cond when active" 36
+				"crit vs burning players" 1
+				"crit vs non burning players" 1
+				}
+				ItemAttributes
+				{
+				ItemName "The Chargin' Targe"
+				"collect currency on kill" 1
+				}
+				CharacterAttributes
+				{
+				"crit mod disabled" 0
+				"not solid to players" 1
+				}
+				AddCond
+				{
+					Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+					Delay 0.1
+					Duration 2
+				}
+				AddCond
+				{
+					Index 5
+					Delay 0.1
+					Duration 3
+				}
+				Addcond { Name TF_COND_REPROGRAMMED_NEUTRAL }
+				UseCustomModel "models/bots/demo/bot_demo_gray.mdl"
+				SpawnTemplate "GreyGlows"
+				ClassIcon gry_lite
+				FireInput
+				{
+					Target !self
+					Action $SetLocalOrigin
+					Param "436.39 1990.38 -73.98"
+					Delay 0.1
+					Repeats 1
+				}
+			}
+		}
+	}							
+// WAVE 5 [$600]
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+					InitWaveOutput
+		{
+			Target spawner_boss_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		SpawnTemplate{name "music_5"}
+			Explanation 
+			{
+				Line "{CCFFCC}///////////BEGIN TRANSMISSION////////////////"
+				Line ""
+				Line "{CCCCCC}Neutral {red}giant robots {CCCCCC}will teleport by the cave in the front and right next to your base!"
+				Line "{CCCCCC}they will roam the map and eviscerate man and machine alike, while patrolling through holographic rings"
+				Line ""
+				Line "{CCFFCC}////////////END TRANSMISSION/////////////////"
+			}
+//  [$75]
+		WaveSpawn
+		{
+			Name  "wave05a"
+			Where spawnbot
+		
+			TotalCount 2
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 75
+			FirstSpawnMessage "{BBFFBB}Now Playing: {FF0000}Consternation, by {FF00FF}Cheshyre{FF0000}"
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  0
+			Squad
+			{
+				TFBot {Template T_TFBot_Giant_Heavyweapons }
+				TFBot 
+				{
+				Template T_TFBot_Giant_Medic 
+				ClassIcon medic_pop_giant
+				}
+			}
+			FirstSpawnOutput
+			{
+				Target w5_music
+				Action Trigger
+			}
+		}
+//  [$125]
+		WaveSpawn
+		{
+			Name  "wave05a"
+			Where spawnbot_upper
+
+			TotalCount 2
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 125
+
+			WaitBeforeStarting 20
+			WaitBetweenSpawns  0
+			Squad
+			{
+				TFBot {Template T_TFBot_Giant_Heavyweapons }
+				TFBot 
+				{
+				Template T_TFBot_Giant_Medic 
+				ClassIcon medic_pop_giant
+				}
+			}
+		}
+//  [$75]
+		WaveSpawn
+		{
+			Name  "wave05a1"
+			Where spawnbot
+
+			TotalCount 25
+			MaxActive  6
+			SpawnCount 3
+			TotalCurrency 75
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  7
+				TFBot 
+				{
+				Template T_TFBot_Soldier_Skilled
+				}
+		}
+//  [$150]
+		WaveSpawn
+		{
+			Name  "wave05b"
+			Where spawnbot
+
+			TotalCount 15
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 150
+			WaitForAllSpawned "wave05a"
+			WaitBeforeStarting 10
+			WaitBetweenSpawns  7
+			TFBot {Template T_TFBot_Heavy_Deflector Attributes AlwaysCrit}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Where spawnbot
+
+			TotalCount 8
+			MaxActive  3
+			SpawnCount 2
+			TotalCurrency 125
+			WaitForAllDead "wave05a"
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  9
+			Support 1
+			TFBot 
+			{
+			Class Scout
+			Skill Hard
+			Attributes AlwaysCrit
+			WeaponRestrictions PrimaryOnly
+			}
+		}
+//  [$75]
+		WaveSpawn
+		{
+			Where spawnbot_upper
+			Name  "wave05b"
+			TotalCount 6
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 75
+			WaitForAllDead "wave05a"
+			WaitBeforeStarting 20
+			WaitBetweenSpawns  10
+			Squad
+			{
+				TFBot 
+				{
+				Template T_TFBot_Giant_Soldier_Incendiary
+				}
+				TFBot
+				{
+				Template T_TFBot_Medic
+				}
+			}
+		}
+//  [$75]
+		WaveSpawn
+		{
+			Where spawnbot_upper
+			Name  "wave05b"
+			TotalCount 8
+			MaxActive  6
+			SpawnCount 2
+			TotalCurrency 75
+			WaitForAllDead "wave05a"
+			WaitBeforeStarting 20
+			WaitBetweenSpawns  4
+			Squad
+			{
+				TFBot 
+				{
+				Template T_TFBot_Soldier_Incendiary
+				}
+				TFBot
+				{
+				Template T_TFBot_Medic
+				}
+			}
+		}
+//  [$150]
+		WaveSpawn
+		{
+			Name "wave05c"
+			Where spawnbot
+
+			TotalCount 8
+			MaxActive  8
+			SpawnCount 4
+			TotalCurrency 150
+			WaitForAllSpawned "wave05b"
+			WaitBeforeStarting 2
+			WaitBetweenSpawns  25
+			Squad
+			{
+				TFBot 
+				{
+				Template T_TFBot_Giant_Soldier_Spammer_Reload_Two_Stage
+				Attributes AlwaysCrit
+				ClassIcon "soldier_spammer_crit"
+				}
+				TFBot 
+				{
+				Template T_TFBot_Medic_BigHeal_Shield
+				}
+				TFBot 
+				{
+				Template T_TFBot_Heavy_Deflector
+				Attributes AlwaysCrit
+				}
+				TFBot 
+				{
+				Template T_TFBot_Heavy_Deflector
+				Attributes AlwaysCrit
+				}
+			}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave05c"
+			Where spawnbot_upper
+
+			TotalCount 16
+			MaxActive  8
+			SpawnCount 6
+			TotalCurrency 50
+			WaitForAllSpawned "wave05b"
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  3
+			TFBot {Template T_TFBot_Soldier_RocketPush_Reserve}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave05c"
+			Where spawnbot
+
+			TotalCount 3
+			MaxActive  1
+			SpawnCount 1
+			TotalCurrency 50
+			WaitForAllDead "wave05b"
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  10
+			TFBot {Template T_TFBot_Giant_Scout_FAN}
+		}
+//  [$50]
+		WaveSpawn
+		{
+			Name  "wave05c"
+			Where spawnbot
+
+			TotalCount 2
+			MaxActive  2
+			SpawnCount 1
+			TotalCurrency 50
+			WaitForAllDead "wave05b"
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  12
+			TFBot {Template T_TFBot_Giant_Pyro_Dragon_Spammer}
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name "wave05d"
+			Where spawnbot
+
+			TotalCount 4
+			MaxActive  4
+			SpawnCount 4
+			TotalCurrency 25
+			WaitForAllSpawned "wave05c"
+			WaitBeforeStarting 4
+			WaitBetweenSpawns  30
+			Squad
+			{
+				TFBot 
+				{
+				Template T_TFBot_Giant_Heavyweapons_Shotgun
+				}
+				TFBot 
+				{
+				Template T_TFBot_Hanami_Medic_Giant_Regen 
+				}
+				TFBot 
+				{
+				Template T_TFBot_Medic_Kritz
+				}
+				TFBot 
+				{
+				Template T_TFBot_Medic_Kritz
+				}
+			}
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name "wave05d"
+			Where spawnbot
+
+			TotalCount 6
+			MaxActive  6
+			SpawnCount 3
+			TotalCurrency 25
+			WaitForAllSpawned "wave05c"
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  24
+			Squad
+			{
+				TFBot 
+				{
+				Template T_TFBot_Giant_Demo_Burst
+				Attributes AlwaysCrit
+				}
+				TFBot 
+				{
+				Template T_TFBot_Giant_Soldier_Spammer_Reload_Two_Stage
+				}
+				TFBot 
+				{
+				Template T_TFBot_Medic_BigHeal_Shield
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave05d"
+			Where spawnbot
+
+			TotalCount 8
+			MaxActive  6
+			SpawnCount 3
+			TotalCurrency 25
+			WaitForAllSpawned "wave05c"
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  6
+			TFBot
+			{
+				Template T_TFBot_Soldier_Minigiant_Burst
+				Attributes AlwaysCrit
+			}
+		}
+		// DUMMY
+		WaveSpawn
+		{
+			TotalCount 0
+			SpawnCount 0
+
+			WaitBeforeStarting 0
+			WaitForAllDead     "wave05d"
+
+			FirstSpawnOutput
+			{
+				Target w5_music_end
+				Action Trigger
+			}
+		}
+//GREY
+//  [$0]
+		WaveSpawn
+		{
+			Where spawnbot_gry_patrol
+
+			TotalCount 30
+			MaxActive  2
+			SpawnCount 2
+			TotalCurrency 0
+			Support 1
+			FirstSpawnWarningSound "#siren2.wav"
+			WaitBeforeStarting 47.5
+			WaitBetweenSpawns  45
+			Squad
+			{
+				TFBot 
+				{
+			Class Soldier
+			Skill Expert
+			Name "Giant Burnless Box Soldier"
+			Health 4200
+			
+			Item "fortunate son"
+			Item "The Hurt Locher"
+			Item "The Black Box"
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+			ItemName "The Black Box"
+			"damage bonus" 0.75
+			"faster reload rate" 0.6
+			"Projectile speed increased"	0.7
+			"clip size upgrade atomic" 6
+			"heal on hit for rapidfire" 200
+			"passive reload" 1
+			}
+				ClassIcon gry_lite
+				UseMeleeThreatPrioritization 1
+				CharacterAttributes
+				{
+					"crit mod disabled" 0
+					"not solid to players" 1
+					"voice pitch scale" 0
+					"damage force reduction" 0
+					"airblast vulnerability multiplier" 0
+					"deploy time increased" 0.01
+					"move speed bonus"	0.5
+					"damage force reduction" 0.4
+					"override footstep sound set" 3
+				}
+						Addcond 
+						{ 
+						Name TF_COND_REPROGRAMMED_NEUTRAL
+						Delay 1
+						}
+						SpawnTemplate "GreyGlows"
+					AddCond
+					{
+						Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+						Delay 0.1
+						Duration 4
+					}
+					AddCond
+					{
+						Index 5
+						Delay 0.1
+						Duration 5
+					}
+							FireInput
+							{
+								Target !self
+								Action $PlaySound
+								Param "=85|mvm\mvm_tele_deliver.wav"
+								Delay 0
+								Repeats 1
+							}
+					Action Mobber
+					Attributes DisableDodge
+					UseCustomModel "models/bots/soldier_boss/bot_soldier_gray_boss.mdl"
+						FireInput
+						{
+							Target !self
+							Action $SetLocalOrigin
+							Param "452.39 2000.03 -39.00"
+							Delay 0.1
+							Repeats 1
+						}
+					InterruptAction
+					{
+						Target "512.86 35.31 11.43"
+						Delay 5
+						Repeats 0
+						Cooldown 2
+						Duration 2
+						Distance 25
+						
+						WaitUntilDone 1
+						AddToQueue 1
+					}
+					InterruptAction
+					{
+						Target "775.54 -1200.09 -100.06"
+						Delay 5
+						Repeats 0
+						Cooldown 2
+						Duration 2
+						Distance 25
+						
+						WaitUntilDone 1
+						AddToQueue 1
+					}
+					InterruptAction
+					{
+						Target "-15.19 -1923.99 -118"
+						Delay 5
+						Repeats 0
+						Cooldown 2
+						Duration 2
+						Distance 25
+						
+						WaitUntilDone 1
+						AddToQueue 1
+					}
+				}
+				TFBot 
+				{
+				Template T_TFBot_Giant_Soldier_Spammer
+				ClassIcon gry_lite
+				CharacterAttributes
+				{
+					"crit mod disabled" 0
+					"not solid to players" 1
+					"voice pitch scale" 0
+					"damage force reduction" 0
+					"airblast vulnerability multiplier" 0
+				}
+						Addcond 
+						{ 
+						Name TF_COND_REPROGRAMMED_NEUTRAL
+						Delay 0.8
+						}
+						SpawnTemplate "GreyGlows"
+					AddCond
+					{
+						Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+						Delay 0.1
+						Duration 5
+					}
+					AddCond
+					{
+						Index 5
+						Delay 0.1
+						Duration 6
+					}
+							FireInput
+							{
+								Target !self
+								Action $PlaySound
+								Param "=85|mvm\mvm_tele_deliver.wav"
+								Delay 0
+								Repeats 1
+							}
+					InterruptAction
+					{
+						Target "512.86 35.31 11.43"
+						Delay 5
+						Repeats 0
+						Cooldown 2
+						Duration 2
+						Distance 25
+						
+						WaitUntilDone 1
+						AddToQueue 1
+					}
+					InterruptAction
+					{
+						Target "775.54 -1200.09 -100.06"
+						Delay 5
+						Repeats 0
+						Cooldown 2
+						Duration 2
+						Distance 25
+						
+						WaitUntilDone 1
+						AddToQueue 1
+					}
+					InterruptAction
+					{
+						Target "-15.19 -1923.99 -118"
+						Delay 5
+						Repeats 0
+						Cooldown 2
+						Duration 2
+						Distance 25
+						
+						WaitUntilDone 1
+						AddToQueue 1
+					}
+					Action Mobber
+					Attributes DisableDodge
+					UseCustomModel "models/bots/soldier_boss/bot_soldier_gray_boss.mdl"
+						FireInput
+						{
+							Target !self
+							Action $SetLocalOrigin
+							Param "452.39 2090.03 -39.00"
+							Delay 0.1
+							Repeats 1
+						}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_gry_patrol_upper
+
+			TotalCount 30
+			MaxActive  2
+			SpawnCount 1
+			TotalCurrency 0
+			Support 1
+			FirstSpawnMessage "{grey}The greys are here!"
+			WaitBeforeStarting 47.5
+			WaitBetweenSpawns  65
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_RapidFire
+					ClassIcon gry_lite
+					UseMeleeThreatPrioritization 1
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_GRENADELAUNCHER"
+						"custom projectile model" "models/weapons/w_models/w_grenade_grenadelauncher_gray.mdl"
+					}
+				CharacterAttributes
+				{
+					"crit mod disabled" 0
+					"not solid to players" 1
+					"voice pitch scale" 0
+					"damage force reduction" 0
+					"airblast vulnerability multiplier" 0
+					"cancel falling damage" 1
+				}
+					ClassIcon gry_lite
+					DesiredAttackRange "700"
+						Addcond 
+						{ 
+						Name TF_COND_REPROGRAMMED_NEUTRAL
+						Delay 0.8
+						}
+						SpawnTemplate "GreyGlows"
+					AddCond
+					{
+						Name "TF_COND_MVM_BOT_STUN_RADIOWAVE" 
+						Delay 0.1
+						Duration 9
+					}
+					AddCond
+					{
+						Index 5
+						Delay 0.1
+						Duration 10
+					}
+					FireInput
+					{
+						Target !self
+						Action $PlaySound
+						Param "=85|mvm\mvm_tele_deliver.wav"
+						Delay 0
+						Repeats 1
+					}
+				Action Mobber
+				Attributes DisableDodge
+				UseCustomModel "models/bots/demo_boss/bot_demo_gray_boss.mdl"
+				InterruptAction
+				{
+					Target "-1392.17 -2969.67 104.31"
+					Delay 5
+					Repeats 0
+					Cooldown 2
+					Duration 2
+					Distance 25
+					
+					WaitUntilDone 1
+					AddToQueue 1
+				}
+				InterruptAction
+				{
+					Target "-1302.02 -1645.81 228.88"
+					Delay 5
+					Repeats 0
+					Cooldown 2
+					Duration 2
+					Distance 25
+					
+					WaitUntilDone 1
+					AddToQueue 1
+				}
+				InterruptAction
+				{
+					Target "-671.34 -850.14 100.54"
+					Delay 5
+					Repeats 0
+					Cooldown 2
+					Duration 2
+					Distance 25
+					
+					WaitUntilDone 1
+					AddToQueue 1
+				}
+				InterruptAction
+				{
+					Target "784.12 -2218.46 133.69"
+					Delay 5
+					Repeats 0
+					Cooldown 2
+					Duration 2
+					Distance 25
+					
+					WaitUntilDone 1
+					AddToQueue 1
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,5964 @@
+#base robot_standard.pop
+#base robot_giant.pop
+
+WaveSchedule
+{
+	StartingCurrency 900
+	RespawnWaveTime 1
+	CanBotsAttackWhileInSpawnRoom No
+	
+	ImprovedAirblast 1 //For red pyros only
+
+	RobotLimit 26
+	LuaScriptFile "scripts/autogamble.lua"
+	
+	ItemAttributes
+    {
+        ItemName "Rocket Jumper"
+        "cannot pick up intelligence" 0
+		"special item description" "Wearer can carry cores"
+    }
+	ItemAttributes
+    {
+        ItemName "Stickybomb Jumper"
+        "cannot pick up intelligence" 0
+		"special item description" "Wearer can carry cores"
+    }
+	ItemAttributes
+    {
+        ItemName "The Pain Train"
+		"special item description" "While active and carrying core:"
+		"special item description 2" "+ Wearer moves at max move speed and 300% increased air control"
+		"special item description 3" "-  Marked-For-Death and maximum health is drained"
+    }
+	
+	PrecacheSound "jackpotsadgirlbgm.mp3"
+
+//////////////////////////////////////////Point Templates//////////////////////////////////////////
+	PointTemplates
+	{
+		CoreFlagInit
+		{
+			NoFixup 0
+			item_teamflag
+			{
+				"origin" "-8576 3456 480"
+				"trail_effect" "2"
+				"TeamNum" "1"
+				"targetname" "flag_core_teamflag"
+				"tags" "core_carrier"
+				"StartDisabled" "0"
+				"ShotClockMode" "0"
+				"ScoringType" "0"
+				"ReturnTime" "60000"
+				"ReturnBetweenWaves" "0"
+				"PointValue" "0"
+				"NeutralType" "1"
+				"GameType" "2"
+				"flag_trail" "flagtrail"
+				"flag_paper" "player_australium_socktrail"
+				"flag_model" "models\props_doomsday\australium_container.mdl"
+				"flag_icon" "../hud/objectives_ticketcase"
+				"DisableBoneFollowers" "1"
+				"angles" "0 0 0"
+				"skin" "0"
+				"$disablebuffs" "1"
+
+				"OnDrop1" "popscript,$DropCore,,0,-1"
+				"OnDrop1" "popscript,$SpawnCoreProp,,0,-1"
+				"OnDrop1" "flag_core_teamflag,Kill,,0,-1"
+			}
+			info_particle_system
+			{
+				"origin" "-8576 3456 480"
+				"effect_name" "player_australium_socktrail"
+				"parentname" "flag_core_teamflag"
+				"start_active" "1"
+			}
+			info_particle_system
+			{
+				"origin" "-8576 3456 480"
+				"effect_name" "utaunt_glitter_parent_gold"
+				"parentname" "flag_core_teamflag"
+				"start_active" "1"
+			}
+		}
+		CoreFlagProp
+		{
+			NoFixup 0
+			prop_dynamic
+			{
+				"origin" "0 0 6"
+				"targetname" "flag_core_prop"
+				"parentname" "flag_core_trigger"
+				"model" "models\props_doomsday\australium_container.mdl"
+				"skin" "2"
+				"DefaultAnim" "spin"
+				"disableshadows" "1"
+			}
+			info_particle_system
+			{
+				"origin" "0 0 6"
+				"effect_name" "utaunt_beams_yellow"
+				"targetname" "core_particles"
+				"parentname" "flag_core_trigger"
+				"start_active" "1"
+			}
+			tf_glow
+			{
+				"origin" "0 0 6"
+				"parentname" "flag_core_trigger"
+				"target" "flag_core_prop"
+				"GlowColor" "205 205 205 255"
+				"targetname" "flag_core_glow"
+				"mode" "0"
+			}
+			trigger_multiple
+			{
+				"origin" "0 0 6"
+				"targetname" "flag_core_trigger"
+				"mins" "-50 -50 -8"
+				"maxs" "50 50 20"
+				"spawnflags" "1"
+				
+				"OnStartTouch" "popscript,$SpawnCore,,0,-1"
+			}
+			OnSpawnOutput
+			{
+				Target flag_core_trigger
+				Action Disable
+				Delay 3
+			}
+			OnSpawnOutput
+			{
+				Target flag_core_trigger
+				Action Enable
+				Delay 3.015
+			}
+		}
+		CoreFlagPickup
+		{
+			NoFixup 0
+			info_particle_system
+			{
+				"effect_name" "utaunt_glitter_parent_gold"
+				"parentname" "flag_core_teamflag"
+				"targetname" "flag_core_trail_particle"
+				"start_active" "1"
+			}
+			info_particle_system
+			{
+				"effect_name" "player_australium_socktrail"
+				"parentname" "flag_core_teamflag"
+				"start_active" "1"
+			}
+			item_teamflag
+			{
+				"trail_effect" "2"
+				"TeamNum" "2"
+				"targetname" "flag_core_teamflag"
+				"tags" "core_carrier"
+				"StartDisabled" "0"
+				"ShotClockMode" "0"
+				"ScoringType" "0"
+				"ReturnTime" "60000"
+				"ReturnBetweenWaves" "0"
+				"PointValue" "0"
+				"NeutralType" "1"
+				"GameType" "2"
+				"flag_trail" "flagtrail"
+				"flag_paper" "player_australium_socktrail"
+				"flag_model" "models\props_doomsday\australium_container.mdl"
+				"flag_icon" "../hud/objectives_ticketcase"
+				"DisableBoneFollowers" "1"
+				"angles" "0 0 0"
+				"skin" "2"
+				"$disablebuffs" "1"
+
+				"OnPickup1" "popscript,$HoldCore,,0,-1"
+				"OnDrop1" "popscript,$DropCore,,0,-1"
+				"OnDrop1" "popscript,$SpawnCoreProp,,0,-1"
+				"OnDrop1" "flag_core_teamflag,Kill,,0.015,-1"
+			}
+			OnSpawnOutput
+			{
+				Target flag_core_trail_particle
+				Action $HideTo
+				Param player
+			}
+		}
+		CoreFlagLeftover
+		{
+			NoFixup 0
+			prop_dynamic
+			{
+				"origin" "0 0 6"
+				"targetname" "flag_core_prop"
+				"parentname" "flag_core_trigger_leftover"
+				"model" "models\props_doomsday\australium_container.mdl"
+				"skin" "2"
+				"DefaultAnim" "spin"
+				"disableshadows" "1"
+			}
+			tf_glow
+			{
+				"origin" "0 0 6"
+				"parentname" "flag_core_trigger_leftover"
+				"target" "flag_core_prop"
+				"GlowColor" "205 205 205 255"
+				"targetname" "flag_core_glow"
+			}
+			trigger_multiple
+			{
+				"origin" "0 0 6"
+				"targetname" "flag_core_trigger_leftover"
+				"mins" "-50 -50 -60"
+				"maxs" "50 50 20"
+				"spawnflags" "1"
+				"StartDisabled" "1"
+				
+				"OnStartTouch" "popscript,$SpawnCore,leftover,0,-1"
+			}
+		}
+		WorldText
+		{
+			NoFixup 1
+			prop_dynamic
+			{
+				"origin" "256, -726, 102"
+				"angles" "0, 90, 0"
+				"model" "models/props_gameplay/sign_wood_cap001.mdl"
+				"disableshadows" "1"
+				"modelscale" "1.4"
+			}
+			point_worldtext
+			{
+				"origin" "178, -730, 170"
+				"angles" "0, 90, 0"
+				"targetname" "howtoplaytext"
+				"message" ""
+				"font" "1"
+				"textsize" "12"
+				"orientation" "0"
+				"rainbow" "1"
+			}
+			point_worldtext
+			{
+				"origin" "174, -730, 150"
+				"angles" "0, 90, 0"
+				"targetname" "howtoplaytext2"
+				"message" ""
+				"font" "1"
+				"textsize" "8"
+				"orientation" "0"
+			}
+			point_worldtext
+			{
+				"origin" "174, -730, 80"
+				"angles" "0, 90, 0"
+				"targetname" "howtoplaytext3"
+				"message" ""
+				"font" "7"
+				"textsize" "15"
+				"orientation" "0"
+			}
+			trigger_multiple
+			{	
+				"origin" "-8576 3456 480"
+				"targetname" "trigger_core_set_spawner"
+				"mins" "-128 -128 -32"
+				"maxs" "128 128 32"
+				"spawnflags" "1"
+				
+				"OnStartTouch" "tele_botspawn_core,Enable,,0.2,-1"
+				"OnStartTouch" "tele_botspawn_core,Disable,,0.25,-1"
+			}
+			trigger_teleport
+			{	
+				"origin" "-8576 3456 600"
+				"targetname" "tele_botspawn_core"
+				"mins" "-128 -128 -152"
+				"maxs" "128 128 152"
+				"target" "tele_dest_botspawn_tickets"
+				"spawnflags" "1"
+				"StartDisabled" "1"
+			}
+			func_flagdetectionzone
+			{	
+				"origin" "-4000, 7424, 96"
+				"targetname" "rouletteupgrade"
+				"mins" "-96 -126 -32"
+				"maxs" "96 126 32"
+				"teamnum" "0"
+				
+				"OnStartTouchFlag" "popscript,$UpgradeBot,roulette,0,-1"
+			}
+			func_flagdetectionzone
+			{
+				"origin" "-1184, 7424, 96"
+				"targetname" "pachinkoupgrade"
+				"mins" "-96 -126 -32"
+				"maxs" "96 126 32"
+				"teamnum" "0"
+				
+				"OnStartTouchFlag" "popscript,$UpgradeBot,pachinko,0,-1"
+			}
+			func_flagdetectionzone
+			{
+				"origin" "2912, 7424, 96"
+				"targetname" "slotsupgrade"
+				"mins" "-96 -126 -32"
+				"maxs" "96 126 32"
+				"teamnum" "0"
+				
+				"OnStartTouchFlag" "popscript,$UpgradeBot,slots,0,-1"
+			}
+			func_flagdetectionzone
+			{
+				"origin" "5344, 7424, 96"
+				"targetname" "blackjackupgrade"
+				"mins" "-96 -126 -32"
+				"maxs" "96 126 32"
+				"teamnum" "0"
+				
+				"OnStartTouchFlag" "popscript,$UpgradeBot,blackjack,0,-1"
+			}
+			point_worldtext
+			{
+				"origin" "-4020, 7424, 146"
+				"targetname" "rouletteleveltext"
+				"message" "Level 0"
+				"font" "1"
+				"orientation" "1"
+			}
+			point_worldtext
+			{
+				"origin" "-2646, 2050, 192"
+				"angles" "0 90 0"
+				"targetname" "rouletteleveltext2"
+				"message" "Level 0"
+				"font" "1"
+				"orientation" "0"
+			}
+			point_worldtext
+			{
+				"origin" "-4357, 7042, 148"
+				"angles" "0 180 0"
+				"targetname" "roulettecollect"
+				"message" "Chips Collected: 0"
+				"font" "7"
+				"orientation" "0"
+				"textsize" "10"
+			}
+			point_worldtext
+			{
+				"origin" "-1184, 7424, 146"
+				"targetname" "pachinkoleveltext"
+				"message" "Level 0"
+				"font" "1"
+				"orientation" "1"
+			}
+			point_worldtext
+			{
+				"origin" "-1578, 638, 352"
+				"angles" "0 270 0"
+				"targetname" "pachinkoleveltext2"
+				"message" "Level 0"
+				"font" "1"
+				"orientation" "0"
+			}
+			point_worldtext
+			{
+				"origin" "-1541, 7762, 148"
+				"angles" "0 180 0"
+				"targetname" "pachinkocollect"
+				"message" "Chips Collected: 0"
+				"font" "7"
+				"orientation" "0"
+				"textsize" "10"
+			}
+			point_worldtext
+			{
+				"origin" "2912, 7424, 146"
+				"targetname" "slotsleveltext"
+				"message" "Level 0"
+				"font" "1"
+				"orientation" "1"
+			}
+			point_worldtext
+			{
+				"origin" "-1450, 1214, 8"
+				"angles" "0 270 0"
+				"targetname" "slotsleveltext2"
+				"message" "Level 0"
+				"font" "1"
+				"orientation" "0"
+				"textsize" "10"
+			}
+			point_worldtext
+			{
+				"origin" "3269, 7823, 148"
+				"angles" "0 0 0"
+				"targetname" "slotscollect"
+				"message" "Chips Collected: 0"
+				"font" "7"
+				"orientation" "0"
+				"textsize" "10"
+			}
+			point_worldtext
+			{
+				"origin" "5344, 7424, 146"
+				"targetname" "blackjackleveltext"
+				"message" "Level 0"
+				"font" "1"
+				"orientation" "1"
+			}
+			point_worldtext
+			{
+				"origin" "-1670, 2466, 0"
+				"angles" "0 90 0"
+				"targetname" "blackjackleveltext2"
+				"message" "Level 0"
+				"font" "1"
+				"orientation" "0"
+			}
+			point_worldtext
+			{
+				"origin" "5701, 7007, 148"
+				"angles" "0 0 0"
+				"targetname" "blackjackcollect"
+				"message" "Chips Collected: 0"
+				"font" "7"
+				"orientation" "0"
+				"textsize" "10"
+			}
+			point_worldtext
+			{
+				"origin" "-524, -1638, 58"
+				"angles" "0 180 0"
+				"targetname" "allcollect"
+				"message" "Chips Collected: 0"
+				"font" "7"
+				"orientation" "0"
+				"textsize" "8"
+			}
+			prop_dynamic
+			{
+				"origin" "270, -2095, -32"
+				"angles" "0, 0, 0"
+				"targetname" "cashout_prop_button_1"
+				"model" "models/props_casino/game_button.mdl"
+				"skin" "8"
+				"solid" "6"
+				"disableshadows" "1"
+			}
+			func_button
+			{
+				"origin" "270, -2099, 27"
+				"angles" "0, 0, 0"
+				"targetname" "cashout_button_1"
+				"mins" "-10, -13, -11"
+				"maxs" "10, 13, 11"
+				"damagefilter" "filter_melee"
+				"spawnflags" "1537"
+				
+				"OnPressed" "cashout_prop_button_1,SetAnimation,press_once,0,-1"
+				"OnPressed" "popscript,$Cashout1,0,0,-1"
+			}
+			prop_dynamic
+			{
+				"origin" "180, -2095, -32"
+				"angles" "0, 0, 0"
+				"targetname" "cashout_prop_button_10"
+				"model" "models/props_casino/game_button.mdl"
+				"skin" "8"
+				"solid" "6"
+				"disableshadows" "1"
+			}
+			func_button
+			{
+				"origin" "180, -2099, 30"
+				"angles" "0, 0, 0"
+				"targetname" "cashout_button_10"
+				"mins" "-10, -13, -11"
+				"maxs" "10, 13, 11"
+				"damagefilter" "filter_melee"
+				"spawnflags" "1537"
+				
+				"OnPressed" "cashout_prop_button_10,SetAnimation,press_once,0,-1"
+				"OnPressed" "popscript,$Cashout10,0,0,-1"
+			}
+			prop_dynamic
+			{
+				"origin" "90, -2095, -32"
+				"angles" "0, 0, 0"
+				"targetname" "cashout_prop_button_100"
+				"model" "models/props_casino/game_button.mdl"
+				"skin" "8"
+				"solid" "6"
+				"disableshadows" "1"
+			}
+			func_button
+			{
+				"origin" "90, -2099, 27"
+				"angles" "0, 0, 0"
+				"targetname" "cashout_button_100"
+				"mins" "-10, -13, -11"
+				"maxs" "10, 13, 11"
+				"damagefilter" "filter_melee"
+				"spawnflags" "1537"
+				
+				"OnPressed" "cashout_prop_button_100,SetAnimation,press_once,0,-1"
+				"OnPressed" "popscript,$Cashout100,0,0,-1"
+			}
+			point_worldtext
+			{
+				"origin" "264, -2110, 146"
+				"angles" "0 270 0"
+				"targetname" "cashouttext"
+				"message" "Cashout"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "35"
+				"color" "94 151 45"
+			}
+			point_worldtext
+			{
+				"origin" "304, -2110, 106"
+				"angles" "0 270 0"
+				"targetname" "cashouttext2"
+				"message" "Total: $0"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "45"
+				"color" "94 151 45"
+			}
+			point_worldtext
+			{
+				"origin" "280, -2110, 40"
+				"angles" "0 270 0"
+				"targetname" "cashout1text"
+				"message" "1"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "50"
+			}
+			point_worldtext
+			{
+				"origin" "208, -2110, 40"
+				"angles" "0 270 0"
+				"targetname" "cashout10text"
+				"message" "10"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "50"
+			}
+			point_worldtext
+			{
+				"origin" "132, -2110, 40"
+				"angles" "0 270 0"
+				"targetname" "cashout100text"
+				"message" "100"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "50"
+			}
+			point_worldtext
+			{
+				"origin" "10, -2110, 146"
+				"angles" "0 270 0"
+				"targetname" "mercbottext"
+				"message" "Reinforcements"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "35"
+				"color" "184 56 59"
+			}
+			point_worldtext
+			{
+				"origin" "-20, -2110, 106"
+				"angles" "0 270 0"
+				"targetname" "mercbottext2"
+				"message" "Max (0/4)"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "45"
+				"color" "184 56 59"
+			}
+			prop_dynamic
+			{
+				"origin" "0, -2095, -32"
+				"angles" "0, 0, 0"
+				"targetname" "mercbot_prop_button_common"
+				"model" "models/props_casino/game_button.mdl"
+				"skin" "6"
+				"solid" "6"
+				"disableshadows" "1"
+			}
+			func_button
+			{
+				"origin" "0, -2099, 27"
+				"angles" "0, 0, 0"
+				"targetname" "mercbot_button_common"
+				"mins" "-10, -13, -11"
+				"maxs" "10, 13, 11"
+				"damagefilter" "filter_melee"
+				"spawnflags" "1537"
+				
+				"OnPressed" "mercbot_prop_button_common,SetAnimation,press_once,0,-1"
+				"OnPressed" "popscript,$SpawnMerc,common,0,-1"
+			}
+			point_worldtext
+			{
+				"origin" "10, -2110, 40"
+				"angles" "0 270 0"
+				"targetname" "mercbotcommontext"
+				"message" "5"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "50"
+			}
+			point_worldtext
+			{
+				"origin" "33, -2110, 88"
+				"angles" "0 270 0"
+				"targetname" "commontext"
+				"message" "common"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "15"
+			}
+			point_worldtext
+			{
+				"origin" "-74, -2110, 88"
+				"angles" "0 270 0"
+				"targetname" "crittext"
+				"message" "crit"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "15"
+				"color" "0 152 192"
+			}
+			point_worldtext
+			{
+				"origin" "-158, -2110, 88"
+				"angles" "0 270 0"
+				"targetname" "gianttext"
+				"message" "giant"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "15"
+				"color" "192 21 0"
+			}
+			point_worldtext
+			{
+				"origin" "-254, -2110, 102"
+				"angles" "0 270 0"
+				"targetname" "crittext2"
+				"message" "crit"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "15"
+				"color" "0 152 192"
+			}
+			point_worldtext
+			{
+				"origin" "-248, -2110, 88"
+				"angles" "0 270 0"
+				"targetname" "gianttext2"
+				"message" "giant"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "15"
+				"color" "192 21 0"
+			}
+			prop_dynamic
+			{
+				"origin" "-90, -2095, -32"
+				"angles" "0, 0, 0"
+				"targetname" "mercbot_prop_button_crit"
+				"model" "models/props_casino/game_button.mdl"
+				"skin" "6"
+				"solid" "6"
+				"disableshadows" "1"
+			}
+			func_button
+			{
+				"origin" "-90, -2099, 27"
+				"angles" "0, 0, 0"
+				"targetname" "mercbot_button_crit"
+				"mins" "-10, -13, -11"
+				"maxs" "10, 13, 11"
+				"damagefilter" "filter_melee"
+				"spawnflags" "1537"
+				
+				"OnPressed" "mercbot_prop_button_crit,SetAnimation,press_once,0,-1"
+				"OnPressed" "popscript,$SpawnMerc,crit,0,-1"
+			}
+			point_worldtext
+			{
+				"origin" "-64, -2110, 40"
+				"angles" "0 270 0"
+				"targetname" "mercbotcrittext"
+				"message" "50"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "50"
+			}
+			prop_dynamic
+			{
+				"origin" "-180, -2095, -32"
+				"angles" "0, 0, 0"
+				"targetname" "mercbot_prop_button_giant"
+				"model" "models/props_casino/game_button.mdl"
+				"skin" "6"
+				"solid" "6"
+				"disableshadows" "1"
+			}
+			func_button
+			{
+				"origin" "-180, -2099, 27"
+				"angles" "0, 0, 0"
+				"targetname" "mercbot_button_giant"
+				"mins" "-10, -13, -11"
+				"maxs" "10, 13, 11"
+				"damagefilter" "filter_melee"
+				"spawnflags" "1537"
+				
+				"OnPressed" "mercbot_prop_button_giant,SetAnimation,press_once,0,-1"
+				"OnPressed" "popscript,$SpawnMerc,giant,0,-1"
+			}
+			point_worldtext
+			{
+				"origin" "-136, -2110, 40"
+				"angles" "0 270 0"
+				"targetname" "mercbotgianttext"
+				"message" "100"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "50"
+			}
+			prop_dynamic
+			{
+				"origin" "-270, -2095, -32"
+				"angles" "0, 0, 0"
+				"targetname" "mercbot_prop_button_giantcrit"
+				"model" "models/props_casino/game_button.mdl"
+				"skin" "6"
+				"solid" "6"
+				"disableshadows" "1"
+			}
+			func_button
+			{
+				"origin" "-270, -2099, 27"
+				"angles" "0, 0, 0"
+				"targetname" "mercbot_button_giantcrit"
+				"mins" "-10, -13, -11"
+				"maxs" "10, 13, 11"
+				"damagefilter" "filter_melee"
+				"spawnflags" "1537"
+				
+				"OnPressed" "mercbot_prop_button_giantcrit,SetAnimation,press_once,0,-1"
+				"OnPressed" "popscript,$SpawnMerc,giantcrit,0,-1"
+			}
+			point_worldtext
+			{
+				"origin" "-232, -2110, 40"
+				"angles" "0 270 0"
+				"targetname" "mercbotgiantcrittext"
+				"message" "150"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "50"
+			}
+			point_worldtext
+			{
+				"origin" "-472, -1410, 102"
+				"angles" "0 180 0"
+				"targetname" "dispensertext2"
+				"message" "Dispenser"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "14"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "spawnbot_mercbot"
+				"TeamNum" "3"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "spawnbot_mercbotgiant"
+				"TeamNum" "3"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "spawnbot_mercbotcrit"
+				"TeamNum" "3"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "spawnbot_mercbotgiantcrit"
+				"TeamNum" "3"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "-4256 1088 32"
+				"targetname" "spawnbot_mercbotsecret"
+				"TeamNum" "3"
+				"StartDisabled" "1"
+			}
+			ambient_generic
+			{
+				"spawnflags" 17
+				"message" "#jackpotsadgirlbgm.mp3"
+				"health" 10
+				"targetname" "bossbgm"
+			}
+			info_target
+			{
+				"targetname" "roulettetarget"
+				"origin" "-2646, 2050, 192"
+			}
+			info_target
+			{
+				"targetname" "pachinkotarget"
+				"origin" "-1578, 638, 352"
+			}
+			info_target
+			{
+				"targetname" "slotstarget"
+				"origin" "-1450, 1214, 8"
+			}
+			info_target
+			{
+				"targetname" "blackjacktarget"
+				"origin" "-1670, 2466, 0"
+			}
+			OnSpawnOutput
+			{
+				Target flag_core_teamflag
+				Action Disable
+			}
+		}
+		Prize3ButtonFix
+		{
+			prop_dynamic
+			{
+				"origin" "-456 -1440 -32"
+				"targetname" "prize_prop_button_3"
+				"StartDisabled" "0"
+				"spawnflags" "0"
+				"solid" "6"
+				"skin" "10"
+				"shadowcastdist" "0"
+				"SetBodyGroup" "0"
+				"rendermode" "0"
+				"renderfx" "0"
+				"rendercolor" "255 255 255"
+				"renderamt" "255"
+				"RandomAnimation" "0"
+				"pressuredelay" "0"
+				"physdamagescale" "1.0"
+				"PerformanceMode" "0"
+				"model" "models/props_casino/game_button.mdl"
+				"minhealthdmg" "0"
+				"MinAnimTime" "5"
+				"MaxAnimTime" "10"
+				"health" "0"
+				"fadescale" "1"
+				"fademindist" "-1"
+				"ExplodeRadius" "0"
+				"ExplodeDamage" "0"
+				"effects" "0"
+				"disableshadows" "1"
+				"disablereceiveshadows" "0"
+				"DisableBoneFollowers" "0"
+				"DefaultAnim" "idle"
+				"body" "0"
+				"angles" "0 270 0"
+				"OnUser1" "!self,Kill,,0.5,-1"
+			}
+		}
+		Prize2ButtonFix
+		{
+			prop_dynamic
+			{
+				"origin" "580 -1928 -32"
+				"texframeindex" "0"
+				"targetname" "prize_prop_button_2"
+				"StartDisabled" "0"
+				"spawnflags" "0"
+				"solid" "6"
+				"skin" "10"
+				"shadowcastdist" "0"
+				"SetBodyGroup" "0"
+				"rendermode" "0"
+				"renderfx" "0"
+				"rendercolor" "255 255 255"
+				"renderamt" "255"
+				"RandomAnimation" "0"
+				"pressuredelay" "0"
+				"physdamagescale" "1.0"
+				"PerformanceMode" "0"
+				"model" "models/props_casino/game_button.mdl"
+				"minhealthdmg" "0"
+				"MinAnimTime" "5"
+				"MaxAnimTime" "10"
+				"health" "0"
+				"fadescale" "1"
+				"fademindist" "-1"
+				"ExplodeRadius" "0"
+				"ExplodeDamage" "0"
+				"effects" "0"
+				"disableshadows" "1"
+				"disablereceiveshadows" "0"
+				"DisableBoneFollowers" "0"
+				"DefaultAnim" "idle"
+				"body" "0"
+				"angles" "0 90 0"
+			}
+		}
+		RedBotParticle
+		{
+			NoFixup 0
+			info_particle_system
+			{
+				"effect_name" "player_recent_teleport_red"
+				"targetname" "mercbot_particles"
+				"origin" "0 0 0"
+				"start_active" "1"
+			}
+			OnSpawnOutput
+			{
+				Target mercbot_particles
+				Action Stop
+				Delay 18
+			}
+		}
+		DispenserPrizeBuy
+		{
+			NoFixup 1
+			prop_dynamic
+			{
+				"origin" "-455, -1376, -32"
+				"angles" "0, 270, 0"
+				"targetname" "dispenser_prop_button"
+				"model" "models/props_casino/game_button.mdl"
+				"skin" "10"
+				"solid" "6"
+				"disableshadows" "1"
+			}
+			func_button
+			{
+				"origin" "-451, -1376, 27"
+				"angles" "0, 0, 0"
+				"targetname" "dispenser_button"
+				"mins" "-10, -13, -11"
+				"maxs" "10, 13, 11"
+				"damagefilter" "filter_melee"
+				"spawnflags" "1537"
+				
+				"OnPressed" "dispenser_prop_button,SetAnimation,press_once,0,-1"
+				"OnPressed" "popscript,$BuyDispenser,,0,-1"
+			}
+			point_worldtext
+			{
+				"origin" "-472, -1398, 42"
+				"angles" "0 180 0"
+				"targetname" "dispensertext"
+				"message" "15"
+				"font" "0"
+				"orientation" "0"
+				"textsize" "50"
+			}
+			prop_dynamic
+			{
+				"origin" "-475, -1376, 36"
+				"angles" "0, 180, 0"
+				"targetname" "dispenser_prop"
+				"model" "models/buildables/dispenser_light.mdl"
+				"skin" "0"
+				"solid" "0"
+				"disableshadows" "1"
+				"renderfx" "16"
+			}
+		}
+		DispenserPrizeSpawner
+		{
+			NoFixup 1
+			trigger_multiple
+			{
+				"origin" "-440, -1376, 32"
+				"mins" "-32 -32 -64"
+				"maxs" "32 32 64"
+				"spawnflags" "1"
+				"targetname" "dispenser_spawner"
+				"OnStartTouch" "popscript,$SpawnDispenser,,0,-1"
+			}
+			info_particle_system
+			{
+				"effect_name" "medicgun_beam_red"
+				"targetname" "dispenser_particles"
+				"origin" "-440, -1376, 60"
+				"cpoint1" "dispenser_particles"
+				"start_active" "1"
+			}
+			info_particle_system
+			{
+				"effect_name" "player_recent_teleport_red"
+				"targetname" "dispenser_particles2"
+				"origin" "-440, -1376, -32"
+				"start_active" "1"
+			}
+			prop_dynamic
+			{
+				"origin" "-475, -1376, 36"
+				"angles" "0, 180, 0"
+				"targetname" "dispenser_prop"
+				"model" "models/buildables/dispenser_light.mdl"
+				"skin" "0"
+				"solid" "0"
+				"disableshadows" "1"
+			}
+		}
+		DispenserPrize
+		{
+			mapobj_cart_dispenser
+			{
+				"targetname" "dispenser_dispenser"
+				"TeamNum" "2"
+				"touch_trigger" "dispenser_touchtrigger"
+			}
+			dispenser_touch_trigger
+			{
+				"targetname" "dispenser_touchtrigger"
+				"StartDisabled" "0"
+				"wait" "0"
+				"mins" "-64 -64 -64"
+				"maxs" "64 64 64"
+			}
+		}
+		TankChipCounter
+		{
+			NoFixup 1
+			point_worldtext
+			{
+				"origin" "0 0 200"
+				"targetname" "tanktext"
+				"message" "Chips: "
+				"font" "11"
+				"orientation" "1"
+				"textsize" "24"
+			}
+			env_shooter
+			{
+				"origin" "-92 15 180"
+				"targetname" "tank_chips_shooter"
+				"spawnflags" "4"
+				"skin" "1"
+				"simulation" "1"
+				"shootsounds" "-1"
+				"shootmodel" "models/props_casino/casino_chip001.mdl"
+				"scale" "2"
+				"rendermode" "0"
+				"renderfx" "0"
+				"rendercolor" "255 255 255"
+				"renderamt" "255"
+				"nogibshadows" "1"
+				"massoverride" "0"
+				"m_iGibs" "240"
+				"m_flVelocity" "400"
+				"m_flVariance" "1"
+				"m_flGibLife" "3"
+				"gibgravityscale" "1"
+				"gibanglevelocity" "300"
+				"gibangles" "0 0 0"
+				"disablereceiveshadows" "1"
+				"delay" "0.33"
+				"angles" "-90 0 0"
+			}
+			OnSpawnOutput
+			{
+				Target tank_chips_shooter
+				Action Shoot
+				Delay 80
+			}
+			OnSpawnOutput
+			{
+				Target tank_chips_shooter
+				Action Kill
+			}
+			OnSpawnOutput
+			{
+				Target popscript
+				Action $SpawnTankChips
+				Param 80
+			}
+			OnParentKilledOutput 
+			{
+				Target popscript
+				Action $DropTankChips
+			}
+		}
+		TankChipCounter2
+		{
+			NoFixup 1
+			point_worldtext
+			{
+				"origin" "0 0 200"
+				"targetname" "tanktext"
+				"message" "Chips: "
+				"font" "11"
+				"orientation" "1"
+				"textsize" "24"
+			}
+			env_shooter
+			{
+				"origin" "-92 15 180"
+				"targetname" "tank_chips_shooter"
+				"spawnflags" "4"
+				"skin" "1"
+				"simulation" "1"
+				"shootsounds" "-1"
+				"shootmodel" "models/props_casino/casino_chip001.mdl"
+				"scale" "2"
+				"rendermode" "0"
+				"renderfx" "0"
+				"rendercolor" "255 255 255"
+				"renderamt" "255"
+				"nogibshadows" "1"
+				"massoverride" "0"
+				"m_iGibs" "333"
+				"m_flVelocity" "400"
+				"m_flVariance" "1"
+				"m_flGibLife" "3"
+				"gibgravityscale" "1"
+				"gibanglevelocity" "300"
+				"gibangles" "0 0 0"
+				"disablereceiveshadows" "1"
+				"delay" "0.33"
+				"angles" "-90 0 0"
+			}
+			OnSpawnOutput
+			{
+				Target tank_chips_shooter
+				Action Shoot
+			}
+			OnSpawnOutput
+			{
+				Target tank_chips_shooter
+				Action Kill
+				Delay 110
+			}
+			OnSpawnOutput
+			{
+				Target popscript
+				Action $SpawnTankChips
+				Param 120
+			}
+			OnParentKilledOutput 
+			{
+				Target popscript
+				Action $DropTankChips
+			}
+		}
+		TankChipDrop
+		{
+			KeepAlive 1
+			NoFixup 1
+			prop_dynamic
+			{
+				"origin" "0 0 6"
+				"targetname" "tank_drop_prop"
+				"parentname" "tank_drop_trigger"
+				"model" "models/flag/flight_case.mdl"
+				"skin" "0"
+				"DefaultAnim" "spin"
+				"disableshadows" "1"
+			}
+			point_worldtext
+			{
+				"origin" "0 0 50"
+				"parentname" "tank_drop_trigger"
+				"targetname" "tank_drop_text"
+				"message" ""
+				"font" "11"
+				"orientation" "1"
+			}
+			tf_glow
+			{
+				"origin" "0 0 6"
+				"parentname" "tank_drop_trigger"
+				"target" "tank_drop_prop"
+				"GlowColor" "184 56 59 255"
+				"targetname" "tank_drop_glow"
+			}
+			trigger_multiple
+			{
+				"origin" "0 0 6"
+				"targetname" "tank_drop_trigger"
+				"mins" "-50 -50 -8"
+				"maxs" "50 50 20"
+				"spawnflags" "1"
+				
+				"OnStartTouch" "popscript,$TankChips,,0,-1"
+			}
+			OnSpawnOutput
+			{
+				Target tank_drop_trigger
+				Action Kill
+				Delay 60
+			}
+		}
+		ChiefAnimation
+		{
+			NoFixup 1
+			prop_physics
+			{
+				"origin" "0 0 200"
+				"model" "models\weapons\c_models\c_battalion_buffbanner\c_batt_buffbanner.mdl"
+				"modelscale" 1.9
+				"targetname" "chief_model1"
+			}
+			prop_physics
+			{
+				"origin" "0 0 200"
+				"model" "models\weapons\c_models\c_battalion_buffpack\c_batt_buffpack.mdl"
+				"modelscale" 1.9
+				"targetname" "chief_model2"
+			}
+		}
+		CaptainJackpotEntities
+		{
+			NoFixup 0
+			func_door_rotating
+			{
+				"WaveHeight" "0"
+				"wait" "-1"
+				"vrad_brush_cast_shadows" "0"
+				"texframeindex" "0"
+				"targetname" "card_rotate"
+				"speed" "200"
+				"spawnpos" "0"
+				"spawnflags" "4110"
+				"solidbsp" "1"
+				"solid" "0"
+				"shadowcastdist" "0"
+				"rendermode" "10"
+				"renderfx" "0"
+				"rendercolor" "255 255 255"
+				"renderamt" "255"
+				"origin" "-32 0 164"
+				"movedir" "0 0 0"
+				"modelindex" "0"
+				"mindxlevel" "0"
+				"maxdxlevel" "0"
+				"loopmovesound" "0"
+				"lip" "0"
+				"ignoredebris" "0"
+				"health" "0"
+				"forceclosed" "0"
+				"effects" "0"
+				"dmg" "0"
+				"distance" "180"
+				"disableshadows" "0"
+				"disablereceiveshadows" "0"
+				"angles" "0 0 0"
+				"classname" "func_door_rotating"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_casino/cc_cards/cc_playing_card_big_spades_red.mdl"
+				"targetname" "spades"
+				"origin" "-32 0 164"
+				"skin" "0"
+				"disableshadows" "1"
+				"solid" "0"
+				"modelscale" "0.3"
+				"StartDisabled" "1"
+				"parentname" "card_rotate"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_casino/cc_cards/cc_playing_card_big_clubs_red.mdl"
+				"targetname" "clubs"
+				"origin" "-32 0 164"
+				"skin" "0"
+				"disableshadows" "1"
+				"solid" "0"
+				"modelscale" "0.3"
+				"StartDisabled" "1"
+				"parentname" "card_rotate"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_casino/cc_cards/cc_playing_card_big_hearts_red.mdl"
+				"targetname" "hearts"
+				"origin" "-32 0 164"
+				"skin" "0"
+				"disableshadows" "1"
+				"solid" "0"
+				"modelscale" "0.3"
+				"StartDisabled" "1"
+				"parentname" "card_rotate"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_casino/cc_cards/cc_playing_card_big_diamonds_red.mdl"
+				"targetname" "diamonds"
+				"origin" "-32 0 164"
+				"skin" "0"
+				"disableshadows" "1"
+				"solid" "0"
+				"modelscale" "0.3"
+				"StartDisabled" "1"
+				"parentname" "card_rotate"
+			}
+		}
+		CaptainJackpotSpawns
+		{
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_1"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_2"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_3"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_4"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_5"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_6"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_7"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_8"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_9"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_10"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_11"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_12"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+			info_player_teamspawn
+			{
+				"origin" "0 0 0"
+				"targetname" "card_13"
+				"TeamNum" "2"
+				"StartDisabled" "1"
+			}
+		}
+	}
+	
+	SpawnTemplate "WorldText"
+	SpawnTemplate "CoreFlagInit"
+	SpawnTemplate "DispenserPrizeBuy"
+	SpawnTemplate "CaptainJackpotSpawns"
+//////////////////////////////////////////Mission Support//////////////////////////////////////////
+	Mission
+	{
+		Objective DestroySentries
+		InitialCooldown 5
+		Where spawnbot
+		BeginAtWave 1
+		RunForThisManyWaves 7
+		CooldownTime 30            
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+		}
+	}
+	
+	Mission
+	{
+		Objective Sniper
+		InitialCooldown 5
+		Where spawnbot_mission_sniper
+		BeginAtWave 3
+		RunForThisManyWaves 1
+		InitialCooldown 60
+		CooldownTime 45        
+		DesiredCount 1
+		TFBot
+		{
+			Template T_TFBot_Sniper
+		}
+	}
+	
+	Mission
+	{
+		Objective Spy
+		InitialCooldown 5
+		Where spawnbot_mission_spy
+		BeginAtWave 2
+		RunForThisManyWaves 1
+		InitialCooldown 60
+		CooldownTime 45
+		DesiredCount 2
+		TFBot
+		{
+			Template T_TFBot_Spy
+		}
+	}
+	
+	Mission
+	{
+		Objective Spy
+		InitialCooldown 5
+		Where spawnbot_mission_spy
+		BeginAtWave 5
+		RunForThisManyWaves 3
+		InitialCooldown 30
+		CooldownTime 60
+		DesiredCount 2
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Name "Armor Penetrating Spy"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_KNIFE"
+				"armor piercing" 2
+			}
+		}
+	}
+	
+	Mission
+	{
+		Objective Sniper
+		InitialCooldown 5
+		Where spawnbot_mission_sniper
+		BeginAtWave 6
+		RunForThisManyWaves 1
+		InitialCooldown 60
+		CooldownTime 45        
+		DesiredCount 1
+		TFBot
+		{
+			Template T_TFBot_Sniper_Sydney_Sleeper
+		}
+	}
+//////////////////////////////////////////Templates//////////////////////////////////////////
+	Templates
+	{
+		T_TFBot_Soldier_Extended_Battalion
+		{
+			Class Soldier
+			Name "Extended Buff Soldier"
+			Skill Normal
+			ClassIcon soldier_backup
+			Attributes SpawnWithFullCharge
+			Item "The Battalion's Backup"
+			CharacterAttributes
+			{
+				"increase buff duration"	9.0
+			}
+		}
+		T_TFBot_Soldier_Melee
+		{
+			Class Soldier
+			Skill Hard // increased to improve ability to hit with melee
+			WeaponRestrictions MeleeOnly
+			ClassIcon soldier_shovel
+		}
+		T_TFBot_Giant_Sniper_Jarate
+		{
+			Class Sniper
+			Name "Giant Jarate Master"
+			Skill Easy
+			ClassIcon sniper_jarate
+			Item "Jarate"
+			Item "The Bushwacka"
+			Item "Desert Marauder"
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			Attributes AlwaysFireWeapon
+			Health 2800
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.7
+				"effect bar recharge rate increased" 0.1
+				"override footstep sound set" 5
+			}
+		}
+		T_TFBot_SMG
+		{
+			Class Sniper
+			Name "SMG Sniper"
+			Skill Normal
+			ClassIcon sniper_smg
+			WeaponRestrictions SecondaryOnly
+		}
+		T_TFBot_Scout_Milk
+		{
+			Class Scout
+			Name "Milkman Scout"
+			Skill Easy
+			ClassIcon scout_milk
+			Item "Mad Milk"
+			Item "Milkman"
+			WeaponRestrictions SecondaryOnly
+			Attributes AlwaysFireWeapon
+			CharacterAttributes
+			{
+				"effect bar recharge rate increased" 0.1
+			}
+		}
+		T_TFBot_Soldier_Mangler
+		{
+			Class Soldier
+			Name "Cow Mangler Soldier"
+			Skill Easy
+			ClassIcon soldier_mangler
+			Item "The Cow Mangler 5000"
+		}
+		T_TFBot_Demoman_Persian
+		{
+			Class Demoman
+			Name "Persian Demoknight"
+			ClassIcon demoknight_persian_nys
+			Skill Hard
+			Item "The Splendid Screen"
+			Item "The Persian Persuader"
+			Item "Ali Baba's Wee Booties"
+			Item "Sultan's Ceremonial"
+			WeaponRestrictions MeleeOnly
+			ItemAttributes
+			{
+				ItemName "The Splendid Screen"
+				"critboost on kill" 3
+			}
+		}
+		T_TFBot_Giant_Steel_Gauntlet
+		{
+			Class heavyweapons
+			Name "Giant Steel Gauntlet"
+			ClassIcon heavy_steelfist
+			Skill expert
+			Health 5000
+			Item "Fists Of Steel"
+			WeaponRestrictions MeleeOnly
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "Fists Of Steel"
+				"fire rate bonus" 0.6
+				"damage bonus" 1.2
+
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+			}
+		}
+		T_TFBot_Giant_Pyro_Flare_Rapid
+		{
+			Class Pyro
+			Name "Giant Rapid Flare Pyro"
+			ClassIcon pyro_flare_giant
+			Skill Expert
+			Health 3000
+			Item "The Flare Gun"
+			Item "Sight for Sore Eyes"
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			AimAt Head
+			ItemAttributes
+			{
+				ItemName "The Flare Gun"
+				"fire rate bonus" 0.1
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+		}
+		T_TFBot_Medic_Kritz
+		{
+			Class Medic
+			Name "Kritz Medic"
+			ClassIcon medic_kritz
+			Skill Normal
+			Attributes SpawnWithFullCharge
+			Item "The Kritzkrieg"
+			ItemAttributes
+			{
+				ItemName "The Kritzkrieg"
+				"uber duration bonus" -9
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+			CharacterAttributes
+			{
+				"heal rate bonus" 0.1
+				"bot medic uber health threshold" 151
+			}
+		}
+		T_TFBot_Giant_Medic_Kritz
+		{
+			Class Medic
+			Name "Giant Kritz Medic"
+			ClassIcon medic_kritz
+			Skill Expert
+			Health 4500
+			Attributes SpawnWithFullCharge
+			Item "The Kritzkrieg"
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "The Kritzkrieg"
+				"uber duration bonus" -9
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"heal rate bonus" 200 // only works on mediguns that have this attribute ie quickfix
+				"bot medic uber health threshold" 4501
+			}
+		}
+		T_TFBot_Giant_Scout_Basher_Armored  
+		{
+			Class Scout
+			Name "Armored Basher Scout"
+			ClassIcon scout_basher_lite
+			Skill Expert
+			Health 3000
+			Item "Wilson Weave"
+			Item "The Boston Basher"
+			WeaponRestrictions MeleeOnly
+			Attributes MiniBoss
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"override footstep sound set" 5
+				"move speed penalty" 0.75
+			}
+		}
+		T_TFBot_Scout_Jumping_Soda_Popper
+		{
+			Class scout
+			Skill Hard
+			Name "Soda Popper Scout"
+			ClassIcon scout_popper
+			Item "The Soda Popper"
+			Item "The Bonk Boy"
+			Item "Front Runner"
+			WeaponRestrictions PrimaryOnly
+			Attributes AutoJump
+				AutoJumpMin 1
+				AutoJumpMax 2
+			Attributes SpawnWithFullCharge
+		}
+		T_TFBot_Demoman_Stickybomb //lifted from MvM - Advanced Popfile Techniques https://steamcommunity.com/sharedfiles/filedetails/?id=1911160067
+		{
+			Class      Demoman
+			Skill      Expert
+			Classicon  demo_sticky_daan // Custom icon
+			WeaponRestrictions    SecondaryOnly
+			ItemAttributes
+			{
+				ItemName    "TF_WEAPON_GRENADELAUNCHER"
+				"is_passive_weapon"    1
+				"override projectile type"    27 // Fires nothing
+				"fire rate penalty" 99  // No grenade launcher firing animations.
+
+			}
+			ItemAttributes
+			{
+				ItemName    "TF_WEAPON_PIPEBOMBLAUNCHER"
+				"stickybomb charge rate"     0.001 //Demo-bot will fire Stickybomb immediately
+				"max pipebombs decreased"    -7 // 1 Stickybomb deployed, will explode when another is fired
+				"projectile range increased" 0.35 // Prevents overshooting target
+			}
+		}
+		T_TFBot_Giant_DragonsFury_Pyro
+		{
+			Class Pyro
+			Name "Giant Pyro"
+			ClassIcon pyro_dragonfury_giant
+			Skill Easy
+			Health 3000
+			Item "The Dragon's Fury"
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Tag bot_giant
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+		}
+	}
+//////////////////////////////////////////Wave 1//////////////////////////////////////////900 + 100
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput					
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target flag_bomb
+			Action Disable
+		}
+		StartWaveOutput
+		{
+			Target CoreFlagInit
+			Action ForceSpawn
+		}
+		WaveSpawn
+		{
+			Name starter
+			Where spawnbot_center
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TFBot
+			{
+				Template T_TFBot_Soldier_Extended_Battalion
+				Name "Captain Jackpot"
+				Item "Soldier's Stash"
+				Item "gentlemanne_rocketlauncher_highrollers"
+				Attributes AlwaysCrit
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			WaitForAllDead starter
+			Name w1s1a
+			Where spawnbot
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 4
+			WaitBetweenSpawns 7
+			WaitBeforeStarting 4
+			TFBot
+			{
+				Template T_TFBot_Scout_Melee
+				ClassIcon scout_bat
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			WaitForAllDead starter
+			Name w1s1b
+			Where spawnbot_left
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 3
+			WaitBetweenSpawns 7
+			WaitBeforeStarting 4
+			TFBot
+			{
+				Template T_TFBot_Demoman_Knight
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			WaitForAllDead starter
+			Name w1s1b
+			Where spawnbot_right
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 3
+			WaitBetweenSpawns 7
+			WaitBeforeStarting 4
+			TFBot
+			{
+				Template T_TFBot_Demoman_Knight
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			WaitForAllDead starter
+			WaitBetweenSpawns 5
+			Name w1s1c
+			Where spawnbot_chips
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Pyro_Flare_Spammer 
+				ClassIcon pyro_detonator_lite
+				Skill Easy
+			}
+			FirstSpawnOutput
+			{
+				Target flag_bomb
+				Action Enable
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w1s2a
+			WaitForAllSpawned w1s1c
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 8
+			Where spawnbot_center
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier
+			}
+			LastSpawnOutput
+			{
+				Target CoreFlag
+				Action ForceSpawn
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w1s3a
+			WaitForAllSpawned w1s2a
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 8
+			Where spawnbot_chips
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TFBot
+			{
+				Template T_TFBot_Giant_Demoman
+				ClassIcon demo_spammer
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 150
+			Name w1s2b
+			WaitForAllSpawned w1s1a
+			WaitBetweenSpawns 2	
+			Where spawnbot
+			TotalCount 20
+			MaxActive 8
+			SpawnCount 2
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Heavyweight_Champ_Fast
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 150
+			Name w1s2c
+			WaitForAllSpawned w1s2b
+			WaitBetweenSpawns 5
+			Where spawnbot
+
+			Support 1
+			MaxActive 8
+			SpawnCount 2
+			TFBot
+			{
+				Template T_TFBot_Soldier_Melee
+			}
+		}
+//////////////////////////////////////////Red bots//////////////////////////////////////////
+		WaveSpawn
+		{
+			Where spawnbot_mercbot
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiant
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiantcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+	}
+//////////////////////////////////////////Wave 2//////////////////////////////////////////800 + 100
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput					
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w2s1a
+			Where spawnbot_center
+			WaitBetweenSpawns 6
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Fast
+			}
+			LastSpawnOutput
+			{
+				Target CoreFlagInit
+				Action ForceSpawn
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w2s1b
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 2
+			Where spawnbot
+			TotalCount 30
+			MaxActive 6
+			SpawnCount 2
+			TFBot
+			{
+				Class Soldier
+			}
+			LastSpawnOutput
+			{
+				Target CoreFlagInit
+				Action ForceSpawn
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w2s1c
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 4
+			Where spawnbot
+			TotalCount 20
+			MaxActive 8
+			SpawnCount 4
+			TFBot
+			{
+				Template T_TFBot_Scout_Melee
+				ClassIcon scout_bat
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 200
+			Name w2s2a
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 40
+			TFBot
+			{
+				Template T_TFBot_Giant_Heavyweapons
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 200
+			Name w2s2b
+			WaitForAllSpawned w2s1c
+			Where spawnbot
+			TotalCount 14
+			WaitBetweenSpawns 6
+			MaxActive 8
+			SpawnCount 2
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Fist
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w2s2c
+			WaitForAllSpawned w2s1b
+			Where spawnbot
+			Support 1
+			MaxActive 4
+			SpawnCount 2
+			TFBot
+			{
+				Template T_TFBot_Pyro
+				Skill Easy
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w2s2d
+			WaitForAllSpawned w2s1b
+			Where spawnbot
+			Support 1
+			MaxActive 4
+			SpawnCount 2
+			TFBot
+			{
+				Class Scout
+			}
+		}
+//////////////////////////////////////////Red bots//////////////////////////////////////////
+		WaveSpawn
+		{
+			Where spawnbot_mercbot
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiant
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiantcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+	}
+//////////////////////////////////////////Wave 3//////////////////////////////////////////900 + 100
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput					
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+			TotalCurrency 200
+			Name w3s1a
+			Where spawnbot_left
+			WaitBetweenSpawns 12
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Spammer
+			}
+			LastSpawnOutput
+			{
+				Target CoreFlagInit
+				Action ForceSpawn
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w3s1b
+			Where spawnbot
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 8
+			TotalCount 12
+			MaxActive 3
+			SpawnCount 3
+			TFBot
+			{
+				Template T_TFBot_Scout_Shortstop
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w3s1c
+			Where spawnbot_left
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 4
+			TotalCount 40
+			MaxActive 12
+			SpawnCount 2
+			TFBot
+			{
+				Template T_TFBot_Sniper_Huntsman
+			}
+			LastSpawnOutput
+			{
+				Target CoreFlagInit
+				Action ForceSpawn
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 150
+			Name w3s2a
+			WaitForAllSpawned w3s1a
+			Where spawnbot_center
+			WaitBeforeStarting 20
+			WaitBetweenSpawns 12
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_RapidFire
+					ClassIcon demo_spammer
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Sniper_Jarate
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 150
+			Name w3s2a
+			WaitForAllSpawned w3s1a
+			Where spawnbot_center
+			WaitBeforeStarting 26
+			WaitBetweenSpawns 12
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			TFBot
+			{
+				Template T_TFBot_Giant_Sniper_Jarate
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w3s2b
+			WaitForAllSpawned w3s1b
+			Where spawnbot
+			WaitBetweenSpawns 2
+			TotalCount 18
+			MaxActive 6
+			SpawnCount 3
+			TFBot
+			{
+				Template T_TFBot_SMG
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w3s3b
+			WaitForAllSpawned w3s2b
+			Where spawnbot
+			WaitBetweenSpawns 2
+			Support 1
+			MaxActive 6
+			SpawnCount 2
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Heavyweight_Champ
+			}
+		}
+//////////////////////////////////////////Red bots//////////////////////////////////////////
+		WaveSpawn
+		{
+			Where spawnbot_mercbot
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiant
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiantcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+	}
+//////////////////////////////////////////Wave 4//////////////////////////////////////////1000 + 100
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput					
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w4s1a
+			Where spawnbot_center
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Extended_Concheror
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w4s1b
+			Where spawnbot_right
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			TFBot
+			{
+				Template T_TFBot_Giant_DragonsFury_Pyro
+			}
+			LastSpawnOutput
+			{
+				Target CoreFlagInit
+				Action ForceSpawn
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w4s1c
+			Where spawnbot_center
+			WaitBetweenSpawns 2
+			TotalCount 30
+			MaxActive 8
+			SpawnCount 4
+			TFBot
+			{
+				Template T_TFBot_Scout_Milk
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w4s1d
+			Where spawnbot_center
+			WaitBetweenSpawns 2
+			TotalCount 24
+			MaxActive 16
+			SpawnCount 4
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Pyro
+					Skill Easy
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w4s2b
+			WaitForAllSpawned w4s1a
+			Where spawnbot_right
+			WaitBeforeStarting 10
+			TotalCount 6
+			MaxActive 3
+			SpawnCount 3
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_RocketShotgun
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+			}
+			LastSpawnOutput
+			{
+				Target CoreFlagInit
+				Action ForceSpawn
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w4s2b
+			WaitForAllSpawned w4s1a
+			Where spawnbot_left
+			WaitBeforeStarting 10
+			TotalCount 6
+			MaxActive 3
+			SpawnCount 3
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_RocketShotgun
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 50
+			Name w4s2c
+			WaitForAllDead w4s1c
+			Where spawnbot
+			WaitBetweenSpawns 1
+			TotalCount 30
+			MaxActive 8
+			SpawnCount 4
+			TFBot
+			{
+				Template T_TFBot_Demoman_Persian
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 50
+			Name w4s2d
+			WaitForAllSpawned w4s1a
+			Where spawnbot_center
+			WaitBetweenSpawns 1
+			TotalCount 20
+			MaxActive 4
+			SpawnCount 2
+			TFBot
+			{
+				Template T_TFBot_Sniper_Huntsman
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w4s3a
+			WaitForAllSpawned w4s2b
+			Where spawnbot_right
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 10
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 1
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Basher_Armored
+				Action Mobber
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w4s3a
+			WaitForAllSpawned w4s2b
+			WaitBeforeStarting 5
+			TotalCount 1
+			Tank
+			{
+				Health 14000
+				Speed 100
+				StartingPathTrackNode tank_path_b_1
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+				SpawnTemplate TankChipCounter
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w4s3b
+			WaitForAllSpawned w4s2d
+			Where spawnbot
+			WaitBetweenSpawns 3
+			Support 1
+			MaxActive 8
+			SpawnCount 4
+			TFBot
+			{
+				Class Demoman
+			}
+		}
+//////////////////////////////////////////Red bots//////////////////////////////////////////
+		WaveSpawn
+		{
+			Where spawnbot_mercbot
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiant
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiantcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+	}
+//////////////////////////////////////////Wave 5//////////////////////////////////////////1000 + 100
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput					
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+			TotalCurrency 200
+			Name w5s1a
+			Where spawnbot_right
+			WaitBetweenSpawns 12
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Spammer_Reload
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Regen
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 200
+			Name w5s1a
+			Where spawnbot_left
+			WaitBeforeStarting 12
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_Burst
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Regen
+				}
+			}
+			LastSpawnOutput
+			{
+				Target CoreFlagInit
+				Action ForceSpawn
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w5s1b
+			Where spawnbot
+			WaitBetweenSpawns 4
+			WaitBeforeStarting 1
+			TotalCount 36
+			MaxActive 14
+			SpawnCount 2
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Shotgun
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w5s2a
+			WaitForAllSpawned w5s1a
+			Where spawnbot_right
+			WaitBeforeStarting 18
+			WaitBetweenSpawns 4
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Baseball
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w5s3a
+			WaitForAllSpawned w5s2a
+			Where spawnbot_right
+			WaitBetweenSpawns 4
+			TotalCount 6
+			MaxActive 3
+			SpawnCount 3
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Pyro_Flare_Rapid 
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_Kritz
+				}
+			}
+			LastSpawnOutput
+			{
+				Target CoreFlagInit
+				Action ForceSpawn
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w5s3a
+			WaitForAllSpawned w5s2a
+			Where spawnbot_right
+			WaitBetweenSpawns 12
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 3
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_Kritz
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w5s3b
+			WaitForAllSpawned w5s1b
+			Where spawnbot
+			WaitBetweenSpawns 2
+			WaitBeforeStarting 1
+			TotalCount 12
+			MaxActive 8
+			SpawnCount 4
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Soldier_RocketShotgun
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w5s4a
+			WaitForAllSpawned w5s3b
+			Where spawnbot
+			WaitBetweenSpawns 5
+			WaitBeforeStarting 1
+			Support 1
+			MaxActive 6
+			SpawnCount 3
+			TFBot
+			{
+				Template T_TFBot_Scout_Shortstop
+			}
+		}
+//////////////////////////////////////////Red bots//////////////////////////////////////////
+		WaveSpawn
+		{
+			Where spawnbot_mercbot
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiant
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiantcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+	}
+//////////////////////////////////////////Wave 6//////////////////////////////////////////1200 + 100
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput					
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		WaveSpawn
+		{
+			TotalCurrency 250
+			Name w6s1c
+			TotalCount 1
+			Tank
+			{
+				Health 30000
+				Speed 70
+				StartingPathTrackNode tank_path_a_1
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+				SpawnTemplate TankChipCounter2
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w6s1a
+			Where spawnbot_right
+			WaitBetweenSpawns 6
+			WaitBeforeStarting 1
+			TotalCount 40
+			MaxActive 16
+			SpawnCount 8
+			TFBot
+			{
+				Template T_TFBot_Scout_Bonk
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 200
+			Name w6s1b
+			Where spawnbot_right
+			WaitBetweenSpawns 26
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons_BrassBeast
+					ItemAttributes
+					{
+						ItemName "The Brass Beast"
+						"damage bonus"	1.7
+
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Kritz
+				}
+			}
+			LastSpawnOutput
+			{
+				Target CoreFlagInit
+				Action ForceSpawn
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 150
+			Name w6s2a
+			WaitBeforeStarting 25
+			WaitForAllSpawned w6s1b
+			Where spawnbot
+			WaitBetweenSpawns 5
+			TotalCount 20
+			MaxActive 6
+			SpawnCount 2
+			TFBot
+			{
+				Template T_TFBot_Sniper_Huntsman_Spammer
+				ClassIcon sniper_bow_multi
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 150
+			Name w6s3b
+			WaitBeforeStarting 25
+			WaitForAllSpawned w6s1b
+			Where spawnbot
+			WaitBetweenSpawns 5
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 2
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Extended_Buff_Banner
+			}
+			LastSpawnOutput
+			{
+				Target CoreFlagInit
+				Action ForceSpawn
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 250
+			Name w6s4a
+			WaitBeforeStarting 25
+			WaitForAllSpawned w6s3b
+			Where spawnbot
+			WaitBetweenSpawns 6
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 4
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_Burst
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 100
+			Name w6s4b
+			WaitBeforeStarting 25
+			WaitForAllSpawned w6s2a
+			Where spawnbot
+			WaitBetweenSpawns 1
+			Support 1
+			MaxActive 12
+			SpawnCount 2
+			TFBot
+			{
+				Template T_TFBot_Scout_Jumping_Soda_Popper
+			}
+		}
+//////////////////////////////////////////Red bots//////////////////////////////////////////
+		WaveSpawn
+		{
+			Where spawnbot_mercbot
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiant
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiantcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+	}
+//////////////////////////////////////////Wave 7//////////////////////////////////////////
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput					
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+			Name w7s1
+			TotalCount 1
+			SpawnCount 1
+			TotalCurrency 500
+			FirstSpawnOutput
+			{
+				Target boss_spawn_relay_sentrytank                                           
+				Action Trigger
+			}
+			Tank
+			{
+				ClassIcon chew_blu_nys
+				Health 45000
+				Speed 80
+				Skin 1
+				Name tankboss_sentrytank
+				StartingPathTrackNode tank_path_sentrytank
+				OnKilledOutput                                  
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+				OnBombDroppedOutput                                  
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+				OnKilledOutput                                  
+				{
+					Target popscript
+					Action $ActivateSecret
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 400
+			Name w7s1a
+			Where spawnbot
+			WaitBetweenSpawns 4
+			Support Limited
+			TotalCount 40
+			MaxActive 8
+			SpawnCount 2
+			TFBot
+			{
+				Template T_TFBot_Demoman_Stickybomb
+				BehaviorModifiers Mobber
+				Item "Ghastly Gibus"
+				ItemAttributes
+				{
+					ItemName "Ghastly Gibus"
+					"set item tint rgb" 7511618
+				}
+			}
+			FirstSpawnOutput
+			{
+				Target flag_bomb
+				Action Disable
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency 400
+			Name w7s2
+			Where spawnbot_center
+			WaitForAllDead w7s1
+			WaitBeforeStarting 5
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TFBot
+			{
+				Class Soldier
+				Skill Expert
+				WeaponRestrictions PrimaryOnly
+				Name "Captain Jackpot"
+				Tag "chief"
+				ClassIcon soldier_backup
+				Health 40000	
+				Scale 1.9
+				Item "Soldier's Stash"
+				Item "The Battalion's Backup"
+				Item "gentlemanne_rocketlauncher_highrollers"
+				Attributes MiniBoss
+				Attributes UseBossHealthBar
+				Attributes HoldFireUntilFullReload
+				Attributes SpawnWithFullCharge
+				SpawnTemplate "CaptainJackpotEntities"
+				ItemAttributes
+				{
+					ItemName "gentlemanne_rocketlauncher_highrollers"
+					"damage bonus" 1.5
+					"fire rate bonus" 0.5
+					"clip size upgrade atomic" 7.0
+					"Projectile speed increased" 0.7
+				}
+				CharacterAttributes
+				{
+					"move speed bonus"	0.5
+					"damage force reduction" 0.4
+					"airblast vulnerability multiplier" 0.4
+					"override footstep sound set" 3
+					"airblast vertical vulnerability multiplier" 0.1
+					"rage giving scale" 0.1
+					"increase buff duration"	1.5
+				}
+			}
+			FirstSpawnOutput
+			{
+				Target flag_bomb
+				Action Enable
+			}
+		}
+//////////////////////////////////////////Card spawns//////////////////////////////////////////
+		WaveSpawn
+		{
+			Where card_1
+			Support 1
+			MaxActive 20
+			SpawnCount 20
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Class Soldier Tag summon}
+					TFBot {Class Pyro Tag summon Skill Easy}
+					TFBot {Class Demoman Tag summon}
+					TFBot {Class Scout Tag summon}
+					TFBot {Class Heavy Tag summon}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Class Soldier Tag summon}
+					TFBot {Class Pyro Tag summon Skill Easy}
+					TFBot {Class Demoman Tag summon}
+					TFBot {Class Scout Tag summon}
+					TFBot {Class Heavy Tag summon}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Class Soldier Tag summon}
+					TFBot {Class Pyro Tag summon Skill Easy}
+					TFBot {Class Demoman Tag summon}
+					TFBot {Class Scout Tag summon}
+					TFBot {Class Heavy Tag summon}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Heavyweapons_Gnome Tag summon Tag 60}
+					TFBot {Template T_TFBot_Giant_Heavyweapons Tag summon Tag 5000}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where card_2
+			Support 1
+			MaxActive 3
+			SpawnCount 3
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Template T_TFBot_Scout_Melee Tag summon}
+					TFBot {Template T_TFBot_Demoman_Knight Tag summon Tag 150}
+					TFBot {Template T_TFBot_Sniper Tag summon}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where card_3
+			Support 1
+			MaxActive 6
+			SpawnCount 6
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Template T_TFBot_Scout_Melee Tag summon}
+					TFBot {Template T_TFBot_Demoman_Knight Tag summon Tag 150}
+					TFBot {Template T_TFBot_Soldier_Melee Tag summon}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where card_4
+			Support 1
+			MaxActive 8
+			SpawnCount 8
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Template T_TFBot_Scout_Melee Tag summon}
+					TFBot {Template T_TFBot_Demoman_Knight Tag summon Tag 150}
+					TFBot {Template T_TFBot_Soldier_Melee Tag summon}
+					TFBot {Template T_TFBot_Heavyweapons_Heavyweight_Champ Tag summon}
+					TFBot {Template T_TFBot_Heavyweapons_Heavyweight_Champ_Fast Tag summon}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where card_5
+			Support 1
+			MaxActive 4
+			SpawnCount 4
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Class Demoman Tag summon}
+					TFBot {Class Soldier Tag summon}
+					TFBot {Template T_TFBot_Pyro_Flaregun Tag summon}
+					TFBot {Template T_TFBot_Heavyweapons_Heavyweight_Champ Tag summon}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where card_6
+			Support 1
+			MaxActive 6
+			SpawnCount 6
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Class Demoman}
+					TFBot {Class Soldier}
+					TFBot {Template T_TFBot_Soldier_RocketShotgun Tag summon}
+					TFBot {Template T_TFBot_Heavyweapons_Heavyweight_Champ Tag summon}
+					TFBot {Template T_TFBot_SMG Tag summon}
+					TFBot {Template T_TFBot_Pyro Tag summon Skill Easy}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where card_7
+			Support 1
+			MaxActive 8
+			SpawnCount 8
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Class Demoman}
+					TFBot {Class Heavy}
+					TFBot {Template T_TFBot_Soldier_Mangler Tag summon}
+					TFBot {Template T_TFBot_Soldier_RocketShotgun Tag summon}
+					TFBot {Template T_TFBot_Heavyweapons_Heavyweight_Champ Tag summon}
+					TFBot {Template T_TFBot_Scout_Milk Tag summon}
+					TFBot {Template T_TFBot_Pyro Tag summon Skill Easy}
+					TFBot {Template T_TFBot_SMG Tag summon}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where card_8
+			Support 1
+			MaxActive 6
+			SpawnCount 6
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Template T_TFBot_Demo_Burst}
+					TFBot {Class Heavy}
+					TFBot {Template T_TFBot_Soldier_Extended_Buff_Banner Tag summon}
+					TFBot {Template T_TFBot_Soldier_RocketShotgun Tag summon}
+					TFBot {Template T_TFBot_Heavyweapons_Shotgun Tag summon}
+					TFBot {Template T_TFBot_Scout_Milk Tag summon}
+					TFBot {Template T_TFBot_Medic_QuickUber Tag summon}
+					TFBot {Template T_TFBot_Pyro Tag summon Skill Easy}
+					TFBot {Template T_TFBot_SMG Tag summon}
+					TFBot {Template T_TFBot_Soldier_Mangler Tag summon}
+					TFBot {Template T_TFBot_Demo_Burst Tag summon}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where card_9
+			Support 1
+			MaxActive 4
+			SpawnCount 4
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Template T_TFBot_Demoman_Samurai Tag summon Tag 650}
+					TFBot {Template T_TFBot_Soldier_Extended_Buff_Banner Tag summon}
+					TFBot {Template T_TFBot_Soldier_Extended_Concheror Tag summon}
+					TFBot {Template T_TFBot_Heavyweapons_Shotgun Tag summon}
+					TFBot {Template T_TFBot_Scout_Milk Tag summon}
+					TFBot {Template T_TFBot_Medic_QuickUber Tag summon}
+					TFBot {Template T_TFBot_Heavyweapons_Fist Tag summon Tag 900}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where card_10
+			Support 1
+			MaxActive 6
+			SpawnCount 6
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Template T_TFBot_Demoman_Samurai Tag summon Tag 650}
+					TFBot {Template T_TFBot_Soldier_Extended_Buff_Banner Tag summon}
+					TFBot {Template T_TFBot_Soldier_Extended_Concheror Tag summon}
+					TFBot {Template T_TFBot_Sniper_Huntsman_Spammer Tag summon Tag 1200}
+					TFBot {Template T_TFBot_Scout_Shortstop Tag summon Tag 650}
+					TFBot {Template T_TFBot_Scout_Milk Tag summon}
+					TFBot {Template T_TFBot_Medic_QuickUber Tag summon}
+					TFBot {Template T_TFBot_Heavyweapons_Fist Tag summon Tag 900}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where card_11
+			Support 2
+			MaxActive 2
+			SpawnCount 2
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Template T_TFBot_Giant_Soldier_Crit Tag summon Tag 3800}
+					TFBot {Template T_TFBot_Giant_Pyro Skill Easy Tag summon Tag 3000}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where card_12
+			Support 2
+			MaxActive 2
+			SpawnCount 2
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Template T_TFBot_Giant_Soldier_Spammer Tag summon Tag 3800}
+					TFBot {Template T_TFBot_Giant_Soldier_Extended_Buff_Banner Tag summon Tag 3800}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where card_13
+			Support 2
+			MaxActive 2
+			SpawnCount 2
+			WaitBetweenSpawns 10
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot {Template T_TFBot_Giant_Soldier_Extended_Concheror Tag summon Tag 3800}
+					TFBot {Template T_TFBot_Giant_Heavyweapons Tag summon Tag 5000}
+					TFBot {Template T_TFBot_Giant_Steel_Gauntlet Tag summon Tag 5000}
+				}
+			}
+		}
+		//WaveSpawn
+		//{
+		//	Where card_joker
+		//	Support 1
+		//	MaxActive 1
+		//	SpawnCount 1
+		//	WaitBetweenSpawns 10
+		//	RandomChoice
+		//	{
+		//		RandomChoice
+		//		{
+		//			TFBot {Template T_TFBot_Giant_Soldier_Extended_Battalion Tag summon Tag 3800}
+		//			TFBot {Template T_TFBot_Giant_Medic_Kritz Tag summon Tag 3800}
+		//		}
+		//	}
+		//}
+//////////////////////////////////////////Red bots//////////////////////////////////////////
+		WaveSpawn
+		{
+			Where spawnbot_mercbot
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiant
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Soldier
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Pyro
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Demoman
+						AimLeadProjectileSpeed 1
+						Skill Expert
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Class Heavy
+						Skill Normal
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotgiantcrit
+			Support 1
+			MaxActive 6
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Soldier
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro
+						Health 4200
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						UseMeleeThreatPrioritization 1
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Demoman
+						AimLeadProjectileSpeed 1
+						Name "Giant Demoman"
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot_mercbotsecret
+			Support 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBetweenSpawns 1
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Heavyweapons_Deflector
+						Name "Jackpot Sad Girl"
+						Health "50000"
+						Tag mercbot
+						Classicon red2_lite
+						Attributes AlwaysCrit
+						Action Mobber
+						CharacterAttributes
+						{	
+							"move speed bonus" 1
+							"override projectile type" 2
+							"damage bonus" 2
+							"fire rate penalty" 2
+							"Projectile speed increased" 2
+							"projectile trail particle" "~eyeboss_projectile"
+							"voice pitch scale" 0.95
+							"crit mod disabled" 0
+							"ammo regen" 1
+							"patient overheal penalty" 0
+							"collect currency on kill" 1
+						}
+						AddCond  
+						{
+							Name TF_COND_REPROGRAMMED
+						}
+						InterruptAction
+						{
+							Target "flag_bomb"
+							AimTarget "flag_bomb"
+							KillAimTarget 1
+							Duration 999
+							Distance 200
+						}
+					}
+				}
+			}
+		}
+	}
+}
