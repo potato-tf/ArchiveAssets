@@ -108,6 +108,6 @@ function KnockbackRageStop(_, activator, handle)
 
     local handleIndex = handle or activator:GetHandleIndex()
 
-    timer.Stop(knockbackHandles[handleIndex])
+    pcall(timer.Stop, knockbackHandles[handleIndex]);
     knockbackHandles[handleIndex] = nil
 end
