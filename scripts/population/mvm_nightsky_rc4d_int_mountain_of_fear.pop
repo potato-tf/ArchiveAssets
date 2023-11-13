@@ -59,29 +59,21 @@
 
 // Changelog V2:
 // W1
-// - Bomb will now always start on a common scout
-// - Added Giant Flare Rain to subwave 2
-// - Increased spawncount of Detonator Pyros, lowered maxactive and totalcount
 
 // W2
-// - Blast Soldiers are now minigiants, spawn with waaay less
-// - Less Reserve Soldiers
-// - Tank has final tank skin now, as it shouold
-// - Doubled Phlog Pyro buff duration
+// - 
 
 // W3
-// - Boss shoots more slowly in shorter intervals. Damage penalty is now -35% (from -25%)
-// - Eviction Heavies are now support limited
+// - Lowered Giant Syringe Medic 
 
 // W4
-// - Bomb will now always start on a common scout
-// - Giant Cleaver Scout now moves 30% slower (from 25%)
-// - Removed one Giant Blaster Scout
-// - Halved TotalCount of Burst Soldiers (24 -> 12)
+// - Added health regen of 1 to Armored Sandman Scouts, to show health on hover-over
+
+// W5
+// - Added AlwaysGlow to the Chief Barrage Soldier
 
 // W6
-// - Reduced TotalCount, SpawnCount, MaxActive of Bowmen and Engies
-// - Boss' third phase: no more crits. Projectiles start out slowly and accelerate briefly afterwards; more spread.
+// - 
 
 //Basic enemy types:
 //- Fairy: Playful/Fire (pyro), Mischievous (demo), Spring (medic)
@@ -123,6 +115,13 @@ popuwashyon
 				"targetname" "aimhere"
 			}
 		}
+		// Rocket_Align
+		// {
+			// OnSpawnOutput
+			// {
+				// Target 
+			// }
+		// }
 		
 		Teleporter_Invis
 		{
@@ -222,6 +221,7 @@ popuwashyon
 			{
 				ItemName "The Air Strike"
 				"paintkit_proto_def_index" 160 //autumn
+				"force distribute currency on death" 1
 			}
 		}
 		//An Air Strike Burst Soldier!
@@ -241,6 +241,7 @@ popuwashyon
 				"projectile spread angle penalty" 1
 				"faster reload rate" 1.5
 				"clipsize increase on kill" 0
+				"force distribute currency on death" 1
 			}
 		}
 		
@@ -742,18 +743,61 @@ popuwashyon
 				Item "The Phlogistinator"
 				ClassIcon pyro_phlog
 				Attributes AlwaysFireWeapon
-				Attributes SpawnWithFullCharge
 				Tag giant
-				ItemAttributes
+				ChangeAttributes
 				{
-					ItemName "The Phlogistinator"
-					"increase buff duration" 2
+					Name "Attack2"
+					IfHealthBelow 2000
+					Repeats 1
+					Delay 0
 				}
 				Taunt
 				{
 					IfHealthBelow 2000
 					Repeats 1
 					Delay 0
+				}
+				AddCond
+				{
+					Index 28 //megaheal knockback invuln
+					Delay 0
+					Duration 3.2
+					IfHealthBelow 2000
+				}
+				AddCond
+				{
+					Index 73 //megaheal healing; approx 325 health healed
+					Delay 0
+					Duration 3.2
+					IfHealthBelow 2000
+				}
+				AddCond
+				{
+					Index 45 //old phlog def buff. cooler than just invuln, aye?
+					Delay 0
+					Duration 3.2
+					IfHealthBelow 2000
+				}
+				EventChangeAttributes
+				{
+					Default
+					{
+						ItemAttributes
+						{
+							ItemName "The Phlogistinator"
+							"flame_drag" 6.6
+						}
+					}
+					Attack2
+					{
+						ItemAttributes
+						{
+							ItemName "The Phlogistinator"
+							"flame_drag" 4.3
+							"flame_lifetime" 0.8
+							"flame_speed" 1700
+						}
+					}
 				}
 			}
 		}
@@ -870,6 +914,7 @@ popuwashyon
 			TFBot
 			{
 				Template T_TFBot_Giant_Medic_Regen
+				Health 4000
 				Name "Raging Tengu"
 				ClassIcon medic_syringe_spammer
 				WeaponRestrictions PrimaryOnly
@@ -1082,6 +1127,10 @@ popuwashyon
 					ItemName "The Sandman"
 					"effect bar recharge rate increased" 0.5
 				}
+				CharacterAttributes
+				{
+					"health regen" 1
+				}
 			}
 		}
 		WaveSpawn
@@ -1229,8 +1278,7 @@ popuwashyon
 	//Wave 5
 	//Subwave 1
 	//- Giant Barrage Soldier
-	//- Giant Barrage Soldier + uber meds
-	//- Giant Barrage Soldier + shield meds
+	//- Giant Barrage Soldiers + uber meds
 	//- Combo Pyro
 	
 	//Subwave 2
@@ -1252,6 +1300,22 @@ popuwashyon
 		{
 			Target wave_finished_relay
 			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target tf_gamerules
+			Action RunScriptCode
+			Param "
+					::RocketAlign <- function()
+					{
+						self.SetMoveType(5,2)
+						self.SetGravity(0.5)
+						local v = self.GetAbsVelocity();
+						v.Norm();
+						self.SetForwardVector(v);
+						return -1
+					}
+					"
 		}
 		WaveSpawn
 		{
@@ -1475,14 +1539,16 @@ popuwashyon
 				Health 12000
 				Name "Deified Wielder of the Wind"
 				ClassIcon soldier_barrage
+				AlwaysGlow 1 [$SIGSEGV]
                 InterruptAction [$SIGSEGV]
                 {
 					Target "-5910.6 -2280.9 150.1"
 					AimTarget "ClosestPlayer"
                     WaitUntilDone 1
-                    Delay 5
+                    Delay 0.1
                     Repeats 1
                     Duration 1
+					Cooldown 0.5
                     OnDoneChangeAttributes "Attack"
                 }
 				FireWeapon [$SIGSEGV]
@@ -1529,7 +1595,7 @@ popuwashyon
 						}
 						InterruptAction [$SIGSEGV] // Stop current bot ai and force the bot to move to a location
 						{
-							AimTarget "-5550 -2660 893" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+							AimTarget "-5550 -2600 893" // Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
 							WaitUntilDone 1
 							// KillAimTarget 1 // Attack aim target (Default: 0)
 							Delay 1.5 // Time before the first task starts (Default: 10)
@@ -1546,11 +1612,12 @@ popuwashyon
 							"fire rate bonus" 0.15
 							"blast radius decreased" 0.5
 							"projectile spread angle penalty" 18
-							"projectile speed decreased" 0.8
+							"projectile speed decreased" 0.7
 							"projectile acceleration" -440
-							"projectile acceleration time" 1.2
+							"projectile acceleration time" 1
 							"projectile gravity" 150
 							"rocket jump damage reduction" -0.01
+							"fire input on attack" "!projectile^RunScriptCode^AddThinkToEnt(self,`RocketAlign`)"
 						}
 					}
 					Attack2
@@ -1582,13 +1649,13 @@ popuwashyon
 							"fire rate bonus" 0.15
 							"blast radius decreased" 0.5
 							"projectile spread angle penalty" 18
-							"projectile speed decreased" 0.8
+							"projectile speed decreased" 0.72
 							"projectile acceleration" -440
-							"projectile acceleration time" 1.2
+							"projectile acceleration time" 1
 							"projectile gravity" 150
 							"rocket jump damage reduction" -0.01
+							"fire input on attack" "!projectile^RunScriptCode^AddThinkToEnt(self,`RocketAlign`)"
 						}
-
 					}
 				}
 			}
