@@ -243,7 +243,7 @@ function UpdateMenu()
 	RandomVoters = ''
 	VoteMenu[1] = {text = 'Unlock RED Side'}
 	VoteMenu[2] = {text = 'Unlock BLU Side'}
-	VoteMenu[3] = {text = 'Random ($100 Bonus)'}
+	VoteMenu[3] = {text = 'Random'}
 	PlayerCount = 0
 	RedVotes = 0
 	BluVotes = 0
@@ -252,15 +252,15 @@ function UpdateMenu()
 		if player:IsRealPlayer() and player.m_iTeamNum == 2 then
 			PlayerCount = PlayerCount + 1
 			if player.VoteChoice == 1 then
-				RandomVoters = RandomVoters .. '\n✓ ' .. player:DumpProperties().m_szNetname[1]
-				VoteMenu[3].text = 'Random ($100 Bonus)' .. RandomVoters
+				RandomVoters = RandomVoters .. '\n✓ ' .. player.m_szNetname
+				VoteMenu[3].text = 'Random' .. RandomVoters
 				RandomVotes = RandomVotes + 1
 			elseif player.VoteChoice == 2 then
-				RedVoters = RedVoters .. '\n✓ ' .. player:DumpProperties().m_szNetname[1]
+				RedVoters = RedVoters .. '\n✓ ' .. player.m_szNetname
 				VoteMenu[1].text = 'Unlock RED Side' .. RedVoters
 				RedVotes = RedVotes + 1
 			elseif player.VoteChoice == 3 then
-				BluVoters = BluVoters .. '\n✓ ' .. player:DumpProperties().m_szNetname[1]
+				BluVoters = BluVoters .. '\n✓ ' .. player.m_szNetname
 				VoteMenu[2].text = 'Unlock BLU Side' .. BluVoters
 				BluVotes = BluVotes + 1
 			end
@@ -390,7 +390,7 @@ function OnWaveStart(wave)
 end
 
 function OnWaveSuccess(wave)
-	if RandomActive == true then
+--[[ 	if RandomActive == true then
 		timer.Simple(1, function()
 			if wave - 1 ~= 6 then
 				util.PrintToChatAll("\x076cc94d$100 bonus for randoming has been awarded!")
@@ -401,7 +401,7 @@ function OnWaveSuccess(wave)
 				end
 			end
 		end)
-	end
+	end ]]
 	if wave - 1 == 1 then
 		if string.sub((WavesPlayed[wave - 1]), 1, 1) == 'r' then
 			util.PrintToChatAll("\x07ff3d3dAI-dol\x07fbeccb has been upgraded with: \x07FFD700Equip Rocket Launcher")
@@ -457,7 +457,7 @@ function OnWaveSuccess(wave)
 	end
 end
 
-function OnWaveReset(wave)
+--[[ function OnWaveReset(wave)
 	for k = 1, wave do
 		if WavesPlayed[k] ~= nil then
 			if string.sub((WavesPlayed[k]), 2, 2) == 'd' then
@@ -471,7 +471,8 @@ function OnWaveReset(wave)
 			end
 		end
 	end
-end
+end ]]
+
 function OnGameTick()
 	if (VoteTimerDuration == 0 and VoteTimerActive == true) or (math.abs(ents.FindByClass('tf_gamerules').m_flRestartRoundTime - CurTime()) < 10 and VoteActive == true) then
 		VoteTimerActive = false
@@ -502,6 +503,7 @@ function OnGameTick()
  			player:SetScriptOverlayMaterial("yiresahud/antiheal")
 			player:Print(2, "Healing Disabled!")
 			player:SetAttributeValue("healing received penalty", 0)
+			if player:IsRealPlayer() then player:SetAttributeValue("mod weapon blocks healing", 1) end
 			player:AcceptInput("AddOutput", "rendercolor 200 0 255")
 			if player.Sound == false then
 				player:PlaySoundToSelf('ana_biotic_grenade_no_healing_sound.mp3')
@@ -510,6 +512,7 @@ function OnGameTick()
 			for i = 0, 6 do
 				if player:GetPlayerItemBySlot(i) ~= nil then
 					player:GetPlayerItemBySlot(i):SetAttributeValue("healing received penalty", 0)
+					if player:IsRealPlayer() then player:GetPlayerItemBySlot(i):SetAttributeValue("mod weapon blocks healing", 1) end
 				end
 			end
 		elseif (player:InCond(65) == true and player:IsAlive() == true and player:InCond(5) == false) then
@@ -523,7 +526,7 @@ function OnGameTick()
 			if player.m_iTeamNum == 3 then
 				for i = 0, 1 do
 					if player:GetPlayerItemBySlot(i) ~= nil then
-						player:GetPlayerItemBySlot(i):SetAttributeValue("no_attack", 1)
+						player:GetPlayerItemBySlot(i):SetAttributeValue("fire rate penalty HIDDEN", 1.8)
 					end
 				end
 			end
@@ -533,14 +536,16 @@ function OnGameTick()
 			end
 			player:Print(2, "")
 			player:SetAttributeValue("healing received penalty", nil)
+			if player:IsRealPlayer() then player:SetAttributeValue("mod weapon blocks healing", nil) end
 			player:AcceptInput("AddOutput", "rendercolor 255 255 255")
 			for i = 0, 6 do
 				if player:GetPlayerItemBySlot(i) ~= nil then
 					player:GetPlayerItemBySlot(i):SetAttributeValue("healing received penalty", nil)
+					if player:IsRealPlayer() then player:GetPlayerItemBySlot(i):SetAttributeValue("mod weapon blocks healing", nil) end
 				end
 				for i = 0, 1 do
 					if player:GetPlayerItemBySlot(i) ~= nil then
-						player:GetPlayerItemBySlot(i):SetAttributeValue("no_attack", nil)
+						player:GetPlayerItemBySlot(i):SetAttributeValue("fire rate penalty HIDDEN", nil)
 					end
 				end
 			end
@@ -583,7 +588,7 @@ function VoteResult()
 
 	if string.sub((VoteListSorted)[3], 1, 1) == string.sub((VoteListSorted)[2], 1, 1) then
 		ResultMenu.title = '✗ Vote Failed\n '
-		ResultMenu[1].text = 'Not enough players voted. Random wave selected.\n$100 bonus awarded on wave completion.'
+		ResultMenu[1].text = 'Not enough players voted. Random wave selected.'
 		ChooseRandom(ents.FindByClass('tf_objective_resource').m_nMannVsMachineWaveCount)
 		VotePassed = false
 	elseif string.sub((VoteListSorted)[3], -1, -1) == 'r' then
@@ -600,7 +605,7 @@ function VoteResult()
 		VotePassed = true
 	elseif string.sub((VoteListSorted)[3], -1, -1) == 'd' then
 		ResultMenu.title = '✓ Vote Passed\n '
-		ResultMenu[1].text = 'Random selected!\n$100 bonus awarded on wave completion.'
+		ResultMenu[1].text = 'Random selected!'
 		ChooseRandom(ents.FindByClass('tf_objective_resource').m_nMannVsMachineWaveCount)
 		VotePassed = true
 	end
