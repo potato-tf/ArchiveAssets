@@ -364,10 +364,6 @@ function OnWaveInit(wave)
 	SlotsWait = SlotsUpgrade[0]
 	BlackjackWait = BlackjackUpgrade[0]
 
-	if DispenserBought == true then
-		ResetDispenser()
-	end
-
 	WaveState[wave].RouletteWinnings = RouletteWinnings
 	WaveState[wave].RouletteWinningsTotal = RouletteWinningsTotal
 	WaveState[wave].PachinkoWinnings = PachinkoWinnings
@@ -411,10 +407,10 @@ function OnWaveInit(wave)
 	end)
 
 	timer.Simple(0.1, function()
-		ents.FindByName('text_tickets_label'):AcceptInput('AddOutput', 'holdtime 0')
+--[[ 		ents.FindByName('text_tickets_label'):AcceptInput('AddOutput', 'holdtime 0')
 		ents.FindByName('text_tickets_value_3'):AcceptInput('AddOutput', 'holdtime 0')
 		ents.FindByName('text_tickets_value_2'):AcceptInput('AddOutput', 'holdtime 0')
-		ents.FindByName('text_tickets_value_1'):AcceptInput('AddOutput', 'holdtime 0')
+		ents.FindByName('text_tickets_value_1'):AcceptInput('AddOutput', 'holdtime 0') ]]
 		ents.FindByName('snd_tickets_lose'):AcceptInput('AddOutput', 'message null')
 		ents.FindByName('snd_tickets_earn'):AcceptInput('AddOutput', 'message null')
 
@@ -489,7 +485,7 @@ function OnWaveInit(wave)
 		ents.FindByName('pachinkocollect'):AcceptInput('SetText', 'Chips Collected: ' .. PachinkoWinnings .. '\n\nTotal: ' .. PachinkoWinningsTotal)
 		ents.FindByName('slotscollect'):AcceptInput('SetText', 'Chips Collected: ' .. SlotsWinnings .. '\n\nTotal: ' .. SlotsWinningsTotal)
 		ents.FindByName('blackjackcollect'):AcceptInput('SetText', 'Chips Collected: ' .. BlackjackWinnings .. '\n\nTotal: ' .. BlackjackWinningsTotal)
-		ents.FindByName('allcollect'):AcceptInput('SetText', 'Roulette.' .. RouletteLevel .. ':      ' .. RouletteWinnings .. '\nPachinko.' .. PachinkoLevel .. ':       ' .. PachinkoWinnings .. '\nSlots.' .. SlotsLevel .. ':          ' .. SlotsWinnings .. '\nBlackjack.' .. BlackjackLevel .. ':     ' .. BlackjackWinnings)
+		ents.FindByName('allcollect'):AcceptInput('SetText', 'Roulette.' .. RouletteLevel .. ':        ' .. RouletteWinnings .. '\nPachinko.' .. PachinkoLevel .. ':         ' .. PachinkoWinnings .. '\nSlots.' .. SlotsLevel .. ':            ' .. SlotsWinnings .. '\nBlackjack.' .. BlackjackLevel .. ':       ' .. BlackjackWinnings)
 
 		ents.FindByName('game_1_relay_wheel_start'):AcceptInput('AddOutput', 'OnTrigger popscript:$BetRoulette:0:0:-1')
 		ents.FindByName('game_2_counter_credits'):AcceptInput('AddOutput', 'OnHitMin popscript:$BetPachinko:0:0:-1')
@@ -703,15 +699,19 @@ function OnWaveStart(wave)
 			if MercBotQueue[1] == "common" then
 				ents.FindByName('spawnbot_mercbot'):AcceptInput('Enable')
 				timer.Simple(0.2, function() ents.FindByName('spawnbot_mercbot'):AcceptInput('Disable') end)
+				print(ents.FindByName('spawnbot_mercbot'):AcceptInput('Enable'))
 			elseif MercBotQueue[1] == "crit" then
 				ents.FindByName('spawnbot_mercbotcrit'):AcceptInput('Enable')
 				timer.Simple(0.2, function() ents.FindByName('spawnbot_mercbotcrit'):AcceptInput('Disable') end)
+				print(ents.FindByName('spawnbot_mercbotcrit'):AcceptInput('Enable'))
 			elseif MercBotQueue[1] == "giant" then
 				ents.FindByName('spawnbot_mercbotgiant'):AcceptInput('Enable')
 				timer.Simple(0.2, function() ents.FindByName('spawnbot_mercbotgiant'):AcceptInput('Disable') end)
+				print(ents.FindByName('spawnbot_mercbotgiant'):AcceptInput('Enable'))
 			elseif MercBotQueue[1] == "giantcrit" then
 				ents.FindByName('spawnbot_mercbotgiantcrit'):AcceptInput('Enable')
 				timer.Simple(0.2, function() ents.FindByName('spawnbot_mercbotgiantcrit'):AcceptInput('Disable') end)
+				print(ents.FindByName('spawnbot_mercbotgiantcrit'):AcceptInput('Enable'))
 			end
 			MercBotQueue[1] = MercBotQueue[2]
 			MercBotQueue[2] = MercBotQueue[3]
@@ -750,7 +750,7 @@ function UpgradeBot(game,player)
 				fadeinTime = 0,
 				fadeoutTime = 0,
 				holdTime = 3},
-				user:DumpProperties().m_szNetname[1].. ' upgraded ' .. game .. ' to Level ' .. level
+				user.m_szNetname.. ' upgraded ' .. game .. ' to Level ' .. level
 			)
 		end
 	end
@@ -859,13 +859,13 @@ function CollectRoulette(_, user)
 				fadeinTime = 0,
 				fadeoutTime = 0,
 				holdTime = 3},
-				user:DumpProperties().m_szNetname[1].. ' +' .. RouletteWinnings .. ' Chips from Roulette'
+				user.m_szNetname.. ' +' .. RouletteWinnings .. ' Chips from Roulette'
 			)
 		end
 		ents.FindByName('tickets_text_counter_buffer'):AcceptInput('Add', RouletteWinnings)
 		RouletteWinnings = 0
 		ents.FindByName('roulettecollect'):AcceptInput('SetText', 'Chips Collected: '.. RouletteWinnings .. '\n\nTotal: ' .. RouletteWinningsTotal)
-		ents.FindByName('allcollect'):AcceptInput('SetText', 'Roulette.' .. RouletteLevel .. ':      ' .. RouletteWinnings .. '\nPachinko.' .. PachinkoLevel .. ':       ' .. PachinkoWinnings .. '\nSlots.' .. SlotsLevel .. ':          ' .. SlotsWinnings .. '\nBlackjack.' .. BlackjackLevel .. ':     ' .. BlackjackWinnings)
+		ents.FindByName('allcollect'):AcceptInput('SetText', 'Roulette.' .. RouletteLevel .. ':        ' .. RouletteWinnings .. '\nPachinko.' .. PachinkoLevel .. ':         ' .. PachinkoWinnings .. '\nSlots.' .. SlotsLevel .. ':            ' .. SlotsWinnings .. '\nBlackjack.' .. BlackjackLevel .. ':       ' .. BlackjackWinnings)
 	end
 end
 
@@ -887,13 +887,13 @@ function CollectPachinko(_, user)
 				fadeinTime = 0,
 				fadeoutTime = 0,
 				holdTime = 3},
-				user:DumpProperties().m_szNetname[1].. ' +' .. PachinkoWinnings .. ' Chips from Pachinko'
+				user.m_szNetname.. ' +' .. PachinkoWinnings .. ' Chips from Pachinko'
 			)
 		end
 		ents.FindByName('tickets_text_counter_buffer'):AcceptInput('Add', PachinkoWinnings)
 		PachinkoWinnings = 0
 		ents.FindByName('pachinkocollect'):AcceptInput('SetText', 'Chips Collected: '.. PachinkoWinnings .. '\n\nTotal: ' .. PachinkoWinningsTotal)
-		ents.FindByName('allcollect'):AcceptInput('SetText', 'Roulette.' .. RouletteLevel .. ':      ' .. RouletteWinnings .. '\nPachinko.' .. PachinkoLevel .. ':       ' .. PachinkoWinnings .. '\nSlots.' .. SlotsLevel .. ':          ' .. SlotsWinnings .. '\nBlackjack.' .. BlackjackLevel .. ':     ' .. BlackjackWinnings)
+		ents.FindByName('allcollect'):AcceptInput('SetText', 'Roulette.' .. RouletteLevel .. ':        ' .. RouletteWinnings .. '\nPachinko.' .. PachinkoLevel .. ':         ' .. PachinkoWinnings .. '\nSlots.' .. SlotsLevel .. ':            ' .. SlotsWinnings .. '\nBlackjack.' .. BlackjackLevel .. ':       ' .. BlackjackWinnings)
 	end
 end
 
@@ -915,13 +915,13 @@ function CollectSlots(_, user)
 				fadeinTime = 0,
 				fadeoutTime = 0,
 				holdTime = 3},
-				user:DumpProperties().m_szNetname[1].. ' +' .. SlotsWinnings .. ' Chips from Slots'
+				user.m_szNetname.. ' +' .. SlotsWinnings .. ' Chips from Slots'
 			)
 		end
 		ents.FindByName('tickets_text_counter_buffer'):AcceptInput('Add', SlotsWinnings)
 		SlotsWinnings = 0
 		ents.FindByName('slotscollect'):AcceptInput('SetText', 'Chips Collected: '.. SlotsWinnings .. '\n\nTotal: ' .. SlotsWinningsTotal)
-		ents.FindByName('allcollect'):AcceptInput('SetText', 'Roulette.' .. RouletteLevel .. ':      ' .. RouletteWinnings .. '\nPachinko.' .. PachinkoLevel .. ':       ' .. PachinkoWinnings .. '\nSlots.' .. SlotsLevel .. ':          ' .. SlotsWinnings .. '\nBlackjack.' .. BlackjackLevel .. ':     ' .. BlackjackWinnings)
+		ents.FindByName('allcollect'):AcceptInput('SetText', 'Roulette.' .. RouletteLevel .. ':        ' .. RouletteWinnings .. '\nPachinko.' .. PachinkoLevel .. ':         ' .. PachinkoWinnings .. '\nSlots.' .. SlotsLevel .. ':            ' .. SlotsWinnings .. '\nBlackjack.' .. BlackjackLevel .. ':       ' .. BlackjackWinnings)
 	end
 end
 
@@ -943,13 +943,13 @@ function CollectBlackjack(_, user)
 				fadeinTime = 0,
 				fadeoutTime = 0,
 				holdTime = 3},
-				user:DumpProperties().m_szNetname[1].. ' +' .. BlackjackWinnings .. ' Chips from Blackjack'
+				user.m_szNetname.. ' +' .. BlackjackWinnings .. ' Chips from Blackjack'
 			)
 		end
 		ents.FindByName('tickets_text_counter_buffer'):AcceptInput('Add', BlackjackWinnings)
 		BlackjackWinnings = 0
 		ents.FindByName('blackjackcollect'):AcceptInput('SetText', 'Chips Collected: '.. BlackjackWinnings .. '\n\nTotal: ' .. BlackjackWinningsTotal)
-		ents.FindByName('allcollect'):AcceptInput('SetText', 'Roulette.' .. RouletteLevel .. ':      ' .. RouletteWinnings .. '\nPachinko.' .. PachinkoLevel .. ':       ' .. PachinkoWinnings .. '\nSlots.' .. SlotsLevel .. ':          ' .. SlotsWinnings .. '\nBlackjack.' .. BlackjackLevel .. ':     ' .. BlackjackWinnings)
+		ents.FindByName('allcollect'):AcceptInput('SetText', 'Roulette.' .. RouletteLevel .. ':        ' .. RouletteWinnings .. '\nPachinko.' .. PachinkoLevel .. ':         ' .. PachinkoWinnings .. '\nSlots.' .. SlotsLevel .. ':            ' .. SlotsWinnings .. '\nBlackjack.' .. BlackjackLevel .. ':       ' .. BlackjackWinnings)
 	end
 end
 
@@ -972,7 +972,7 @@ function CollectAll(_, user)
 				fadeinTime = 0,
 				fadeoutTime = 0,
 				holdTime = 3},
-				user:DumpProperties().m_szNetname[1].. ' +' .. AllWinnings .. ' Chips from all games'
+				user.m_szNetname.. ' +' .. AllWinnings .. ' Chips from all games'
 			)
 		end
 		ents.FindByName('tickets_text_counter_buffer'):AcceptInput('Add', AllWinnings)
@@ -984,7 +984,7 @@ function CollectAll(_, user)
 		ents.FindByName('pachinkocollect'):AcceptInput('SetText', 'Chips Collected: '.. PachinkoWinnings .. '\n\nTotal: ' .. PachinkoWinningsTotal)
 		ents.FindByName('slotscollect'):AcceptInput('SetText', 'Chips Collected: '.. SlotsWinnings .. '\n\nTotal: ' .. SlotsWinningsTotal)
 		ents.FindByName('blackjackcollect'):AcceptInput('SetText', 'Chips Collected: '.. BlackjackWinnings .. '\n\nTotal: ' .. BlackjackWinningsTotal)
-		ents.FindByName('allcollect'):AcceptInput('SetText', 'Roulette.' .. RouletteLevel .. ':      ' .. RouletteWinnings .. '\nPachinko.' .. PachinkoLevel .. ':       ' .. PachinkoWinnings .. '\nSlots.' .. SlotsLevel .. ':          ' .. SlotsWinnings .. '\nBlackjack.' .. BlackjackLevel .. ':     ' .. BlackjackWinnings)
+		ents.FindByName('allcollect'):AcceptInput('SetText', 'Roulette.' .. RouletteLevel .. ':        ' .. RouletteWinnings .. '\nPachinko.' .. PachinkoLevel .. ':         ' .. PachinkoWinnings .. '\nSlots.' .. SlotsLevel .. ':            ' .. SlotsWinnings .. '\nBlackjack.' .. BlackjackLevel .. ':       ' .. BlackjackWinnings)
 	end
 end
 
@@ -1013,7 +1013,7 @@ function Cashout1(_,user)
 				fadeinTime = 0,
 				fadeoutTime = 0,
 				holdTime = 3},
-				user:DumpProperties().m_szNetname[1].. ' cashed out $1!'
+				user.m_szNetname.. ' cashed out $1!'
 			)
 		end
 		ents.FindByName('cashouttext2'):AcceptInput('SetText', "Total: $" .. CashedOut)
@@ -1048,7 +1048,7 @@ function Cashout10(_,user)
 				fadeinTime = 0,
 				fadeoutTime = 0,
 				holdTime = 3},
-				user:DumpProperties().m_szNetname[1].. ' cashed out $10!'
+				user.m_szNetname.. ' cashed out $10!'
 			)
 		end
 		ents.FindByName('cashouttext2'):AcceptInput('SetText', "Total: $" .. CashedOut)
@@ -1083,7 +1083,7 @@ function Cashout100(_,user)
 				fadeinTime = 0,
 				fadeoutTime = 0,
 				holdTime = 3},
-				user:DumpProperties().m_szNetname[1].. ' cashed out $100!'
+				user.m_szNetname.. ' cashed out $100!'
 			)
 		end
 		ents.FindByName('cashouttext2'):AcceptInput('SetText', "Total: $" .. CashedOut)
@@ -1117,7 +1117,7 @@ function SpendText(prize,user)
 			fadeinTime = 0,
 			fadeoutTime = 0,
 			holdTime = 3},
-			user:DumpProperties().m_szNetname[1].. ' bought the ' .. prize
+			user.m_szNetname.. ' bought the ' .. prize
 		)
 	end
 	if prize == "Special Prize!" then
@@ -1307,7 +1307,7 @@ function SpawnMerc(robot,user)
 					fadeinTime = 0,
 					fadeoutTime = 0,
 					holdTime = 3},
-					user:DumpProperties().m_szNetname[1].. ' hired a ' .. text .. ' Robot!'
+					user.m_szNetname.. ' hired a ' .. text .. ' Robot!'
 				)
 			end
 		else
@@ -1426,6 +1426,7 @@ function OnWaveSpawnBot(bot, wave, tags)
 			timer.Simple(1.8, function() ents.FindByName('card_'..number):Teleport(bot:GetAbsOrigin()) end)
 			timer.Simple(2, function() 
 				ents.FindByName('card_'..number):AcceptInput('Enable')
+				print(ents.FindByName('card_'..number):AcceptInput('Enable'))
 				util.ParticleEffect("teleportedin_blue", bot:GetAbsOrigin())
 				util.ParticleEffect("teleported_blue", bot:GetAbsOrigin())
 				bot:PlaySound('weapons/teleporter_send.wav')
@@ -1505,8 +1506,7 @@ function BuyDispenser(_,player)
 		timer.Simple(0.5, function() ents.FindByName('dispenser_prop_button'):AcceptInput('Kill') end)
 		ents.FindByName('dispenser_button'):AcceptInput('Kill')
 		ents.FindByName('dispensertext'):AcceptInput('Kill')
-		--ents.FindByName('dispensertext2'):AcceptInput('Kill')
-		--ents.FindByName('dispenser_prop'):AcceptInput('Kill')
+		ents.FindByName('dispenser_prop'):AcceptInput('Kill')
 		ents.SpawnTemplate('DispenserPrizeSpawner')
 	else
 		ents.FindByName('prize_not_enough_tickets'):AcceptInput('Trigger')
@@ -1519,12 +1519,11 @@ function SpawnDispenser(_,player)
 		player.hasDispenser = true
 		ents.SpawnTemplate('DispenserPrize', {translation = Vector(0, 0, 50), parent = player})
 	end
-	ents.FindByName('dispenser_touchtrigger'):AcceptInput('Disable')
-	timer.Simple(0.1, function() ents.FindByName('dispenser_touchtrigger'):AcceptInput('Enable') end)
 end
 
 function ResetDispenser()
 	DispenserBought = false
+	ents.FindByName('dispenser_prop'):AcceptInput('Kill')
 	ents.FindByName('dispenser_particles'):AcceptInput('Kill')
 	ents.FindByName('dispenser_particles2'):AcceptInput('Kill')
 	ents.FindByName('dispenser_spawner'):AcceptInput('Kill')
@@ -1612,6 +1611,10 @@ function ActivateSecret()
 end
 
 function OnWaveSuccess(wave)
+	if DispenserBought == true then
+		ResetDispenser()
+	end
+
 	if wave == ents.FindByClass('tf_objective_resource').m_nMannVsMachineMaxWaveCount + 1 then
 		if SpentChips == 0 then
 			util.PrintToChatAll("\x07FFD700>>>>>>>>SPENDLESS CLEAR<<<<<<<<")
@@ -1634,7 +1637,7 @@ function OnWaveSuccess(wave)
 	end
 end
 
-function OnGameTick()
+--[[ timer.Create(3, function()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() == true then
 			player:ShowHudText({
@@ -1647,14 +1650,14 @@ function OnGameTick()
 				r2 = 203,
 				g2 = 179,
 				b2 = 37,
-				fadeinTime = 0,
-				fadeoutTime = 0,
-				holdTime = 1},
+				fadeinTime = 0.2,
+				fadeoutTime = 0.5,
+				holdTime = 3},
 				'Chips: ' .. TicketsOwned
 			)
 		end
 	end
-end
+end, 0) ]]
 
 --[[ function ShowChips(chips)
 	util.PrintToChatAll(chips)
