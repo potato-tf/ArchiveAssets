@@ -510,7 +510,11 @@ function SeducerHit(_, activator, caller)
 
 	controlled[handle] = caller
 
-	caller:AddCond(TF_COND_REPROGRAMMED)
+	if caller:InCond(TF_COND_REPROGRAMMED) then
+		caller:RemoveCond(TF_COND_REPROGRAMMED)
+	else
+		caller:AddCond(TF_COND_REPROGRAMMED)
+	end
 	caller:AddCond(TF_COND_CRITBOOSTED_CARD_EFFECT)
 
 	local secondary = activator:GetPlayerItemBySlot(1)
@@ -1522,7 +1526,7 @@ end
 local diverCallbacks = {}
 function WormholeDiverEquip(_, activator)
 	-- fix weird quirk with template being spawned after you switch to a different class
-	if classIndices_Internal[activator:DumpProperties().m_iClass] ~= "Pyro" then
+	if classIndices_Internal[activator.m_iClass] ~= "Pyro" then
 		return
 	end
 
