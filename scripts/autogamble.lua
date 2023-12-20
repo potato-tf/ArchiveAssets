@@ -699,19 +699,15 @@ function OnWaveStart(wave)
 			if MercBotQueue[1] == "common" then
 				ents.FindByName('spawnbot_mercbot'):AcceptInput('Enable')
 				timer.Simple(0.2, function() ents.FindByName('spawnbot_mercbot'):AcceptInput('Disable') end)
-				print(ents.FindByName('spawnbot_mercbot'):AcceptInput('Enable'))
 			elseif MercBotQueue[1] == "crit" then
 				ents.FindByName('spawnbot_mercbotcrit'):AcceptInput('Enable')
 				timer.Simple(0.2, function() ents.FindByName('spawnbot_mercbotcrit'):AcceptInput('Disable') end)
-				print(ents.FindByName('spawnbot_mercbotcrit'):AcceptInput('Enable'))
 			elseif MercBotQueue[1] == "giant" then
 				ents.FindByName('spawnbot_mercbotgiant'):AcceptInput('Enable')
 				timer.Simple(0.2, function() ents.FindByName('spawnbot_mercbotgiant'):AcceptInput('Disable') end)
-				print(ents.FindByName('spawnbot_mercbotgiant'):AcceptInput('Enable'))
 			elseif MercBotQueue[1] == "giantcrit" then
 				ents.FindByName('spawnbot_mercbotgiantcrit'):AcceptInput('Enable')
 				timer.Simple(0.2, function() ents.FindByName('spawnbot_mercbotgiantcrit'):AcceptInput('Disable') end)
-				print(ents.FindByName('spawnbot_mercbotgiantcrit'):AcceptInput('Enable'))
 			end
 			MercBotQueue[1] = MercBotQueue[2]
 			MercBotQueue[2] = MercBotQueue[3]
@@ -1426,7 +1422,6 @@ function OnWaveSpawnBot(bot, wave, tags)
 			timer.Simple(1.8, function() ents.FindByName('card_'..number):Teleport(bot:GetAbsOrigin()) end)
 			timer.Simple(2, function() 
 				ents.FindByName('card_'..number):AcceptInput('Enable')
-				print(ents.FindByName('card_'..number):AcceptInput('Enable'))
 				util.ParticleEffect("teleportedin_blue", bot:GetAbsOrigin())
 				util.ParticleEffect("teleported_blue", bot:GetAbsOrigin())
 				bot:PlaySound('weapons/teleporter_send.wav')
