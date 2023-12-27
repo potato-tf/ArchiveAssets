@@ -289,6 +289,7 @@ function UpdateMenu()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() and player.m_iTeamNum == 2 then
 			player:DisplayMenu(VoteMenu)
+			player.Overlay = 'wavebar'
 			player:AcceptInput('SetScriptOverlayMaterial', 'yiresahud/wavebar'..CurrentWave)
 		end
 	end
@@ -479,7 +480,10 @@ function OnGameTick()
 		VoteActive = false
 		for _, player in pairs(ents.GetAllPlayers()) do
 			if player:IsRealPlayer() then
-				player:AcceptInput('SetScriptOverlayMaterial', '')
+				if player.Overlay == 'wavebar' then
+					player:AcceptInput('SetScriptOverlayMaterial', '')
+					player.Overlay = 'none'
+				end
 			end
 		end
 		VoteResult()
@@ -498,58 +502,62 @@ function OnGameTick()
 		UpdateMenu()
 	end
 
-	for _, player in pairs(ents.GetAllPlayers()) do
-		if (player:InCond(12) == true and player:IsAlive() == true and player:InCond(5) == false) then
- 			player:SetScriptOverlayMaterial("yiresahud/antiheal")
-			player:Print(2, "Healing Disabled!")
-			player:SetAttributeValue("healing received penalty", 0)
-			if player:IsRealPlayer() then player:SetAttributeValue("mod weapon blocks healing", 1) end
-			player:AcceptInput("AddOutput", "rendercolor 200 0 255")
-			if player.Sound == false then
-				player:PlaySoundToSelf('ana_biotic_grenade_no_healing_sound.mp3')
-				player.Sound = true
-			end
-			for i = 0, 6 do
-				if player:GetPlayerItemBySlot(i) ~= nil then
-					player:GetPlayerItemBySlot(i):SetAttributeValue("healing received penalty", 0)
-					if player:IsRealPlayer() then player:GetPlayerItemBySlot(i):SetAttributeValue("mod weapon blocks healing", 1) end
+	if VoteActive == false then
+		for _, player in pairs(ents.GetAllPlayers()) do
+			if (player:InCond(12) == true and player:IsAlive() == true and not (player:InCond(5) == true or player:InCond(52) == true)) then
+				if player.Overlay == 'none' then
+					player.Overlay = 'antiheal'
+					player:SetScriptOverlayMaterial("yiresahud/antiheal")
+					player:Print(2, "Healing Disabled!")
+					player:SetAttributeValue("healing received penalty", 0)
+					if player:IsRealPlayer() then player:SetAttributeValue("mod weapon blocks healing", 1) end
+					player:AcceptInput("AddOutput", "rendercolor 200 0 255")
+					player:PlaySoundToSelf('ana_biotic_grenade_no_healing_sound.mp3')
+					for i = 0, 6 do
+						if player:GetPlayerItemBySlot(i) ~= nil then
+							player:GetPlayerItemBySlot(i):SetAttributeValue("healing received penalty", 0)
+							if player:IsRealPlayer() then player:GetPlayerItemBySlot(i):SetAttributeValue("mod weapon blocks healing", 1) end
+						end
+					end
 				end
-			end
-		elseif (player:InCond(65) == true and player:IsAlive() == true and player:InCond(5) == false) then
-			player:SetScriptOverlayMaterial("yiresahud/ammodrain")
-			player:Print(2, "Ammo Drained!")
-			player:AcceptInput("AddOutput", "rendercolor 255 150 0")
-			if player.Sound == false then
-				player:PlaySoundToSelf('ana_biotic_grenade_no_healing_sound.mp3')
-				player.Sound = true
-			end
-			if player.m_iTeamNum == 3 then
-				for i = 0, 1 do
-					if player:GetPlayerItemBySlot(i) ~= nil then
-						player:GetPlayerItemBySlot(i):SetAttributeValue("fire rate penalty HIDDEN", 1.8)
+			elseif (player:InCond(65) == true and player:IsAlive() == true and not (player:InCond(5) == true or player:InCond(52) == true)) then
+				if player.Overlay == 'none' then
+					player.Overlay = 'ammodrain'
+					player:SetScriptOverlayMaterial("yiresahud/ammodrain")
+					player:Print(2, "Ammo Drained!")
+					player:AcceptInput("AddOutput", "rendercolor 255 150 0")
+					player:PlaySoundToSelf('ana_biotic_grenade_no_healing_sound.mp3')
+					if player.m_iTeamNum == 3 then
+						for i = 0, 1 do
+							if player:GetPlayerItemBySlot(i) ~= nil then
+								player:GetPlayerItemBySlot(i):SetAttributeValue("fire rate penalty HIDDEN", 1.8)
+								player:GetPlayerItemBySlot(i):SetAttributeValue("reload time increased hidden", 1.8)
+							end
+						end
+					end
+				end
+			else
+				if player.Overlay ~= 'none' then
+					player.Overlay = 'none'
+					player:SetScriptOverlayMaterial("")
+					player:Print(2, "")
+					player:SetAttributeValue("healing received penalty", nil)
+					if player:IsRealPlayer() then player:SetAttributeValue("mod weapon blocks healing", nil) end
+					player:AcceptInput("AddOutput", "rendercolor 255 255 255")
+					for i = 0, 6 do
+						if player:GetPlayerItemBySlot(i) ~= nil then
+							player:GetPlayerItemBySlot(i):SetAttributeValue("healing received penalty", nil)
+							if player:IsRealPlayer() then player:GetPlayerItemBySlot(i):SetAttributeValue("mod weapon blocks healing", nil) end
+						end
+					end
+					for i = 0, 1 do
+						if player:GetPlayerItemBySlot(i) ~= nil then
+							player:GetPlayerItemBySlot(i):SetAttributeValue("fire rate penalty HIDDEN", nil)
+							player:GetPlayerItemBySlot(i):SetAttributeValue("reload time increased hidden", nil)
+						end
 					end
 				end
 			end
-		else
-			if VoteActive == false then
-				player:SetScriptOverlayMaterial("")
-			end
-			player:Print(2, "")
-			player:SetAttributeValue("healing received penalty", nil)
-			if player:IsRealPlayer() then player:SetAttributeValue("mod weapon blocks healing", nil) end
-			player:AcceptInput("AddOutput", "rendercolor 255 255 255")
-			for i = 0, 6 do
-				if player:GetPlayerItemBySlot(i) ~= nil then
-					player:GetPlayerItemBySlot(i):SetAttributeValue("healing received penalty", nil)
-					if player:IsRealPlayer() then player:GetPlayerItemBySlot(i):SetAttributeValue("mod weapon blocks healing", nil) end
-				end
-				for i = 0, 1 do
-					if player:GetPlayerItemBySlot(i) ~= nil then
-						player:GetPlayerItemBySlot(i):SetAttributeValue("fire rate penalty HIDDEN", nil)
-					end
-				end
-			end
-			player.Sound = false
 		end
 	end
 
