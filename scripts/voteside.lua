@@ -504,7 +504,7 @@ function OnGameTick()
 
 	if VoteActive == false then
 		for _, player in pairs(ents.GetAllPlayers()) do
-			if (player:InCond(12) == true and player:IsAlive() == true and (player:InCond(5) == false or player:InCond(8) == false or player:InCond(52) == false)) then
+			if (player:InCond(12) == true and player:IsAlive() == true and not (player:InCond(5) == true or player:InCond(52) == true)) then
 				if player.Overlay == 'none' then
 					player.Overlay = 'antiheal'
 					player:SetScriptOverlayMaterial("yiresahud/antiheal")
@@ -520,7 +520,7 @@ function OnGameTick()
 						end
 					end
 				end
-			elseif (player:InCond(65) == true and player:IsAlive() == true and (player:InCond(5) == false or player:InCond(8) == false or player:InCond(52) == false)) then
+			elseif (player:InCond(65) == true and player:IsAlive() == true and not (player:InCond(5) == true or player:InCond(52) == true)) then
 				if player.Overlay == 'none' then
 					player.Overlay = 'ammodrain'
 					player:SetScriptOverlayMaterial("yiresahud/ammodrain")
