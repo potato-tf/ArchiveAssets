@@ -383,7 +383,9 @@ WaveSchedule
 			{
 				targetname red_tank_relay
 				OnTrigger tankbossred,Setteam,2,0.25,-1
+				OnTrigger tankbossred_please_work,Setteam,2,0.25,-1 //w4 InterruptAction, don't touch.
 				OnTrigger tankbossred,AddCaptureDestroyPostfix,destroy_mvm_cactus_valley3,0.5,-1	// cool explodey effect, doesn't work :(
+				OnTrigger tankbossred_please_work,AddCaptureDestroyPostfix,destroy_mvm_cactus_valley3,0.5,-1	// idk if it works or not all i know is dont touch this.
 			}
 			NoFixup 1
 
@@ -2481,11 +2483,11 @@ WaveSchedule
 			TotalCurrency 250
 			WaitBeforeStarting 10
 			FirstSpawnWarningSound mvm/mvm_tele_deliver.wav
-			FirstSpawnMessage "{red}Tank deployed with 15k (15000) HP!" [$SIGSEGV] //Chat message when a bot is spawned for the first time
+			FirstSpawnMessage "{red}Tank deployed with 10k (10000) HP!" [$SIGSEGV] //Chat message when a bot is spawned for the first time
 
 			Tank
 			{
-				Health 15000
+				Health 10000 //15000
 				Name tankbossred
 				ClassIcon tank_red	// _lite
 				Model models/bots/boss_bot/boss_tankred.mdl
@@ -2849,11 +2851,10 @@ WaveSchedule
 			MaxActive 4
 			SpawnCount 1
 			Support Limited	// Support Limited and TotalCount 999 for RandomChoice/Squadded support
-			WaitBeforeStarting 10
+			WaitBeforeStarting 1
+			WaitForAllDead tank
 			WaitBetweenSpawns 3
 
-			RandomChoice
-			{
 				TFBot
 				{
 					Class Pyro
@@ -2861,31 +2862,45 @@ WaveSchedule
 					Name "Dragon Furry"
 					Skill Expert
 					Item "The Dragon's Fury"
+					Action FetchFlag
+					//i'm actually so mad at this. this worked during judging. and then it just breaks. and it doesn't want to b e  f i x e d. this is partly why i dumped my rr2 mission early. do i really want to spend my days debugging garbage that i barely understand that nobody else can help me with because they somehow barely understand it either.
+					//ofc the other part is i don't want to spend 40+ hours making a mission that will be seen as dull/boring/whatever because i'm not actually creative, especially when i have to use notepad hammer to effectively turn a map into a new one. making this mission was fun. making prod was not and fixing this was ABSOLUTELY not. how was spending 2 hours to fix one thing in hoovydam more enjoyable than this?
+					//rant over
+					// EventChangeAttributes	// thx seel (>w< ) //thx therealscroob for fixing an issue similar to this in a completely different mission which helped me here. //thx damno for help aswell.
+					// {
+					// 	Default	// shoot the tank
+					// 	{
+					// 		InterruptAction [$SIGSEGV]
+					// 		{
+					// 			Target "tankbossred_please_work"	// Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					// 			AimTarget "tankbossred_please_work"	// Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
+					// 			WaitWhenDone 1
+					// 			Delay 0.1
+					// 			Repeats 0
+					// 			Cooldown 2 //1 //fix
+					// 			Duration 2 //0.1 //fix
+					// 			KillAimTarget 1
+					// 			OnDoneChangeAttributes "bombflag"
+					// 		}
+					// 	}
 
-					EventChangeAttributes	// thx seel (>w< )
-					{
-						Default	// shoot the tank
-						{
-							InterruptAction [$SIGSEGV]
-							{
-								Target tank_boss	// Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
-								AimTarget tank_boss	// Entity / bot / class name as an alternative. Also: RandomEnemy, ClosestPlayer
-								WaitWhenDone 1
-								Delay 0.1
-								Repeats 0
-								Cooldown 1
-								Duration 0.1
-								KillAimTarget 1
-								OnDoneChangeAttributes Bots
-							}
-						}
-
-						Bots	// shoot the leg things
-						{
-						}
-					}
+					// 	bombflag	// go to the intel cause i can't fix them being lobotomised at some point. 
+					// 	{
+					// 		// ActionOverride FetchFlag [$SIGSEGV]
+					// 		//^ desperate fix attempt one.
+					// 		// InterruptAction [$SIGSEGV]
+					// 		// {
+					// 		// // 	Target classic_mode_intel
+					// 		// // 	Delay 0.1
+					// 		// // 	Repeats 0
+					// 		// // 	Cooldown 2 //1 //fix
+					// 		// // 	Duration 2 //0.1 //fix
+					// 		// 	StopCurrentInterruptAction 1 // If there is already another interrupt action active, completely stop previous action instead of suspending it (Default: 0)
+					// 		// }
+					// 		//^ desperate fix attempt two.
+					// 	}
+					// }
 				}
-			}
 		}
 	}
 
