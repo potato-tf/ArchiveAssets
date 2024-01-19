@@ -20,13 +20,8 @@
 //- Ditto (maybe no 2nd set of fan spawns?)
 //- Reduce Giant Uber duration to 6, health threshold to...1200?
 
-//Changelog 31-10 (spooky)
-//- Added changes to Vita-saw, Huntsman, Spy-cicle
-//- Wave 2, wave 5: Added Hype condition to Homing Flare Rains, indicating their homing ability
-//- Wave 5: Added 12 Killer Bee Scouts to the first subwave.
-//- Wave 6 support's cash moved to teletank's cash to prevent potentially missed money from the support not spawning.
-//- Fixed both wave 6 tanks not deploying the bomb.
-//- Added a forcefield around the scaffolds on the left route, to prevent giants from getting stuck.
+//Changelog 8-11
+//- W5: Ally Pyros will now stray from the bomb to target Giant Charged Scouts
 
 //Themed waves:
 //- Nautical Nightmares (FireWeapon)
@@ -254,6 +249,7 @@ popuwashyon
 				"OnTrigger" "spawnpointprops,skin,0,0,-1" // When triggered, changes all "spawnpointprops" to use the Disabled skin (3)
 			}
 		}
+		//Teletank
 		tanktext
 		{
 			NoFixUp 1
@@ -265,6 +261,7 @@ popuwashyon
 			  "origin" "-4320 -1600 388"
 			}
 		}
+		//Airspawn
 		airtext
 		{
 			NoFixUp 1
@@ -383,6 +380,16 @@ popuwashyon
 				"require_all_tags" "1"
 				"tags" "giant"
 				"targetname" "filter_giants"
+			}
+		}
+		
+		hornet_target
+		{
+			NoFixup 1
+			info_target
+			{
+				"origin" 0 0 0 //gets parented to entity
+				"targetname" "hornetarget"
 			}
 		}
 		
@@ -771,20 +778,14 @@ popuwashyon
         }
 		
 		//Vita-saw change
-		//ty @ Jurrell for making the base form of this. Quite neat!
-		//For those unfamiliar (me):
+		//ty @ Jurrell for making the original form of this. Quite neat! But, not quite future-proof.
+		//For those unfamiliar:
 		//- when Vita-saw is equipped, spawn this entire template
-		//- on spawn, add condition 130 and remove the machinery beam attrib from secondary slot
-		//- then, trigger a logic relay, which activates a filter
-		//- filter checks for cond 130, then adds the attrib with value 2.5 to slot 2
+		//- on spawn or death, remove the machinery beam attrib from secondary slot (failsafe)
+		//- target the activator's "3rd weapon" - in this case, the melee - and get its Item ID
+		//- compare checks if it's 173, the Vita-saw ID; and if correct, it adds the attrib with value 2.5 to slot 2 (melee)
         vsaw_equipped
         {
-            OnSpawnOutput
-	    	{
-	    		Target "vsaw_checker"
-	    		Action "Trigger"
-	    		Delay 0.1
-	    	}
             OnSpawnOutput
 	    	{
 	    		Target "!activator"
@@ -799,25 +800,22 @@ popuwashyon
                 Param "medic machinery beam|1" //15 hp/sec
 	    		Delay 0.1
 	    	}
-            OnSpawnOutput
-            {
-                Target "!activator"
-	        	Action "$AddCond"
-                Param "130"
-            }
-			filter_tf_condition
+			
+			OnSpawnOutput
+	    	{
+	    		Target "@e@m_hMyWeapons$2@!activator"
+	    		Action "$GetProp$m_iItemDefinitionIndex"
+				Param "counter_of_vitals|SetValueCompare|8" //8 is the ID of the stock Bonesaw
+	    		Delay 0.1
+	    	}
+			logic_compare
 			{
-				"targetname" "filter_has_vsaw"
-				"Negated" "0"
-				"condition" "130"
-				"OnPass" "!activator,$AddItemAttribute,medic machinery beam|2.5|1,0.1,-1"
-				"OnFail" "!activator,$AddItemAttribute,medic machinery beam|2.5|1,0.1,-1"
+				"targetname" "counter_of_vitals"
+				"CompareValue" "173" //Item ID of the Vita-saw.
+				
+				"OnEqualTo" "!activator,$AddItemAttribute,medic machinery beam|2.5|1,0.1,-1"
+				"OnNotEqualTo" "!activator,$RemoveItemAttribute,medic machinery beam|2.5|1,0.1,-1"
 			}
-            logic_relay 
-            {
-				"targetname" "vsaw_checker"
-				"OnTrigger" "filter_has_vsaw,TestActivator,!activator,0,-1"
-            }
         }
 		
 		//The Spy-cicle tweak
@@ -870,37 +868,33 @@ popuwashyon
 			
             OnSpawnOutput
 	    	{
-	    		Target "ice_checker"
-	    		Action "Trigger"
+	    		Target "@e@m_hMyWeapons$1@!activator"
+	    		Action "$GetProp$m_iItemDefinitionIndex"
+				Param "counter_of_ice|SetValueCompare|4" //4 is the ID of the stock Knife
 	    		Delay 0.1
 	    	}
             OnSpawnOutput
-            {
-                Target "!activator"
-	        	Action "$AddCond"
-                Param "130"
-            }
-			filter_tf_condition
+	    	{
+	    		Target "@e@m_hMyWeapons$1@!activator"
+	    		Action "$GetProp$m_iItemDefinitionIndex"
+				Param "player|$DisplayTextChat|NULL" //4 is the ID of the stock Knife
+	    		Delay 0.1
+	    	}
+			logic_compare
 			{
-				"targetname" "filter_has_ice"
-				"Negated" "0"
-				"condition" "130"
-				"OnFail" "!activator,$AddItemAttribute,damage bonus HIDDEN|0.7|0,0.1,-1"
-				"OnFail" "!activator,$AddItemAttribute,bullets per shot bonus|4|0,0.1,-1"
-				"OnFail" "!activator,$AddItemAttribute,spread penalty|2|0,0.1,-1"
+				"targetname" "counter_of_ice"
+				"CompareValue" "649" //Item ID of the Spy-cicle.
 				
-				"OnPass" "!activator,$AddItemAttribute,damage bonus HIDDEN|0.7|0,0.1,-1"
-				"OnPass" "!activator,$AddItemAttribute,bullets per shot bonus|4|0,0.1,-1"
-				"OnPass" "!activator,$AddItemAttribute,spread penalty|2|0,0.1,-1"
+				"OnEqualTo" "!activator,$AddItemAttribute,damage bonus HIDDEN|0.7|1,0.1,-1"
+				"OnEqualTo" "!activator,$AddItemAttribute,bullets per shot bonus|4|1,0.1,-1"
+				"OnEqualTo" "!activator,$AddItemAttribute,spread penalty|2|1,0.1,-1"
+				
+				"OnNotEqualTo" "!activator,$RemoveItemAttribute,damage bonus HIDDEN|0.7|1,0.1,-1"
+				"OnNotEqualTo" "!activator,$RemoveItemAttribute,bullets per shot bonus|4|1,0.1,-1"
+				"OnNotEqualTo" "!activator,$RemoveItemAttribute,spread penalty|2|1,0.1,-1"
 			}
-            logic_relay 
-            {
-				"targetname" "ice_checker"
-				"OnTrigger" "filter_has_ice,TestActivator,!activator,0,-1"
-            }
         }
 	}
-	
 	
 	
 	//Vortex-es. Vortices?
@@ -913,22 +907,10 @@ popuwashyon
 	
 	SpawnTemplate "GetOffMe" [$SIGSEGV] //nav fix
 	
-	// SpawnTemplate [$SIGSEGV]
-	// {
-		// Name "SwirlyFull"
-		// Origin "1918 4208 2103"
-	// }
-	
 	
 								////// Props //////
 	//Angle: Z+ = clockwise, when towards 0 0 0!!
 	//Eyes
-	// SpawnTemplate [$SIGSEGV]
-	// {
-		// Name "spookeyes"
-		// Origin "-5646 -271 -34"
-		// Angles "0 -90 0"
-	// }
 	
 	
 	SpawnTemplate [$SIGSEGV] //scaffold
@@ -942,16 +924,6 @@ popuwashyon
 	////////////////////////////////////////////////////////////////////////////////
 	
 	//Weapon rebalances
-	
-	// PlayerShootTemplate
-	// {
-		// Name Spellbomb_Super_Red
-		// Speed 1000
-		// Offset "20 0 0"
-		// AttachToProjectile 0
-		// OverrideShoot 1
-		// ItemName "The Family Business"
-	// }
 	
 	ItemAttributes
 	{
@@ -1220,6 +1192,7 @@ popuwashyon
 			{
 				"cancel falling damage"	1
 				"collect currency on kill" 1
+				"dmg taken mult from special damage type 1" 0.75
 			}
 			FireWeapon [$SIGSEGV]
 			{
@@ -1234,6 +1207,16 @@ popuwashyon
 				Name "TF_COND_REPROGRAMMED"
 				Duration 1606180
 				Delay 0.01
+			}
+			InterruptAction [$SIGSEGV]
+			{
+				Target "hornetarget"
+				AimTarget "hornetarget"
+				WaitWhenDone 1
+				Delay 0.1 // Time before the first task starts (Default: 10)
+				Repeats 0 // How many times should bot do the task in total (Default: 0 - Infinite)
+				Cooldown 1 //Time between each task (Default: 10)
+				Duration 6
 			}
 		}
 		Red_Giant_Medic_Shield //tries to stick to players
@@ -2318,6 +2301,7 @@ popuwashyon
 			Attributes AlwaysCrit
 			MaxVisionRange 800
 			Tag giant
+			SpawnTemplate hornet_target [$SIGSEGV]
 			ItemAttributes
 			{
 				ItemName "Bumble Beenie"
@@ -2588,7 +2572,7 @@ popuwashyon
 				Speed 800 //Velocity
 				OverrideShoot 1 //Stop default projectile from being spawned (Default: 0)
 				Spread 0
-			}	
+			}
 		}
 		
 		//Special space bots
