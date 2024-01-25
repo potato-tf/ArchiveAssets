@@ -4,6 +4,16 @@
 local deathCounts = {}
 local waveActive = false
 
+function OnPlayerConnected(player)
+	local handle = player:GetHandleIndex()
+
+	deathCounts[handle] = 0
+
+	player:AddCallback(ON_DEATH, function()
+		deathCounts[handle] = deathCounts[handle] + 1
+	end)
+end
+
 function OnPlayerDisconnected(player)
 	deathCounts[player:GetHandleIndex()] = nil
 end
@@ -53,7 +63,7 @@ function chargerLogic(_, activator)
 				return
 			end
 			
-			if activator.m_flChargeMeter < 100 then
+			if activator.m_flChargeMeter < 95 then -- from 100, so the chargers have a bit of a 'tell' when they're getting ready to charge
                 return
             end
 
@@ -85,7 +95,6 @@ local function cashforhits(activator)
 		end
 	end
 
-	
 	callbacks.damagetype = activator:AddCallback(ON_DAMAGE_RECEIVED_PRE, function(_, damageInfo)
 		-- PrintTable(damageInfo)
 		local mult = (DoublePointsDuration > 0) and 2 or 1
@@ -110,9 +119,18 @@ local function cashforhits(activator)
 
 		local curHealth = activator.m_iHealth
 
-		if InstakillDuration > 0 and activator.m_szNetname == "Zombie" and hitter:InCond(56) then --instakill functionality -washy
+		if InstakillDuration > 0 and activator.m_szNetname == "Zombie" and hitter:InCond(56) == true then --instakill functionality -washy
 			damage = curHealth
 			activator.m_iHealth = 0
+		end
+		
+		if damage > curHealth and activator.m_szNetname == "Tank" then -- snuck in here so we don't need a separate function for it
+			hitter:SpeakResponseConcept("TLK_MVM_TANK_DEAD") -- ding dong the tank is dead
+		end
+		
+		if activator.m_szNetname == "Zombie" and hitter.m_szNetname == "Tank" then
+			damage = curHealth
+			activator.m_iHealth = 0 -- if converted zombie is hit by Tank, treat it as Instakill
 		end
 
 		--local isLethal = curHealth - (damage + 1) <= 0
@@ -176,9 +194,13 @@ local function cashforhits(activator)
 
 		local curHealth = activator.m_iHealth
 
-		if InstakillDuration > 0 and activator.m_szNetname == "Zombie" and hitter:InCond(56) then --instakill functionality -washy
+		if InstakillDuration > 0 and activator.m_szNetname == "Zombie" and hitter:InCond(56) == true then --instakill functionality -washy
 			damage = curHealth
 			activator.m_iHealth = 0
+		end
+		
+		if damage > curHealth and activator.m_szNetname == "Tank" then -- snuck in here so we don't need a separate function for it
+			hitter:SpeakResponseConcept("TLK_MVM_TANK_DEAD") -- ding dong the tank is dead
 		end
 
 		local function addCurrency(amount)
@@ -221,7 +243,7 @@ function OnWaveSpawnBot(bot)
 	end)
 end
 
-function playertracker(_, activator) -- the only thing here made by Sntr
+function playertracker(_, activator) -- the only other thing here made by Sntr
 	local callbacks = {}
 	
 	local function removeCallbacks()
@@ -255,7 +277,7 @@ function playertracker(_, activator) -- the only thing here made by Sntr
 	end
 	
 	callbacks.damagetype = activator:AddCallback(ON_DAMAGE_RECEIVED_PRE, function(_, damageInfo)
-		if activator:InCond(5) then
+		if activator:InCond(5) == true then
 			return
 		end
 
@@ -269,7 +291,7 @@ function playertracker(_, activator) -- the only thing here made by Sntr
 		local damage = damageInfo.Damage
 		local curHealth = activator.m_iHealth
 				
-		if damage > curHealth and activator:InCond(129) then --  give full heal + uber when condition 70 is removed
+		if damage > curHealth and activator:InCond(129) == true then --  give full heal + uber when condition 70 is removed
 			activator:AddCond(5,2.5)
 			activator:AddHealth(300,1)
 			activator:PlaySoundToSelf("misc/halloween/merasmus_stun.wav")
@@ -312,14 +334,10 @@ function OnWaveReset()
 			end
 		end
 	end
-	if TextDisplay ~= nil then
-		timer.Stop(TextDisplay)
-		TextDisplay = nil
-	end
+	timer.Stop(TextDisplay)
 end
 
 function OnGameTick()
-	local currencyCollected = ents.FindByClass("tf_player_manager").m_iCurrencyCollected
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
 			if player.m_bUsingActionSlot == 1 and player.InteractCooldown ~= true then
@@ -334,7 +352,11 @@ function OnGameTick()
 				player.holdTime = 0
 			end
 			player:GetUserId()
-			currencyCollected[player:GetNetIndex()+1] = player.m_nCurrency
+			for k, v in pairs(ents.FindByClass("tf_player_manager"):DumpProperties().m_iUserID) do
+				if v == player:GetUserId() then
+					ents.FindByClass("tf_player_manager"):AcceptInput("$SetProp$m_iCurrencyCollected$" .. k-1, player.m_nCurrency)
+				end
+			end
 			if player.m_nCurrencyDiff ~= player.m_nCurrency then
 				if player.m_nCurrency - player.m_nCurrencyDiff > 0 then
 					player.CashText = 132
@@ -414,6 +436,7 @@ function OnWaveStart()
 	BoxTable = {}
 	waveActive = true
 	ThunderGunTaken = false
+	RejuvenatorTaken = false
 	DumpsterRoulette = {1,2,3,4,5}
 	DumpsterRouletteIndex = 1
 	PowerupTable = {[1] = "DoublePoints", [2] = "FireSale", [3] = "Instakill", [4] = "Nuke", [5] = "MaxAmmo", [6] = "BonusPoints"}
@@ -493,18 +516,6 @@ function OnWaveStart()
 					player:Print(2,"")
 				end
 			end)
-	--	ents.FindByName("vm_flopmsg"):AddCallback(ON_START_TOUCH,
-	--		function(_, player)
-	--			if player:IsRealPlayer() and player.m_nCurrency >= 1000 then
-	--				player.InteractWith = "vm_flopbutton"
-	--			end
-	--		end)
-	--	ents.FindByName("vm_flopmsg"):AddCallback(ON_END_TOUCH,
-	--		function(_, player)
-	--			if player:IsRealPlayer() then
-	--				player.InteractWith = "nothing"
-	--			end
-	--		end)
 	end)
 	TextDisplay = timer.Create(1, function()
 		ents.FindByName("poweruptext"):AcceptInput("$SetKey$message",FireSaleText .. "\n" ..InstakillText .. "\n" ..DoublePointsText)
@@ -514,6 +525,11 @@ function OnWaveStart()
 end
 
 function Interact(player)
+	if player.InteractWith == "revive_button" then -- trigger_multiple attached to reanimator
+		ents.FindByName("revive_button"):AcceptInput("Press",_,player)
+		timer.Simple(1, function() player.InteractCooldown = true end) -- put way in the start because I hope I don't break the rest of this function
+		timer.Simple(2.3, function() player.InteractCooldown = false end)
+	end
 	if player.InteractWith == "dumpsterbutton1" and player.m_nCurrency >= DumpsterCost and ents.FindByName("dumpster_light1").m_On == false then
 		OpenDumpsterBox(player, 1)
 		player.m_nCurrency = player.m_nCurrency - DumpsterCost
@@ -549,12 +565,12 @@ function Interact(player)
 			player:Print(2,"You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_quickrevbutton" and player.m_nCurrency >= 1500 then
-		if player:InCond(70) then
+		if player:InCond(70) == false then
 			ents.FindByName("vm_quickrevbutton"):AcceptInput("Press",_,player)
 			if player:GetPlayerItemBySlot(1):GetClassname() ~= "tf_weapon_pipebomblauncher" then PlayViewmodelSequence(player) end
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
-		elseif player:InCond(70) then
+		elseif player:InCond(70) == true then
 			player:Print(2,"You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_speedbutton" and player.m_nCurrency >= 3000 then
@@ -732,7 +748,7 @@ function ActivateBonusPoints()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
 			player:Print(2,"Bonus Points!")
-			player:AcceptInput("$AddCurrency",1000)
+			player:AcceptInput("$AddCurrency",2000)
 			player:PlaySoundToSelf("shadows/powerup_money_01.mp3")
 			player:PlaySoundToSelf("mvm/mvm_money_pickup.wav")
 		end
@@ -819,7 +835,8 @@ BoxRoulette =
 		{text = "The SMG", itemname = "Primary SMG", model = "models/weapons/w_models/w_smg.mdl", slot = "primary", response = "TLK_MVM_LOOT_COMMON"},
 		{text = "The Crusader's Crossbow", itemname = "The Crusader's Crossbow", model = "models/weapons/c_models/c_crusaders_crossbow/c_crusaders_crossbow.mdl", slot = "primary", response = "TLK_MVM_LOOT_COMMON"},
 		{text = "The Crusader's Crossbow", itemname = "The Crusader's Crossbow", model = "models/weapons/c_models/c_crusaders_crossbow/c_crusaders_crossbow.mdl", slot = "primary", response = "TLK_MVM_LOOT_COMMON"},
-		{text = "The Black Box", itemname = "The Black Box", model = "models/workshop/weapons/c_models/c_blackbox/c_blackbox.mdl", slot = "primary", response = "TLK_MVM_LOOT_RARE"},
+		{text = "The DNA Rejuvenator", itemname = "DNA Rejuvenator", model = "models/workshop/weapons/c_models/c_uberneedle/c_uberneedle.mdl", slot = "melee", response = "TLK_MVM_LOOT_ULTRARARE"},
+		{text = "Das Maschinenpistole", itemname = "Das Maschinenpistole", model = "models/weapons/c_models/c_mp40/c_mp40.mdl", slot = "primary", response = "TLK_MVM_LOOT_RARE"},
 		{text = "Das Maschinenpistole", itemname = "Das Maschinenpistole", model = "models/weapons/c_models/c_mp40/c_mp40.mdl", slot = "primary", response = "TLK_MVM_LOOT_RARE"},
 		{text = "a dud", itemname = "Dud", model = "models/workshop/weapons/c_models/c_invasion_pistol/c_invasion_pistol.mdl"},
 	},
@@ -875,6 +892,10 @@ BoxRoulette =
 }
 
 function SpawnDumpsterBox(box)
+	if FireSaleDuration <= 0 then
+		BoxTable[box].firesale = false
+		BoxTable[box].dud = true	
+	end
 	if BoxTable[box].spawned == false then
 		BoxTable[box].spawned = true
 		ents.FindByName("dumpster_push"..box):AcceptInput("$TeleportToEntity","dumpster_tele_"..box)
@@ -980,6 +1001,12 @@ function OpenDumpsterBox(player, box)
 				BoxTable[box].text = "The Double Barrel"
 				BoxTable[box].slot = "secondary"
 				BoxTable[box].response = "TLK_MVM_LOOT_COMMON"
+			elseif BoxTable[box].weapon == "DNA Rejuvenator" and RejuvenatorTaken == true then
+				ents.FindByName("dumpster_weapon"..box):AcceptInput("$SetModel", "models/weapons/w_models/w_smg.mdl")
+				BoxTable[box].weapon = "Primary SMG"
+				BoxTable[box].text = "The SMG"
+				BoxTable[box].slot = "primary"
+				BoxTable[box].response = "TLK_MVM_LOOT_COMMON"
 				BoxTable[box].message = ents.FindByName("dumpster_msg"..box):AddCallback(ON_START_TOUCH,
 				function(_, player)
 					if player:IsRealPlayer() and player == owner then
@@ -1035,8 +1062,10 @@ function DumpsterBoxTakeWeapon(player, box)
 	ents.FindByName("dumpster_weapon"..box):AcceptInput("Disable")
 	player:GiveItem(BoxTable[box].weapon)
 	if BoxTable[box].weapon == "Thunder Gun" then ThunderGunTaken = true end
+	if BoxTable[box].weapon == "DNA Rejuvenator" then RejuvenatorTaken = true end				-- nuh uh you get only one of these like tgun
 	if BoxTable[box].slot == "primary" then player.loadout[0] = BoxTable[box].weapon end
 	if BoxTable[box].slot == "secondary" then player.loadout[1] = BoxTable[box].weapon end
+	if BoxTable[box].slot == "melee" then player.loadout[2] = BoxTable[box].weapon end 		-- this line is for a single weapon :^)
 	player:RefillAmmo()
 	player:SpeakResponseConcept(BoxTable[box].response, 0.6)
 	player:PlaySoundToSelf("items/gunpickup2.wav")
@@ -1065,4 +1094,56 @@ end
 function GiveSuperShank(_,player)
 	player:GiveItem("Super Shank")
 	player.loadout[2] = "Super Shank"
+end
+
+function spawn_revive_marker(_,activator) -- return of Sntr, the logic below is a portover from Titanium Thieves
+
+    for k, marker in pairs(ents.FindAllByClass("entity_revive_marker")) do
+        if marker.m_hOwner == activator then
+            templateEnts = ents.SpawnTemplate("Revivemarker", {parent = marker})
+			ents.FindByName("revive_trigger*"):AddCallback(ON_START_TOUCH,
+			function(_, player)
+				if player:IsRealPlayer() and player:IsAlive() then -- IsAlive is so dead people somehow don't interact with the button
+					player.InteractWith = "revive_button"
+				end
+			end)
+			ents.FindByName("revive_trigger*"):AddCallback(ON_END_TOUCH,
+			function(_, player)
+				if player:IsRealPlayer() then
+					player.InteractWith = "nothing"
+					player:Print(2,"")
+				end
+			end)
+        end
+    end
+end
+
+function revivelogic(_,activator) -- haw haw now start living
+    -- There's now Mince in here as well, everyone's invited to Shadows
+    if (not IsValid(activator) or not activator:IsAlive()) then return; end -- still has the thing where it stays active!!
+    
+    activator:TauntFromItem("Laugh Taunt")
+    local think_timer = nil;
+    local found_animator = false;
+    think_timer = timer.Simple(0.65, function()
+        for _, reanimator in pairs(ents.FindInSphere(activator:GetAbsOrigin(), 150)) do
+            if reanimator:GetClassname() == "entity_revive_marker" then
+            found_animator = true;
+
+            reanimator.m_hOwner:ForceRespawnDead()
+            reanimator.m_hOwner:PlaySoundToSelf("mvm/mvm_revive.wav")
+            reanimator.m_hOwner:SpeakResponseConcept("TLK_RESURRECTED")
+            activator:PlaySoundToSelf("mvm/mvm_revive.wav")
+            reanimator.m_hOwner:Teleport(activator:GetAbsOrigin())
+            reanimator.m_hOwner:AddCond(51,2) -- give invulnerability to revived players
+            activator:StunPlayer(0.2,1,TF_STUNFLAG_BONKSTUCK)
+            activator:AddCurrency(50)
+			return 	-- we did it reddit
+			end
+        end
+
+        if not found_animator then
+          pcall(timer.Stop, think_timer);
+        end
+    end)
 end
