@@ -776,8 +776,8 @@ BoxRoulette =
 	},
 	[2] =
 	{
-		{text = "The Shotgun", itemname = "TF_WEAPON_SHOTGUN_PYRO", model = "models/weapons/w_models/w_shotgun.mdl", slot = "secondary", response = "TLK_MVM_LOOT_COMMON"},
-		{text = "The Shotgun", itemname = "TF_WEAPON_SHOTGUN_PYRO", model = "models/weapons/w_models/w_shotgun.mdl", slot = "secondary", response = "TLK_MVM_LOOT_COMMON"},
+	--	{text = "The Shotgun", itemname = "TF_WEAPON_SHOTGUN_PYRO", model = "models/weapons/w_models/w_shotgun.mdl", slot = "secondary", response = "TLK_MVM_LOOT_COMMON"}, -- no more sniper shotgun
+	--	{text = "The Shotgun", itemname = "TF_WEAPON_SHOTGUN_PYRO", model = "models/weapons/w_models/w_shotgun.mdl", slot = "secondary", response = "TLK_MVM_LOOT_COMMON"}, -- uberupgrade makes this overtake Primary weapon
 		{text = "The Scattergun", itemname = "TF_WEAPON_SCATTERGUN", model = "models/weapons/w_models/w_scattergun.mdl", slot = "primary", response = "TLK_MVM_LOOT_COMMON"},
 		{text = "The Scattergun", itemname = "TF_WEAPON_SCATTERGUN", model = "models/weapons/w_models/w_scattergun.mdl", slot = "primary", response = "TLK_MVM_LOOT_COMMON"},
 		{text = "The Double Barrel", itemname = "Double Barrel", model = "models/weapons/c_models/c_shotfun/c_shotfun.mdl", slot = "secondary", response = "TLK_MVM_LOOT_COMMON"},
@@ -810,8 +810,8 @@ BoxRoulette =
 	},
 	[4] =
 	{
-		{text = "The Shotgun", itemname = "TF_WEAPON_SHOTGUN_PYRO", model = "models/weapons/w_models/w_shotgun.mdl", slot = "secondary", response = "TLK_MVM_LOOT_COMMON"},
-		{text = "The Shotgun", itemname = "TF_WEAPON_SHOTGUN_PYRO", model = "models/weapons/w_models/w_shotgun.mdl", slot = "secondary", response = "TLK_MVM_LOOT_COMMON"},
+	--	{text = "The Shotgun", itemname = "TF_WEAPON_SHOTGUN_PYRO", model = "models/weapons/w_models/w_shotgun.mdl", slot = "secondary", response = "TLK_MVM_LOOT_COMMON"}, -- removed due to loadout issues
+	--	{text = "The Shotgun", itemname = "TF_WEAPON_SHOTGUN_PYRO", model = "models/weapons/w_models/w_shotgun.mdl", slot = "secondary", response = "TLK_MVM_LOOT_COMMON"}, -- uberupgrade takes away Primary weapon
 		{text = "The Double Barrel", itemname = "Double Barrel", model = "models/weapons/c_models/c_shotfun/c_shotfun.mdl", slot = "secondary", response = "TLK_MVM_LOOT_COMMON"},
 		{text = "The Double Barrel", itemname = "Double Barrel", model = "models/weapons/c_models/c_shotfun/c_shotfun.mdl", slot = "secondary", response = "TLK_MVM_LOOT_COMMON"},
 		{text = "The SMG", itemname = "TF_WEAPON_SMG", model = "models/weapons/w_models/w_smg.mdl", slot = "secondary", response = "TLK_MVM_LOOT_COMMON"},
@@ -1137,7 +1137,7 @@ function revivelogic(_,activator) -- haw haw now start living
             reanimator.m_hOwner:Teleport(activator:GetAbsOrigin())
             reanimator.m_hOwner:AddCond(51,2) -- give invulnerability to revived players
             activator:StunPlayer(0.2,1,TF_STUNFLAG_BONKSTUCK)
-            activator:AddCurrency(50)
+        --    activator:AddCurrency(50) -- damn it people
 			return 	-- we did it reddit
 			end
         end
