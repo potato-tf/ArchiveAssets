@@ -1137,7 +1137,11 @@ function revivelogic(_,activator) -- haw haw now start living
             reanimator.m_hOwner:Teleport(activator:GetAbsOrigin())
             reanimator.m_hOwner:AddCond(51,2) -- give invulnerability to revived players
             activator:StunPlayer(0.2,1,TF_STUNFLAG_BONKSTUCK)
+<<<<<<< HEAD
         --    activator:AddCurrency(50) -- damn it people
+=======
+            activator:AddCurrency(50)
+>>>>>>> main
 			return 	-- we did it reddit
 			end
         end
