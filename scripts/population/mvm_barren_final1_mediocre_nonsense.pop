@@ -1,0 +1,2319 @@
+#base robot_giant.pop
+#base robot_standard.pop
+#base robot_gatebot.pop
+
+
+
+population
+{
+	StartingCurrency	600
+	RespawnWaveTime	6
+	CanBotsAttackWhileInSpawnRoom	no
+	AddSentryBusterWhenDamageDealtExceeds	500
+    AddSentryBusterWhenKillCountExceeds	10
+	Templates
+	{
+		T_TFBot_MSB
+		{
+			Health	500
+			Name	"Nano Sentry Buster"
+			Scale	0.2
+			Class	Demoman
+			Skill	Expert
+			WeaponRestrictions	MeleeOnly
+			Item	"tf_weapon_grenadelauncher"
+			Item	"tf_weapon_pipebomblauncher"
+			Item	"the ullapool caber"
+			CharacterAttributes
+			{
+				"move speed bonus"	4
+				"override footstep sound set"	7
+				"cannot be backstabbed"	1
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+		}
+		T_TFBot_MSB2
+		{
+			Health	750
+			Name	"Mini Sentry Buster"
+			Scale   0.5
+			Class	Demoman
+			Skill	Expert
+			WeaponRestrictions	MeleeOnly
+			Item	"tf_weapon_grenadelauncher"
+			Item	"tf_weapon_pipebomblauncher"
+			Item	"the ullapool caber"
+			CharacterAttributes
+			{
+				"move speed bonus"	2
+				"airblast vulnerability multiplier"	0.75
+				"override footstep sound set"	7
+				"cannot be backstabbed"	1
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+		}
+		T_TFBot_GSB
+		{
+			Health	9001
+			Name	"Giant Sentry Buster"
+			Scale   2
+			Class	Demoman
+			Skill	Expert
+			WeaponRestrictions	MeleeOnly
+			Item	"tf_weapon_grenadelauncher"
+			Item	"tf_weapon_pipebomblauncher"
+			Item	"the ullapool caber"
+			CharacterAttributes
+			{
+				"move speed bonus"	0.4
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"cannot be backstabbed"	1
+				"override footstep sound set"	3
+			}
+		}
+	}
+	Mission
+	{
+		Objective DestroySentries
+
+		InitialCooldown 25
+		Where spawnbot
+		BeginAtWave 1
+		RunForThisManyWaves 5
+
+		CooldownTime 25        
+
+            RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_MSB
+					Name "Nano Sentry Buster"
+				}
+				TFBot
+				{
+					Template T_TFBot_MSB2
+					Name "Mini Sentry Buster"
+				}
+				TFBot
+				{
+					Template T_TFBot_GSB
+					Name "Giant Sentry Buster"
+				}
+			}
+
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	a1
+			TotalCurrency	10
+			TotalCount	35
+			MaxActive	21
+			SpawnCount	7
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	4
+			Squad
+			{
+				TFBot
+				{
+					Health	150
+					Name	"Minor Abductor"
+					BehaviorModifiers	Mobber
+					Class	Scout
+					ClassIcon scout_shortstop
+					Skill	Normal
+					Item	"the shortstop"
+					Item	"tf_weapon_pistol_scout"
+					Item	"tf_weapon_bat"
+					Item	"parasite hat"
+					CharacterAttributes
+					{
+						"apply look velocity on damage"	-2000
+						"damage causes airblast" 1
+						"damage penalty"	0.1
+						"health drain" -10
+						"faster reload rate"	0.1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	a2
+			WaitForAllDead	a1
+			TotalCurrency	40
+			TotalCount	25
+			MaxActive	15
+			SpawnCount	5
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	4
+			Squad
+			{
+				TFBot
+				{
+					Health	300
+					Name	"Motion Blur"
+					Class	Soldier
+					ClassIcon soldier_spammer
+					Skill	Normal
+					Item	"the cow mangler 5000"
+					Item	"tf_weapon_shotgun_soldier"
+					Item	"tf_weapon_shovel"
+					ItemAttributes
+					{
+						ItemName	"the cow mangler 5000"
+						"projectile spread angle penalty"	10
+						"fire rate bonus"	0.2
+						"faster reload rate"	0.1
+						"damage penalty"	0.05
+						"clip size bonus"   2
+						"Projectile speed decreased"	0.4
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	a3
+			WaitForAllDead	a2
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	5
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	2000
+					Name	"Major Abductor"
+					Scale	1.4
+					Class	Scout
+					ClassIcon scout_SHORTSTOP
+					Skill	Expert
+					WeaponRestrictions	PrimaryOnly
+					Attributes	"MiniBoss"
+					Attributes  "UseBossHealthBar"
+					Item	"the shortstop"
+					Item	"tf_weapon_pistol_scout"
+					Item	"tf_weapon_bat"
+					Item	"parasite hat"
+					CharacterAttributes
+					{
+						"head scale"	1.3
+						"move speed bonus"	0.25
+						"apply look velocity on damage"	-10000
+						"damage causes airblast" 1
+					}
+					ItemAttributes
+					{
+						ItemName	"the shortstop"
+						"damage penalty"	0.1
+						"mod max primary clip override"	30
+						"dmg bonus vs buildings" 100
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	a4
+			WaitForAllDead	a3
+			TotalCurrency	250
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	1
+			Squad
+			{
+				TFBot
+				{
+					Health	900
+					Name	"Atomic Beaty"
+					Scale	1.5
+					BehaviorModifiers	Mobber
+					Class	Soldier
+					ClassIcon soldier_crit
+					Skill	Expert
+					Attributes	"MiniBoss"
+					Attributes  "UseBossHealthBar"
+					Attributes	"AlwaysCrit"
+					Item	"the original"
+					Item	"tf_weapon_shotgun_soldier"
+					Item	"tf_weapon_shovel"
+					Item	"the crafty hair"
+					CharacterAttributes
+					{
+						"move speed bonus"	0.4
+						"use large smoke explosion"	1
+						"airblast vulnerability multiplier" 2
+					}
+					ItemAttributes
+					{
+						ItemName	"the original"
+						"Projectile speed decreased"	0.1
+						"damage bonus"	11
+						"use large smoke explosion"	1
+						"Blast radius increased"	20
+						"fire rate bonus"	10
+						"faster reload rate"	3
+						"dmg pierces resists absorbs"  1
+						"dmg bonus vs buildings" 0.001
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name as
+			WaitForAllSpawned a4
+			TotalCurrency	0
+			TotalCount	6
+			MaxActive	3
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	5
+			WaitBetweenSpawns	1
+			Support	Limited
+			Squad
+			{
+				TFBot
+				{
+					Health	175
+					Name	Pyro
+					Class	Pyro
+					Skill	Expert
+					Item	"tf_weapon_flamethrower"
+					Item	"tf_weapon_shotgun_pyro"
+					Item	"tf_weapon_fireaxe"
+					CharacterAttributes
+					{
+						"move speed bonus"	0.8
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	a5
+			WaitForAllDead	a4
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	3500
+					Name	"Captain Airlock"
+					Scale	0.5
+					Class	Soldier
+					ClassIcon soldier_barrage
+					Skill	Expert
+					WeaponRestrictions	PrimaryOnly
+					Attributes	"MiniBoss"
+					Attributes  "UseBossHealthBar"
+					Item	"the direct hit"
+					Item	"tf_weapon_shotgun_soldier"
+					Item	"the chief constable"
+					CharacterAttributes
+					{
+						"health regen"	40
+						"move speed bonus"	0.15
+						"damage force reduction"	0
+						"airblast vulnerability multiplier"	0
+						"override footstep sound set"	3
+						"airblast vertical vulnerability multiplier"	0
+						"rage giving scale"	0.1
+						"apply z velocity on damage" 2500
+					}
+					ItemAttributes
+					{
+						ItemName	"the direct hit"
+						"mod mini-crit airborne"	1
+						"Projectile speed decreased" 2.1
+						"damage penalty"	0.001
+						"faster reload rate"	0.01
+						"fire rate bonus"	0.04
+						"projectile spread angle penalty"	1
+						"dmg pierces resists absorbs"  1
+						"dmg bonus vs buildings" 10000
+						"rocket specialist" 1
+					}
+					ItemAttributes
+					{
+                        ItemName    "the chief constable"
+					    "attach particle effect" 14
+					}
+				}
+			}
+		}
+				WaveSpawn
+		{
+			Name	a6
+			WaitForAllSpawned	a5
+			TotalCurrency	0
+			TotalCount	9
+			MaxActive	9
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	5
+			Support	limited
+			Squad
+			{
+				TFBot
+				{
+					Health	12500
+					Name	"Dynamite"
+					BehaviorModifiers	Mobber
+					Class	Demoman
+					ClassIcon demo_caber
+					Skill	Expert
+					Attributes  "IgnoreFlag"
+					WeaponRestrictions	MeleeOnly
+					Item	"tf_weapon_grenadelauncher"
+					Item	"the splendid screen"
+					Item	"the ullapool caber"
+					Item	"sober stuntman"
+					CharacterAttributes
+					{
+						"health regen" 5000
+                        "cannot be backstabbed" 1
+                        "blast dmg to self increased" 100000
+						"damage force reduction" 0.01
+						"airblast vulnerability multiplier" 0.01
+						"charge time increased"	10
+						"charge recharge rate increased"	10
+						"move speed bonus"	4
+					}
+					ItemAttributes
+					{
+						ItemName	"the ullapool caber"
+						"damage bonus"	0.001
+						"no crit boost" 1
+					}
+                    ItemAttributes
+					{
+						ItemName	"the splendid screen"
+						"Attack not cancel charge"	1
+					}
+				}
+			}
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	b1
+			TotalCurrency	100
+			TotalCount	16
+			MaxActive	8
+			SpawnCount	8
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	50
+					Name	"Tiny Tickles"
+					Scale	0.3
+					BehaviorModifiers	Mobber
+					Class	HeavyWeapons
+					ClassIcon heavy_mittens
+					Skill	Expert
+					WeaponRestrictions	MeleeOnly
+					Attributes	"AlwaysCrit"
+					Attributes  "IgnoreFlag"
+					Item	"tf_weapon_minigun"
+					Item	"tf_weapon_shotgun_hwg"
+					Item	"the holiday punch"
+					Item	"the b.m.o.c."
+					CharacterAttributes
+					{
+						"move speed bonus"	2
+					    "melee range multiplier"	30
+						"melee bounds multiplier"	10
+					}
+					ItemAttributes
+					{
+						ItemName	"the holiday punch"
+						"crit forces victim to laugh"	1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	b1s
+			WaitForAllSpawned	b1
+			TotalCurrency	0
+			TotalCount  10
+			MaxActive	5
+			SpawnCount	5
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	1
+			Squad
+			{
+				TFBot
+				{
+					Health	200
+					AutoJumpMin	1
+					AutoJumpMax	1
+					Name	"Evasive Reinforcements"
+					BehaviorModifiers	Mobber
+					Class	HeavyWeapons
+					ClassIcon heavy_shotgun
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Attributes	"AutoJump"
+					Attributes  "Parachute"
+					Attributes  "IgnoreFlag"
+					Item	"The B.A.S.E. Jumper"
+					Item	"tf_weapon_shotgun_hwg"
+					CharacterAttributes
+					{
+						"move speed bonus"	4
+						"increased jump height"	2
+						"increased air control" 10000
+					}
+					ItemAttributes
+					{
+					    ItemName    "tf_weapon_shotgun_hwg"
+						"damage bonus"	0.75
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	tank1
+			WaitForAllDead	b1s
+			TotalCurrency	150
+			TotalCount	5
+			MaxActive	5
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	5
+			WaitBetweenSpawns	1
+			Squad
+			{
+				Tank
+				{
+					Health	1200
+					Name	tank1
+					Speed	225
+					StartingPathTrackNode	boss_path_1
+					OnKilledOutput
+					{
+						Target	boss_dead_relay
+						Action	Trigger
+					}
+					OnBombDroppedOutput
+					{
+						Target	boss_deploy_relay
+						Action	Trigger
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	b3
+			WaitForAllDead	tank1
+			TotalCurrency	50
+			TotalCount	15
+			MaxActive	15
+			SpawnCount	5
+			Where	spawnbot
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	4
+			Squad
+			{
+				TFBot
+				{
+					Health	325
+					Name	"Bowling Night"
+					Class	Demoman
+					Skill	Normal
+					Attributes	"HoldFireUntilFullReload"
+					Item	"tf_weapon_grenadelauncher"
+					Item	"tf_weapon_pipebomblauncher"
+					Item	"tf_weapon_bottle"
+					Item	"mask of the shaman"
+					ItemAttributes
+					{
+						ItemName	tf_weapon_grenadelauncher
+						"fire rate bonus"	0.02
+						"damage bonus"	0.2
+						"Blast radius increased"	3
+						"clip size bonus"	2
+						"projectile spread angle penalty"	10
+						"fuse bonus" 1.5
+						"faster reload rate"	0.25
+						"custom projectile model" "models/weapons/w_models/w_cannonball.mdl"
+						"dmg bonus vs buildings" 0.01
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	b4
+			WaitForAllDead	b3
+			TotalCurrency	200
+			TotalCount	20
+			MaxActive	20
+			SpawnCount	5
+			Where	spawnbot
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	5
+			Squad
+			{
+				TFBot
+				{
+					Health	400
+					Name	"Slicer"
+					BehaviorModifiers	Mobber
+					Class	Demoman
+					ClassIcon demoknight_samurai
+					Skill	Expert
+					Attributes  "IgnoreFlag"
+					WeaponRestrictions	MeleeOnly
+					Item	"tf_weapon_grenadelauncher"
+					Item	"the splendid screen"
+					Item	"the half-zatoichi"
+					Item	"ttg glasses"
+					CharacterAttributes
+					{
+						"move speed bonus"	3
+                        "charge time increased"	10
+						"charge recharge rate increased"	10
+					}
+					ItemAttributes
+					{
+						ItemName	"the half-zatoichi"
+						"fire rate bonus"	0.5
+						"damage bonus"	0.02
+					}
+					ItemAttributes
+					{
+						ItemName	"the splendid screen"
+						"Attack not cancel charge"	1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	b5
+			WaitForAllDead	b4
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	1500
+					Name	"Muffler"
+					Scale	1.9
+					BehaviorModifiers	Mobber
+					Class	Medic
+					ClassIcon medic_d
+					Skill	Normal
+					Attributes	"AlwaysCrit"
+					Attributes	"MiniBoss"
+					Attributes  "UseBossHealthBar"
+					Item	"the crusader's crossbow"
+					Item	"tf_weapon_medigun"
+					Item	"tf_weapon_bonesaw"
+					Item	"the team captain"
+					Item	"blighted beak"
+					CharacterAttributes
+					{
+						"move speed bonus"	0.4
+						"dmg taken from bullets reduced" 0.5
+						"dmg taken from crit reduced" 0
+						"dmg taken from blast increased" 1.2
+						"dmg taken from fire increased"  0.7
+					}
+					ItemAttributes
+					{
+						ItemName	"the crusader's crossbow"
+						"projectile spread angle penalty"	20
+						"fire rate bonus"	0.005
+						"faster reload rate"	0.005
+						"dmg bonus vs buildings" 0.75
+						"damage bonus"	1.1
+						"override projectile type" 6
+						"Projectile speed increased" 0.25
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	b6
+			WaitForAllDead	b5
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	4500
+					Name	"Delayed Justice"
+					Scale	2
+					Class	HeavyWeapons
+					ClassIcon heavy
+					Skill	Expert
+					WeaponRestrictions	PrimaryOnly
+					Attributes	"MiniBoss"
+					Attributes  "UseBossHealthBar"
+					Item	"the brass beast"
+					Item	"tf_weapon_shotgun_hwg"
+					Item	"tf_weapon_fists"
+					Item	"hard counter"
+					Item	"the marxman"
+					CharacterAttributes
+					{
+						"move speed bonus"	0.3
+						"damage force reduction"	0.3
+						"airblast vulnerability multiplier"	0.3
+						"override footstep sound set"	2
+					}
+					ItemAttributes
+					{
+						ItemName	"the brass beast"
+						"fire rate bonus"	0.01
+						"minigun spinup time increased"	10
+					}
+				}
+			}
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	c1
+			TotalCurrency	100
+			TotalCount	12
+			MaxActive	12
+			SpawnCount	6
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	5
+			Squad
+			{
+				TFBot
+				{
+					Health	200
+					AutoJumpMin	2
+					AutoJumpMax	2
+					Name	"Frogmin"
+					Class	Spy
+					Skill	Expert
+					Attributes	"AutoJump"
+					Item	"tf_weapon_revolver"
+					Item	"tf_weapon_knife"
+					Item	"the hyperbaric bowler"
+					CharacterAttributes
+					{
+						"increased jump height"	10
+						"move speed bonus"	3
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	c2
+			WaitForAllSpawned	c1
+			TotalCurrency	5
+			TotalCount	2
+			MaxActive	2
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	50
+			Support	1
+			Squad
+			{
+				TFBot
+				{
+					Health	110
+					AutoJumpMin	4
+					AutoJumpMax	4
+					Name	Frogmin
+					Class	Spy
+					Skill	Expert
+					Attributes	"AutoJump"
+					Attributes  "IgnoreFlag"
+					Item	"tf_weapon_revolver"
+					Item	"tf_weapon_knife"
+					CharacterAttributes
+					{
+						"increased jump height"	6
+						"move speed bonus"	3
+						"health regen" 55	
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	c3
+			WaitForAllDead	c1
+			TotalCurrency	95
+			TotalCount	20
+			MaxActive	20
+			SpawnCount	10
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	5
+			Squad
+			{
+				TFBot
+				{
+					Health	225
+					MaxVisionRange	2500
+					Name	"Jar Master"
+					Class	Sniper
+					Skill	Normal
+					WeaponRestrictions	SecondaryOnly
+					Attributes	"AlwaysCrit"
+					Attributes  "AlwaysFireWeapon"
+					Item	"tf_weapon_sniperrifle"
+					Item	"jarate"
+					Item	"tf_weapon_club"
+					ItemAttributes
+					{
+						ItemName	jarate
+						"effect bar recharge rate increased"	0.01
+					}
+				}
+				TFBot
+				{
+					Health	275
+					Name	"Flare Punch"
+					Class	Pyro
+					ClassIcon pyro_scorch
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Attributes  "IgnoreFlag"
+					Item	"tf_weapon_flamethrower"
+					Item	"the scorch shot"
+					Item	"tf_weapon_fireaxe"
+					ItemAttributes
+					{
+						ItemName	"the scorch shot"
+						"faster reload rate"	0.9
+						"fire rate bonus"	0.9
+						"damage bonus"	0.1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	c4
+			WaitForAllDead	c3
+			TotalCurrency	200
+			TotalCount	8
+			MaxActive	8
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	5
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	1500
+					Name	"Mental Man"
+					Scale	2.1
+					BehaviorModifiers	Mobber
+					Class	HeavyWeapons
+					ClassIcon heavy_steelfist
+					Skill	Expert
+					WeaponRestrictions	MeleeOnly
+					Attributes	"MiniBoss"
+					Attributes  "UseBossHealthBar"
+					Attributes  "IgnoreFlag"
+					Item	"tf_weapon_minigun"
+					Item	"tf_weapon_shotgun_hwg"
+					Item	"fists of steel"
+										CharacterAttributes
+					{
+						"move speed bonus"	0.3
+						"damage causes airblast" 10
+						"dmg from ranged reduced" 0.1	
+					}
+					ItemAttributes
+					{
+						ItemName	"fists of steel"
+						"melee range multiplier"	6
+						"melee attack rate bonus"	3
+						"dmg from melee increased"	5
+						"damage bonus"	0.3
+						"damage causes airblast"    10
+						"dmg bonus vs buildings" 0.3
+					}
+				}
+				TFBot
+				{
+					Health	80
+					Name	Medic
+					Class	Medic
+					ClassIcon medic_bullet
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Attributes	"SpawnWithFullCharge"
+					Attributes	"VaccinatorBullets"
+					Item	"tf_weapon_syringegun_medic"
+					Item	"the vaccinator"
+					Item	"tf_weapon_bonesaw"
+					CharacterAttributes
+					{
+					    "move speed bonus"	0.3
+						"ubercharge rate bonus"	25
+						"heal rate bonus"	1
+						"uber duration bonus"	100
+						"medigun bullet resist passive"	1
+						"medigun bullet resist deployed"	1
+					}
+					ItemAttributes
+					{
+						ItemName	tf_weapon_syringegun_medic
+						"damage penalty"	0.1
+					}
+				}
+				TFBot
+				{
+					Health	80
+					Name	Medic
+					Class	Medic
+					ClassIcon medic_blast
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Attributes	"SpawnWithFullCharge"
+					Attributes	"VaccinatorBlast"
+					Item	"tf_weapon_syringegun_medic"
+					Item	"the vaccinator"
+					Item	"tf_weapon_bonesaw"
+					CharacterAttributes
+					{
+						"ubercharge rate bonus"	25
+						"move speed bonus"	0.3
+						"heal rate bonus"	1
+						"uber duration bonus"	100
+						"medigun blast resist passive"	1
+						"medigun blast resist deployed"	1
+					}
+					ItemAttributes
+					{
+						ItemName	tf_weapon_syringegun_medic
+						"damage penalty"	0.1
+					}
+				}
+				TFBot
+				{
+					Health	80
+					Name	Medic
+					Class	Medic
+					ClassIcon medic_fire
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Attributes	"SpawnWithFullCharge"
+					Attributes	"VaccinatorFire"
+					Item	"tf_weapon_syringegun_medic"
+					Item	"the vaccinator"
+					Item	"tf_weapon_bonesaw"
+					CharacterAttributes
+					{
+						"ubercharge rate bonus"	25
+						"move speed bonus"	0.3
+						"heal rate bonus"	1
+						"uber duration bonus"	100
+						"medigun fire resist passive"	1
+						"medigun fire resist deployed"	1
+					}
+					ItemAttributes
+					{
+						ItemName	tf_weapon_syringegun_medic
+						"damage penalty"	0.1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	c0
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot_flank
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	0
+			Support	1
+			Squad
+			{
+				TFBot
+				{
+					Health	5000
+					MaxVisionRange	25000
+					Name	"Fireworks"
+					Scale	15
+					Class	Demoman
+					ClassIcon sniper_bow_multi
+					Skill	Expert
+					WeaponRestrictions	PrimaryOnly
+					Attributes	"AlwaysCrit"
+					Attributes  "AlwaysFireWeapon"
+					Attributes	"HoldFireUntilFullReload"
+					Attributes  "IgnoreFlag"
+					Item	"the loch-n-load"
+					Item	"tf_weapon_pipebomblauncher"
+					Item	"tf_weapon_bottle"
+					CharacterAttributes
+					{
+						"move speed bonus"	1
+						"blast dmg to self increased" 100
+					}
+					ItemAttributes
+					{
+						ItemName	"the loch-n-load"
+						"fire rate bonus"	0.01
+						"faster reload rate"	0.03
+						"mod max primary clip override"	50
+						"Blast radius increased" 15
+						"projectile spread angle penalty"	10
+						"override projectile type" 8
+						"dmg pierces resists absorbs"  1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	c6
+			WaitForAllDead	c4
+			TotalCurrency	100
+			TotalCount	25
+			MaxActive	15
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	1
+			Squad
+			{
+				TFBot
+				{
+					Health	300
+					Name	"Lil Puffer"
+					Scale   "0.85"
+					Class	Pyro
+					ClassIcon pyro_dragon_fury_swordstone
+					Skill	Hard
+				    Attributes  "AlwaysFireWeapon"
+					Item	"the dragon's fury"
+					CharacterAttributes
+					{
+						"move speed bonus"	0.4
+					}
+					ItemAttributes
+					{
+						ItemName	"the dragon's fury"
+                    "damage penalty"	0.3
+					"fire rate bonus"	0.2
+					"Projectile speed increased" 5
+					"dmg bonus vs buildings" 0.2
+					}
+				}
+			}
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	d0
+			TotalCurrency	100
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			Support	limited
+			Squad
+			{
+				TFBot
+				{
+					Health	12500
+					Name	"Lethal Performance"
+					BehaviorModifiers	Mobber
+					Class	Demoman
+					ClassIcon demo_caber
+					Skill	Expert
+					Attributes  "IgnoreFlag"
+					WeaponRestrictions	MeleeOnly
+					Item	"tf_weapon_grenadelauncher"
+					Item	"the splendid screen"
+					Item	"the ullapool caber"
+					Item	"sober stuntman"
+					CharacterAttributes
+					{
+						"health regen" 5000
+                        "cannot be backstabbed" 1
+                        "blast dmg to self increased" 1000
+						"damage force reduction" 0.2
+						"airblast vulnerability multiplier" 0.2
+						"charge time increased"	10
+						"charge recharge rate increased"	10
+						"move speed bonus"	2
+					}
+					ItemAttributes
+					{
+						ItemName	"the ullapool caber"
+						"damage bonus"	10
+					    "dmg pierces resists absorbs"  1
+					}
+                    ItemAttributes
+					{
+						ItemName	"the splendid screen"
+						"Attack not cancel charge"	1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	d1
+			WaitForAllSpawned d0
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	12
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	200000
+					Name	"Immortal Liberator"
+					BehaviorModifiers	Mobber
+					Class	Soldier
+					ClassIcon soldier_giant
+					Skill	Normal
+					Attributes	"MiniBoss"
+					Attributes  "UseBossHealthBar"
+					Attributes  "IgnoreFlag"
+					Item	"the liberty launcher"
+					Item	"the mantreads"
+					Item	"tf_weapon_shovel"
+					Item	"honcho's headgear"
+					CharacterAttributes
+					{
+						"health regen" 5000
+                        "cannot be backstabbed" 1
+                        "blast dmg to self increased" 1000
+						"move speed bonus"	0.15
+						"damage force reduction" 0.2
+						"airblast vulnerability multiplier" 0.2
+						"torso scale" 2
+						"apply look velocity on damage"	-1200
+						"damage causes airblast" 1
+						"override footstep sound set"	3
+					}
+					ItemAttributes
+					{
+						ItemName	"the liberty launcher"
+						"blast dmg to self increased" 1000
+						"Projectile speed decreased" 2
+						"faster reload rate"	0.01
+						"fire rate bonus"	0.6
+						"damage bonus"	0.01
+						"dmg bonus vs buildings" 10000
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	d2
+			WaitForAllSpawned	d1
+			TotalCurrency	100
+			TotalCount	24
+			MaxActive	20
+			SpawnCount	8
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	3
+			Squad
+			{
+				TFBot
+				{
+					Health	200
+					Name	"COME"
+					Class	Soldier
+					ClassIcon soldier_buff
+					Skill	Normal
+					Attributes	"SpawnWithFullCharge"
+					Item	"tf_weapon_rocketlauncher"
+					Item	"the buff banner"
+					Item	"tf_weapon_shovel"
+					CharacterAttributes
+					{
+						"increase buff duration"	9.0
+						"blast dmg to self increased" 100
+						"damage bonus"	0.3
+					}
+				}
+				TFBot
+				{
+					Health	200
+					Name	"VERY CLOSE"
+					Class	Soldier
+					ClassIcon soldier_conch
+					Skill	Normal
+					Attributes	"SpawnWithFullCharge"
+					Item	"tf_weapon_rocketlauncher"
+					Item	"the concheror"
+					Item	"tf_weapon_shovel"
+					CharacterAttributes
+					{
+						"increase buff duration"	9.0
+						"blast dmg to self increased" 100
+						"damage bonus"	0.3
+					}
+				}
+				TFBot
+				{
+					Health	200
+					Name	"TO THE BOSS"
+					Class	Soldier
+					ClassIcon soldier_backup
+					Skill	Normal
+					Attributes	"SpawnWithFullCharge"
+					Item	"tf_weapon_rocketlauncher"
+					Item	"the battalion's backup"
+					Item	"tf_weapon_shovel"
+					CharacterAttributes
+					{
+						"increase buff duration"	9.0
+						"blast dmg to self increased" 100
+						"damage bonus"	0.3
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name	d3
+			WaitForAllDead d1
+			TotalCurrency	50
+			TotalCount	6
+			MaxActive	6
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	5
+			Support	limited
+			Squad
+			{
+				TFBot
+				{
+					Health	12500
+					Name	"Greater Lethal Performance"
+					BehaviorModifiers	Mobber
+					Scale   "1.8"
+					Class	Demoman
+					ClassIcon demo_caber_giant
+					Skill	Hard
+					WeaponRestrictions	MeleeOnly
+					Attributes	"MiniBoss"
+					Attributes  "IgnoreFlag"
+					Item	"tf_weapon_grenadelauncher"
+					Item	"the splendid screen"
+					Item	"the ullapool caber"
+					CharacterAttributes
+					{
+						"health regen" 5000
+                        "cannot be backstabbed" 1
+                        "blast dmg to self increased" 1000
+						"damage force reduction" 0.2
+						"move speed bonus"	1.5
+						"override footstep sound set"	2
+						"airblast vulnerability multiplier" 0.2
+						"mult charge turn control"	100
+						"charge time increased"	20
+						"charge recharge rate increased"	10
+					}
+					ItemAttributes
+					{
+						ItemName	"the ullapool caber"
+						"damage bonus"	10
+						"dmg pierces resists absorbs"  1
+						"Blast radius increased" 10
+					}
+					ItemAttributes
+					{
+						ItemName	"the splendid screen"
+						"Attack not cancel charge"	1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+		    Name	d5
+			WaitForAllSpawned d4
+			TotalCurrency	0
+			TotalCount	2
+			MaxActive	2
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	5
+			WaitBetweenSpawns	12
+			Support 1
+			Squad
+			{
+				TFBot
+				{
+					Health	12500
+					Name	"Greater Lethal Performance"
+					BehaviorModifiers	Mobber
+					Scale   "1.8"
+					Class	Demoman
+					ClassIcon demo_caber_giant
+					Skill	Hard
+					WeaponRestrictions	MeleeOnly
+					Attributes	"MiniBoss"
+					Attributes  "IgnoreFlag"
+					Item	"tf_weapon_grenadelauncher"
+					Item	"the splendid screen"
+					Item	"the ullapool caber"
+					CharacterAttributes
+					{
+						"health regen" 5000
+                        "cannot be backstabbed" 1
+                        "blast dmg to self increased" 1000
+						"damage force reduction" 0.2
+						"move speed bonus"	2.7
+						"override footstep sound set"	2
+						"airblast vulnerability multiplier" 0.2
+						"mult charge turn control"	100
+						"charge time increased"	20
+						"charge recharge rate increased"	10
+					}
+					ItemAttributes
+					{
+						ItemName	"the ullapool caber"
+						"damage bonus"	10
+						"dmg pierces resists absorbs"  1
+						"Blast radius increased" 10
+					}
+					ItemAttributes
+					{
+						ItemName	"the splendid screen"
+						"Attack not cancel charge"	1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	d4
+			WaitForAllSpawned	d3
+			TotalCurrency	250
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			Squad
+			{
+				Tank
+				{
+					Health	5500
+					Name	Tank
+					Speed	50
+					StartingPathTrackNode	boss_path_1
+					OnKilledOutput
+					{
+						Target	boss_dead_relay
+						Action	Trigger
+					}
+					OnBombDroppedOutput
+					{
+						Target	boss_deploy_relay
+						Action	Trigger
+					}
+				}
+			}
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	e1
+			TotalCurrency	250
+			TotalCount	8
+			MaxActive	2
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	5
+			Squad
+			{
+				TFBot
+				{
+					Health	450
+					Name	"Fog of War"
+					Scale	1.6
+					BehaviorModifiers	Mobber
+					Class	Pyro
+					ClassIcon pyro_gascann
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Item	"tf_weapon_flamethrower"
+					Item	"The Gas Passer"
+					Item	"tf_weapon_fireaxe"
+					CharacterAttributes
+					{
+						"effect bar recharge rate increased"	0.01
+						"move speed bonus"	0.5
+					}
+					ItemAttributes
+					{
+						ItemName "The Gas Passer"
+						"item_meter_charge_rate"  0.1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	e2
+			TotalCurrency	150
+			TotalCount	16
+			MaxActive	4
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	3
+			Squad
+			{
+				TFBot
+				{
+					Health	300
+					Name	"Razorback Launcher"
+					Scale	1.3
+					BehaviorModifiers	Mobber
+					Class	Demoman
+					Skill	Expert
+					WeaponRestrictions	PrimaryOnly
+					Attributes	"HoldFireUntilFullReload"
+					Item	"tf_weapon_grenadelauncher"
+					Item	"tf_weapon_pipebomblauncher"
+					Item	"tf_weapon_bottle"
+					CharacterAttributes
+					{
+						"move speed bonus"	0.5
+					}
+					ItemAttributes
+					{
+						ItemName	tf_weapon_grenadelauncher
+						"mod max primary clip override"	40
+						"faster reload rate"	0.1
+						"fire rate bonus"	0.01
+						"custom projectile model" "models/player/items/sniper/knife_shield.mdl"
+						"fuse bonus" 0.7
+						"damage bonus"	0.1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	e3
+			TotalCurrency   0
+			TotalCount	15
+			MaxActive	3
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	1
+			Squad
+			{
+				TFBot
+				{
+					Health	195
+					Name	"Unnamed Cook"
+					Scale	1.2
+					BehaviorModifiers	Mobber
+					Class	Scout
+					ClassIcon scout_cleaver
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Attributes	"AlwaysFireWeapon"
+					Item	"tf_weapon_scattergun"
+					Item	"the flying guillotine"
+					Item	"tf_weapon_bat"
+					CharacterAttributes
+					{
+						"effect bar recharge rate increased"	0.1
+						"move speed bonus"	0.5
+					}
+						ItemAttributes
+					{
+						ItemName   "the flying guillotine"
+						"faster reload rate"	0.1
+						"fire rate bonus"	0.1
+						"custom projectile model" "models/weapons/c_models/c_switchblade/c_switchblade.mdl"
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllSpawned	e5
+			TotalCurrency	0
+			TotalCount	5
+			MaxActive	5
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	1
+			WaitBetweenSpawns	3
+			Support	1
+			Squad
+			{
+				TFBot
+				{
+					Health	115
+					Name	Moskito
+					BehaviorModifiers	Mobber
+					Class	Scout
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Attributes	"IgnoreFlag"
+					Item	"tf_weapon_scattergun"
+					Item	"tf_weapon_pistol_scout"
+					Item	"tf_weapon_bat"
+					Item	"tf birthday hat 2011"
+					CharacterAttributes
+					{
+						"move speed bonus"	0.2
+					}
+					ItemAttributes
+					{
+						ItemName	tf_weapon_pistol_scout
+						"damage bonus"	0.1
+						"dmg bonus vs buildings" 1000
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	e4
+			WaitForAllDead	e1
+			TotalCurrency	0
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	3850
+					MaxVisionRange	2500
+					Name	"Wheel of Fortune"
+					Scale	1.8
+					Class	Demoman
+					ClassIcon demo_bomber
+					Skill	Expert
+					WeaponRestrictions	PrimaryOnly
+					Attributes	"MiniBoss"
+					Attributes	"AlwaysCrit"
+					Attributes  "UseBossHealthBar"
+					Attributes  "AlwaysFireWeapon"
+					Attributes	"HoldFireUntilFullReload"
+					Item	"the loch-n-load"
+					Item	"tf_weapon_pipebomblauncher"
+					Item	"tf_weapon_bottle"
+					CharacterAttributes
+					{
+						"move speed bonus"	0.3
+						"blast dmg to self increased" 0.1
+					}
+					ItemAttributes
+					{
+						ItemName	"the loch-n-load"
+						"fire rate bonus"	0.6
+						"damage force reduction"	0.5
+						"fuse bonus" 2
+						"faster reload rate" 0.01
+						"Blast radius increased" 1.5
+						"projectile spread angle penalty"	8
+						"custom projectile model"  "models/workshop/weapons/c_models/c_wheel_shield/c_wheel_shield.mdl"
+						"damage bonus"	2.2
+						"dmg pierces resists absorbs"  1
+						"blast dmg to self increased" 0.1
+						"override footstep sound set"	4
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	e5
+			WaitForAllDead	e4
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	4500
+					Name	"El Gaspasso"
+					Scale	2
+					BehaviorModifiers	Mobber
+					Class	Pyro
+					ClassIcon pyro_gascann_explode
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Attributes	"AlwaysFireWeapon"
+					Attributes	"MiniBoss"
+					Attributes  "UseBossHealthBar"
+					Attributes  "IgnoreFlag"
+					Item	"The Gas Passer"
+					Item	"old guadalajara"
+					Item	"pyro monocle"
+					CharacterAttributes
+					{
+						"effect bar recharge rate increased"	0.01
+						"explode_on_ignite" 1
+						"move speed bonus"	0.2
+						"heal on hit for rapidfire"	1200
+						"override footstep sound set"	6
+					}
+					ItemAttributes
+					{
+						ItemName	"The Gas Passer"
+						"item_meter_charge_rate"  0.1
+						"explode_on_ignite" 1
+					}
+				}	
+			}
+		}
+	}
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	f1
+			TotalCurrency	100
+			TotalCount	20
+			MaxActive	20
+			SpawnCount	5
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	1
+			Squad
+			{
+				TFBot
+				{
+					Health	1750
+					Name	"Robo-Tornado"
+					BehaviorModifiers	Mobber
+					Class	Demoman
+					ClassIcon demo_d
+					Skill	Expert
+					WeaponRestrictions	PrimaryOnly
+					Item	"the loose cannon"
+					Item    "the splendid screen"
+					CharacterAttributes
+					{
+						"self dmg push force increased" 0
+					    "increased jump height" 5
+						"blast dmg to self increased" 4
+						"drop health pack on kill" 1
+						"apply z velocity on damage" 2500
+						"apply look velocity on damage"	1200
+						"mod_air_control_blast_jump" 100
+						"damage causes airblast" 1
+						"ring of fire while aiming" 1
+						"boots falling stomp" 1
+						"cancel falling damage" 1
+						"mult charge turn control"	100
+						"charge time increased"	1.8
+						"charge recharge rate increased"	9
+					}
+					ItemAttributes
+					{
+						ItemName	"the loose cannon"
+						
+						"Blast radius increased" 0.001
+						"faster reload rate" 0.01
+						"damage bonus"	0.02
+					}
+					ItemAttributes
+					{
+						ItemName	"the splendid screen"
+						"Attack not cancel charge"	1
+						"charge impact damage increased" 0.001
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	f2
+			WaitForAllDead	f1
+			TotalCurrency	10
+			TotalCount	10
+			MaxActive   10
+			SpawnCount	10
+			Where	spawnbot
+			WaitBeforeStarting	1
+			WaitBetweenSpawns	0
+			Squad
+			{
+			    TFBot
+				{
+					Health	180
+					Name	"Sanguinary League Scout"
+					Class	Scout
+					ClassIcon scout_stun_spammer
+					Skill	Expert
+					WeaponRestrictions	MeleeOnly
+					Item	"tf_weapon_scattergun"
+					Item	"tf_weapon_pistol_scout"
+					Item	"the sandman"
+					ItemAttributes
+					{
+						ItemName	"the sandman"
+						"effect bar recharge rate increased"	0.01
+						"bleeding duration" 5
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name f3
+			WaitForAllDead	f2
+			TotalCurrency	280
+			TotalCount	14
+			MaxActive	7
+			SpawnCount	7
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	333
+					Name	"Private Skittles"
+					BehaviorModifiers	Mobber
+					Class	Soldier
+					ClassIcon soldier_bison
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Item	"the righteous bison"
+					CharacterAttributes
+					{
+					"move speed bonus"	0.6
+					}
+					ItemAttributes
+					{
+						ItemName	"the righteous bison"
+						"set item tint RGB" 16711680
+						"fire rate bonus" 0.1
+						"Reload time increased" 0.001
+					}
+				}
+				TFBot
+				{
+					Health	333
+					Name	"Private Skittles"
+					BehaviorModifiers	Mobber
+					Class	Soldier
+					ClassIcon soldier_bison
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Item	"the righteous bison"
+					CharacterAttributes
+					{
+					"move speed bonus"	0.6
+					}
+					ItemAttributes
+					{
+						ItemName	"the righteous bison"
+						"set item tint RGB" 16737792
+						"fire rate bonus" 0.1
+						"Reload time increased" 0.001
+					}
+				}	
+				TFBot
+				{
+					Health	333
+					Name	"Private Skittles"
+					BehaviorModifiers	Mobber
+					Class	Soldier
+					ClassIcon soldier_bison
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Item	"the righteous bison"
+					CharacterAttributes
+					{
+					"move speed bonus"	0.6
+					}
+					ItemAttributes
+					{
+						ItemName	"the righteous bison"
+						"set item tint RGB" 16776960
+						"fire rate bonus" 0.1
+						"Reload time increased" 0.001
+					}
+				}	
+				TFBot
+				{
+					Health	333
+					Name	"Private Skittles"
+					BehaviorModifiers	Mobber
+					Class	Soldier
+					ClassIcon soldier_bison
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Item	"the righteous bison"
+					CharacterAttributes
+					{
+					"move speed bonus"	0.6
+					}
+					ItemAttributes
+					{
+						ItemName	"the righteous bison"
+						"set item tint RGB" 52224
+						"fire rate bonus" 0.1
+						"Reload time increased" 0.001
+					}
+				}	
+				TFBot
+				{
+					Health	333
+					Name	"Private Skittles"
+					BehaviorModifiers	Mobber
+					Class	Soldier
+					ClassIcon soldier_bison
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Item	"the righteous bison"
+					CharacterAttributes
+					{
+					"move speed bonus"	0.6
+					}
+					ItemAttributes
+					{
+						ItemName	"the righteous bison"
+						"set item tint RGB" 3394815
+						"fire rate bonus" 0.1
+						"Reload time increased" 0.001
+					}
+				}	
+				TFBot
+				{
+					Health	333
+					Name	"Private Skittles"
+					BehaviorModifiers	Mobber
+					Class	Soldier
+					ClassIcon soldier_bison
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Item	"the righteous bison"
+					CharacterAttributes
+					{
+					"move speed bonus"	0.6
+					}
+					ItemAttributes
+					{
+						ItemName	"the righteous bison"
+						"set item tint RGB" 255
+						"fire rate bonus" 0.1
+						"Reload time increased" 0.001
+					}
+				}	
+				TFBot
+				{
+					Health	333
+					Name	"Private Skittles"
+					BehaviorModifiers	Mobber
+					Class	Soldier
+					ClassIcon soldier_bison
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Item	"the righteous bison"
+					CharacterAttributes
+					{
+					"move speed bonus"	0.6
+					}
+					ItemAttributes
+					{
+						ItemName	"the righteous bison"
+						"set item tint RGB" 6684876
+						"fire rate bonus" 0.1
+						"Reload time increased" 0.001
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	f4
+			WaitForAllDead	f3
+			TotalCurrency	1
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	1
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	51
+					Name	"Cleaning Service"
+					BehaviorModifiers	Mobber
+					Class	Demoman
+					ClassIcon demo_atomic
+					Skill	Expert
+					WeaponRestrictions	PrimaryOnly
+					Attributes	"IgnoreFlag"
+					Item	"the loch-n-load"
+					Item	"tf_weapon_pipebomblauncher"
+					Item	"tf_weapon_bottle"
+					CharacterAttributes
+					{
+						"health drain" -25
+						"dmg taken from bullets reduced" 0
+						"dmg taken from crit reduced" 0
+						"dmg taken from blast reduced" 0
+						"dmg taken from fire reduced"  0
+						"cannot be backstabbed"	1
+						"move speed bonus"	5
+					}
+					ItemAttributes
+					{
+						ItemName	"the loch-n-load"
+						"damage bonus"  100
+						"custom projectile model" "models/player/heavy.mdl"
+						"dmg pierces resists absorbs"  1
+						"Blast radius increased"	20
+						"Projectile speed decreased"	0.9
+						"sticky air burst mode" 0
+						"fuse bonus" 0.3
+						"use large smoke explosion"	1
+						"energy weapon penetration" 1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	f5
+			WaitForAllDead	f4
+			TotalCurrency	100
+			TotalCount	10
+			MaxActive	10
+			SpawnCount	10
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	250
+					Name	"Suspicious Cloud"
+					Scale   0.18
+					BehaviorModifiers	Mobber
+					Class	Engineer
+					Skill	Expert
+					Attributes	"IgnoreFlag"
+					Item	"the gunslinger"
+					Item	"modest pile of hat"
+					CharacterAttributes
+					{
+						"move speed bonus"	3
+					}
+					ItemAttributes
+					{
+						ItemName	"the gunslinger"
+						"fire rate penalty" 6
+						"engy sentry fire rate increased" 0.2
+						"engy sentry radius increased" 0.6
+					}
+					ItemAttributes
+					{
+						ItemName	"modest pile of hat"
+						"attach particle effect" 99
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	f6
+			WaitForAllDead	f5
+			TotalCurrency	1010
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	7
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	5000
+					Name	"Uncatchable Roamer"
+					Scale   2
+					BehaviorModifiers	Mobber
+					Class	Soldier
+					ClassIcon soldier_airstrike
+					Skill	Expert
+					WeaponRestrictions	PrimaryOnly
+					Attributes	"UseBossHealthBar"
+					Attributes  "MiniBoss"
+					Item	"the black box"
+					Item	"tf_weapon_shotgun_soldier"
+					Item	"tf_weapon_shovel"
+					ItemAttributes
+					{
+						ItemName	"the black box"
+						"Blast radius increased"	20
+						"override projectile type" 17
+					    "fire rate penalty" 0.001
+						"faster reload rate" 0.001
+						"Projectile speed decreased" 5
+						"projectile spread angle penalty" 100
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.5
+						"fuse bonus" 0.01
+						"damage causes airblast" 1
+						"apply look velocity on damage"	1200
+						"apply z velocity on damage"	1200
+						"cancel falling damage" 1
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	flast
+			WaitForAllDead	f6
+			TotalCurrency	25000
+			TotalCount	1
+			MaxActive   1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	3
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Health	4000
+					Name	"Don Ivan"
+					BehaviorModifiers	Mobber
+					Class	HeavyWeapons
+					ClassIcon heavy_shotgun
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Attributes	"MiniBoss"
+					Attributes  "UseBossHealthBar"
+					Attributes	"IgnoreFlag"
+					Item	"tf_weapon_shotgun_hwg"
+					Item	"capone's capper"
+					CharacterAttributes
+					{
+						"healing received bonus" 15
+						"move speed bonus"	0.3
+						"jarate backstabber" 1
+						"health drain" -25
+						"head scale"	1.4
+					}
+					ItemAttributes
+					{
+						ItemName	"tf_weapon_shotgun_hwg"
+						"fire rate penalty" 4.5
+						"bullets per shot bonus" 100
+						"faster reload rate" 1.5
+						"damage bonus"	0.02
+                        "bleeding duration" 10
+						"Set DamageType Ignite" 1
+						"mark for death" 1
+						"crit kill will gib" 1
+						"critboost on kill" 15
+						"minicrits become crits" 1
+						"heal on hit for rapidfire" 3
+						"heal on kill" 500
+						"weapon spread bonus" 10
+						"projectile penetration" 1
+						"slow enemy on hit major" 0.5
+						"dmg bonus vs buildings" 1000
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	flastsp1
+			WaitForAllSpawned	flast
+			TotalCurrency	0
+			TotalCount	5
+			MaxActive	5
+			SpawnCount	5
+			Where	spawnbot
+			WaitBeforeStarting	0
+			Support Limited
+			Squad
+			{
+				TFBot
+				{
+					Health	200
+					Name	Crook
+					Class	Medic
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Attributes	"SpawnWithFullCharge"
+					Attributes	"IgnoreFlag"
+					Item	"tf_weapon_syringegun_medic"
+					Item	"the quick-fix"
+					Item	"tf_weapon_bonesaw"
+					Item	"the sarif cap"
+					CharacterAttributes
+					{
+						"move speed bonus"	3
+					}
+					ItemAttributes
+					{
+						ItemName	tf_weapon_syringegun_medic
+						"damage bonus"	2
+					}
+					ItemAttributes
+					{
+						ItemName	"the quick-fix"
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	flastsp2
+			WaitForAllDead	flastsp1
+			TotalCurrency	0
+			TotalCount	5
+			MaxActive	5
+			SpawnCount	5
+			Where	spawnbot
+			WaitBeforeStarting	12
+			Support Limited
+			Squad
+			{
+				TFBot
+				{
+					Health	200
+					Name	Crook
+					Class	Medic
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Attributes	"SpawnWithFullCharge"
+					Attributes	"IgnoreFlag"
+					Item	"tf_weapon_syringegun_medic"
+					Item	"the quick-fix"
+					Item	"tf_weapon_bonesaw"
+					Item	"the sarif cap"
+					CharacterAttributes
+					{
+						"move speed bonus"	3
+					}
+					ItemAttributes
+					{
+						ItemName	tf_weapon_syringegun_medic
+						"damage bonus"	2
+					}
+					ItemAttributes
+					{
+						ItemName	"the quick-fix"
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	flastsp3
+			WaitForAllDead	flastsp2
+			TotalCurrency	0
+			TotalCount	5
+			MaxActive	5
+			SpawnCount	5
+			Where	spawnbot
+			WaitBeforeStarting	12
+			Support Limited
+			Squad
+			{
+				TFBot
+				{
+					Health	200
+					Name	Crook
+					Class	Medic
+					Skill	Expert
+					WeaponRestrictions	SecondaryOnly
+					Attributes	"SpawnWithFullCharge"
+					Attributes	"IgnoreFlag"
+					Item	"tf_weapon_syringegun_medic"
+					Item	"the quick-fix"
+					Item	"tf_weapon_bonesaw"
+					Item	"the sarif cap"
+					CharacterAttributes
+					{
+						"move speed bonus"	3
+					}
+					ItemAttributes
+					{
+						ItemName	tf_weapon_syringegun_medic
+						"damage bonus"	2
+					}
+					ItemAttributes
+					{
+						ItemName	"the quick-fix"
+					}
+				}
+			}
+		}
+	}
+}
+
