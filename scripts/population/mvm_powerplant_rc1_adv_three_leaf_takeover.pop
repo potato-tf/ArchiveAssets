@@ -4,19 +4,7 @@ WaveSchedule
 {
 	StartingCurrency 800
 	RespawnWaveTime 2
-	// WaveStartCountdown 0 [$SIGSEGV]
 	CanBotsAttackWhileInSpawnRoom no
-	CustomNavFile "mvm_powerplant_rc1_adv_three_leaf_takeover.nav" [$SIGSEGV]
-	CustomScriptSoundFile "scripts/gg_pea_soundscript.txt" [$SIGSEGV]
-	NoRomevisionCosmetics 1 [$SIGSEGV]
-	
-	PrecacheParticle "lava_fireball" [$SIGSEGV]
-	
-	PrecacheModel "models/props_mvm/robot_spawnpoint.mdl" [$SIGSEGV]
-	
-	PrecacheGeneric "materials/teleport_warning_overlay.vmt" [$SIGSEGV]
-	PrecacheGeneric "materials/teleport_warning_overlay.vtf" [$SIGSEGV]
-	
 	Templates
 	{
 		T_TFBot_Medic_AoEUber
@@ -30,134 +18,11 @@ WaveSchedule
 			WeaponRestrictions MeleeOnly
 			Item "The Amputator"
 			Item "Your Worst Nightmare"
-			Action FetchFlag [$SIGSEGV]
-			UseMeleeThreatPrioritization 1 [$SIGSEGV]
 			Tag bot_giant
 			Tag aoe_medic
-			AddCond [$SIGSEGV]
-			{
-				Index 55
-			}
 			CharacterAttributes
 			{
 				"move speed penalty" 0.65
-			}
-			FireInput [$SIGSEGV] 
-			{
-				Target !self
-				Action RunScriptCode
-				Param "SetUpAoEUber()"
-				Delay 0
-				Cooldown 3600
-				Repeats 0
-			}
-		}
-		T_TFBot_TeleBot
-		{
-			Item "Lo-Fi Longwave"
-			ItemAttributes
-			{
-				ItemName "Lo-Fi Longwave"
-				"set item tint RGB" "15132390"
-			}
-			FireInput [$SIGSEGV] 
-			{
-				Target !self
-				Action RunScriptCode
-				Param TeleportRobot()
-				Delay 0
-				Cooldown 3600
-				Repeats 0
-			}
-		}
-		T_TFBot_TeleBot_SquadLeader
-		{
-			Item "Lo-Fi Longwave"
-			ItemAttributes
-			{
-				ItemName "Lo-Fi Longwave"
-				"set item tint RGB" "15132390"
-			}
-			FireInput [$SIGSEGV] 
-			{
-				Target !self
-				Action RunScriptCode
-				Param TeleportRobot(`squad_leader`)
-				Delay 0
-				Cooldown 3600
-				Repeats 0
-			}
-		}
-		T_TFBot_TeleBot_SquadMember
-		{
-			Item "Lo-Fi Longwave"
-			ItemAttributes
-			{
-				ItemName "Lo-Fi Longwave"
-				"set item tint RGB" "15132390"
-			}
-			FireInput [$SIGSEGV] 
-			{
-				Target !self
-				Action RunScriptCode
-				Param TeleportRobot(`squad_member`)
-				Delay 0
-				Cooldown 3600
-				Repeats 0
-			}
-		}
-		T_TFBot_TeleBot_W3D
-		{
-			Item "Lo-Fi Longwave"
-			ItemAttributes
-			{
-				ItemName "Lo-Fi Longwave"
-				"set item tint RGB" "15132390"
-			}
-			FireInput [$SIGSEGV] 
-			{
-				Target !self
-				Action RunScriptCode
-				Param "TeleportRobot(null, true, Vector(-800, -2050, 235), `Surprise attack!`)"
-				Delay 0
-				Cooldown 3600
-				Repeats 0
-			}
-		}
-		T_TFBot_TeleBot_W5A_SquadLeader
-		{
-			Item "Lo-Fi Longwave"
-			ItemAttributes
-			{
-				ItemName "Lo-Fi Longwave"
-				"set item tint RGB" "15132390"
-			}
-			FireInput [$SIGSEGV] 
-			{
-				Target !self
-				Action RunScriptCode
-				Param "TeleportRobot(`squad_leader`, true, Vector(-1850, -700, 285))"
-				Delay 0
-				Cooldown 3600
-				Repeats 0
-			}
-		}
-		T_TFBot_TeleBot_Boss
-		{
-			Item "Lo-Fi Longwave"
-			ItemAttributes
-			{
-				ItemName "Lo-Fi Longwave"
-				"set item tint RGB" "15132390"
-			}
-			FireInput [$SIGSEGV] 
-			{
-				Target !self
-				Action RunScriptCode
-				Param "TeleportRobot(`boss_helper`)"
-				Delay 0
-				Cooldown 3600
-				Repeats 0
 			}
 		}
 	}
@@ -254,15 +119,6 @@ WaveSchedule
 			Template T_TFBot_Engineer_Sentry_Battle
 		}
 	}
-	ExtraSpawnPoint [$SIGSEGV]
-    {
-        Name "support_boss_spawnbot"
-        TeamNum 3
-		StartDisabled 1
-        X "-1040"
-        Y "3280"
-        Z "96"
-    }
 	Wave // WAVE 1
 	{
 		InitWaveOutput
@@ -286,18 +142,12 @@ WaveSchedule
 			Name "W1A-1"
 			TotalCount 1
 			TotalCurrency 100
-			FirstSpawnOutput
-			{
-				Target boss_spawn_relay
-				Action Trigger
-			}
 			Tank
 			{
-				Name tank
+				Name tankboss
 				Health 17500
 				Speed 75
 				StartingPathTrackNode boss_path_1
-				ClassIcon tank [$SIGSEGV]
 				OnKilledOutput
 				{
 					Target boss_dead_relay
@@ -488,11 +338,10 @@ WaveSchedule
 			}
 			Tank
 			{
-				Name tank
+				Name tankboss
 				Health 10000
 				Speed 75
 				StartingPathTrackNode boss_path_1
-				ClassIcon tank [$SIGSEGV]
 				OnKilledOutput
 				{
 					Target boss_dead_relay
@@ -531,8 +380,8 @@ WaveSchedule
 			FirstSpawnOutput
 			{
 				Target gamerules
-				Action RunScriptCode
-				Param "Teles_StatusChange(`begin`)"
+				Action CallScriptFunction
+				Param "Teles_Start"
 			}
 		}
 		WaveSpawn
@@ -552,7 +401,8 @@ WaveSchedule
 			{
 				Class Scout
 				Skill Easy
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -572,7 +422,8 @@ WaveSchedule
 			{
 				Class Demoman
 				Skill Easy
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -643,7 +494,8 @@ WaveSchedule
 			TFBot
 			{
 				Template T_TFBot_Sniper_Huntsman
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -655,7 +507,7 @@ WaveSchedule
 			{
 				Target gamerules
 				Action RunScriptCode
-				Param "Teles_StatusChange(`end`)"
+				Param "EntFireByHandle(gamerules_entity, `PlayVO`, `weapons/teleporter_explode.wav`, -1.0, null, null); teleports_active = false"
 			}
 		}
 	}
@@ -689,11 +541,11 @@ WaveSchedule
 			TotalCurrency 50
 			Squad
 			{
-				NoFormation 1 [$SIGSEGV]
 				TFBot
 				{
 					Class Soldier
 					Skill Normal
+					Tag disband_squad
 				}
 				TFBot
 				{
@@ -789,8 +641,8 @@ WaveSchedule
 			FirstSpawnOutput
 			{
 				Target gamerules
-				Action RunScriptCode
-				Param "Teles_StatusChange(`begin`)"
+				Action CallScriptFunction
+				Param "Teles_Start"
 			}
 		}
 		WaveSpawn
@@ -845,24 +697,29 @@ WaveSchedule
 			TotalCurrency 100
 			Squad
 			{
-				NoWaitForFormation 1 [$SIGSEGV]
 				TFBot
 				{
 					Class Heavyweapons
 					Skill Easy
-					AddTemplate "T_TFBot_TeleBot_SquadLeader" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadleader
+					Item "Lo-Fi Longwave"
 				}
 				TFBot
 				{
 					Class Heavyweapons
 					Skill Easy
-					AddTemplate "T_TFBot_TeleBot_SquadMember" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadmember
+					Item "Lo-Fi Longwave"
 				}
 				TFBot
 				{
 					Class Heavyweapons
 					Skill Easy
-					AddTemplate "T_TFBot_TeleBot_SquadMember" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadmember
+					Item "Lo-Fi Longwave"
 				}
 			}
 		}
@@ -900,7 +757,6 @@ WaveSchedule
 			TotalCurrency 50
 			Squad
 			{
-				NoWaitForFormation 1 [$SIGSEGV]
 				TFBot
 				{
 					Class Heavyweapons
@@ -935,7 +791,8 @@ WaveSchedule
 			{
 				Class Pyro
 				Skill Easy
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -954,7 +811,8 @@ WaveSchedule
 			TFBot
 			{
 				Template T_TFBot_Heavyweapons_Heavyweight_Champ_Fast
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -974,7 +832,8 @@ WaveSchedule
 			{
 				Template T_TFBot_Giant_DemoMan_PrinceTavish
 				Tag bot_giant
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -998,7 +857,7 @@ WaveSchedule
 			{
 				Target gamerules
 				Action RunScriptCode
-				Param "Teles_StatusChange(`end`)"
+				Param "EntFireByHandle(gamerules_entity, `PlayVO`, `weapons/teleporter_explode.wav`, -1.0, null, null); teleports_active = false"
 			}
 		}
 		WaveSpawn
@@ -1016,12 +875,12 @@ WaveSchedule
 			TotalCurrency 100
 			Squad
 			{
-				NoFormation 1 [$SIGSEGV]
 				TFBot
 				{
 					Class Scout
 					Skill Easy
 					Attributes AlwaysCrit
+					Tag disband_squad
 				}
 				TFBot
 				{
@@ -1204,8 +1063,8 @@ WaveSchedule
 			FirstSpawnOutput
 			{
 				Target gamerules
-				Action RunScriptCode
-				Param "Teles_StatusChange(`begin`)"
+				Action CallScriptFunction
+				Param "Teles_Start"
 			}
 		}
 		WaveSpawn
@@ -1228,7 +1087,8 @@ WaveSchedule
 				Name "Shortstop Scout"
 				Skill Easy
 				Item "The Shortstop"
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -1250,25 +1110,33 @@ WaveSchedule
 				{
 					Template T_TFBot_Giant_Heavyweapons
 					Tag bot_giant
-					AddTemplate "T_TFBot_TeleBot_SquadLeader" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadleader
+					Item "Lo-Fi Longwave"
 				}
 				TFBot
 				{
 					Class Pyro
 					Skill Normal
-					AddTemplate "T_TFBot_TeleBot_SquadMember" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadmember
+					Item "Lo-Fi Longwave"
 				}
 				TFBot
 				{
 					Class Pyro
 					Skill Normal
-					AddTemplate "T_TFBot_TeleBot_SquadMember" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadmember
+					Item "Lo-Fi Longwave"
 				}
 				TFBot
 				{
 					Class Pyro
 					Skill Normal
-					AddTemplate "T_TFBot_TeleBot_SquadMember" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadmember
+					Item "Lo-Fi Longwave"
 				}
 			}
 		}
@@ -1286,11 +1154,10 @@ WaveSchedule
 			}
 			Tank
 			{
-				Name tank
+				Name tankboss
 				Health 18000
 				Speed 75
 				StartingPathTrackNode boss_path_1
-				ClassIcon tank [$SIGSEGV]
 				OnKilledOutput
 				{
 					Target boss_dead_relay
@@ -1362,11 +1229,10 @@ WaveSchedule
 			}
 			Tank
 			{
-				Name tank
+				Name tankboss
 				Health 18000
 				Speed 75
 				StartingPathTrackNode boss_path_1
-				ClassIcon tank [$SIGSEGV]
 				OnKilledOutput
 				{
 					Target boss_dead_relay
@@ -1444,7 +1310,8 @@ WaveSchedule
 				{
 					Template T_TFBot_Demo_Burst
 					Skill Easy
-					AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+					Tag telebot
+					Item "Lo-Fi Longwave"
 				}
 			}
 		}
@@ -1457,7 +1324,7 @@ WaveSchedule
 			{
 				Target gamerules
 				Action RunScriptCode
-				Param "Teles_StatusChange(`end`)"
+				Param "EntFireByHandle(gamerules_entity, `PlayVO`, `weapons/teleporter_explode.wav`, -1.0, null, null); teleports_active = false"
 			}
 		}
 		WaveSpawn
@@ -1477,7 +1344,9 @@ WaveSchedule
 			{
 				Template T_TFBot_Giant_Heavyweapons
 				Tag bot_giant
-				AddTemplate "T_TFBot_TeleBot_W3D" [$SIGSEGV]
+				Tag telebot_ignorenavfunc
+				Tag telebot_w3d
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -1495,7 +1364,6 @@ WaveSchedule
 			TotalCurrency 125
 			Squad
 			{
-				NoFormation 1 [$SIGSEGV]
 				TFBot
 				{
 					Class Scout
@@ -1503,6 +1371,7 @@ WaveSchedule
 					Name "Shortstop Scout"
 					Skill Normal
 					Item "The Shortstop"
+					Tag disband_squad
 				}
 				TFBot
 				{
@@ -1636,7 +1505,6 @@ WaveSchedule
 			TotalCurrency 25
 			Squad
 			{
-				NoWaitForFormation 1 [$SIGSEGV]
 				TFBot
 				{
 					Template T_TFBot_Medic_AoEUber
@@ -1676,7 +1544,6 @@ WaveSchedule
 			TotalCurrency 25
 			Squad
 			{
-				NoWaitForFormation 1 [$SIGSEGV]
 				TFBot
 				{
 					Template T_TFBot_Medic_AoEUber
@@ -1716,7 +1583,6 @@ WaveSchedule
 			TotalCurrency 50
 			Squad
 			{
-				NoWaitForFormation 1 [$SIGSEGV]
 				TFBot
 				{
 					Template T_TFBot_Medic_AoEUber
@@ -1775,7 +1641,6 @@ WaveSchedule
 			TotalCurrency 125
 			Squad
 			{
-				NoWaitForFormation 1 [$SIGSEGV]
 				TFBot
 				{
 					Template T_TFBot_Medic_AoEUber
@@ -1826,11 +1691,10 @@ WaveSchedule
 			}
 			Tank
 			{
-				Name tank
+				Name tankboss
 				Health 20000
 				Speed 75
 				StartingPathTrackNode boss_path_1
-				ClassIcon tank [$SIGSEGV]
 				OnKilledOutput
 				{
 					Target boss_dead_relay
@@ -1852,8 +1716,8 @@ WaveSchedule
 			FirstSpawnOutput
 			{
 				Target gamerules
-				Action RunScriptCode
-				Param "Teles_StatusChange(`begin`)"
+				Action CallScriptFunction
+				Param "Teles_Start"
 			}
 		}
 		WaveSpawn
@@ -1873,7 +1737,8 @@ WaveSchedule
 			{
 				Template T_TFBot_Heavyweapons_Shotgun
 				Skill Easy
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -1893,7 +1758,8 @@ WaveSchedule
 			{
 				Template T_TFBot_Soldier_Extended_Battalion
 				Skill Easy
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -1913,7 +1779,8 @@ WaveSchedule
 			{
 				Template T_TFBot_Giant_Scout_Baseball
 				Tag bot_giant
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -1969,7 +1836,6 @@ WaveSchedule
 			TotalCurrency 50
 			Squad
 			{
-				NoWaitForFormation 1 [$SIGSEGV]
 				TFBot
 				{
 					Template T_TFBot_Giant_Soldier_Spammer_Reload
@@ -2019,36 +1885,47 @@ WaveSchedule
 			TotalCurrency 100
 			Squad
 			{
-				NoWaitForFormation 1 [$SIGSEGV]
 				TFBot
 				{
 					Template T_TFBot_Medic_AoEUber
-					AddTemplate "T_TFBot_TeleBot_SquadLeader" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadleader
+					Item "Lo-Fi Longwave"
 				}
 				TFBot
 				{
 					Template T_TFBot_Heavyweapons_Shotgun
-					AddTemplate "T_TFBot_TeleBot_SquadMember" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadmember
+					Item "Lo-Fi Longwave"
 				}
 				TFBot
 				{
 					Template T_TFBot_Heavyweapons_Shotgun
-					AddTemplate "T_TFBot_TeleBot_SquadMember" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadmember
+					Item "Lo-Fi Longwave"
 				}
 				TFBot
 				{
 					Template T_TFBot_Heavyweapons_Shotgun
-					AddTemplate "T_TFBot_TeleBot_SquadMember" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadmember
+					Item "Lo-Fi Longwave"
 				}
 				TFBot
 				{
 					Template T_TFBot_Heavyweapons_Shotgun
-					AddTemplate "T_TFBot_TeleBot_SquadMember" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadmember
+					Item "Lo-Fi Longwave"
 				}
 				TFBot
 				{
 					Template T_TFBot_Heavyweapons_Shotgun
-					AddTemplate "T_TFBot_TeleBot_SquadMember" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadmember
+					Item "Lo-Fi Longwave"
 				}
 			}
 		}
@@ -2061,7 +1938,7 @@ WaveSchedule
 			{
 				Target gamerules
 				Action RunScriptCode
-				Param "Teles_StatusChange(`end`)"
+				Param "EntFireByHandle(gamerules_entity, `PlayVO`, `weapons/teleporter_explode.wav`, -1.0, null, null); teleports_active = false"
 			}
 		}
 		WaveSpawn
@@ -2079,7 +1956,6 @@ WaveSchedule
 			TotalCurrency 100
 			Squad
 			{
-				NoWaitForFormation 1 [$SIGSEGV]
 				TFBot
 				{
 					Template T_TFBot_Giant_Demo_Burst
@@ -2118,8 +1994,8 @@ WaveSchedule
 			FirstSpawnOutput
 			{
 				Target gamerules
-				Action RunScriptCode
-				Param "Teles_StatusChange(`begin`)"
+				Action CallScriptFunction
+				Param "Teles_Start"
 			}
 		}
 		WaveSpawn
@@ -2157,13 +2033,18 @@ WaveSchedule
 				{
 					Template T_TFBot_Giant_Pyro
 					Tag bot_giant
-					AddTemplate "T_TFBot_TeleBot_W5A_SquadLeader"
+					Tag telebot
+					Tag telebot_squadleader
+					Tag telebot_w5a
+					Item "Lo-Fi Longwave"
 				}
 				TFBot
 				{
 					Template T_TFBot_Giant_Medic
 					Tag bot_giant
-					AddTemplate "T_TFBot_TeleBot_SquadMember"
+					Tag telebot
+					Tag telebot_squadmember
+					Item "Lo-Fi Longwave"
 				}
 			}
 		}
@@ -2272,7 +2153,8 @@ WaveSchedule
 				Template T_TFBot_Giant_Soldier_Spammer
 				Tag bot_giant
 				Attributes AlwaysCrit
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -2291,7 +2173,8 @@ WaveSchedule
 			TFBot
 			{
 				Template T_TFBot_Scout_Melee
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -2311,7 +2194,8 @@ WaveSchedule
 			{
 				Template T_TFBot_Heavyweapons_Fist
 				Attributes AlwaysCrit
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -2376,7 +2260,8 @@ WaveSchedule
 			{
 				Template T_TFBot_Heavyweapons_Fist
 				Attributes AlwaysCrit
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
 			}
 		}
 		WaveSpawn
@@ -2398,25 +2283,17 @@ WaveSchedule
 				{
 					Class Heavyweapons
 					Skill Expert
-					AddTemplate "T_TFBot_TeleBot_SquadLeader" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadleader
+					Item "Lo-Fi Longwave"
 				}
 				TFBot
 				{
 					Template T_TFBot_Medic_BigHeal
-					AddTemplate "T_TFBot_TeleBot_SquadMember" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_squadmember
+					Item "Lo-Fi Longwave"
 				}
-			}
-		}
-		WaveSpawn
-		{
-			Where spawnbot
-			Name "W5-TeleEnd"
-			WaitForAllSpawned "W5E-2"
-			FirstSpawnOutput
-			{
-				Target gamerules
-				Action RunScriptCode
-				Param "Teles_StatusChange(`end`)"
 			}
 		}
 		WaveSpawn
@@ -2436,7 +2313,20 @@ WaveSchedule
 			{
 				Class Heavyweapons
 				Skill Expert
-				AddTemplate "T_TFBot_TeleBot" [$SIGSEGV]
+				Tag telebot
+				Item "Lo-Fi Longwave"
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "W5-TeleEnd"
+			WaitForAllSpawned "W5E-2"
+			FirstSpawnOutput
+			{
+				Target gamerules
+				Action RunScriptCode
+				Param "EntFireByHandle(gamerules_entity, `PlayVO`, `weapons/teleporter_explode.wav`, -1.0, null, null); teleports_active = false"
 			}
 		}
 		WaveSpawn
@@ -2510,30 +2400,18 @@ WaveSchedule
 				ClassIcon pyro_dragon_fury_swordstone
 				Skill Expert
 				Health 50000
-				Item "Festive Gloves of Running Urgently"
-				Item "Large Luchadore"
-				Attributes MiniBoss
-				Attributes UseBossHealthBar
-				Attributes AlwaysFireWeapon // must have this or otherwise it won't shoot fireballs
-				Tag bot_giant
-				Tag boss_bot
-				EventChangeAttributes [$SIGSEGV]
+				EventChangeAttributes
 				{
 					Default
 					{
+						Item "Festive Gloves of Running Urgently"
+						Item "Large Luchadore"
+						Attributes MiniBoss
+						Attributes UseBossHealthBar
+						Attributes AlwaysFireWeapon
+						Tag bot_giant
+						Tag boss_bot
 						WeaponRestrictions PrimaryOnly
-						FireSound "=70|misc/halloween/spell_fireball_impact.wav" [$SIGSEGV]
-						Item "TF_WEAPON_ROCKETLAUNCHER"
-						ItemAttributes
-						{
-							ItemName "TF_WEAPON_ROCKETLAUNCHER"
-							"custom item model" "models/weapons/c_models/c_boxing_gloves/c_boxing_gloves_xmas.mdl"
-							"custom projectile model" "models/weapons/w_models/w_drg_ball.mdl"
-							"projectile trail particle" "lava_fireball"
-							"custom kill icon" "taunt_pyro"
-							"clip size bonus" 9999
-							"fire input on hit" "!caller^$IgnitePlayerDuration^6"
-						}
 						ItemAttributes
 						{
 							ItemName "Festive Gloves of Running Urgently"
@@ -2548,47 +2426,42 @@ WaveSchedule
 							"airblast vulnerability multiplier" 0.3
 							"override footstep sound set" 2
 							"no_jump" 1
-							"stomp player force" 270
 						}
 					}
 					Phase2
 					{
-						WeaponRestrictions MeleeOnly
-						Attributes AlwaysFireWeapon
+						Item "Festive Gloves of Running Urgently"
+						Item "Large Luchadore"
+						Attributes MiniBoss
+						Attributes UseBossHealthBar
 						Attributes AlwaysCrit
+						Attributes AlwaysFireWeapon
+						Tag bot_giant
+						Tag boss_bot
+						WeaponRestrictions MeleeOnly
 						ItemAttributes
 						{
 							ItemName "Festive Gloves of Running Urgently"
 							"fire rate bonus" 0.25
 							"mod_maxhealth_drain_rate" 0
 							"mult_player_movespeed_active" 1
-						} 
-						RingOfFire 5 [$SIGSEGV]
+						}
 						CharacterAttributes
 						{
-							"move speed bonus" 0.4
+							"move speed bonus" 0.5
 							"damage force reduction" 0.3
 							"airblast vulnerability multiplier" 0.3
 							"override footstep sound set" 2
 							"no_jump" 1
-							"stomp player force" 270
 							"gesture speed increase" 2.5
 						}
 					}
-				}
-				FireInput [$SIGSEGV] 
-				{
-					Target !self
-					Action RunScriptCode
-					Param "SetUpBossEnts()"
-					Delay 0
-					Cooldown 3600
 				}
 			}
 		}
 		WaveSpawn
 		{
-			Where support_boss_spawnbot
+			Where spawnbot_single_flag
 			Name "W5G-Support"
 			SpawnCount 3
 			MaxActive 15
@@ -2598,7 +2471,6 @@ WaveSchedule
 			WaitBetweenSpawns 5
 			TotalCurrency 0
 			Support 1
-			HideIcon 1 [$SIGSEGV] 
 			RandomChoice
 			{
 				TFBot
@@ -2606,262 +2478,71 @@ WaveSchedule
 					Class Scout
 					Item "Sun-on-a-Stick"
 					WeaponRestrictions MeleeOnly
-					ClassIcon spy
-					AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_bosshelper
+					Item "Lo-Fi Longwave"
+					ClassIcon scout_giant
 				}
 				TFBot
 				{
 					Class Scout
 					Item "Sun-on-a-Stick"
 					WeaponRestrictions MeleeOnly
-					ClassIcon spy
-					AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_bosshelper
+					Item "Lo-Fi Longwave"
+					ClassIcon scout_giant
 				}
 				TFBot
 				{
 					Class Pyro
 					Item "The Flare Gun"
 					WeaponRestrictions SecondaryOnly
-					ClassIcon spy
-					AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_bosshelper
+					Item "Lo-Fi Longwave"
+					ClassIcon pyro_flare
 				}
 				TFBot
 				{
 					Class Pyro
 					Item "The Flare Gun"
 					WeaponRestrictions SecondaryOnly
-					ClassIcon spy
-					AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_bosshelper
+					Item "Lo-Fi Longwave"
+					ClassIcon pyro_flare
 				}
 				TFBot
 				{
 					Class Pyro
 					Item "The Axtinguisher"
 					WeaponRestrictions MeleeOnly
-					ClassIcon spy
-					AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_bosshelper
+					Item "Lo-Fi Longwave"
+					ClassIcon pyro_flare
 				}
 				TFBot
 				{
 					Class Pyro
 					Item "The Axtinguisher"
 					WeaponRestrictions MeleeOnly
-					ClassIcon spy
-					AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_bosshelper
+					Item "Lo-Fi Longwave"
+					ClassIcon pyro_flare
 				}
 				TFBot
 				{
 					Class Heavyweapons
 					Item "The Huo Long Heatmaker"
-					ClassIcon spy
-					AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
+					Tag telebot
+					Tag telebot_bosshelper
+					Item "Lo-Fi Longwave"
+					ClassIcon heavy_heater_giant
 				}
 			}
 		}
 	}
-	// Wave // TEST
-	// {
-		// InitWaveOutput
-		// {
-			// Target gamerules
-			// Action RunScriptFile
-			// Param "powerplant_pea.nut"
-		// }
-		// StartWaveOutput
-		// {
-			// Target wave_start_relay
-			// Action Trigger
-		// }
-		// DoneOutput
-		// {
-			// Target wave_finished_relay
-			// Action Trigger
-		// }
-		// WaveSpawn
-		// {
-			// Where spawnbot_middle
-			// Name "W5G"
-			// SpawnCount 1
-			// MaxActive 1
-			// TotalCount 1
-			// WaitBeforeStarting 0
-			// WaitBetweenSpawns 0
-			// TotalCurrency 100
-			// FirstSpawnWarningSound "player/taunt_bell.wav"
-			// TFBot
-			// {
-				// Class Heavyweapons
-				// Name "Fire Fist"
-				// ClassIcon pyro_dragon_fury_swordstone
-				// Skill Expert
-				// Health 50000
-				// Item "Festive Gloves of Running Urgently"
-				// Item "Large Luchadore"
-				// Attributes MiniBoss
-				// Attributes UseBossHealthBar
-				// Attributes AlwaysFireWeapon // must have this or otherwise it won't shoot fireballs
-				// Tag bot_giant
-				// Tag boss_bot
-				// AddCond [$SIGSEGV]
-				// {
-					// Index 30
-				// }
-				// EventChangeAttributes [$SIGSEGV]
-				// {
-					// Default
-					// {
-						// WeaponRestrictions PrimaryOnly
-						// FireSound "=70|misc/halloween/spell_fireball_impact.wav" [$SIGSEGV]
-						// Item "TF_WEAPON_ROCKETLAUNCHER"
-						// ItemAttributes
-						// {
-							// ItemName "TF_WEAPON_ROCKETLAUNCHER"
-							// "custom item model" "models/weapons/c_models/c_boxing_gloves/c_boxing_gloves_xmas.mdl"
-							// "custom projectile model" "models/weapons/w_models/w_drg_ball.mdl"
-							// "projectile trail particle" "lava_fireball"
-							// "custom kill icon" "taunt_pyro"
-							// "clip size bonus" 9999
-							// "fire input on hit" "!caller^$IgnitePlayerDuration^6"
-						// }
-						// ItemAttributes
-						// {
-							// ItemName "Festive Gloves of Running Urgently"
-							// "is_passive_weapon" 1
-							// "mod_maxhealth_drain_rate" 0
-							// "mult_player_movespeed_active" 1
-						// }
-						// CharacterAttributes
-						// {
-							// "move speed bonus" 0.5
-							// "damage force reduction" 0.3
-							// "airblast vulnerability multiplier" 0.3
-							// "override footstep sound set" 2
-							// "no_jump" 1
-							// "stomp player force" 270
-						// }
-					// }
-					// Phase2
-					// {
-						// WeaponRestrictions MeleeOnly
-						// Attributes AlwaysFireWeapon
-						// Attributes AlwaysCrit
-						// ItemAttributes
-						// {
-							// ItemName "Festive Gloves of Running Urgently"
-							// "fire rate bonus" 0.25
-							// "mod_maxhealth_drain_rate" 0
-							// "mult_player_movespeed_active" 1
-						// } 
-						// RingOfFire 5 [$SIGSEGV]
-						// CharacterAttributes
-						// {
-							// "move speed bonus" 0.4
-							// "damage force reduction" 0.3
-							// "airblast vulnerability multiplier" 0.3
-							// "override footstep sound set" 2
-							// "no_jump" 1
-							// "stomp player force" 270
-							// "gesture speed increase" 2.5
-						// }
-					// }
-				// }
-				// FireInput [$SIGSEGV] 
-				// {
-					// Target !self
-					// Action RunScriptCode
-					// Param "SetUpBossEnts()"
-					// Delay 0
-					// Cooldown 3600
-				// }
-			// }
-		// }
-		// WaveSpawn
-		// {
-			// Where support_boss_spawnbot
-			// Name "W5G-Support"
-			// SpawnCount 3
-			// MaxActive 15
-			// TotalCount 100
-			// WaitBeforeStarting 0
-			// WaitBetweenSpawns 5
-			// TotalCurrency 0
-			// Support 1
-			// HideIcon 1 [$SIGSEGV] 
-			// RandomChoice
-			// {
-				// TFBot
-				// {
-					// Class Scout
-					// Item "Sun-on-a-Stick"
-					// WeaponRestrictions MeleeOnly
-					// ClassIcon spy
-					// AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
-				// }
-				// TFBot
-				// {
-					// Class Scout
-					// Item "Sun-on-a-Stick"
-					// WeaponRestrictions MeleeOnly
-					// ClassIcon spy
-					// AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
-				// }
-				// TFBot
-				// {
-					// Class Pyro
-					// Item "The Flare Gun"
-					// WeaponRestrictions SecondaryOnly
-					// ClassIcon spy
-					// AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
-				// }
-				// TFBot
-				// {
-					// Class Pyro
-					// Item "The Flare Gun"
-					// WeaponRestrictions SecondaryOnly
-					// ClassIcon spy
-					// AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
-				// }
-				// TFBot
-				// {
-					// Class Pyro
-					// Item "The Axtinguisher"
-					// WeaponRestrictions MeleeOnly
-					// ClassIcon spy
-					// AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
-				// }
-				// TFBot
-				// {
-					// Class Pyro
-					// Item "The Axtinguisher"
-					// WeaponRestrictions MeleeOnly
-					// ClassIcon spy
-					// AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
-				// }
-				// TFBot
-				// {
-					// Class Heavyweapons
-					// Item "The Huo Long Heatmaker"
-					// ClassIcon spy
-					// AddTemplate "T_TFBot_TeleBot_Boss" [$SIGSEGV]
-				// }
-			// }
-		// }
-		// WaveSpawn
-		// {
-			// Where spawnbot_left
-			// Where spawnbot_middle
-			// Where spawnbot_right
-			// Name "W5A-1"
-			// SpawnCount 3
-			// MaxActive 15
-			// TotalCount 39
-			// WaitBeforeStarting 3600
-			// WaitBetweenSpawns 2.5
-			// TotalCurrency 100
-			// TFBot
-			// {
-				// Template T_TFBot_Scout_Melee
-			// }
-		// }
-	// }
 }
