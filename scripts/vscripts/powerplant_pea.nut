@@ -1,329 +1,301 @@
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// LOCALS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////// DEBUGGING ///////////////////////////////////
-
-local debug = false
-local debug_teles = false
-
-/////////////////////////////////// DEBUGGING ///////////////////////////////////
-/////////////////////////////////// GLOBAL ENTITIES ///////////////////////////////////
-
-local gamerules_entity;
-gamerules_entity = Entities.FindByName(gamerules_entity, "gamerules")
-
-local objective_resource_entity;
-objective_resource_entity = Entities.FindByClassname(objective_resource_entity, "tf_objective_resource")
-
-local wave_start_relay_entity;
-wave_start_relay_entity = Entities.FindByName(wave_start_relay_entity, "wave_start_relay")
-
-local intel_entity;
-intel_entity = Entities.FindByName(intel_entity, "intel")
-
-local bomb_dir_left1_entity
-bomb_dir_left1_entity = Entities.FindByName(bomb_dir_left1_entity, "bombpath_left_left")
-
-local bomb_dir_left2_entity
-bomb_dir_left2_entity = Entities.FindByName(bomb_dir_left2_entity, "bombpath_left_middle")
-
-local bomb_dir_left3_entity
-bomb_dir_left3_entity = Entities.FindByName(bomb_dir_left3_entity, "bombpath_left_right")
-
-local bomb_dir_right1_entity
-bomb_dir_right1_entity = Entities.FindByName(bomb_dir_right1_entity, "bombpath_right_left")
-
-/////////////////////////////////// GLOBAL ENTITIES ///////////////////////////////////
-/////////////////////////////////// CALLBACKS ///////////////////////////////////
-
-self.ValidateScriptScope()
-
-::CALLBACKS <- {}
-
-ClearGameEventCallbacks()
-	
-for (local i = 1; i <= Constants.Server.MAX_PLAYERS; i++) // run this for when first player connects to the server and the callback hasn't loaded yet
-{
-	local player = PlayerInstanceFromIndex(i)
-	if (player == null) continue
-	if (IsPlayerABot(player)) continue
-	
-	player.ValidateScriptScope()
-	local scope = player.GetScriptScope()
-	
-	if (!("saw_mission_info" in scope)) 
-	{
-		scope.saw_mission_info <- true
-		ClientPrint(player, 4, "For the duration of this mission, certain robots will be spawning from several different locations marked on this map.")
-		ClientPrint(player, 3, "\x07FFD700For the duration of this mission, certain robots will be spawning from several different locations marked on this map.")
-	}
-}
-
-::CALLBACKS.OnGameEvent_post_inventory_application <- function(params)
-{
-	local spawned_player = GetPlayerFromUserID(params.userid);
-	
-	if (spawned_player.IsFakeClient()) return
-	
-	spawned_player.ValidateScriptScope()
-	local scope = spawned_player.GetScriptScope()
-	
-	if (!("saw_mission_info" in scope)) 
-	{
-		scope.saw_mission_info <- true
-		ClientPrint(spawned_player, 4, "For the duration of this mission, certain robots will be spawning from several different locations marked on this map.")
-		ClientPrint(spawned_player, 3, "\x07FFD700For the duration of this mission, certain robots will be spawning from several different locations marked on this map.")
-	}
-}
-
-/////////////////////////////////// CALLBACKS ///////////////////////////////////
-/////////////////////////////////// TELEPORTERS ///////////////////////////////////
-
 for (local ent; ent = Entities.FindByName(ent, "tele_*"); ) ent.Kill()
 
-::tele_func_threshold <- null
-
-local teledestination_table =
+::PEA <-
 {
-	"1": Vector(-630, -430, 285) // back (1)
-	"2": Vector(-1150, -1120, 285) // back (2)
-	"3": Vector(-1850, -700, 285) // back (3)
-	"4": Vector(450, -450, 235) // back (4)
-	"5": Vector(-1500, 1600, 210) // forward 1 (1)
-	"6": Vector(-450, 1500, 70) // forward 1 (2)
-	"7": Vector(450, 600, 110) // forward 2 (1)
-	"8": Vector(-1950, -100, 285) // forward 2 (2)
+	debug = true
+
+	intel_entity = Entities.FindByName(null, "intel")
 	
-	"9": Vector(-800, -2050, 235) // special 1 (w3d)
-}
+	teledestination_array = []
+	teledestination_array_giant = []
 
-local prop_vector = Vector(0, 0, 30)
-
-::tele_spot_b1 <- SpawnEntityFromTable("prop_dynamic",
-{
-	targetname    = "tele_spot_b1"
-	origin        = teledestination_table["1"] - prop_vector
-	angles        = QAngle(0, 90, 0)
-	model         = "models/props_mvm/robot_spawnpoint.mdl"
-	DefaultAnim   = "idle"
-})
-
-::tele_spot_b2 <- SpawnEntityFromTable("prop_dynamic",
-{
-	targetname    = "tele_spot_b2"
-	origin        = teledestination_table["2"] - prop_vector
-	angles        = QAngle(0, 90, 0)
-	model         = "models/props_mvm/robot_spawnpoint.mdl"
-	DefaultAnim   = "idle"
-})
-
-::tele_spot_b3 <- SpawnEntityFromTable("prop_dynamic",
-{
-	targetname    = "tele_spot_b3"
-	origin        = teledestination_table["3"] - prop_vector
-	angles        = QAngle(0, 90, 0)
-	model         = "models/props_mvm/robot_spawnpoint.mdl"
-	DefaultAnim   = "idle"
-})
-
-::tele_spot_b4 <- SpawnEntityFromTable("prop_dynamic",
-{
-	targetname    = "tele_spot_b4"
-	origin        = teledestination_table["4"] - prop_vector
-	angles        = QAngle(0, 90, 0)
-	model         = "models/props_mvm/robot_spawnpoint.mdl"
-	DefaultAnim   = "idle"
-})
-
-::tele_spot_f1 <- SpawnEntityFromTable("prop_dynamic",
-{
-	targetname    = "tele_spot_f1"
-	origin        = teledestination_table["5"] - prop_vector
-	angles        = QAngle(0, 90, 0)
-	model         = "models/props_mvm/robot_spawnpoint.mdl"
-	DefaultAnim   = "idle"
-})
-
-::tele_spot_f2 <- SpawnEntityFromTable("prop_dynamic",
-{
-	targetname    = "tele_spot_f2"
-	origin        = teledestination_table["6"] - prop_vector
-	angles        = QAngle(0, 90, 0)
-	model         = "models/props_mvm/robot_spawnpoint.mdl"
-	DefaultAnim   = "idle"
-})
-
-::tele_spot_f3 <- SpawnEntityFromTable("prop_dynamic",
-{
-	targetname    = "tele_spot_f3"
-	origin        = teledestination_table["7"] - prop_vector
-	angles        = QAngle(0, 90, 0)
-	model         = "models/props_mvm/robot_spawnpoint.mdl"
-	DefaultAnim   = "idle"
-})
-
-::tele_spot_f4 <- SpawnEntityFromTable("prop_dynamic",
-{
-	targetname    = "tele_spot_f4"
-	origin        = teledestination_table["8"] - prop_vector
-	angles        = QAngle(0, 90, 0)
-	model         = "models/props_mvm/robot_spawnpoint.mdl"
-	DefaultAnim   = "idle"
-})
-
-::tele_spot_b1_skyparticle <- SpawnEntityFromTable("info_particle_system",
-{
-	targetname    	   = "tele_b_skyparticle"
-	origin             = teledestination_table["1"] - prop_vector
-	angles             = QAngle(0, 90, 0)
-	start_active       = 0,
-	effect_name        = "teleporter_mvm_bot_persist"
-})
-
-::tele_spot_b2_skyparticle <- SpawnEntityFromTable("info_particle_system",
-{
-	targetname    	   = "tele_b_skyparticle"
-	origin             = teledestination_table["2"] - prop_vector
-	angles             = QAngle(0, 90, 0)
-	start_active       = 0,
-	effect_name        = "teleporter_mvm_bot_persist"
-})
-
-::tele_spot_b3_skyparticle <- SpawnEntityFromTable("info_particle_system",
-{
-	targetname    	   = "tele_b_skyparticle"
-	origin             = teledestination_table["3"] - prop_vector
-	angles             = QAngle(0, 90, 0)
-	start_active       = 0,
-	effect_name        = "teleporter_mvm_bot_persist"
-})
-
-::tele_spot_b4_skyparticle <- SpawnEntityFromTable("info_particle_system",
-{
-	targetname    	   = "tele_b_skyparticle"
-	origin             = teledestination_table["4"] - prop_vector
-	angles             = QAngle(0, 90, 0)
-	start_active       = 0,
-	effect_name        = "teleporter_mvm_bot_persist"
-})
-
-::tele_spot_f1_skyparticle <- SpawnEntityFromTable("info_particle_system",
-{
-	targetname    	   = "tele_f_skyparticle"
-	origin             = teledestination_table["5"] - prop_vector
-	angles             = QAngle(0, 90, 0)
-	start_active       = 0,
-	effect_name        = "teleporter_mvm_bot_persist"
-})
-
-::tele_spot_f2_skyparticle <- SpawnEntityFromTable("info_particle_system",
-{
-	targetname    	   = "tele_f_skyparticle"
-	origin             = teledestination_table["6"] - prop_vector
-	angles             = QAngle(0, 90, 0)
-	start_active       = 0,
-	effect_name        = "teleporter_mvm_bot_persist"
-})
-
-::tele_spot_f3_skyparticle <- SpawnEntityFromTable("info_particle_system",
-{
-	targetname    	   = "tele_f_skyparticle"
-	origin             = teledestination_table["7"] - prop_vector
-	angles             = QAngle(0, 90, 0)
-	start_active       = 0,
-	effect_name        = "teleporter_mvm_bot_persist"
-})
-
-::tele_spot_f4_skyparticle <- SpawnEntityFromTable("info_particle_system",
-{
-	targetname    	   = "tele_f_skyparticle"
-	origin             = teledestination_table["8"] - prop_vector
-	angles             = QAngle(0, 90, 0)
-	start_active       = 0,
-	effect_name        = "teleporter_mvm_bot_persist"
-})
-
-::teleport_status <- "inbetween_waves"
-
-::current_squad_leader <- null
-::bomb_placement_adjusted <- false
-
-/////////////////////////////////// TELEPORTERS ///////////////////////////////////
-
-::aoe_medic_counter <- 1
-
-::boss_entity <- null
-::boss_stage_threshold_reached <- false
-::after_boss_phase_transition <- false
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// LOCALS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// AUTOEXECUTE ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/////////////////////////////////// EVERY WAVE ///////////////////////////////////
-
-NetProps.SetPropString(gamerules_entity, "m_iszScriptThinkFunction", "");
-
-EntityOutputs.RemoveOutput(bomb_dir_left1_entity, "OnTrigger", "gamerules", "RunScriptCode", "tele_func_threshold = 100.0")
-EntityOutputs.RemoveOutput(bomb_dir_left2_entity, "OnTrigger", "gamerules", "RunScriptCode", "tele_func_threshold = 100.0")
-EntityOutputs.RemoveOutput(bomb_dir_left3_entity, "OnTrigger", "gamerules", "RunScriptCode", "tele_func_threshold = 100.0")
-EntityOutputs.RemoveOutput(bomb_dir_right1_entity, "OnTrigger", "gamerules", "RunScriptCode", "tele_func_threshold = -300.0")
-
-EntityOutputs.RemoveOutput(wave_start_relay_entity, "OnTrigger", "gamerules", "RunScriptCode", "teleport_status = `inactive`")
-
-EntityOutputs.AddOutput(bomb_dir_left1_entity, "OnTrigger", "gamerules", "RunScriptCode", "tele_func_threshold = 100.0", 0.0, -1)
-EntityOutputs.AddOutput(bomb_dir_left2_entity, "OnTrigger", "gamerules", "RunScriptCode", "tele_func_threshold = 100.0", 0.0, -1)
-EntityOutputs.AddOutput(bomb_dir_left3_entity, "OnTrigger", "gamerules", "RunScriptCode", "tele_func_threshold = 100.0", 0.0, -1)
-EntityOutputs.AddOutput(bomb_dir_right1_entity, "OnTrigger", "gamerules", "RunScriptCode", "tele_func_threshold = -300.0", 0.0, -1)
-
-EntityOutputs.AddOutput(wave_start_relay_entity, "OnTrigger", "gamerules", "RunScriptCode", "teleport_status = `inactive`", 0.0, -1)
-
-for (local think_to_clear; think_to_clear = Entities.FindByName(think_to_clear, "defenderspushedcheck"); )
-{
-	think_to_clear.Kill()
-}
-
-local think_havedefendersbeenpushed = SpawnEntityFromTable("logic_relay", {targetname = "defenderspushedcheck"})
-AddThinkToEnt(think_havedefendersbeenpushed, "HaveDefendersBeenPushed_Think")
-
-for (local think_to_clear; think_to_clear = Entities.FindByName(think_to_clear, "bombcarrierspawnspeedup"); )
-{
-	think_to_clear.Kill()
-}
-
-local think_bombcarrierspawnspeedup = SpawnEntityFromTable("logic_relay", {targetname = "bombcarrierspawnspeedup"})
-AddThinkToEnt(think_bombcarrierspawnspeedup, "BombCarrierSpawnSpeedUp_Think")
-
-if (Entities.FindByName(null, "nav_avoid_giant") == null)
-{
-	local nav_avoid_giant = SpawnEntityFromTable("func_nav_avoid",
+	tele_spot_b1 = SpawnEntityFromTable("prop_dynamic",
 	{
-		targetname       = "nav_avoid_giant"
-		origin           = Vector(-700, -350, 0)
-		tags             = "bot_giant"
+		targetname    = "tele_spot_b1"
+		origin        = Vector(-630, -430, 255)
+		angles        = QAngle(0, -90, 0)
+		model         = "models/props_mvm/robot_spawnpoint.mdl"
+		DefaultAnim   = "idle"
 	})
 
-	nav_avoid_giant.KeyValueFromInt("solid", 2)
-	nav_avoid_giant.KeyValueFromString("mins", "-300 -300 -1000")
-	nav_avoid_giant.KeyValueFromString("maxs", "300 300 1000")
-
-	local nav_avoid_telebot = SpawnEntityFromTable("func_nav_avoid",
+	tele_spot_b2 = SpawnEntityFromTable("prop_dynamic",
 	{
-		targetname       = "nav_avoid_telebot"
-		origin           = Vector(-500, -1500, 0)
-		tags             = "bot_telebot"
+		targetname    = "tele_spot_b2"
+		origin        = Vector(-1150, -1120, 255)
+		angles        = QAngle(0, 90, 0)
+		model         = "models/props_mvm/robot_spawnpoint.mdl"
+		DefaultAnim   = "idle"
 	})
 
-	nav_avoid_telebot.KeyValueFromInt("solid", 2)
-	nav_avoid_telebot.KeyValueFromString("mins", "-2000 -1500 -1000")
-	nav_avoid_telebot.KeyValueFromString("maxs", "2000 400 1000")
-}
+	tele_spot_b3 = SpawnEntityFromTable("prop_dynamic",
+	{
+		targetname    = "tele_spot_b3"
+		origin        = Vector(-1850, -700, 255)
+		angles        = QAngle(0, 0, 0)
+		model         = "models/props_mvm/robot_spawnpoint.mdl"
+		DefaultAnim   = "idle"
+	})
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// AUTOEXECUTE ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	tele_spot_b4 = SpawnEntityFromTable("prop_dynamic",
+	{
+		targetname    = "tele_spot_b4"
+		origin        = Vector(450, -450, 205)
+		angles        = QAngle(0, 180, 0)
+		model         = "models/props_mvm/robot_spawnpoint.mdl"
+		DefaultAnim   = "idle"
+	})
 
-/////////////////////////////////// TELEPORTERS ///////////////////////////////////
+	tele_spot_b5 = SpawnEntityFromTable("prop_dynamic",
+	{
+		targetname    = "tele_spot_b5"
+		origin        = Vector(180, -1120, 320)
+		angles        = QAngle(0, 180, 0)
+		model         = "models/props_mvm/robot_spawnpoint.mdl"
+		DefaultAnim   = "idle"
+	})
 
-::Teles_StatusChange <- function(action)
-{
-	if (action == "begin")
+	tele_spot_f1 = SpawnEntityFromTable("prop_dynamic",
+	{
+		targetname    = "tele_spot_f1"
+		origin        = Vector(-1500, 1600, 180)
+		angles        = QAngle(0, -90, 0)
+		model         = "models/props_mvm/robot_spawnpoint.mdl"
+		DefaultAnim   = "idle"
+	})
+
+	tele_spot_f2 = SpawnEntityFromTable("prop_dynamic",
+	{
+		targetname    = "tele_spot_f2"
+		origin        = Vector(-450, 1500, 40)
+		angles        = QAngle(0, -90, 0)
+		model         = "models/props_mvm/robot_spawnpoint.mdl"
+		DefaultAnim   = "idle"
+	})
+
+	tele_spot_f3 = SpawnEntityFromTable("prop_dynamic",
+	{
+		targetname    = "tele_spot_f3"
+		origin        = Vector(450, 600, 80)
+		angles        = QAngle(0, 180, 0)
+		model         = "models/props_mvm/robot_spawnpoint.mdl"
+		DefaultAnim   = "idle"
+	})
+
+	tele_spot_f4 = SpawnEntityFromTable("prop_dynamic",
+	{
+		targetname    = "tele_spot_f4"
+		origin        = Vector(-1950, -100, 255)
+		angles        = QAngle(0, 0, 0)
+		model         = "models/props_mvm/robot_spawnpoint.mdl"
+		DefaultAnim   = "idle"
+	})
+
+	tele_spot_b1_skyparticle = SpawnEntityFromTable("info_particle_system",
+	{
+		targetname    	   = "skyparticle_tele_spot_b1"
+		origin        	   = Vector(-630, -430, 255)
+		angles             = QAngle(0, 90, 0)
+		start_active       = 0,
+		effect_name        = "teleporter_mvm_bot_persist"
+	})
+
+	tele_spot_b2_skyparticle = SpawnEntityFromTable("info_particle_system",
+	{
+		targetname    	   = "skyparticle_tele_spot_b2"
+		origin             = Vector(-1150, -1120, 255)
+		angles             = QAngle(0, 90, 0)
+		start_active       = 0,
+		effect_name        = "teleporter_mvm_bot_persist"
+	})
+
+	tele_spot_b3_skyparticle = SpawnEntityFromTable("info_particle_system",
+	{
+		targetname    	   = "skyparticle_tele_spot_b3"
+		origin             = Vector(-1850, -700, 255)
+		angles             = QAngle(0, 90, 0)
+		start_active       = 0,
+		effect_name        = "teleporter_mvm_bot_persist"
+	})
+
+	tele_spot_b4_skyparticle = SpawnEntityFromTable("info_particle_system",
+	{
+		targetname    	   = "skyparticle_tele_spot_b4"
+		origin             = Vector(450, -450, 205)
+		angles             = QAngle(0, 90, 0)
+		start_active       = 0,
+		effect_name        = "teleporter_mvm_bot_persist"
+	})
+
+	tele_spot_b5_skyparticle = SpawnEntityFromTable("info_particle_system",
+	{
+		targetname    	   = "skyparticle_tele_spot_b5"
+		origin        	   = Vector(180, -1120, 320)
+		angles             = QAngle(0, 90, 0)
+		start_active       = 0,
+		effect_name        = "teleporter_mvm_bot_persist"
+	})
+
+	tele_spot_f1_skyparticle = SpawnEntityFromTable("info_particle_system",
+	{
+		targetname    	   = "skyparticle_tele_spot_f1"
+		origin             = Vector(-1500, 1600, 180)
+		angles             = QAngle(0, 90, 0)
+		start_active       = 0,
+		effect_name        = "teleporter_mvm_bot_persist"
+	})
+
+	tele_spot_f2_skyparticle = SpawnEntityFromTable("info_particle_system",
+	{
+		targetname    	   = "skyparticle_tele_spot_f2"
+		origin             = Vector(-450, 1500, 40)
+		angles             = QAngle(0, 90, 0)
+		start_active       = 0,
+		effect_name        = "teleporter_mvm_bot_persist"
+	})
+
+	tele_spot_f3_skyparticle = SpawnEntityFromTable("info_particle_system",
+	{
+		targetname    	   = "skyparticle_tele_spot_f3"
+		origin             = Vector(450, 600, 80)
+		angles             = QAngle(0, 90, 0)
+		start_active       = 0,
+		effect_name        = "teleporter_mvm_bot_persist"
+	})
+
+	tele_spot_f4_skyparticle = SpawnEntityFromTable("info_particle_system",
+	{
+		targetname    	   = "skyparticle_tele_spot_f4"
+		origin             = Vector(-1950, -100, 285)
+		angles             = QAngle(0, 90, 0)
+		start_active       = 0,
+		effect_name        = "teleporter_mvm_bot_persist"
+	})
+
+	teleports_active = false
+
+	current_squad_leader = null
+	bomb_placement_adjusted = false
+
+	current_bombpath = null
+	
+	nav_avoid_giant = null
+	nav_avoid_giant2 = null
+	nav_avoid_bossbot = null
+	
+	SetUpNavFuncs = function()
+	{
+		nav_avoid_giant = SpawnEntityFromTable("func_nav_avoid",
+		{
+			targetname       = "nav_avoid_giant"
+			origin           = Vector(-700, -350, 0)
+			tags             = "bot_giant"
+		})
+
+		nav_avoid_giant.KeyValueFromInt("solid", 2)
+		nav_avoid_giant.KeyValueFromString("mins", "-300 -300 -1000")
+		nav_avoid_giant.KeyValueFromString("maxs", "300 300 1000")
+		
+		nav_avoid_giant2 = SpawnEntityFromTable("func_nav_avoid",
+		{
+			targetname       = "nav_avoid_giant"
+			origin           = Vector(-800, 200, 200)
+			tags             = "bot_giant"
+		})
+
+		nav_avoid_giant2.KeyValueFromInt("solid", 2)
+		nav_avoid_giant2.KeyValueFromString("mins", "-200 -200 -1000")
+		nav_avoid_giant2.KeyValueFromString("maxs", "200 200 1000")
+		
+		function PreventBadPathing()
+		{
+			local nav_avoid_telebot = SpawnEntityFromTable("func_nav_avoid",
+			{
+				targetname       = "nav_avoid_telebot"
+				origin           = Vector(-500, -1500, 0)
+				tags             = "telebot"
+			})
+
+			nav_avoid_telebot.KeyValueFromInt("solid", 2)
+			nav_avoid_telebot.KeyValueFromString("mins", "-2000 -1500 -1000")
+			nav_avoid_telebot.KeyValueFromString("maxs", "2000 250 1000")
+		}
+		
+		PreventBadPathing(); PreventBadPathing(); PreventBadPathing(); PreventBadPathing() // needs to be run this many times to ensure the telebot nav paths win the attention of telebots over all the default nav funcs
+		
+		nav_avoid_bossbot = SpawnEntityFromTable("func_nav_avoid",
+		{
+			targetname       = "nav_avoid_bossbot"
+			origin           = Vector(-100, 650, 0)
+			tags             = "boss_bot"
+		})
+	
+		nav_avoid_bossbot.KeyValueFromInt("solid", 2)
+		nav_avoid_bossbot.KeyValueFromString("mins", "-300 -300 -1000")
+		nav_avoid_bossbot.KeyValueFromString("maxs", "300 250 1000")
+
+	}
+	
+	ignite_player = Entities.CreateByClassname("tf_weapon_flamethrower")
+	
+	CALLBACKS =
+	{
+		OnGameEvent_post_inventory_application = function(params)
+		{
+			local spawned_player = GetPlayerFromUserID(params.userid);
+			
+			if (spawned_player.IsFakeClient()) return
+			
+			spawned_player.ValidateScriptScope()
+			local scope = spawned_player.GetScriptScope()
+			
+			if (!("saw_mission_info" in scope)) 
+			{
+				scope.saw_mission_info <- true
+				ClientPrint(spawned_player, 4, "For the duration of this mission, certain robots will be spawning from several different locations marked on this map.")
+				ClientPrint(spawned_player, 3, "\x07FFD700For the duration of this mission, certain robots will be spawning from several different locations marked on this map.")
+			}
+		}
+
+		OnGameEvent_player_spawn = function(params) // it takes an extra short while for the populator to fill in all of a bot's data when it spawns in, so "onspawn" callbacks need to be delayed
+		{
+			local bot = GetPlayerFromUserID(params.userid);
+			
+			if (!bot.IsFakeClient()) return
+			
+			EntFireByHandle(bot, "CallScriptFunction", "BotTagCheck", -1.0, null, null)
+		}
+
+		OnGameEvent_player_death = function(params)
+		{
+			local dead_player = GetPlayerFromUserID(params.userid)
+			
+			if (dead_player.IsFakeClient())
+			{
+				if (dead_player.GetScriptScope() != null)
+				{
+					foreach (thing in dead_player.GetScriptScope())
+					{
+						try { thing.GetClassname() }
+						catch (e) { continue }
+						
+						if (!thing.IsPlayer()) thing.Kill()
+					}
+				}
+				
+				AddThinkToEnt(dead_player, null)
+				NetProps.SetPropString(dead_player, "m_iszScriptThinkFunction", "")
+
+				dead_player.TerminateScriptScope()
+			}
+		}
+		
+		OnGameEvent_mvm_begin_wave = function(params)
+		{
+			if (Wave == 5) { HideIcon("scout_giant"); HideIcon("pyro_flare"); HideIcon("heavy_heater_giant") }
+		}
+	}
+	
+	Teles_Start = function()
 	{
 		EntFireByHandle(gamerules_entity, "PlayVO", "mvm/mvm_tele_activate.wav", 0.0, null, null)
 		
@@ -344,430 +316,667 @@ if (Entities.FindByName(null, "nav_avoid_giant") == null)
 			}
 		}
 		
-		teleport_status = "active"
+		teleports_active = true
 	}
-	
-	if (action == "end")
-	{	
-		EntFire("tele_b_skyparticle", "Stop")
-		EntFire("tele_f_skyparticle", "Stop")
-		
-		EntFireByHandle(gamerules_entity, "PlayVO", "weapons/teleporter_explode.wav", 0.0, null, null)
-		
-		teleport_status = "inactive"
-	}
-}
 
-::TeleportRobot <- function(type = null, manual = false, destination = null, teletext = "   A giant robot\nhas teleported in!")
-{	
-	if (type != "squad_member" || !manual)
+	BotTagCheck = function()
 	{
-		if (intel_entity.GetOrigin().y >= tele_func_threshold)
+		if (self.HasBotTag("aoe_medic")) AddThinkToEnt(self, "AoEUber_Think")
+		if (self.HasBotTag("boss_bot")) AddThinkToEnt(self, "FireFist_Think")
+		
+		if (!(self.HasBotTag("telebot")) && !(self.HasBotTag("telebot_ignorenavfunc"))) return
+		
+		if (!(self.HasBotTag("telebot_squadmember")) || !(self.HasBotTag("telebot_w3d")) || !(self.HasBotTag("telebot_w5a")) || !(self.HasBotTag("telebot_bosshelper")))
 		{
-			if (!self.HasBotAttribute(32768)) self.Teleport(true, teledestination_table[RandomInt(1, 4).tostring()], false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
-			else                              self.Teleport(true, teledestination_table[RandomInt(3, 4).tostring()], false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
+			try
+			{
+				if (!(self.HasBotAttribute(32768))) self.Teleport(true, teledestination_array[RandomInt(0, teledestination_array.len() - 1)] + Vector(0, 0, 10), false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
+				else                                self.Teleport(true, teledestination_array_giant[RandomInt(0, teledestination_array_giant.len() - 1)] + Vector(0, 0, 10), false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
+			}
+			catch (e) {} // vscript complains about not finding any tele locations even when the "if" condition is not met
 		}
 		
-		if (intel_entity.GetOrigin().y < tele_func_threshold) self.Teleport(true, teledestination_table[RandomInt(5, 8).tostring()], false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
-	}
-	
-	if (manual) self.Teleport(true, destination, false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
-	
-	if (type == "squad_leader")
-	{
-		current_squad_leader = self
-		EntFireByHandle(gamerules_entity, "RunScriptCode", "current_squad_leader = null", 0.5, null, null)
-	}
-	
-	if (type == "squad_member") self.Teleport(true, current_squad_leader.GetOrigin(), false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
-	
-	if (type == "boss_helper" && boss_entity != null) self.Teleport(true, boss_entity.GetOrigin() + Vector(0, 0, 50), false, QAngle(0, 0, 0), true, Vector(RandomInt(-500, 500), RandomInt(-500, 500), 600))
-	
-	if (!(self.HasBotAttribute(32768)))
-	{
-		self.AddCustomAttribute("force distribute currency on death", 1, -1)
-		for (local i = 1; i <= Constants.Server.MAX_PLAYERS; i++)
-		{
-			local player_to_alert = PlayerInstanceFromIndex(i)
-			if (player_to_alert == null) continue
-			if (IsPlayerABot(player_to_alert)) continue
-			EmitSoundOn("GG.BotTeleported", player_to_alert)
-		}
-	} 
-	if (self.HasBotAttribute(32768))
-	{
-		NetProps.SetPropBool(self, "m_bGlowEnabled", true)
-		EntFireByHandle(gamerules_entity, "PlayVO", "mvm/giant_heavy/giant_heavy_entrance.wav", 0.0, null, null)
+		if (self.HasBotTag("telebot_w3d")) self.Teleport(true, Vector(-800, -2050, 235), false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
+		if (self.HasBotTag("telebot_w5a")) self.Teleport(true, Vector(-1850, -700, 285), false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
 		
-		SendGlobalGameEvent("show_annotation", 
+		if (self.HasBotTag("telebot_squadleader"))
 		{
-			text = teletext
-			worldPosX = self.GetOrigin().x
-			worldPosY = self.GetOrigin().y
-			worldPosZ = self.GetOrigin().z
-			play_sound = "misc/null.wav"
-			show_distance = false
-			show_effect = true
-			lifetime = 5
-		})
-	}
-	
-	if (type != "boss_helper")
-	{
-		for (local entity_to_telefrag; entity_to_telefrag = Entities.FindInSphere(entity_to_telefrag, self.GetOrigin(), 100); )
-		{
-			if (entity_to_telefrag.GetTeam() == 2)
-			{
-				entity_to_telefrag.TakeDamage(1000.0, 64, self)
-			}
-		}
-	}
-}
-
-/////////////////////////////////// TELEPORTERS ///////////////////////////////////
-/////////////////////////////////// MISCELLANEOUS ///////////////////////////////////
-
-::HaveDefendersBeenPushed_Think <- function()
-{
-	// if (intel_entity.GetOrigin().y > tele_func_threshold) ClientPrint(null,3,"not_pushed")
-	// if (intel_entity.GetOrigin().y < tele_func_threshold) ClientPrint(null,3,"pushed")
-	
-	if (teleport_status == "inbetween_waves")
-	{
-		for (local telespot; telespot = Entities.FindByName(telespot, "tele_spot_*"); )
-		{
-			NetProps.SetPropInt(telespot, "m_nSkin", 1)
-			NetProps.SetPropFloat(telespot, "m_flPlaybackRate", 0.0)
-			telespot.KeyValueFromInt("rendermode", 1)
-			EntFireByHandle(telespot, "$SetKey$renderamt", "" + 90, 0.0, null, null)
-		}
-	}
-	
-	if (teleport_status != "inbetween_waves") for (local telespot; telespot = Entities.FindByName(telespot, "tele_spot_*"); ) telespot.KeyValueFromInt("rendermode", 0)
-	
-	if (teleport_status == "inactive")
-	{
-		for (local telespot; telespot = Entities.FindByName(telespot, "tele_spot_*"); )
-		{
-			NetProps.SetPropInt(telespot, "m_nSkin", 2)
-			NetProps.SetPropFloat(telespot, "m_flPlaybackRate", 0.0)
-		}
-	}
-	
-	if (teleport_status == "active")
-	{
-		if (intel_entity.GetOrigin().y > tele_func_threshold)
-		{	
-			EntFire("tele_b_skyparticle", "Start")
-			EntFire("tele_f_skyparticle", "Stop")
-			
-			EntFire("nav_avoid_telebot", "Enable")
-			
-			for (local telespot; telespot = Entities.FindByName(telespot, "tele_spot_b*"); )
-			{
-				NetProps.SetPropInt(telespot, "m_nSkin", 1)
-				NetProps.SetPropFloat(telespot, "m_flPlaybackRate", 1.0)
-			}
-			for (local telespot; telespot = Entities.FindByName(telespot, "tele_spot_f*"); )
-			{
-				NetProps.SetPropInt(telespot, "m_nSkin", 2)
-				NetProps.SetPropFloat(telespot, "m_flPlaybackRate", 0.0)
-			}
-
-			// ClientPrint(null,3,"not pushed");
+			current_squad_leader = self
+			EntFireByHandle(gamerules_entity, "RunScriptCode", "current_squad_leader = null", 0.5, null, null)
 		}
 		
-		if (intel_entity.GetOrigin().y < tele_func_threshold)
-		{	
-			EntFire("tele_b_skyparticle", "Stop")
-			EntFire("tele_f_skyparticle", "Start")
-			
-			EntFire("nav_avoid_telebot", "Disable")
-			
-			for (local telespot; telespot = Entities.FindByName(telespot, "tele_spot_b*"); )
-			{
-				NetProps.SetPropInt(telespot, "m_nSkin", 2)
-				NetProps.SetPropFloat(telespot, "m_flPlaybackRate", 0.0)
-			}
-			for (local telespot; telespot = Entities.FindByName(telespot, "tele_spot_f*"); )
-			{
-				NetProps.SetPropInt(telespot, "m_nSkin", 1)
-				NetProps.SetPropFloat(telespot, "m_flPlaybackRate", 1.0)
-			}
-			
-			// ClientPrint(null,3,"pushed");
-		}
-	}
-	
-	return
-}
-
-::BombCarrierSpawnSpeedUp_Think <- function()
-{
-	for (local i = 1; i <= Constants.Server.MAX_PLAYERS; i++)
-	{
-		local player = PlayerInstanceFromIndex(i)
-		if (player == null) continue
-		if (player.GetTeam() != 3) continue
-		if (player.HasItem())
+		if (self.HasBotTag("telebot_squadmember")) self.Teleport(true, current_squad_leader.GetOrigin(), false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
+		
+		if (!(self.HasBotAttribute(32768)))
 		{
-			if (player.InCond(130) && !player.HasBotAttribute(32768)) player.AddCustomAttribute("CARD: move speed bonus", 10, -1)
-			else player.RemoveCustomAttribute("CARD: move speed bonus")
-			
-			if (!bomb_placement_adjusted)
+			self.AddCustomAttribute("force distribute currency on death", 1, -1)
+			for (local i = 1; i <= Constants.Server.MAX_PLAYERS; i++)
 			{
-				if (tele_func_threshold == -300.0) player.Teleport(true, Vector(-1056, 3312, 96), false, QAngle(0, 0, 0), false, Vector(0, 0, 0)) // bots will disobey bomb path if they don't spawn from spawnbot_right
+				local player_to_alert = PlayerInstanceFromIndex(i)
 				
-				bomb_placement_adjusted = true
+				if (player_to_alert == null || IsPlayerABot(player_to_alert)) continue
+				
+				if (!(self.HasBotTag("telebot_squadmember"))) EmitSoundEx({sound_name = "mvm/mvm_tele_deliver.wav", channel = 6, entity = player_to_alert, pitch = 100, filter_type = 4, volume = 0.2})
+			}
+		}
+		
+		if (self.HasBotAttribute(32768))
+		{
+			NetProps.SetPropBool(self, "m_bGlowEnabled", true)
+			if (!(self.HasBotTag("telebot_squadmember"))) EntFireByHandle(gamerules_entity, "PlayVO", "mvm/giant_heavy/giant_heavy_entrance.wav", -1.0, null, null)
+		}
+		
+		EntFireByHandle(self, "CallScriptFunction", "Telefrag", 0.2, null, null) // smallest comfortable amount of time required by the populator to fill in all of the bot's identity without issues
+	}
+
+	Telefrag = function()
+	{
+		if (!self.HasBotTag("telebot") && !(self.HasBotTag("telebot_ignorenavfunc"))) return
+		
+		local teletext = NetProps.GetPropString(self, "m_szNetname") + "\nhas teleported in!"
+		
+		if (self.HasBotTag("telebot_w3d")) teletext = "Surprise attack!"
+		if (self.HasBotTag("telebot_w5a")) teletext = "Giant Pyro and Giant Medic\nhave teleported in!"
+		
+		if (self.HasBotAttribute(32768) && !self.HasBotTag("telebot_squadmember"))
+		{
+			SendGlobalGameEvent("show_annotation", 
+			{
+				text = teletext
+				worldPosX = self.GetOrigin().x
+				worldPosY = self.GetOrigin().y
+				worldPosZ = self.GetOrigin().z
+				play_sound = "misc/null.wav"
+				show_distance = false
+				show_effect = true
+				lifetime = 5
+			})
+		}
+		
+		if (!self.HasBotTag("telebot_bosshelper"))
+		{
+			for (local entity_to_telefrag; entity_to_telefrag = Entities.FindInSphere(entity_to_telefrag, self.GetOrigin(), 100); )
+			{
+				if (entity_to_telefrag.GetTeam() == 2)
+				{
+					entity_to_telefrag.TakeDamage(1000.0, 64, self)
+				}
+			}
+		}
+	}
+
+	ControlTeleSpot = function(action, ent_to_effect)
+	{
+		ent_to_effect.KeyValueFromInt("rendermode", 0)
+		
+		if (action == "enable")
+		{
+			NetProps.SetPropInt(ent_to_effect, "m_nSkin", 1)
+			NetProps.SetPropFloat(ent_to_effect, "m_flPlaybackRate", 1.0)
+			
+			EntFire("skyparticle_" + ent_to_effect.GetName(), "Start")
+		}
+		
+		if (action == "disable")
+		{
+			NetProps.SetPropInt(ent_to_effect, "m_nSkin", 2)
+			NetProps.SetPropFloat(ent_to_effect, "m_flPlaybackRate", 0.0)
+			
+			EntFire("skyparticle_" + ent_to_effect.GetName(), "Stop")
+		}
+		
+		if (NetProps.GetPropBool(objective_resource_entity, "m_bMannVsMachineBetweenWaves") == true)
+		{
+			ent_to_effect.KeyValueFromInt("rendermode", 1)
+			ent_to_effect.KeyValueFromInt("renderamt", 90)
+			
+			EntFire("skyparticle_" + ent_to_effect.GetName(), "Stop")
+		}
+	}
+
+	HaveDefendersBeenPushed_Think = function()
+	{	
+		if (thinkertick % 7 != 0) return
+		
+		if (!teleports_active)
+		{
+			if (NetProps.GetPropBool(objective_resource_entity, "m_bMannVsMachineBetweenWaves") == true)
+			{
+				for (local telespot; telespot = Entities.FindByName(telespot, "tele_spot_b*"); ) ::ControlTeleSpot("enable", telespot)
+				for (local telespot; telespot = Entities.FindByName(telespot, "tele_spot_f*"); ) ::ControlTeleSpot("disable", telespot)
+			}
+			else for (local telespot; telespot = Entities.FindByName(telespot, "tele_spot_*"); ) ::ControlTeleSpot("disable", telespot)
+		}
+		
+		if (teleports_active)
+		{
+			if (intel_entity.GetOrigin().y < -300.0) EntFire("nav_avoid_telebot", "Disable")
+			else EntFire("nav_avoid_telebot", "Enable")
+			
+			if (current_bombpath == "left")
+			{
+				if (intel_entity.GetOrigin().y <= 850.0) {::ControlTeleSpot("disable", tele_spot_b4); ::ControlTeleSpot("disable", tele_spot_b5)}
+				else 									 {::ControlTeleSpot("enable", tele_spot_b4); ::ControlTeleSpot("enable", tele_spot_b5)}
+				
+				if (intel_entity.GetOrigin().y <= 100.0) {::ControlTeleSpot("disable", tele_spot_b1); ::ControlTeleSpot("disable", tele_spot_b2); ::ControlTeleSpot("disable", tele_spot_b3); ::ControlTeleSpot("enable", tele_spot_f1); ::ControlTeleSpot("enable", tele_spot_f2); ::ControlTeleSpot("enable", tele_spot_f3)}
+				else									 {::ControlTeleSpot("enable", tele_spot_b1); ::ControlTeleSpot("enable", tele_spot_b2); ::ControlTeleSpot("enable", tele_spot_b3); ::ControlTeleSpot("disable", tele_spot_f1); ::ControlTeleSpot("disable", tele_spot_f2); ::ControlTeleSpot("disable", tele_spot_f3)}
+				
+				if (intel_entity.GetOrigin().y <= -600.0) ::ControlTeleSpot("enable", tele_spot_f4)
+				else 									  ::ControlTeleSpot("disable", tele_spot_f4)
+			}
+			
+			if (current_bombpath == "right")
+			{
+				if (intel_entity.GetOrigin().y <= 700.0) {::ControlTeleSpot("disable", tele_spot_b1); ::ControlTeleSpot("disable", tele_spot_b2); ::ControlTeleSpot("disable", tele_spot_b3)}
+				else									 {::ControlTeleSpot("enable", tele_spot_b1); ::ControlTeleSpot("enable", tele_spot_b2); ::ControlTeleSpot("enable", tele_spot_b3)}
+				
+				if (intel_entity.GetOrigin().y <= 0.0) {::ControlTeleSpot("disable", tele_spot_b4); ::ControlTeleSpot("disable", tele_spot_b5); ::ControlTeleSpot("enable", tele_spot_f1); ::ControlTeleSpot("enable", tele_spot_f2); ::ControlTeleSpot("enable", tele_spot_f3)}
+				else								   {::ControlTeleSpot("enable", tele_spot_b4); ::ControlTeleSpot("enable", tele_spot_b5); ::ControlTeleSpot("disable", tele_spot_f1); ::ControlTeleSpot("disable", tele_spot_f2); ::ControlTeleSpot("disable", tele_spot_f3)}
+				
+				if (intel_entity.GetOrigin().y <= -650.0) ::ControlTeleSpot("enable", tele_spot_f4)
+				else 									  ::ControlTeleSpot("disable", tele_spot_f4)
+			}
+		}
+		
+		teledestination_array.clear()
+		teledestination_array_giant.clear()
+		
+		for (local telespot; telespot = Entities.FindByName(telespot, "tele_spot_*"); )
+		{
+			if (NetProps.GetPropInt(telespot, "m_nSkin") == 2) continue
+			
+			teledestination_array.append(telespot.GetOrigin())
+			
+			if (telespot.GetName() == "tele_spot_b1" || telespot.GetName() == "tele_spot_b2" || telespot.GetName() == "tele_spot_b5") continue
+			
+			teledestination_array_giant.append(telespot.GetOrigin())
+		}
+	}
+
+	BombCarrierSpawnSpeedUp_Think = function()
+	{
+		if (thinkertick % 7 != 0) return
+		
+		if (NetProps.GetPropBool(objective_resource_entity, "m_bMannVsMachineBetweenWaves") == false)
+		{
+			for (local i = 1; i <= Constants.Server.MAX_PLAYERS; i++)
+			{
+				local player = PlayerInstanceFromIndex(i)
+				if (player == null) continue
+				if (player.GetTeam() != 3) continue
+				if (player.HasItem())
+				{
+					if (player.InCond(130) && !player.HasBotAttribute(32768)) player.AddCustomAttribute("CARD: move speed bonus", 10, -1)
+					else player.RemoveCustomAttribute("CARD: move speed bonus")
+					
+					if (!bomb_placement_adjusted)
+					{
+						if (current_bombpath == "right") player.Teleport(true, Vector(-1056, 3312, 96), false, QAngle(0, 0, 0), false, Vector(0, 0, 0)) // bots will disobey bomb path if they don't spawn from spawnbot_right
+						
+						bomb_placement_adjusted = true
+					}
+				}
 			}
 		}
 	}
 	
-	return
-}
-
-::SetUpAoEUber <- function()
-{	
-	self.KeyValueFromString("targetname", "aoe_medic_" + aoe_medic_counter)
-	
-	local uber_beam_1 = SpawnEntityFromTable("dispenser_touch_trigger",
-	{
-		targetname    	   = "dispenser_trigger" + aoe_medic_counter
-		origin             = self.GetOrigin()
-		spawnflags         = 1
-	})
-	
-	local uber_beam_2 = SpawnEntityFromTable("mapobj_cart_dispenser",
-	{
-		targetname    	   = "dispenser_mapobj" + aoe_medic_counter
-		origin             = self.GetOrigin()
-		TeamNum            = 3,
-		spawnflags         = 12
-		touch_trigger      = "dispenser_trigger" + aoe_medic_counter
-	})
-	
-	uber_beam_1.KeyValueFromInt("solid", 2)
-	uber_beam_1.KeyValueFromString("mins", "-250 -250 -250")
-	uber_beam_1.KeyValueFromString("maxs", "250 250 250")
-	
-	EntFire("dispenser_trigger" + aoe_medic_counter, "SetParent", "aoe_medic_" + aoe_medic_counter) // can only parent entities to other entities with valid targetnames
-	EntFire("dispenser_mapobj" + aoe_medic_counter, "SetParent", "aoe_medic_" + aoe_medic_counter)
-	
-	AddThinkToEnt(self, "AoEUber_Think")
-	
-	aoe_medic_counter = aoe_medic_counter + 1
-	
-	EntFireByHandle(self, "RunScriptCode", "self.KeyValueFromString(`targetname`, null)", 0.1, null, null) // has to be done because custom targetnames persist across bot deaths
-}
-
-::AoEUber_Think <- function()
-{	
-	if (NetProps.GetPropInt(self, "m_lifeState") != 0)
+	AoEUber_Think = function()
 	{	
-		for (local ent; ent = Entities.FindByName(ent, "dispenser_*"); ) if (ent.GetRootMoveParent() == self) ent.Kill()
+		local scope = self.GetScriptScope()
 		
-		NetProps.SetPropString(self, "m_iszScriptThinkFunction", "")
-		return
-	}
-
-	for (local player_to_shield; player_to_shield = Entities.FindByClassnameWithin(player_to_shield, "player", self.GetOrigin(), 250); )
-	{
-		if (player_to_shield == null) continue
-		if (player_to_shield.GetTeam() == 3 && !player_to_shield.HasBotTag("aoe_medic")) player_to_shield.AddCondEx(52, 0.5, self)
-	}
-	
-	return
-}
-
-::SetUpBossEnts <- function()
-{	
-	boss_entity = self
-	
-	self.KeyValueFromString("targetname", "firefist_boss")
-	
-	PrecacheSound("misc/rd_finale_beep01.wav")
-	PrecacheSound("ambient/explosions/explode_2.wav")
-	PrecacheSound("vo/mvm/mght/heavy_mvm_m_battlecry06.mp3")
-	
-	local phase_change_explosion = SpawnEntityFromTable("tf_point_weapon_mimic",
-	{
-		targetname              = "phase_change_explosion"
-		origin                  = self.GetOrigin()
-		angles                  = QAngle(90, 0, 0)
-		TeamNum                 = 3
-		"$preventshootparent"   : 1
-		"$weaponname"           : "TF_WEAPON_ROCKETLAUNCHER"
-	})
-	
-	local phase2_weapon = SpawnEntityFromTable("tf_point_weapon_mimic",
-	{
-		targetname              = "phase2_weapon"
-		origin                  = self.GetOrigin()
-		angles                  = QAngle(-90, 0, 0)
-		TeamNum                 = 3
-		"$killicon"             : "taunt_pyro"
-		"$preventshootparent"   : 1
-		"$weaponnosound"        : 1
-		"$weaponname"           : "TF_WEAPON_ROCKETLAUNCHER"
-	})
-	
-	local phase2_skybeam = SpawnEntityFromTable("info_particle_system",
-	{
-		targetname    	   = "phase2_skybeam"
-		origin             = self.GetOrigin()
-		angles             = QAngle(0, 90, 0)
-		start_active       = 0,
-		effect_name        = "teleporter_mvm_bot_persist"
-	})
-	
-	EntFire("phase_change_explosion", "SetParent", "firefist_boss")
-	EntFire("phase2_weapon", "SetParent", "firefist_boss")
-	EntFire("phase2_skybeam", "SetParent", "firefist_boss")
-	
-	EntFire("phase_change_explosion", "$AddWeaponAttribute", "explosion particle|fluidSmokeExpl_ring_mvm")
-	EntFire("phase_change_explosion", "$AddWeaponAttribute", "damage causes airblast|1")
-	EntFire("phase_change_explosion", "$AddWeaponAttribute", "Blast radius increased|4")
-	EntFire("phase_change_explosion", "$AddWeaponAttribute", "self dmg push force decreased|0")
-	EntFire("phase_change_explosion", "$AddWeaponAttribute", "no self blast dmg|2")
-	
-	EntFire("phase2_weapon", "$AddWeaponAttribute", "projectile gravity|4000")
-	EntFire("phase2_weapon", "$AddWeaponAttribute", "custom projectile model|models/weapons/w_models/w_drg_ball.mdl")
-	EntFire("phase2_weapon", "$AddWeaponAttribute", "projectile trail particle|lava_fireball")
-	EntFire("phase2_weapon", "$AddWeaponAttribute", "projectile spread angle penalty|45")
-	EntFire("phase2_weapon", "$AddWeaponAttribute", "fire input on hit|!caller^$IgnitePlayerDuration^6")
-	EntFire("phase2_weapon", "$AddWeaponAttribute", "fire input on hit name restrict|ignite_me")
-	EntFire("phase2_weapon", "$AddWeaponAttribute", "Projectile speed increased|1.8")
-	
-	phase_change_explosion.SetOwner(self)
-	phase2_weapon.SetOwner(self)
-	
-	self.AddCond(30)
-	
-	AddThinkToEnt(self, "BossState_Think")
-	
-	EntFireByHandle(self, "RunScriptCode", "self.KeyValueFromString(`targetname`, null)", 1.0, null, null)
-}
-
-::BossState_Think <- function()
-{	
-	if (NetProps.GetPropInt(self, "m_lifeState") != 0)
-	{
-		EntFire("phase_change_explosion", "Kill")
-		EntFire("phase2_weapon", "Kill")
-		EntFire("phase2_skybeam", "Stop")
-		EntFire("phase2_skybeam", "Kill")
-		
-		boss_entity = null
-		
-		NetProps.SetPropString(self, "m_iszScriptThinkFunction", "")
-		return
-	}
-	
-	if (self.GetHealth() < 40000.0 && !boss_stage_threshold_reached)
-	{
-		boss_stage_threshold_reached = true
-		self.AddCondEx(71, 5.0, self)
-		self.AddCustomAttribute("dmg taken increased", 0.1, -1)
-		
-		for (local i = 1; i <= Constants.Server.MAX_PLAYERS; i++)
+		if (!("init" in scope))
 		{
-			local player = PlayerInstanceFromIndex(i)
-			if (player == null) continue;
-			if (IsPlayerABot(player)) continue;
+			scope.init <- true
+
+			scope.uber_beam_1 <- SpawnEntityFromTable("dispenser_touch_trigger",
+			{
+				origin             = self.GetOrigin()
+				spawnflags         = 1
+			})
 			
-			EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`misc/rd_finale_beep01.wav`, 300.0, 0, 100, self)", 0.0, null, null)
-			EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`misc/rd_finale_beep01.wav`, 300.0, 0, 125, self)", 1.0, null, null)
-			EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`misc/rd_finale_beep01.wav`, 300.0, 0, 150, self)", 2.0, null, null)
-			EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`misc/rd_finale_beep01.wav`, 300.0, 0, 175, self)", 3.0, null, null)
-			EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`misc/rd_finale_beep01.wav`, 300.0, 0, 200, self)", 4.0, null, null)
-			EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`misc/rd_finale_beep01.wav`, 300.0, 0, 225, self)", 5.0, null, null)
+			scope.uber_beam_2 <- SpawnEntityFromTable("mapobj_cart_dispenser",
+			{
+				origin             = self.GetOrigin()
+				TeamNum            = 3,
+				spawnflags         = 12
+				touch_trigger      = "dispenser_trigger"
+			})
 			
-			EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`ambient/explosions/explode_2.wav`, 300.0, 0, 100, self)", 5.0, null, null)
-			EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`vo/mvm/mght/heavy_mvm_m_battlecry06.mp3`, 300.0, 0, 100, self)", 5.0, null, null)
+			scope.uber_beam_1.KeyValueFromInt("solid", 2)
+			scope.uber_beam_1.KeyValueFromString("mins", "-250 -250 -250")
+			scope.uber_beam_1.KeyValueFromString("maxs", "250 250 250")
 			
-			player.KeyValueFromString("targetname", "ignite_me")
+			EntFireByHandle(scope.uber_beam_1, "SetParent", "!activator", -1.0, self, null)
+			EntFireByHandle(scope.uber_beam_2, "SetParent", "!activator", -1.0, self, null)
+			
+			self.AddCond(55)
 		}
 		
-		EntFire("phase_change_explosion", "FireMultiple", 3, 5.0)
+		for (local player_to_shield; player_to_shield = Entities.FindByClassnameWithin(player_to_shield, "player", self.GetOrigin(), 250); )
+		{
+			if (player_to_shield == null) continue
+			if (player_to_shield.GetTeam() == 3 && !player_to_shield.HasBotTag("aoe_medic")) player_to_shield.AddCondEx(52, 0.5, self)
+		}
 		
-		EntFireByHandle(self, "RunScriptCode", "self.RemoveCustomAttribute(`dmg taken increased`)", 5.0, null, null)
-		EntFireByHandle(self, "$ChangeAttributes", "Phase2", 5.0, null, null)
-		
-		EntFireByHandle(gamerules_entity, "PlayVO", "mvm/mvm_tele_activate.wav", 7.5, null, null)
-		EntFireByHandle(gamerules_entity, "RunScriptCode", "after_boss_phase_transition = true", 9.0, null, null)
-		
-		EntFire("support_boss_spawnbot", "Enable", null, 9.0)
-		EntFire("phase2_skybeam", "Start", null, 9.0)
-	}
-	if (after_boss_phase_transition)
-	{
-		EntFire("phase2_weapon", "FireOnce")
-		
-		return 0.5
+		return
 	}
 	
-	return
+	FireFist_Think = function()
+	{	
+		local scope = self.GetScriptScope()
+		
+		if (!("init" in scope))
+		{
+			scope.init <- true
+			
+			scope.tick <- 1
+			
+			scope.boss_stage_threshold_reached <- false
+			scope.after_boss_phase_transition <- false
+			
+			local firefist_gun = Entities.CreateByClassname("tf_weapon_rocketlauncher")
+
+			NetProps.SetPropInt(firefist_gun, "m_AttributeManager.m_Item.m_iItemDefinitionIndex", 18)
+			NetProps.SetPropBool(firefist_gun, "m_AttributeManager.m_Item.m_bInitialized", true)
+			NetProps.SetPropBool(firefist_gun, "m_bValidatedAttachedEntity", true)
+			NetProps.SetPropInt(firefist_gun, "m_nModelIndexOverrides", PrecacheModel("models/weapons/c_models/c_boxing_gloves/c_boxing_gloves_xmas.mdl"))
+			
+			firefist_gun.SetTeam(self.GetTeam())
+			firefist_gun.AddAttribute("clip size bonus", 9999, -1.0)
+			
+			Entities.DispatchSpawn(firefist_gun) 
+			self.Weapon_Equip(firefist_gun)
+			
+			NetProps.GetPropEntityArray(self, "m_hMyWeapons", 0).Destroy()
+			NetProps.SetPropEntityArray(self, "m_hMyWeapons", firefist_gun, 0)
+			
+			self.Weapon_Switch(firefist_gun)
+			
+			self.AddCond(30)
+			
+			scope.skybeam <- SpawnEntityFromTable("info_particle_system",
+			{
+				targetname    	   = "phase2_skybeam"
+				origin             = self.GetOrigin()
+				angles             = QAngle(0, 90, 0)
+				start_active       = 0,
+				effect_name        = "teleporter_mvm_bot_persist"
+			})
+			
+			EntFire("phase2_skybeam", "SetParent", "!activator", -1.0, self)
+			
+			SpawnEntityFromTable("point_populator_interface", {targetname = "behavior_control"})
+
+			function OnScriptHook_OnTakeDamage(params)
+			{
+				if (params.attacker == self || params.attacker == Entities.FindByName(null, "phase2_rockets"))
+				{
+					if ((params.damage_type == 2359360 || params.damage_type == 3407936) && params.const_entity != self) params.const_entity.TakeDamageEx(params.inflictor, params.attacker, ignite_player, Vector(0, 0, 0), params.const_entity.GetOrigin(), 0.01, 8)
+				}
+			}
+			
+			function OnGameEvent_player_spawn(params)
+			{
+				local bot = GetPlayerFromUserID(params.userid);
+				
+				if (!bot.IsFakeClient()) return
+				
+				bot.Teleport(true, self.GetOrigin() + Vector(0, 0, 50), false, QAngle(0, 0, 0), true, Vector(RandomInt(-500, 500), RandomInt(-500, 500), 600))
+			}
+			
+			__CollectGameEventCallbacks(scope)
+		}
+		
+		if (!scope.boss_stage_threshold_reached)
+		{
+			for (local player; player = Entities.FindByClassnameWithin(player, "player", self.GetOrigin(), 250.0); )
+			{
+				if (player.GetTeam() != 2) continue
+				
+				local selfmins = self.GetBoundingMins() + self.GetOrigin() - Vector(3, 3, 3)
+				local selfmaxs = self.GetBoundingMaxs() + self.GetOrigin() + Vector(3, 3, 3)
+
+				local playermins = player.GetBoundingMins() + player.GetOrigin()
+				local playermaxs = player.GetBoundingMaxs() + player.GetOrigin()
+
+				if (playermins.x > selfmaxs.x || playermaxs.x < selfmins.x || playermins.y > selfmaxs.y || playermaxs.y < selfmins.y || playermaxs.y < selfmins.y || playermaxs.y < selfmins.y || playermaxs.y < selfmins.y || playermins.z > selfmaxs.z || playermaxs.z < selfmins.z) continue
+				else
+				{
+					local pushforce = player.GetOrigin() - self.GetOrigin()
+					pushforce.Norm()
+					pushforce.z = 1.0
+					pushforce = pushforce * 270
+					
+					player.RemoveFlag(1)
+					player.AddCond(115)
+					
+					player.ApplyAbsVelocityImpulse(pushforce)
+				}
+			}
+		
+			if (self.GetHealth() < 40000.0)
+			{
+				scope.boss_stage_threshold_reached = true
+				
+				self.AddCondEx(71, 5.0, self)
+				self.AddCustomAttribute("dmg taken increased", 0.1, -1)
+				
+				for (local i = 1; i <= Constants.Server.MAX_PLAYERS; i++)
+				{
+					local player = PlayerInstanceFromIndex(i)
+					if (player == null) continue;
+					if (IsPlayerABot(player)) continue;
+					
+					EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`misc/rd_finale_beep01.wav`, 300.0, 0, 100, self)", 0.0, null, null)
+					EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`misc/rd_finale_beep01.wav`, 300.0, 0, 125, self)", 1.0, null, null)
+					EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`misc/rd_finale_beep01.wav`, 300.0, 0, 150, self)", 2.0, null, null)
+					EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`misc/rd_finale_beep01.wav`, 300.0, 0, 175, self)", 3.0, null, null)
+					EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`misc/rd_finale_beep01.wav`, 300.0, 0, 200, self)", 4.0, null, null)
+					EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`misc/rd_finale_beep01.wav`, 300.0, 0, 225, self)", 5.0, null, null)
+					
+					EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`ambient/explosions/explode_2.wav`, 300.0, 0, 100, self)", 5.0, null, null)
+					EntFireByHandle(player, "RunScriptCode", "EmitAmbientSoundOn(`vo/mvm/mght/heavy_mvm_m_battlecry06.mp3`, 300.0, 0, 100, self)", 5.0, null, null)
+				}
+				
+				function ExplosionPush()
+				{
+					self.RemoveCustomAttribute("dmg taken increased")
+					
+					DispatchParticleEffect("fireSmoke_Collumn_mvmAcres", self.GetOrigin(), Vector(0, 90, 0))
+					
+					for (local player_to_push; player_to_push = Entities.FindByClassnameWithin(player_to_push, "player", self.GetOrigin(), 500); )
+					{
+						if (player_to_push.GetTeam() == 2)
+						{
+							local pushforce = player_to_push.GetOrigin() - self.GetOrigin()
+							pushforce.Norm()
+							pushforce.z = 1.0
+							pushforce = pushforce * 800
+							
+							player_to_push.TakeDamage(100.0, 64, self)
+							
+							player_to_push.RemoveFlag(1)
+							player_to_push.AddCond(115)
+							
+							player_to_push.ApplyAbsVelocityImpulse(pushforce)
+						}
+					}
+					
+					EntFire("behavior_control", "ChangeBotAttributes", "Phase2")
+				}
+				
+				EntFireByHandle(self, "CallScriptFunction", "ExplosionPush", 5.0, null, null)
+				
+				EntFireByHandle(gamerules_entity, "PlayVO", "mvm/mvm_tele_activate.wav", 7.5, null, null)
+				EntFireByHandle(self, "RunScriptCode", "self.GetScriptScope().after_boss_phase_transition = true", 9.0, null, null)
+				
+				EntFire("spawnbot_single_flag", "Enable", null, 9.0)
+				EntFireByHandle(gamerules_entity, "RunScriptCode", "UnhideIcon(`scout_giant`, 2); UnhideIcon(`pyro_flare`, 2); UnhideIcon(`heavy_heater_giant`, 2); UnhideIcon(`pyro_dragon_fury_swordstone`, 25)", 9.0, null, null)
+				
+				EntFire("phase2_skybeam", "Start", null, 9.0)
+			}
+		}
+		
+		if (scope.after_boss_phase_transition && scope.tick % 40 == 0)
+		{
+			if (Entities.FindByName(null, "phase2_rockets") == null)
+			{
+				scope.phase2_rocket <- SpawnEntityFromTable("tf_point_weapon_mimic",
+				{
+					targetname              = "phase2_rockets"
+					origin                  = self.GetOrigin() + Vector(0, 0, 150)
+					angles                  = QAngle(-90, 0, 0)
+					TeamNum                 = 3
+					speedmin                = 2000
+					speedmax                = 2000
+					WeaponType              = 0
+					SplashRadius            = 146
+					SpreadAngle				= 45
+					Damage                  = 90
+					crits                   = 1
+				})
+				
+				EntFireByHandle(scope.phase2_rocket, "SetParent", "!activator", -1.0, self, null)
+				
+				scope.phase2_rocket.SetOwner(self)
+			}
+			
+			else EntFireByHandle(Entities.FindByName(null, "phase2_rockets"), "FireOnce", null, -1.0, self, self)
+		}
+		
+		for (local ent; ent = Entities.FindByClassname(ent, "tf_projectile_rocket"); )
+		{
+			if (ent.GetTeam() == 3)
+			{	
+				ent.ValidateScriptScope()
+				local scope = ent.GetScriptScope()
+			
+				if (!("fixed" in scope))
+				{
+					scope.fixed <- true
+					
+					EmitSoundEx(
+					{
+						sound_name = "MVM.GiantSoldierRocketShoot",
+						filter = 5,
+						entity = self,
+						volume = 1,
+						soundlevel = 150,
+						flags = 4,
+						channel = 6
+					})
+					
+					if (ent.GetOwner().GetClassname() == "tf_point_weapon_mimic") { ent.SetMoveType(5, 0); ent.SetGravity(4) }
+				
+					EmitSoundEx(
+					{
+						sound_name = "misc/halloween/spell_fireball_impact.wav",
+						filter = 5,
+						entity = self,
+						volume = 1,
+						soundlevel = 150,
+						flags = 0,
+						channel = 6
+					})
+					
+					ent.SetModelSimple("models/weapons/w_models/w_drg_ball.mdl")
+
+					local fireparticle = SpawnEntityFromTable("trigger_particle",
+					{
+						attachment_type    = 1
+						spawnflags 		   = 64
+						particle_name      = "lava_fireball"
+					})
+					
+					EntFireByHandle(fireparticle, "StartTouch", "!activator", -1, ent, ent)
+					EntFireByHandle(fireparticle, "Kill", null, -1, null, null)
+				}
+			}
+		}
+		
+		scope.tick = scope.tick + 1
+		
+		return -1
+	}
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// DEBUGGING ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+if (!("onetimeactions_performed" in PEA))
+{
+	PEA.onetimeactions_performed <- true
+
+	PrecacheSound("mvm/mvm_tele_deliver.wav")
+	PrecacheSound("misc/halloween/spell_fireball_impact.wav")
+	PrecacheSound("misc/rd_finale_beep01.wav")
+	
+	NavMesh.GetNavAreaByID(39).Disconnect(NavMesh.GetNavAreaByID(1867))
+	NavMesh.GetNavAreaByID(143).Disconnect(NavMesh.GetNavAreaByID(292))
+	NavMesh.GetNavAreaByID(352).Disconnect(NavMesh.GetNavAreaByID(663))
+	NavMesh.GetNavAreaByID(446).Disconnect(NavMesh.GetNavAreaByID(39))
+	NavMesh.GetNavAreaByID(1018).Disconnect(NavMesh.GetNavAreaByID(682))
+	NavMesh.GetNavAreaByID(1022).Disconnect(NavMesh.GetNavAreaByID(687))
+	NavMesh.GetNavAreaByID(1867).Disconnect(NavMesh.GetNavAreaByID(39))
+	NavMesh.GetNavAreaByID(2358).Disconnect(NavMesh.GetNavAreaByID(292))
+	NavMesh.GetNavAreaByID(2385).Disconnect(NavMesh.GetNavAreaByID(354))
+	NavMesh.GetNavAreaByID(2918).Disconnect(NavMesh.GetNavAreaByID(39))
+	NavMesh.GetNavAreaByID(2937).Disconnect(NavMesh.GetNavAreaByID(1573))
+	NavMesh.GetNavAreaByID(2938).Disconnect(NavMesh.GetNavAreaByID(203))
+	NavMesh.GetNavAreaByID(2939).Disconnect(NavMesh.GetNavAreaByID(203))
+	NavMesh.GetNavAreaByID(2939).Disconnect(NavMesh.GetNavAreaByID(83))
+	NavMesh.GetNavAreaByID(2940).Disconnect(NavMesh.GetNavAreaByID(83))
+}
+
+try { IncludeScript("pea.nut") }
+catch (e) { ClientPrint(null,3,"Failed to locate `pea.nut` file. Some of this mission's features may not work correctly or result in softlocks.") }
+
+if (Entities.FindByName(null, "nav_avoid_giant") == null) ::SetUpNavFuncs()
+
+ignite_player.AddAttribute("Set DamageType Ignite", 1, -1.0)
+Entities.DispatchSpawn(ignite_player)
+
+AssignThinkToThinksTable("HaveDefendersBeenPushed_Think")
+AssignThinkToThinksTable("BombCarrierSpawnSpeedUp_Think")
+	
+for (local i = 1; i <= Constants.Server.MAX_PLAYERS; i++) // run this for when the first player connects to the server and the callback hasn't loaded yet
+{
+	local player = PlayerInstanceFromIndex(i)
+	if (player == null) continue
+	if (IsPlayerABot(player))
+	{
+		if (player.GetScriptScope() != null)
+		{
+			foreach (thing in player.GetScriptScope())
+			{
+				try { thing.GetClassname() }
+				catch (e) { continue }
+				
+				if (!thing.IsPlayer()) thing.Kill()
+			}
+		}
+		
+		AddThinkToEnt(player, null)
+		NetProps.SetPropString(player, "m_iszScriptThinkFunction", "")
+
+		player.TerminateScriptScope()
+		
+		continue
+	}
+	
+	player.ValidateScriptScope()
+	local scope = player.GetScriptScope()
+	
+	if (!("saw_mission_info" in scope)) 
+	{
+		scope.saw_mission_info <- true
+		ClientPrint(player, 4, "For the duration of this mission, certain robots will be spawning from several different locations marked on this map.")
+		ClientPrint(player, 3, "\x07FFD700For the duration of this mission, certain robots will be spawning from several different locations marked on this map.")
+	}
+}
+
+if (Wave == 5) { EntFire("spawnbot_invasion", "Disable"); HideIcon("scout_giant"); HideIcon("pyro_flare"); HideIcon("heavy_heater_giant") }
+
+EntFire("spawnbot_single_flag", "Disable")
+
+for (local ent; ent = Entities.FindByName(ent, "bombpath_left_*"); )
+{
+	EntityOutputs.RemoveOutput(ent, "OnTrigger", "gamerules", "RunScriptCode", "current_bombpath = `left`")
+	EntityOutputs.AddOutput(ent, "OnTrigger", "gamerules", "RunScriptCode", "current_bombpath = `left`", -1.0, -1)
+}
+
+for (local ent; ent = Entities.FindByName(ent, "bombpath_right_*"); )
+{
+	EntityOutputs.RemoveOutput(ent, "OnTrigger", "gamerules", "RunScriptCode", "current_bombpath = `right`")
+	EntityOutputs.AddOutput(ent, "OnTrigger", "gamerules", "RunScriptCode", "current_bombpath = `right`", -1.0, -1)
+}
 
 if (debug)
 {
-	::CALLBACKS.OnGameEvent_player_say <- function(params)
+	SpawnEntityFromTable("point_worldtext",
 	{
-		local player = GetPlayerFromUserID(params.userid)
-
-		if (params.text == "1")
-		{
-			player.KeyValueFromString("targetname", "dispenser_1")
-			
-			local roambot_robot = SpawnEntityFromTable("obj_dispenser",
-			{
-				targetname              = "roambot_robot"
-				origin 		            = player.GetOrigin()
-				teamnum                 = 3
-				SolidToPlayer           = 0
-			})
-			
-			EntFireByHandle(roambot_robot, "SetParent", "dispenser_1", 0.0, null, null)
-			
-			EntFireByHandle(player, "RunScriptCode", "self.KeyValueFromString(`targetname`, null)", 0.1, null, null)
-		}
-		if (params.text == "2")
-		{
-			for (local clear_particle; clear_particle = Entities.FindByClassname(clear_particle, "info_particle_system"); )
-			{
-				clear_particle.Kill()
-			}
-		}
-	}
+		textsize       = 40
+		message        = "B1"
+		font           = 1
+		orientation    = 1
+		origin         = tele_spot_b1.GetOrigin() + Vector(0, 0, 100)
+		rendermode     = 3
+	})
 	
-	for (local i = 1; i <= Constants.Server.MAX_PLAYERS; i++)
+	SpawnEntityFromTable("point_worldtext",
 	{
-		local player = PlayerInstanceFromIndex(i)
-		if (NetProps.GetPropString(player, "m_szNetworkIDString") == "[U:1:95064912]")
-		{
-			player.SetHealth(90000)
-			player.SetMoveType(8, 0)
-			player.AddCurrency(10000)
-			// player.EmitSound("MVM.TankExplodes")
-			// EntFireByHandle(player, "SetScriptOverlayMaterial", "airraid_warning_overlay", 0.0, null, null);
-			// EntFireByHandle(player, "SetScriptOverlayMaterial","supplydrop_tele_warning_overlay", 0.0, null, null);
-			// EntFireByHandle(player, "SetScriptOverlayMaterial","supplydrop_crate_warning_overlay", 0.0, null, null);
-			// DispatchParticleEffect("fireSmokeExplosion3", player.GetOrigin() + Vector(-700, 0, 150), Vector(0, 0, 0))
-		}
-		// ClientPrint(null,3,"current self y:" + player.GetOrigin().y);
-		
-		// EntFireByHandle(player, "SetScriptOverlayMaterial", "", 0.0, null, null);
-	}
+		textsize       = 40
+		message        = "B2"
+		font           = 1
+		orientation    = 1
+		origin         = tele_spot_b2.GetOrigin() + Vector(0, 0, 100)
+		rendermode     = 3
+	})
 	
-	// EntFireByHandle(gamerules_entity, "RunScriptCode", "AirRaid_Start(1)", 0.0, null, null)
-	// EntFireByHandle(gamerules_entity, "RunScriptCode", "SupplyDropTeles_Start()", 0.0, null, null)
-	// EntFireByHandle(gamerules_entity, "RunScriptCode", "SupplyDropCrates_Start()", 0.0, null, null)
+	SpawnEntityFromTable("point_worldtext",
+	{
+		textsize       = 40
+		message        = "B3"
+		font           = 1
+		orientation    = 1
+		origin         = tele_spot_b3.GetOrigin() + Vector(0, 0, 100)
+		rendermode     = 3
+	})
 	
+	SpawnEntityFromTable("point_worldtext",
+	{
+		textsize       = 40
+		message        = "B4"
+		font           = 1
+		orientation    = 1
+		origin         = tele_spot_b4.GetOrigin() + Vector(0, 0, 100)
+		rendermode     = 3
+	})
+	
+	SpawnEntityFromTable("point_worldtext",
+	{
+		textsize       = 40
+		message        = "B5"
+		font           = 1
+		orientation    = 1
+		origin         = tele_spot_b5.GetOrigin() + Vector(0, 0, 100)
+		rendermode     = 3
+	})
+	
+	SpawnEntityFromTable("point_worldtext",
+	{
+		textsize       = 40
+		message        = "F1"
+		font           = 1
+		orientation    = 1
+		origin         = tele_spot_f1.GetOrigin() + Vector(0, 0, 100)
+		rendermode     = 3
+	})
+	
+	SpawnEntityFromTable("point_worldtext",
+	{
+		textsize       = 40
+		message        = "F2"
+		font           = 1
+		orientation    = 1
+		origin         = tele_spot_f2.GetOrigin() + Vector(0, 0, 100)
+		rendermode     = 3
+	})
+	
+	SpawnEntityFromTable("point_worldtext",
+	{
+		textsize       = 40
+		message        = "F3"
+		font           = 1
+		orientation    = 1
+		origin         = tele_spot_f3.GetOrigin() + Vector(0, 0, 100)
+		rendermode     = 3
+	})
+	
+	SpawnEntityFromTable("point_worldtext",
+	{
+		textsize       = 40
+		message        = "F4"
+		font           = 1
+		orientation    = 1
+		origin         = tele_spot_f4.GetOrigin() + Vector(0, 0, 100)
+		rendermode     = 3
+	})
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// DEBUGGING ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-__CollectGameEventCallbacks(::CALLBACKS)
