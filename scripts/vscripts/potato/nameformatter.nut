@@ -229,11 +229,8 @@ __potato.NameFormatter <- {
 
             // Reset mission name before the popfile is reloaded by plugin
             EntFireByHandle(objres, "RunScriptCode", format(@"
-                if (__potato.NameFormatter.InVictory) {
+                if (__potato.NameFormatter.InVictory)
                     NetProps.SetPropString(__potato.NameFormatter.objres, `m_iszMvMPopfileName`, `%s`)
-                    #if (__potato.IsSigmod) # TODO: Test if this carries over
-                    #    self.AcceptInput(`$ResetClientProp$m_iszMvMPopfileName`, ``, null, null)
-                }
                 ", params.mission),
             PluginReloadDelay - 0.015, null, null)
             // Only need to advance by SINGLE_TICK as this is for the server's benefit.
@@ -249,9 +246,10 @@ __CollectGameEventCallbacks(__potato.NameFormatter.Events)
 // Addendum: Mission name-changing logic is (in part) complex because the Potato plugin that
 //   serves the mission name to the Potato website retrieves the popfile name directly from
 //   the NetProp, causing the website to track progress incorrectly if it is modified.
-//  Mission reloading also breaks on Potato for the same reason.
 //  Aspiring plugin authors should consider instead using a method like this instead in a
 //   static function to reduce overhead,
 //    https://github.com/mtxfellen/tf2-plugins/blob/3a83742/addons/sourcemod/scripting/include/tfmvm_stocks.inc#L21
 //   or set up the appropriate SDKCall to CPopulationManager::GetPopulationFilename().
-//  The rest of the complexity is just over-engineering for aesthetic purposes.
+//  It is also the case that as a result of this, missions that change their display name
+//   typically use Sigmod $SetClientProp, so additional complexity is incurred by the need to
+//   test for both name changes by $SetClientProp or SetPropString().
