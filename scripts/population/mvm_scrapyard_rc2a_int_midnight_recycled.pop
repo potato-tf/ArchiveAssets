@@ -1,0 +1,1951 @@
+//	Mission designer: Lyney
+//	Map designer: Louie Pikmin (Steam: https://steamcommunity.com/profiles/76561199412852390)
+//	Map designer: BotRot (Steam: https://steamcommunity.com/id/BotRot)
+
+#base robot_giant.pop
+#base robot_standard.pop
+#base robot_lyney.pop
+#base midnight_recycled_weapons.pop
+//#base judge_restricts.pop
+
+// WAVE 1 Current Money: 400$
+// WAVE 2 Current Money: 400$ + 700$ + 100$ Bonus = 1200$ (No Bonus: 1100$)
+// WAVE 3 Current Money: 1200$ + 700$ + 100$ Bonus = 2000$ (No Bonus: 1800$)
+// WAVE 4 Current Money: 2000$ + 1000$ + 100$ Bonus = 3100$ (No Bonus: 2800$)
+// WAVE 5 Current Money: 3100$ + 200$ + 100$ Bonus = 3400$ (No Bonus: 3000$)
+// WAVE 6 Current Money: 3400$ + 800$ + 100$ Bonus = 4300$ (No Bonus: 3800$)
+// WAVE 7 Current Money: 4300$ + 1200$ + 100$ Bonus = 5600$ (No Bonus: 5000$)
+// Total Possible Money: 5600$ + 700$ = 6300$ (No Bonus: 5700$)
+
+
+WaveSchedule
+{
+
+	StartingCurrency 400
+	RespawnWaveTime 4
+	CanBotsAttackWhileInSpawnRoom no
+	
+	//DisallowUpgrade "building instant upgrade"
+	
+	//ClassLimit [$SIGSEGV] 
+	//{
+		//HeavyWeapons 0
+		//Spy 0
+	//}
+
+	Mission // Sentry Buster
+	{
+		Objective DestroySentries
+
+		InitialCooldown 5
+		Where spawnbot
+		BeginAtWave 1
+		RunForThisManyWaves 9
+
+		CooldownTime 55       
+
+        TFBot
+		{
+			Template T_TFBot_SentryBuster
+        }
+	}
+	
+	Mission // Sniper - Wave 3
+	{
+		Objective Sniper
+
+		InitialCooldown 35
+		Where spawnbot_mission_sniper
+		BeginAtWave 3
+		RunForThisManyWaves 1
+		CooldownTime 53
+		DesiredCount 2
+
+		TFBot
+		{
+			Class Sniper
+			Skill Hard
+			Name Sniper
+		}
+	}
+	
+	Mission // Spy - Wave 4
+	{
+		Objective Spy
+
+		InitialCooldown 50
+		Where spawnbot
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		CooldownTime 75
+		DesiredCount 2
+
+		TFBot
+		{
+			Class Spy
+			Skill Hard
+			Name Spy
+		}
+	}
+	
+	Mission // Sniper - Wave 6-7
+	{
+		Objective Sniper
+
+		InitialCooldown 35
+		Where spawnbot_mission_sniper
+		BeginAtWave 6
+		RunForThisManyWaves 2
+		CooldownTime 45
+		DesiredCount 2
+
+		TFBot
+		{
+			Class Sniper
+			Skill Hard
+			Name Sniper
+		}
+	}
+	
+	Mission // Spy - Wave 7
+	{
+		Objective Spy
+
+		InitialCooldown 20
+		Where spawnbot
+		BeginAtWave 7
+		RunForThisManyWaves 1
+		CooldownTime 60
+		DesiredCount 2
+
+		TFBot
+		{
+			Class Spy
+			Skill Hard
+			Name Spy
+		}
+	}
+	
+	//WAVE 1 (700$)
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+        StartWaveOutput
+        {
+            Target wave_start_classic_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+		InitWaveOutput
+		{
+			Target wave_start_classic_relay
+			Action RunScriptCode
+			Param
+			"
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_arrows_left`, `TurnOff`)
+                EntFire(`bombpath_left_relay`, `Trigger`)
+				ClientPrint(null,3,`\x08FF54F1FFThis mission, The bomb will take a unique path for each wave!`)
+			"
+		}
+		
+		WaveSpawn
+		{
+			Name 1a
+
+			Where spawnbot
+			TotalCount 20
+			MaxActive 10
+			SpawnCount 4
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 2
+			TotalCurrency 100
+			
+			TFBot
+			{
+				Template T_TFBot_Soldier_Shovel
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1a
+
+			Where spawnbot_left
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 9
+			TotalCurrency 100
+			
+			TFBot
+			{
+				Template T_TFBot_Pyro_DF_Armored
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1b
+			WaitForAllSpawned 1a
+
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 100
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Pyro_Detonator_Spammer
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1b
+			WaitForAllDead 1a
+
+			Where spawnbot
+			TotalCount 24
+			MaxActive 9
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 3
+			TotalCurrency 100
+			
+			Support Limited
+			
+			TFBot
+			{
+				Class Scout
+				Skill Easy
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1b
+			WaitForAllDead 1a
+
+			Where spawnbot_right
+			TotalCount 16
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 4.5
+			TotalCurrency 100
+			
+			Support Limited
+			
+			TFBot
+			{
+				Class Demoman
+				Skill Normal
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1b
+			WaitForAllDead 1a
+
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 15
+			TotalCurrency 200
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Pyro_FlareGun_Spammer
+			}
+		}
+	}
+	
+	Wave // Wave 2 (700$)
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_classic_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_start_classic_relay
+			Action RunScriptCode
+			Param 
+			"
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_arrows_left`, `TurnOff`)
+				EntFire(`bombpath_arrows_right`, `TurnOn`)
+                EntFire(`bombpath_right_relay`, `Trigger`)
+				IncludeScript(`disablesquad`)
+            "
+		}
+		
+		WaveSpawn
+		{
+			Name 2a
+
+			Where spawnbot_left
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 1
+			TotalCurrency 40
+			
+			TFBot
+			{
+				Template T_TFBot_Sniper_Huntsman
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2a
+
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 16
+			MaxActive 10
+			SpawnCount 4
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 1
+			TotalCurrency 160
+			
+			TFBot
+			{
+				Template T_TFBot_Sniper_Huntsman
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2a
+
+			Where spawnbot
+			TotalCount 15
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 1
+			TotalCurrency 100
+			
+			TFBot
+			{
+				Template T_TFBot_Soldier_Bison
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2a
+
+			Where spawnbot_left
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 0
+			TotalCurrency 40
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Spammer
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2b
+			WaitForAllSpawned 2a
+			
+			TotalCurrency 200
+			TotalCount 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			FirstSpawnWarningSound	"mvm\mvm_tank_start.wav"
+			
+			Tank
+			{
+				Health	15000
+				Name	Tank
+				Speed	75
+				StartingPathTrackNode	tank_path_b_1
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2b
+			WaitForAllDead 2a
+
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 20
+			TotalCurrency 80
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Spammer
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2b
+			WaitForAllDead 2a
+
+			Where spawnbot_left
+			TotalCount 48
+			MaxActive 10
+			SpawnCount 6
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 4
+			TotalCurrency 80
+			
+			Support Limited
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Soldier_Bison
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Class Pyro
+					Skill Easy
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Class Pyro
+					Skill Easy
+					Tag disband_squad
+				}
+			}
+		}
+	}
+	
+	Wave // Wave 3 (950$)
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_classic_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_start_classic_relay
+			Action RunScriptCode
+			Param 
+			"
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_arrows_left`, `TurnOn`)
+				EntFire(`bombpath_arrows_right`, `TurnOff`)
+                EntFire(`bombpath_left_relay`, `Trigger`)
+            "
+		}
+		
+		WaveSpawn
+		{
+			Name 3a-Support
+
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 0
+			
+			Support Limited
+			
+			TFBot
+			{
+				Template T_TFBot_Scout_Melee_FixIcons
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3a
+
+			Where spawnbot
+			TotalCount 24
+			MaxActive 10
+			SpawnCount 3
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 1
+			TotalCurrency 120
+			
+			TFBot
+			{
+				Class Soldier
+				Skill Normal
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3b
+			WaitForAllSpawned 3a
+
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 120
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Escape
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3b
+			WaitForAllDead 3a
+
+			Where spawnbot
+			TotalCount 20
+			MaxActive 8
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 2
+			TotalCurrency 100
+			
+			TFBot
+			{
+				Template T_TFBot_Pyro_Flaregun
+				Name "Flare Gun Pyro"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3b
+			WaitForAllDead 3a
+
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 20
+			TotalCurrency 60
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Fast
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3b
+			WaitForAllDead 3a
+
+			Where spawnbot_left
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 0.5
+			TotalCurrency 50
+			
+			TFBot
+			{
+				Template T_TFBot_Demoman_Sticky
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c
+			WaitForAllSpawned 3b
+
+			Where spawnbot_right
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 0.5
+			TotalCurrency 50
+			
+			TFBot
+			{
+				Template T_TFBot_Demoman_Sticky
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c
+			WaitForAllSpawned 3b
+
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 60
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demoman_No_RapidFire
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Attributes IgnoreEnemies
+					Name "Big-Heal Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c-Support
+			WaitForAllDead 3b
+
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 100
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 1
+			TotalCurrency 100
+			
+			Support 1
+			
+			TFBot
+			{
+				Template T_TFBot_Scout_Melee_FixIcons
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c-Support
+			WaitForAllDead 3b
+
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 100
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 7
+			TotalCurrency 100
+			
+			Support 1
+			
+			TFBot
+			{
+				Template T_TFBot_Soldier_DirectHit
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c
+			WaitForAllDead 3b
+
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 18
+			WaitBetweenSpawns 18
+			TotalCurrency 120
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demoman_No_RapidFire
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Attributes IgnoreEnemies
+					Name "Big-Heal Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c
+			WaitForAllDead 3b
+
+			Where spawnbot_left
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 35
+			WaitBetweenSpawns 0
+			TotalCurrency 120
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Escape
+			}
+		}
+	}
+	
+	Wave // Wave 4 (200$)
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_classic_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_start_classic_relay
+			Action RunScriptCode
+			Param 
+			"
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_arrows_left`, `TurnOn`)
+				EntFire(`bombpath_arrows_right`, `TurnOff`)
+                EntFire(`bombpath_left_relay`, `Trigger`)
+				IncludeScript(`disablesquad`)
+            "
+		}
+		
+		WaveSpawn
+		{
+			Name 4a
+
+			Where spawnbot
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 30
+			TotalCurrency 150
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Pyro_No_Airblast_AlwaysFireWeapons
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Regen
+					Attributes IgnoreEnemies
+					Name "Giant Regen Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 4a-Support
+
+			Where spawnbot
+			TotalCount 10
+			MaxActive 10
+			SpawnCount 10
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 20
+
+			Support Limited
+			
+			TFBot
+			{
+				Template T_TFBot_Scout_Melee_FixIcons
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 4a-Support
+
+			Where spawnbot_left
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 0
+			TotalCurrency 0
+
+			Support Limited
+			
+			TFBot
+			{
+				Class Pyro
+				Skill Easy
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 4a-Support
+
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 30
+			MaxActive 9
+			SpawnCount 3
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 3
+			TotalCurrency 30
+
+			Support 1
+
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Demoman_LochNLoad
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Class Pyro
+					Skill Easy
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_Melee_FixIcons
+					Tag disband_squad
+				}
+			}
+		}
+	}
+	
+	Wave // Wave 5 (800$)
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_classic_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_start_classic_relay
+			Action RunScriptCode
+			Param 
+			"
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_arrows_left`, `TurnOff`)
+				EntFire(`bombpath_arrows_right`, `TurnOn`)
+                EntFire(`bombpath_right_relay`, `Trigger`)
+				IncludeScript(`disablesquad`)
+            "
+		}
+
+		WaveSpawn
+		{
+			Name 5a
+
+			Where spawnbot
+			TotalCount 28
+			MaxActive 8
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 1
+			TotalCurrency 40
+			
+			TFBot
+			{
+				Template T_TFBot_Scout_Soda_Popper
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5a
+
+			Where spawnbot_right
+			TotalCount 16
+			MaxActive 8
+			SpawnCount 8
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 16
+			TotalCurrency 60
+			
+			TFBot
+			{
+				Class Soldier
+				Skill Normal
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5b
+			WaitForAllDead 5a
+
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 30
+			MaxActive 9
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 4
+			TotalCurrency 50
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Shotgun
+					Name "Shotgun Heavy"
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template T_TFBot_Soldier_Shotgun
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Shotgun
+					Tag disband_squad
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5b
+			WaitForAllDead 5a
+
+			Where spawnbot
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 10
+			TotalCurrency 100
+			
+			TFBot
+			{
+				Template T_TFBot_Soldier_Extended_Concheror_Armored
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5b
+			WaitForAllSpawned 5a
+
+			Where spawnbot_left
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 100
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_RapidFire_FixIcons
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Name "Flare Gun Pyro"
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Name "Flare Gun Pyro"
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Name "Flare Gun Pyro"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5b
+			WaitForAllDead 5a
+			
+			TotalCurrency 100
+			TotalCount 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			FirstSpawnWarningSound	"mvm\mvm_tank_start.wav"
+			
+			Tank
+			{
+				Health	17500
+				Name	Tank
+				Speed	75
+				StartingPathTrackNode	tank_path_a_1
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5b
+			WaitForAllDead 5a
+
+			Where spawnbot_left
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 17
+			WaitBetweenSpawns 0
+			TotalCurrency 100
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_RapidFire_FixIcons
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Name "Flare Gun Pyro"
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Name "Flare Gun Pyro"
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Name "Flare Gun Pyro"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5b-giant
+			WaitForAllSpawned 5b
+
+			Where spawnbot
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 25
+			TotalCurrency 200
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Heater
+					Name "Giant Heater Heavy"
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Name "Flare Gun Pyro"
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Name "Flare Gun Pyro"
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Name "Flare Gun Pyro"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5b-support
+			WaitForAllSpawned 5b
+
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 24
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 2
+			TotalCurrency 24
+			
+			Support 1
+			
+			TFBot
+			{
+				Template T_TFBot_Soldier_Equalizer
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 5b-support
+			WaitForAllSpawned 5b
+
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 26
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 1
+			TotalCurrency 26
+			
+			Support 1
+
+			TFBot
+			{
+				Class Pyro
+				Skill Easy
+			}
+		}
+	}
+	
+	Wave // Wave 6 (1200$)
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_classic_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_start_classic_relay
+			Action RunScriptCode
+			Param 
+			"
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_arrows_left`, `TurnOff`)
+				EntFire(`bombpath_arrows_right`, `TurnOn`)
+                EntFire(`bombpath_right_relay`, `Trigger`)
+				IncludeScript(`disablesquad`)
+            "
+		}
+		
+		WaveSpawn
+		{
+			Name 6a
+
+			Where spawnbot_left
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 1
+			TotalCurrency 4
+			
+			TFBot
+			{
+				Class Demoman
+				Skill Normal
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 6a
+
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 18
+			MaxActive 8
+			SpawnCount 2
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 2
+			TotalCurrency 36
+			
+			TFBot
+			{
+				Class Demoman
+				Skill Normal
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 6a-giant
+
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 0
+			TotalCurrency 60
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Spammer_Reload
+					CharacterAttributes
+					{
+						"cancel falling damage" 1
+						"blast dmg to self increased" 0
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Attributes IgnoreEnemies
+					Name "Big-Heal Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Attributes IgnoreEnemies
+					Name "Big-Heal Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Attributes IgnoreEnemies
+					Name "Big-Heal Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 6b
+			WaitForAllSpawned 6a
+
+			Where spawnbot_left
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 200
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_FAN
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 6b
+			WaitForAllSpawned 6a
+
+			Where spawnbot_left
+			TotalCount 35
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 4
+			TotalCurrency 100
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Pyro_Airblast
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template T_TFBot_Soldier_DirectHit
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template T_TFBot_Soldier_DirectHit
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template T_TFBot_Soldier_DirectHit
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template T_TFBot_Soldier_DirectHit
+					Tag disband_squad
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 6b
+			WaitForAllSpawned 6a
+
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 20
+			WaitBetweenSpawns 0
+			TotalCurrency 100
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_Burst
+					CharacterAttributes
+					{
+						"cancel falling damage" 1
+						"blast dmg to self increased" 0
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Attributes IgnoreEnemies
+					Name "Big-Heal Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Attributes IgnoreEnemies
+					Name "Big-Heal Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Attributes IgnoreEnemies
+					Name "Big-Heal Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 6c
+			WaitForAllSpawned 6b
+
+			Where spawnbot_left
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 25
+			TotalCurrency 400
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_FAN
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 6c-support
+			WaitForAllSpawned 6b
+
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 100
+			MaxActive 7
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 3
+			TotalCurrency 200
+			
+			Support 1
+			
+			RandomChoice
+			{			
+				TFBot
+				{
+					Template T_TFBot_Demoman_Knight
+				}
+				TFBot
+				{
+					Template T_TFBot_Demoman_Knight
+				}
+				TFBot
+				{
+					Template T_TFBot_Demoman_Knight
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_Pistol
+					Skill Easy
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_Pistol
+					Skill Easy
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 6c-giant
+			WaitForAllSpawned 6b
+
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 1
+			TotalCurrency 100
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Pyro_Flare_Rain
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Attributes IgnoreEnemies
+					Name "Big-Heal Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Attributes IgnoreEnemies
+					Name "Big-Heal Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Attributes IgnoreEnemies
+					Name "Big-Heal Medic"
+				}
+			}
+		}
+	}
+	
+	Wave // Wave 7 (700$)
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_classic_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_start_classic_relay
+			Action RunScriptCode
+			Param 
+			"
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_arrows_left`, `TurnOn`)
+				EntFire(`bombpath_arrows_right`, `TurnOff`)
+                EntFire(`bombpath_left_relay`, `Trigger`)
+				IncludeScript(`disablesquad`)
+            "
+		}
+
+		WaveSpawn
+		{
+			Name 7a
+
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 0
+			
+			Support Limited
+			
+			Squad
+			{
+				Squad
+				{
+					TFBot
+					{
+						Template T_TFBot_Scout_Melee_FixIcons
+					}
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 7a
+
+			Where spawnbot
+			TotalCount 48
+			MaxActive 12
+			SpawnCount 3
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 4
+			TotalCurrency 180
+			
+			Squad
+			{
+				TFBot
+				{
+					Class Scout
+					Skill Easy
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Class Scout
+					Skill Easy
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Class Soldier
+					Skill Normal
+					Tag disband_squad
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 7a
+
+			Where spawnbot
+			TotalCount 6
+			MaxActive 3
+			SpawnCount 1
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 8
+			TotalCurrency 120
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Spammer
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 7b-Tank
+			WaitForAllSpawned 7a
+			
+			TotalCurrency 100
+			TotalCount 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			FirstSpawnWarningSound	"mvm\mvm_tank_start.wav"
+			
+			Tank
+			{
+				Health	22000
+				Name	Tank
+				Speed	75
+				Skin 1
+				StartingPathTrackNode	tank_path_b_1
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 7b-support
+			WaitForAllDead 7a
+
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 0
+			
+			Support Limited
+			
+			TFBot
+			{
+				Template T_TFBot_Sniper_Carbine
+				Skill Easy
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 7b-support
+			WaitForAllDead 7a
+
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 0
+			TotalCurrency 0
+			
+			Support Limited
+			
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Steel_Manlet
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 7b-support
+			WaitForAllDead 7a
+
+			Where spawnbot
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 100
+			MaxActive 8
+			SpawnCount 2
+			WaitBeforeStarting 4
+			WaitBetweenSpawns 3
+			TotalCurrency 100
+			
+			Support 1
+			
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Sniper_Carbine
+					Skill Easy
+				}
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Steel_Manlet
+				}
+				TFBot
+				{
+					Template T_TFBot_Demoman_Sticky
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 7b
+			WaitForAllSpawned 7a
+
+			Where spawnbot_left
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 100
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Pyro_Dragon_Fury
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 7b
+			WaitForAllSpawned 7a
+
+			Where spawnbot_right
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 0
+			TotalCurrency 100
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Pyro_Dragon_Fury
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 7c
+			WaitForAllSpawned 7b
+
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 0
+			TotalCurrency 0
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+			}
+		}
+	}
+}
+
+// Change Log
+// Wave 1
+// Add 1 Giant Flare Gun Pyro on Subwave 1b
+// Reduced Shovel Soldier WaitBetweenSpawns from 4 to 2
+// Change 9 Demoman to Mini Giant Dragon Fury Pyro (Armored Dragon Fury Pyro)
+// Armored Dragon Fury Pyro Change WaitBeforeStarting from 6 to 15
+// Reduce Armored Dragon Fury Pyro TotalCount from 9 to 6, MaxActive Change from 6 to 4, SpawnCount from 3 to 2
+
+// Wave 2
+// Change First 4 Huntsman from spawnbot to spawnbot_left
+// Change Huntsman MaxActive from 4 to 10, SpawnCount 1 to 4, SpawncountWaitBetweenSpawns from 4 to 1
+// Change Bison MaxActive from 8 to 10, WaitBetweenSpawns from 5 to 1
+// Added 1 more Giant Rapid Fire Soldier on Subwave 2a WaitBeforeStarting 8
+// Added 2 more Giant Rapid Fire Soldier on Subwave 2b WaitBetweenSpawns 20
+// Remove the last Giant Rapid Fire Soldier
+// Remove Heavy to Squad NoFormation 1
+// Move Bison Soldier and Pyro to Support Limited
+// Tank Reduced HP From 20k to 15k
+
+// Wave 3
+// Support Bat Scout Change WaitBetweenSpawns from 4 to 1
+// Add Big-Heal Medic on Giant Demoman
+// Add Super Scout TotalCount 2, SpawnCount 1, WaitBeforeStarting 15, WaitBetweenSpawns 20
+
+// Added Wave 4
+
+// Update
+
+// Added Wave 5
+
+// Change Log & Update
+// Added Wave 6 and 7
+
+// Wave 1
+// Reduce Shovel Soldier TotalCount from 28 to 20
+
+// Change Log
+
+// Wave 1
+// Remove Bat Scout Support
+// Scout and Demo bot are now Support Limited
+
+// Change Log
+// Wave 5
+// Change Armored Conch Soldier from Melee Restricted to Primary
+
+// Wave 7
+// Lower MaxActive Giant Charged Soldier from 4 to 3
+
+// Change Log
+// Wave 7
+// Change Giant Charged Soldier to Giant Rapid Fire Soldier
+// Change the Giant from 1 Quick-Uber Medic in Giant Dragon Pyro and 1 Quick-Uber Medic in Giant Heavy to 3 Quick-Uber Medic per each giant
+
+// Change Log
+// Wave 3 Increase Money from 700 to 1000
+// Wave 4 Decrease Money from 500 to 200
+
+// Change Log
+// Wave 1
+// Decrease Demoman MaxActive from 9 to 6, SpawnCount from 3 to 2
+
+// Wave 3
+// Change Demoknight to Sticky Demo
+// add Direct Hit Support on 3c (MaxActive 4 SpawnCount 2 WaitBetweenSpawns 1)
+
+// Wave 4
+// Change Support GRU Heavy and Scout to Pyro Easy Skill AlwaysFireWeapon and Loch Demo
+// Increase Spy Support to 2
+
+// Wave 6
+// Change Subwave in Giant Burst Fire Soldier from 6a to 6a-giant
+// Subwave 6b the Airblast Pyro and Direct Hit Soldier was Change spawnbot to spawnbot_left only (due it too slow when spawn in spawnbot)
+// Subwave 6b was WaitForAllSpawned 
+// Direct Hit Soldier + Pyro WaitBeforeStarting change from 0 to 5
+// Giant Burst Fire Demo WaitBeforeStarting change from 15 to 20
+// Subwave 6c was change to WaitForAllSpawned
+// Giant FAN Scout TotalCount Change from 1 to 2, WaitBetweenSpawns from 0 to 25, TotalCount from 200 ro 400
+// Remove the last 1 Giant FAN Scout
+// Support TotalCount from 5 to 3
+
+// Wave 7
+// Add 1 melee scout for carrying the bomb and Scout+Soldier change WaitBeforeStarting from 0 to 3
+// Change the 1st Giant Fury Pyro WaitBeforeStarting from 5 to 0
+// Change the 2nd Giant Fury Pyro WaitBeforeStarting from 30 to 15 (First Giant Fury Pyro was 0 (basically 15 sec between spawn))
+// Change Giant Heavy WaitBeforeStarting from 0 to 15 and use WaitForAllSpawned
+
+// Change Log
+// Wave 3
+// Direct Hit Soldier Support Change WaitBeforeStarting from 0 to 10, WaitBetweenSpawns 1 to 7
+
+// Change Log
+// Wave 5
+// Giant Heavy + Flare Pyro Squad Change MaxActive from 5 to 8
+
+// Change Log
+// Wave 4
+// Remove AlwaysFireWeapon from Pyro
+// Change RandomChoice to Squad with NoFormation 1
+
+// Change NoFormation 1 to Tag disband_squad with vscript

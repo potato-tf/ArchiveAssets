@@ -1,19 +1,19 @@
-// Allow expression constants
-::CONST <- getconsttable()
-
-//my disappointment is immeasureable, and my day is ruined.
-
 //"reminder that constants are resolved at preprocessor level and not runtime"
 //"if you add them dynamically to the table they wont show up until you execute a new script as the preprocessor isnt aware yet"
 
-//the performance difference here is not worth refactoring everything around using the constant table so whatever
+//fold into both const and root table to work around this.
 
+::CONST <- getconsttable()
 ::ROOT <- getroottable()
 
 if (!("ConstantNamingConvention" in ROOT)) {
+
 	foreach(a, b in Constants)
 		foreach(k, v in b)
+		{
+			CONST[k] <- v != null ? v : 0
 			ROOT[k] <- v != null ? v : 0
+		}
 }
 
 CONST.setdelegate({ _newslot = @(k, v) compilestring("const " + k + "=" + (typeof(v) == "string" ? ("\"" + v + "\"") : v))() })
@@ -54,6 +54,14 @@ const INT_COLOR_WHITE = 16777215
 
 const COND_CRITBOOST = 39 //TF_COND_CRITBOOSTED_CTF_CAPTURE
 const COND_UBERCHARGE = 57 //TF_COND_INVULNERABLE_CARD_EFFECT
+
+//redefine EFlags 
+const EFL_USER = 1048576 // EFL_IS_BEING_LIFTED_BY_BARNACLE
+const EFL_USER2 = 1073741824 //EFL_NO_PHYSCANNON_INTERACTION
+const EFL_SPAWNTEMPLATE = 33554432 //EFL_DONTBLOCKLOS
+const EFL_PROJECTILE = 2097152 //EFL_NO_ROTORWASH_PUSH
+const EFL_BOT = 268435456 //EFL_NO_MEGAPHYSCANNON_RAGDOLL
+const EFL_BOT2 = 67108864 //EFL_DONTWALKON
 
 // CONST.COLOR_END <- "\x07"
 // CONST.COLOR_DEFAULT <- "\x07FBECCB"
@@ -153,6 +161,11 @@ const PATTACH_POINT_FOLLOW 		= 4
 const PATTACH_WORLDORIGIN 		= 5
 const PATTACH_ROOTBONE_FOLLOW 	= 6
 
+// Object flags
+const OF_ALLOW_REPEAT_PLACEMENT      = 1
+const OF_MUST_BE_BUILT_ON_ATTACHMENT = 2
+const OF_DOESNT_HAVE_A_MODEL         = 4
+const OF_PLAYER_DESTRUCTION          = 8
 
 // EmitSoundEx flags
 const SND_NOFLAGS         = 0
@@ -193,7 +206,7 @@ const DMG_NOCLOSEDISTANCEMOD = 131072    // DMG_POISON
 const DMG_MELEE              = 134217728 // DMG_BLAST_SURFACE
 const DMG_DONT_COUNT_DAMAGE_TOWARDS_CRIT_RATE = 67108864 //DMG_DISSOLVE
 
-//can only be used in OnTakeDamage
+//can only be used with trigger_hurts
 const DMG_IGNORE_MAXHEALTH = 2
 const DMG_IGNORE_DEBUFFS = 4
 
@@ -208,6 +221,9 @@ const TF_STUN_NO_EFFECTS = 32
 const TF_STUN_LOSER_STATE = 64
 const TF_STUN_BY_TRIGGER = 128
 const TF_STUN_BOTH = 256
+
+//powerup
+const TF_POWERUP_LIFETIME = 30
 
 // Bot behavior flags
 // only useful for bot_generator
@@ -244,13 +260,22 @@ const TTYPE_ENTRANCE = 1
 const TTYPE_EXIT     = 2
 
 // Flags for wavebar functions below
-CONST.MVM_CLASS_FLAG_NONE            <- 0
-CONST.MVM_CLASS_FLAG_NORMAL          <- 1 << 0 // Non support or mission icon
-CONST.MVM_CLASS_FLAG_SUPPORT         <- 1 << 1 // Support icon flag. Mission icon does not have this flag
-CONST.MVM_CLASS_FLAG_MISSION         <- 1 << 2 // Mission icon flag. Support icon does not have this flag
-CONST.MVM_CLASS_FLAG_MINIBOSS        <- 1 << 3 // Giant icon flag. Support and mission icons do not display red background when set
-CONST.MVM_CLASS_FLAG_ALWAYSCRIT      <- 1 << 4 // Crit icon flag. Support and mission icons do not display crit outline when set
-CONST.MVM_CLASS_FLAG_SUPPORT_LIMITED <- 1 << 5 // Support limited flag. Game uses it together with support flag
+const MVM_CLASS_FLAG_NONE			 = 0
+const MVM_CLASS_FLAG_NORMAL          = 1 // Non support or mission icon
+const MVM_CLASS_FLAG_SUPPORT         = 2 // Support icon flag. Mission icon does not have this flag
+const MVM_CLASS_FLAG_MISSION         = 4 // Mission icon flag. Support icon does not have this flag
+const MVM_CLASS_FLAG_MINIBOSS        = 8 // Giant icon flag. Support and mission icons do not display red background when set
+const MVM_CLASS_FLAG_ALWAYSCRIT      = 16 // Crit icon flag. Support and mission icons do not display crit outline when set
+const MVM_CLASS_FLAG_SUPPORT_LIMITED = 32 // Support limited flag. Game uses it together with support flag
+
+//also add to root table so they can be used in popfiles
+::MVM_CLASS_FLAG_NONE            <- 0
+::MVM_CLASS_FLAG_NORMAL          <- 1 // Non support or mission icon
+::MVM_CLASS_FLAG_SUPPORT         <- 2 // Support icon flag. Mission icon does not have this flag
+::MVM_CLASS_FLAG_MISSION         <- 4 // Mission icon flag. Support icon does not have this flag
+::MVM_CLASS_FLAG_MINIBOSS        <- 8 // Giant icon flag. Support and mission icons do not display red background when set
+::MVM_CLASS_FLAG_ALWAYSCRIT      <- 16 // Crit icon flag. Support and mission icons do not display crit outline when set
+::MVM_CLASS_FLAG_SUPPORT_LIMITED <- 32 // Support limited flag. Game uses it together with support flag
 
 // trigger_* entity spawnflags
 const SF_TRIGGER_ALLOW_CLIENTS                = 1
@@ -269,6 +294,17 @@ const SF_TRIGGER_DISALLOW_BOTS                = 4096
 
 // game_text entity spawnflags
 const SF_ENVTEXT_ALLPLAYERS = 1
+
+// Button spawnflags
+const SF_BUTTON_DONTMOVE 				= 1
+const SF_ROTBUTTON_NOTSOLID				= 1
+const SF_BUTTON_TOGGLE 					= 32		// button stays pushed until reactivated
+const SF_BUTTON_TOUCH_ACTIVATES			= 256		// Button fires when touched.
+const SF_BUTTON_DAMAGE_ACTIVATES		= 512		// Button fires when damaged.
+const SF_BUTTON_USE_ACTIVATES			= 1024	// Button fires when used.
+const SF_BUTTON_LOCKED					= 2048	// Whether the button is initially locked.
+const SF_BUTTON_SPARK_IF_OFF			= 4096	// button sparks in OFF state
+const SF_BUTTON_JIGGLE_ON_USE_LOCKED	= 8192	// whether to jiggle if someone uses us when we're locked
 
 // Player speak concepts
 const MP_CONCEPT_FIREWEAPON           = 0
@@ -503,7 +539,7 @@ const MAXAMMO_BASE_SPY_PRIMARY = 24
 // Content masks
 CONST.MASK_OPAQUE      <- (CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_OPAQUE)
 CONST.MASK_PLAYERSOLID <- (CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_PLAYERCLIP|CONTENTS_WINDOW|CONTENTS_MONSTER|CONTENTS_GRATE)
-CONST.MASK_SOLID_BRUSHONLY <- 16395
+CONST.MASK_SOLID_BRUSHONLY <- (CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW|CONTENTS_GRATE)
 
 // NavMesh related
 const STEP_HEIGHT = 18

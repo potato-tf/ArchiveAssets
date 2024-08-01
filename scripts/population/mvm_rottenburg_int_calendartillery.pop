@@ -1,0 +1,3866 @@
+//tf_mvm_popfile int_calendartillery; wait 200; tf_mvm_jump_to_wave 3
+//Calendartillery, an intermediate mission by That Hat Guy and Seelpit
+//For the Osmium Ordinance campaign of Potato MvM
+	
+//Dependecies:
+//seel_ins.nut - Script file by yours truly for icon manipulation.
+//damageable_projectile_shield_calendartillery.nut - Nut file for the destructible shield. Original by royal.
+//PopExtensionsPlus - General use, by Potato.tf
+//calendartillery_pointtemplates.nut - PointTemplates used in this mission.
+//calendartillery_wave6.nut - Wave 6's script, too long to fit in a RunScriptCode feasibly.
+
+//Additional credits:
+//- Charlie: created the absurdly perfect sleigh tank, an unparallelable feat.
+//- NotYourSagittarius: various high-quality icons (including mashups of vanilla plus hers!)
+//- lite: various high-quality icons
+//- Braindawg, Mince, Ultimaximus, washy, and everyone else who contributed to PopExtensionsPlus
+//- royal: Original script for the damageable projectile shield script!
+
+#base robot_standard.pop
+#base robot_giant.pop
+// #base robot_tank_small_turret.pop
+
+
+//Notes from test
+//W1
+//- 
+
+//W2
+//- 
+
+//W3
+//- Sub 1 is a bit weak in terms of pushing, could try spawning tank earlier while having a bit more health again.
+//- Or maybe add 2nd tank!
+//- Can try making support a little tougher by making them 50/50 split of Scatters and Bats?
+//	FaNs, maybe?
+
+
+//TODO (cosmetic): add Northern Lights.
+
+//W4
+//- Make more demos spawn in.
+//- Sub 2 is a bit too weak healthwise. Players do die, but the subwave doesn't capitalize on it.
+//	Add something that can capitalize on this a bit more...maybe a GScout variant of the Ruffian?
+//- Final sub *can* be quite strong...but maybe just a taaad more health for Morozko...?
+
+//W5
+//- 
+
+//W6
+//TODO: add Northern Lights.
+
+//CHANGELOG v6
+//W1:
+//- Buffed Sticky Demo range slightly (0.28x --> 0.33x), increased reload rate, and reduced max stickies active at once
+//- Powder Hound Scouts (Scattergun) fire slightly faster (1.25x --> 1.2x penalty)
+
+//W2:
+//- The second Giant Demo + Air Strike Soldier squad spawns a little earlier (WBS 3 -> 2)
+//- Chief Sandvich Heavy now has 12k health
+//- Caffei-Nuisance Scouts (Cola) fire slightly faster (1.3x --> 1.2x penalty)
+//- Soda Jerks fire just as fast as their Cola counterparts (1x --> 1.2x penalty)
+//- Both soft drink enjoyers now spawn as streams (2 per 2s --> 1 per 0.75s)
+//- Slightly altered spawn conditions of the A-Nahuatl-Ator Heavies and Gas Pyros
+
+//W3:
+//- Spies now use Support Limited and show up as Mission Support
+//- Giant Fireball Demoknights now deal more damage but have a slower projectile (damage penalty 0.5 -> 0.75, projectile speed 1 --> 0.7).
+//	In addition, they fire more frequently (7.5s --> 5s between spells), and spawn from the flank at first
+//- Wolf Demos now move even faster (1.2x -> 1.4x), spawn faster (WaitBetweenSpawns 2.5 -> 1.5), and there are more in total (30 -> 45)
+//- Tank spawns earlier, now time-based rather than spawn-based
+//- Finale Support now has Soda Popper Scouts included
+
+//W4:
+//- Giant Neon Demos now spawn with 2 max from both spawns, and immediately start spawning from both sides.
+//	In addition, their damage penalty has been removed and they reload slightly faster (0.65 -> 1, 0.65 -> 0.6)
+//- Added Giant Scouts to subwave 2, one spawning after all Neon Demos per side die, plus one after all minigiants have spawned (3 total)
+//- Deadly Morozko (Giant Crit Canteen Heavy) is now a chief of sorts with 10k health. Health threshold for its crit canteen is still 55%.
+//- The bomb's path is now always over the bridge, matching the sleigh tank's path.
+
+//W5:
+//- 
+
+//W6:
+//- 
+
+WaveSchedule
+{
+	StartingCurrency 1000
+	RespawnWaveTime 2
+	CanBotsAttackWhileInSpawnRoom no
+	ForceHoliday 2 [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/robo_sleigh/robo_sleigh.mdl" [$SIGSEGV]   //Ensures file is downloaded.
+	PrecacheModel "models/bots/boss_bot/robo_sleigh/robo_sleigh_damage1.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/robo_sleigh/robo_sleigh_damage2.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/robo_sleigh/robo_sleigh_damage3.mdl" [$SIGSEGV]
+	
+	Templates
+	{
+		
+		Human_Generic
+		{
+			Tag "popext_usehumanmodel"
+			// NoIdleSound 1  
+			CharacterAttributes
+			{
+				"override footstep sound set" 0
+			}
+		}
+		Zombie_Scout
+		{
+			Item "Zombie Scout"
+			Template "Human_Generic"
+		}
+		Zombie_Soldier
+		{
+			Item "Zombie Soldier"
+			Template "Human_Generic"
+		}
+		Zombie_Pyro
+		{
+			Item "Zombie Pyro"
+			Template "Human_Generic"
+		}
+		Zombie_Demo
+		{
+			Item "Zombie Demo"
+			Template "Human_Generic"
+		}
+		Zombie_Heavy
+		{
+			Item "Zombie Heavy"
+			Template "Human_Generic"
+		}
+		Zombie_Engineer
+		{
+			Item "Zombie Engineer"
+			Template "Human_Generic"
+		}
+		Zombie_Medic
+		{
+			Item "Zombie Medic"
+			Template "Human_Generic"
+		}
+		Zombie_Sniper
+		{
+			Item "Zombie Sniper"
+			Template "Human_Generic"
+		}
+		Zombie_Spy
+		{
+			Item "Zombie Spy"
+			Template "Human_Generic"
+		}
+		///////////////////////////////////////////////////////////////////
+        ///////////////////////        Winter Bots        /////////////////
+        ///////////////////////////////////////////////////////////////////
+		
+		Winter_Scout_Milk
+		{
+			Class Scout
+			Name "Powder Hound Scout"
+			ClassIcon scout_milk
+			Skill Normal
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			Item "Mad Milk"
+			Item "Wipe Out Wraps"
+			Item "Blizzard Britches"
+			Item "Snowwing"
+			Tag "popext_stripslot|2|2"
+			ItemAttributes
+			{
+				ItemName "Mad Milk"
+				"effect bar recharge rate increased" 0.5 //10 seconds
+			}
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"Paintkit_proto_def_index" 272		//Elfin Enamel; Optional: make Festive/Festivized
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x3729eaae" //May need new seed
+				"custom_paintkit_seed_hi" "x72050db2"
+				"fire rate penalty" 1.2				//Makes them slightly less scary; Normal tracking is deceptively good on Scouts
+			}
+		}
+		
+		Winter_Scout_Milk_Melee
+		{
+			Class Scout
+			Name "Grommet Scout"
+			ClassIcon scout_milk
+			Skill Hard
+			Item "Mad Milk"
+			Item "The Holy Mackerel"
+			Item "Wipe Out Wraps"
+			Item "Blizzard Britches"
+			Item "Snowwing"
+			Tag "popext_stripslot|0|0"
+			ItemAttributes
+			{
+				ItemName "Mad Milk"
+				"effect bar recharge rate increased" 0.3 //6 seconds
+				"fire rate bonus" 1.5
+			}
+			ItemAttributes
+			{
+				ItemName "The Holy Mackerel"
+				"Paintkit_proto_def_index" 272		//Elfin Enamel; Optional: make Festive/Festivized
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x3729eaae"
+				"custom_paintkit_seed_hi" "x72050db2"
+			}
+		}
+		Winter_Pyro_M1
+		{
+			Class Pyro
+			Skill Normal
+			Name "Extra-Layered Pyro"
+			Item "The Head Warmer"
+			Item "EOTL_pyro_sweater"
+			Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_FLAMETHROWER"
+				"Paintkit_proto_def_index" 248
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x4a144112"
+				"custom_paintkit_seed_hi" "x2de08fdd"
+				"airblast disabled" 1
+			}
+		}
+		Winter_Pyro_Neon
+		{
+			Class Pyro
+			Name "Pyroshark"
+			ClassIcon pyro_neon
+			Skill Hard
+			Item "The Neon Annihilator"
+			Item "The Blizzard Breather"
+			Item "The Sub Zero Suit"
+			WeaponRestrictions MeleeOnly
+		}
+		Winter_Pyro_Neon_Minigiant
+		{
+			Class Pyro
+			Name "Menacing Pyroshark"
+			ClassIcon pyro_neon
+			Scale 1.4
+			Health 650
+			Skill Hard
+			Item "The Neon Annihilator"
+			Item "The Blizzard Breather"
+			Item "The Sub Zero Suit"
+			WeaponRestrictions MeleeOnly
+			CharacterAttributes
+			{
+				"health regen" 1
+			}
+		}
+
+		Winter_Medic_Quickfix
+		{
+			Template T_TFBot_Medic_BigHeal
+			Name "Festive Spirited Medic"
+			Item "The Ebenezer"
+			Item "The Ruffled Ruprecht"
+			Item "The Dead Little Buddy"
+		}
+		
+		Winter_Giant_Soldier_Direct
+		{
+			Template T_TFBot_Giant_Soldier
+			Name "Giant Cold War Soldier"
+			ClassIcon soldier_directhit_lite
+			Skill Hard
+			Item "The Direct Hit"
+			// Item "Antarctic Parka"  //TODO: new coat?
+			Item "Brain Cane"
+		}
+		
+		Winter_Giant_Demoman_Sticky
+		{
+			Class Demoman
+			Name "Giant Stickybomber Demo"
+			ClassIcon demo_sticky_daan
+			Skill Hard
+			Health 3300
+			Item "Upgradeable TF_WEAPON_PIPEBOMBLAUNCHER"
+			Item "Thunder Dome"
+			Item "The Shrapnel Shell"
+			Item "Glittering Garland"
+			Item "Stunt Suit"
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload //Probably doesn't work on sticky launchers, but still.
+			WeaponRestrictions SecondaryOnly
+			CharacterAttributes
+			{
+				"move speed bonus"    0.5
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"is_passive_weapon" 1
+				"fire rate penalty" 1357
+				"override projectile type" 29
+			}
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_PIPEBOMBLAUNCHER"
+				"Paintkit_proto_def_index" 104
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x1f9105d"
+				"custom_paintkit_seed_hi" "x2449b10d"
+				"stickybomb charge rate" 0.001
+				"projectile range decreased" 0.33
+				"faster reload rate" 0.3
+				"max pipebombs decreased" -4
+			}
+			ItemAttributes
+			{
+				ItemName "Stunt Suit"
+				"item style override" 2
+			}
+		}
+		
+		Winter_Giant_Medic_Milk_Syringe
+		{
+			Template T_TFBot_Giant_Medic
+			Name "Giant Hypercalcemia Medic"
+			ClassIcon medic_syringe_milk2
+			Skill Expert //Syringes are pretty bad without tracking, so this compensates ever-so-slightly for it.
+			Health 3500
+			Item "Upgradeable TF_WEAPON_SYRINGEGUN_MEDIC"
+			Item "Neckwear Headwear"
+			Item "Scourge of the Sky"
+			Item "Medical Emergency"
+			WeaponRestrictions PrimaryOnly
+			Action FetchFlag [$SIGSEGV] 
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SYRINGEGUN_MEDIC"
+				"mad milk syringes" 1
+				"faster reload rate" 0
+				"damage bonus" 1.5
+			}
+		}
+		
+	    ///////////////////////////////////////////////////////////////////
+        ///////////////////////        Summer Bots        /////////////////
+        ///////////////////////////////////////////////////////////////////
+		Summer_Scout_Bonk
+		{
+			Class Scout
+			ClassIcon scout_bonk_nys
+			Name "Soda Jerk"
+			Skill Normal
+			// AimTrackingInterval 0.4   //Might have to sacrifice aim
+			Item "Bonk! Atomic Punch"
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			Item "Bonk Leadwear"
+			Item "Soda Specs"
+			Item "The Caffeine Cooler"
+			WeaponRestrictions PrimaryOnly
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"Paintkit_proto_def_index" 207
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x1f7789d6"
+				"custom_paintkit_seed_hi" "x6a479cab"
+				"fire rate penalty" 1.2
+			}
+		}
+		
+		Summer_Scout_Cola
+		{
+			Class Scout
+			ClassIcon scout_cola_nys
+			Name "Caffei-Nuisance"
+			Skill Normal
+			Item "Crit-a-Cola"
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			Item "Bonk Leadwear"
+			Item "Soda Specs"
+			Item "The Caffeine Cooler"
+			MaxVisionRange 750
+			Tag cola
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"Paintkit_proto_def_index" 207
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x1f7789d6"
+				"custom_paintkit_seed_hi" "x6a479cab"
+				"killstreak tier" 2
+				"killstreak idleeffect" 6
+				"fire rate penalty" 1.2
+			}
+			ItemAttributes
+			{
+				ItemName "Crit-a-Cola"
+				"mod_mark_attacker_for_death" 0
+				"effect bar recharge rate increased" 0.6 //18 seconds
+			}
+			ItemAttributes
+			{
+				ItemName "Soda Specs"
+				"item style override" 1
+			}
+			ItemAttributes
+			{
+				ItemName "The Caffeine Cooler"
+				"item style override" 2
+			}
+			ItemAttributes
+			{
+				ItemName "Bonk Leadwear"
+				"set item tint rgb" 5322826
+			}
+		}
+		
+		Summer_Giant_Pyro_Dragon
+		{
+			Template T_TFBot_Giant_Pyro
+			Name "Flame-Broiled Fisherman"
+			ClassIcon pyro_dragon_fury_swordstone
+			Item "The Dragon's Fury"
+			Item "Reel Fly Hat"
+			Item "Water Waders"
+			Item "Hook Line and Cinder"
+			MaxVisionRange 700
+			ItemAttributes
+			{
+				ItemName "The Dragon's Fury"
+				"Paintkit_proto_def_index" 390 //
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x2d1dfc0a"
+				"custom_paintkit_seed_hi" "x7366ae05"
+			}
+		}
+		
+		//A slightly weaker burst fire soldier, suitable for intermediate missions.
+		Summer_Soldier_Burst
+		{
+			Class Soldier
+			Name "Bunker Buster Soldier"
+			Skill Normal
+			MaxVisionRange 1200
+			ClassIcon soldier_burstfire
+			Item "The Air Strike"
+			Item "The B.A.S.E. Jumper" //I'm keeping this just because it looks nice
+			Item "The Cross-Comm Crash Helmet"
+			Item "Soldier's Sparkplug"
+			// Item "The Patriot's Pouches" Needs replacing! --> Flakcatcher?
+			Item "Wavefinder"
+			Attributes HoldFireUntilFullReload //Verify that this works
+			ItemAttributes
+			{
+				ItemName "The Air Strike"
+				"Paintkit_proto_def_index" 414 //Bomb Carrier
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x2db751a9"
+				"custom_paintkit_seed_hi" "x11c0d1a"
+				
+				"fire rate bonus" 0.5
+				"rocketjump attackrate bonus" 1
+				"projectile spread angle penalty" 1.5
+			}
+			ItemAttributes
+			{
+				ItemName "The Patriot's Pouches"
+				"item style override" 1
+			}
+		}
+		//A rafmod-dependent Air Strike-wielding rocketjumping soldier!
+		//Unfortunately, RocketJump behavior is...kind of complex and weird.
+		Summer_Soldier_Parachute
+		{
+			Class Soldier
+			Name "Bunker Buster Soldier"
+			Skill Normal
+			MaxVisionRange 1200
+			ClassIcon soldier_airstrike_para
+			Item "The Air Strike"
+			Item "The B.A.S.E. Jumper"
+			Item "The Cross-Comm Crash Helmet"
+			Item "Soldier's Sparkplug"
+			// Item "The Patriot's Pouches" Needs replacing! --> Flakcatcher?
+			Item "Wavefinder"
+			Attributes Parachute
+			// RocketJump 2  
+			ItemAttributes
+			{
+				ItemName "The Air Strike"
+				"Paintkit_proto_def_index" 414 //Bomb Carrier
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x2db751a9"
+				"custom_paintkit_seed_hi" "x11c0d1a"
+				"rocket jump damage reduction" 0.01
+				"self dmg push force increased" 1.5
+			}
+			ItemAttributes
+			{
+				ItemName "The Patriot's Pouches"
+				"item style override" 1
+			}
+		}
+		
+		Summer_Pyro
+		{
+			Class Pyro
+			Name "Grease Fryer Pyro"
+			Skill Normal
+			Item "Employee of the Mmmph"
+			Item "The Frymaster"
+			Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_FLAMETHROWER"
+				"Paintkit_proto_def_index" 205 //Fire Glazed
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x52bd18ef"
+				"custom_paintkit_seed_hi" "x76aecc74"
+				"airblast disabled" 1
+			}
+		}
+		
+		Summer_Pyro_Gas
+		{
+			Class Pyro
+			Name "Grease Fire Pyro"
+			Skill Normal
+			ClassIcon pyro_gascann
+			Item "The Gas Passer"
+			Item "Connoisseur's Cap"
+			Item "The Frymaster"
+			WeaponRestrictions SecondaryOnly
+			Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_FLAMETHROWER"
+				"Paintkit_proto_def_index" 205 //Fire Glazed
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x52bd18ef"
+				"custom_paintkit_seed_hi" "x76aecc74"
+				"airblast disabled" 1
+			}
+			ItemAttributes
+			{
+				ItemName "The Gas Passer"
+				"item_meter_charge_rate" 5
+			}
+		}
+		
+		Summer_Heavy_Heater
+		{
+			Class Heavyweapons
+			Name "A-Nahuatl-Ator Heavy"
+			Skill Normal
+			ClassIcon heavy_heater_nys
+			Item "The Huo Long Heatmaker"
+			Item "The Aztec Aggressor"
+			Item "Deity's Dress"
+			WeaponRestrictions PrimaryOnly
+		}
+		
+		Summer_Chief_Heavy_Sandvich
+		{
+			Template T_TFBot_Giant_Heavyweapons
+			Name "Chief Picnic Heavy"
+			Attributes UseBossHealthBar
+			Health 12000
+			WeaponRestrictions MeleeOnly
+			Item "Upgradeable TF_WEAPON_MINIGUN"
+			// Item "The Robo-Sandvich"
+			Item "Gloves of Running Urgently MvM"
+			Item "Snack Stack"
+			Item "The Sandvich Safe"
+			// Item "Graybanns"
+			ClassIcon heavy_robosandvich_nys_gru
+			Tag "popext_usehumananims"
+			Tag "sandvich"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_MINIGUN"
+				"damage bonus" 1.2
+				"Paintkit_proto_def_index" 230
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x79289810"
+				"custom_paintkit_seed_hi" "x3963a4d3"
+			}
+			ItemAttributes
+			{
+				ItemName "Graybanns"
+				"set item tint rgb" 5801378
+			}
+		}
+		
+		Summer_Giant_Demo_Golfer
+		{
+			Template T_TFBot_Giant_Demo_RapidFire
+			Name "Q-School Dropout"
+			Item "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+			Item "Tam O'Shanter"
+			Item "The Tartantaloons"
+			Item "The Gaelic Golf Bag"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+				"fire rate bonus" 0.5
+				"faster reload rate" 0.5
+				"Paintkit_proto_def_index" 122
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x2d1dfc0a"
+				"custom_paintkit_seed_hi" "x7366ae05"
+			}
+			CharacterAttributes
+			{ 
+				"damage force reduction" 0.5 
+			}
+		}
+		
+		///////////////////////////////////////////////////////////////////
+        ///////////////////////        Halloween Bots        //////////////
+        ///////////////////////////////////////////////////////////////////
+		
+		Halloween_Scout_Melee
+		{
+			Template T_TFBot_Scout_Melee
+			Name "Tomb Raider Scout"
+			ClassIcon scout_bat_nys
+			Item "Zombie Scout"
+			Item "Wrap Battler"
+			Item "B-ankh!"
+			Item "Futankhamun"
+			Tag "popext_usehumanmodel"
+			// NoIdleSound 1  
+			CharacterAttributes
+			{
+				"override footstep sound set" 0
+			}
+		}
+		Halloween_Scout_Popper
+		{
+			Class Scout
+			Name "Jumping Jackal"
+			Skill Normal
+			ClassIcon scout_popper2
+			Item "The Soda Popper"
+			Item "The Baphomet Trotters"
+			Item "The Crown of the Old Kingdom"
+			Item "Hundekopf"
+			Tag "popext_usehumanmodel"
+			ItemAttributes
+			{
+				ItemName "The Soda Popper"
+				"Set_item_texture_wear" 0
+				"paintkit_proto_def_index" 268 //Mummified Mimic
+				"custom_paintkit_seed_lo" "x5da92e48"
+				"custom_paintkit_seed_hi" "x58a7eaed"
+			}
+			ItemAttributes
+			{
+				ItemName "Hundekopf"
+				"set item tint RGB" "1315860" //Distinct Lack Of Hue, AKA black
+			}
+			CharacterAttributes
+			{
+				"override footstep sound set" 0
+			}
+		}
+		Halloween_Scout_Fast
+		{
+			Class Scout
+			Name "Grave-Robbin' Ruffian"
+			ClassIcon scout_giant_fast
+			Health 350
+			Scale 1.3
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			Item "Head Hunter"
+			Item "Claws And Infect"
+			Item "Crazy Legs"
+			Item "Ghost of Spies Checked Past"
+			Item "Unarmed Combat"
+			Tag "popext_usehumanmodel"
+			// NoIdleSound 1  
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"Paintkit_proto_def_index" 255
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x7ca81e04"
+				"custom_paintkit_seed_hi" "x37d7ac01"
+			}
+			CharacterAttributes
+			{
+				"override footstep sound set" 0
+				"move speed bonus" 1.3
+			}
+		}
+		
+		Halloween_Demo_Fist
+		{
+			Class Demoman
+			ClassIcon heavy_fist_nys //temp; final may be demo_fast //we might need a more suitable icon for this
+			Name "Creature of the Night"
+			Skill Hard
+			// Tag "popext_giveweapon|tf_weapon_fists|5" //Fists
+			Tag "popext_customweaponmodel|models/empty.mdl"
+			Tag "wolfhair"
+			Item "Hair of the Dog"
+			Item "Scottish Snarl"
+			Item "Pickled Paws"
+			Item "Dynamite Abs"
+			Item "TF_WEAPON_FISTS"  
+			WeaponRestrictions MeleeOnly
+			CharacterAttributes
+			{
+				"move speed bonus" 1.4
+			}
+			Template Human_Generic
+		}
+		
+		Halloween_Spy
+		{
+			Class Spy
+			Skill Expert
+			Name "All-Seeing Spy"
+			Item "Upgradeable TF_WEAPON_KNIFE"
+			Item "Six-Eyed Specs"
+			Item "Spyder"
+			Item "Terror-antula"
+			Item "Creepy Crawlers"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_KNIFE"
+				"Paintkit_proto_def_index" 269
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x335c0c4c"
+				"custom_paintkit_seed_hi" "x68faa0ef"
+			}
+			Template Zombie_Spy
+		}
+		
+		
+		Halloween_Giant_Demoknight_Fireball
+		{
+			Class Demoman
+			ClassIcon demoknight_fireball
+			Name "Buried Emperor Demoknight"
+			Skill Expert
+			Health 3300
+			//Cosmetics - bopped
+			Item "Forgotten King's Restless Head"
+			Item "Forgotten King's Pauldrons"
+			Item "The Horsemann's Hand-Me-Down"
+			Item "The Dark Age Defender"
+			Item "The Sole Saviors"
+
+			//Items
+			Tag "popext_stripslot|0|0" //Remove booties
+			Tag "fireball_knight"
+			//does this stripslot thing even work with only one argument???
+			Item "The Splendid Screen" //Chargin Targe gives too more beefyness
+			Item "The Eyelander"
+			Item "TF_WEAPON_SPELLBOOK"
+
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "The Eyelander"
+				"critboost on kill" 3
+				"attach particle effect" 1
+				"Set DamageType Ignite" 1
+				"deploy time decreased" 0.01
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SPELLBOOK"
+				"deploy time decreased" 0.01
+				"fire rate bonus" 0.01    
+				"projectile spread angle penalty" 4
+				"dmg penalty vs players" 0.75
+				"Projectile speed increased" 0.7
+			}
+			Tag "popext_spell|0|5|3" // Gives specified spell to bots. 0 = Fireball|cooldown|delay
+			// Tag "popext_homingprojectile|15|0.7" / Very, very laggy. May not be worth it :<
+			CharacterAttributes
+			{
+				"move speed bonus" 0.5
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4
+			}
+			Template Zombie_Demo
+		}
+		
+		Halloween_Giant_Heavy_Shotgun
+		{
+			Template T_TFBot_Giant_Heavyweapons
+			Name "Tsar Caesarion"
+			ClassIcon heavy_shotgun_burst_lite
+			Item "Zombie Heavy"
+			Item "TF_WEAPON_SHOTGUN_HWG"
+			Item "The Crown of the Old Kingdom"
+			Item "Kapitan's Kaftan"
+			WeaponRestrictions SecondaryOnly
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SHOTGUN_HWG"
+				//can't have skins on shotguns cause they refuse attributes then 8|
+				// "Paintkit_proto_def_index" 163
+				// "Set_item_texture_wear" 0
+				// "custom_paintkit_seed_lo" "x38f5b2c5"
+				// "custom_paintkit_seed_hi" "x6271e027"
+				
+				"bullets per shot bonus" 2 //might already be overkill, but let's pretend it's not.
+				"fire rate bonus" 0.25
+				"faster reload rate" 0.65
+				"auto fires when full" 1
+				"auto fires full clip" 1
+				// "clip size penalty" 0.67
+			}
+			Tag "popext_usehumanmodel"
+			CharacterAttributes
+			{
+				"override footstep sound set" 0
+			}
+		}
+		
+		Halloween_Giant_Medic_Shield
+		{
+			Template T_TFBot_Giant_Medic
+			Name "Expired Warranty Shield Medic"
+			ClassIcon medic_shield
+			Item "Upgradeable TF_WEAPON_MEDIGUN"
+			Item "Teutonkahmun"
+			Item "Ramses' Regalia"
+			Item "Zombie Medic"
+			Attributes ProjectileShield
+			Tag destructible_shield
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_MEDIGUN"
+				"generate rage on heal" 2
+				"increase buff duration" 9.0
+				"Paintkit_proto_def_index" 268
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x7002f11e"
+				"custom_paintkit_seed_hi" "x1258367e"
+			}
+			Tag "popext_usehumanmodel"
+			// NoIdleSound 1  
+			CharacterAttributes
+			{
+				"bot medic uber deploy delay duration" 99
+				"override footstep sound set" 0
+			}
+		}
+		
+		///////////////////////////////////////////////////////////////////
+        ///////////////////////        Mix Robots        //////////////////
+        ///////////////////////////////////////////////////////////////////
+		Mix_Pyro_Flamedeer
+		{
+			Class Pyro
+            Name "Flightless Flamedeer"
+			ClassIcon pyro_backburner_nys
+			Skill Hard
+			Item "Festive Backburner 2014"
+            Item "Pyro the Flamedeer"
+            Item "Sweet Smissmas Sweater"
+            Item "The Trail-Blazer"
+			Attributes AlwaysFireWeapon
+			Template "Human_Generic"
+		}
+		Mix_Pyro_Reindeer
+		{
+			Class Pyro
+            Name "Learner's Permit Flamedeer"
+			ClassIcon pyro_flare
+			Scale 1.4
+			Health 650
+			Skill Hard
+			Item "Festive Flare Gun"
+            Item "Pyro the Flamedeer"
+            Item "Flammable Favor"
+            Item "Festive Flip-thwomps"
+            Item "Ominous Offering"
+			WeaponRestrictions SecondaryOnly
+			Template "Human_Generic"
+			ItemAttributes
+			{
+				ItemName "Festive Flare Gun"
+				"faster reload rate" 0.5
+			}
+			CharacterAttributes
+			{
+				"health regen" 1
+			}
+		}
+		Mix_Pyro_Reindeer_Melee
+		{
+			Class Pyro
+            Name "Learner's Permit Flamedeer"
+			ClassIcon objector_lite
+			Scale 1.4
+			Health 650
+			Skill Hard
+			Tag "popext_giveweapon|tf_weapon_fireaxe|474"
+			Tag "learnerspermit"
+			Item "The Conscientious Objector"
+            Item "Pyro the Flamedeer"
+            Item "Flammable Favor"
+            Item "Festive Flip-thwomps"
+            Item "Ominous Offering"
+			WeaponRestrictions MeleeOnly
+			Template "Human_Generic"
+			ItemAttributes
+			{
+				ItemName "The Conscientious Objector"
+				"custom texture hi" "1.5604179093481017e-18"
+				"custom texture lo" "-4.403380311492439e+25"
+			}
+			CharacterAttributes
+			{
+				"health regen" 1
+			}
+		}
+		Mix_Pyro_Neon_Minigiant
+		{
+			Class Pyro
+			Name "Gone Fission Pyroshark"
+			ClassIcon pyro_neon
+			Scale 1.4
+			Health 650
+			Skill Hard
+			Item "The Neon Annihilator"
+			Item "Pyro Shark"
+			Item "Partizan"
+			Item "Water Waders"
+			Item "Hook Line and Cinder"
+			WeaponRestrictions MeleeOnly
+			Template "Human_Generic"
+			CharacterAttributes
+			{
+				"health regen" 1
+			}
+		}
+		Mix_Demo_Milkman
+        {
+            Class Demoman
+            Name "Milkman Demo"
+			ClassIcon demo_milky
+            Skill Hard
+            Item "The Milkman"
+            Item "Manndatory Attire"
+            Item "Catastrophic Companions"
+			Item "Upgradeable TF_WEAPON_GRENADELAUNCHER" 
+			Attributes HoldFireUntilFullReload
+			Tag "milkdemo"
+			//Until someone fixes this
+			// Tag "popext_customattr|add cond on hit|[27,6]"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+				"paintkit_proto_def_index" 130 //bovine blazemaker bc I am very funny
+				"set_item_texture_wear" 0
+				
+				// "damage penalty" 0.65
+				// "fire rate bonus" 0.1
+				// "reload time increased" 1.3
+				// "clip size penalty" 0.75
+				// "projectile spread angle penalty" 2
+				
+				"blast radius decreased" 0.75
+				"custom projectile model" "models/weapons/c_models/c_madmilk/c_madmilk.mdl"
+				
+				//Can't have these in vanilla. Sad!
+				"explosion particle" "peejar_impact_milk" [$SIGSEGV]
+				"projectile trail particle" "~peejar_trail_blu" [$SIGSEGV]
+				"custom impact sound" "=35|weapons/jar_explode.wav" [$SIGSEGV]
+			}
+        }
+		Mix_Demoknight_Fireball_Minigiant
+		{
+			Class Demoman
+			ClassIcon demoknight_fireball
+			Name "Wise Mage Demoknight"
+			Skill Expert
+			Scale 1.4
+			Health 650 // if we're going to be spammy with these, I've given them half health for now
+			//Cosmetics
+			Item "Nightbane Brim"
+			Item "Dynamite Abs"
+			Item "Unforgiven Glory"
+			Item "Batter's Bracers"
+			Item "The Sole Saviors"
+
+			//Items
+			Tag "popext_stripslot|0|0" //Remove booties
+			Tag "fireball_knight"
+			Tag "popext_spell|0|10|3"
+			Item "The Splendid Screen" //Chargin Targe gives too more beefyness
+			Item "The Eyelander"
+			Item "TF_WEAPON_SPELLBOOK"
+			
+			ItemAttributes
+			{
+				ItemName "Dynamite Abs"
+				"item style override" 1
+			}
+			ItemAttributes
+			{
+				ItemName "The Eyelander"
+				"critboost on kill" 3
+				"attach particle effect" 1
+				"Set DamageType Ignite" 1
+				"deploy time decreased" 0.01
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SPELLBOOK"
+				"deploy time decreased" 0.01
+				"fire rate bonus" 0.01    
+				"projectile spread angle penalty" 4
+				"dmg penalty vs players" 0.5
+				"Projectile speed increased" 0.7
+			}
+			CharacterAttributes
+			{
+				"health regen" 1
+			}
+			Template "Human_Generic" // not Zombie_Demo because the Unforgiven Glory is skin toned
+		}
+		
+		Mix_Heavy_Spider_Tosser
+		{
+			Class Heavyweapons
+			ClassIcon heavy_rocket
+			Name "Siberian Singoriensis"
+			Skill Expert
+			Scale 1.4
+			Health 650
+			Tag "spiderheavy"
+			Item "The Spooky Sleeves"
+			Item "The Bone Cone"
+			Item "Creepy Crawlers"
+			Item "harvest_minigun_macabreweb"
+			// Tag "popext_customattr|custom projectile model|models/props_halloween/smlprop_spider.mdl"
+			MaxVisionRange 1200
+			ItemAttributes
+			{
+				ItemName "harvest_minigun_macabreweb"
+				"no self blast dmg" 2
+				"blast radius decreased" 0.05
+				"override projectile type" 2
+				"projectile speed decreased" 0.65
+				"fire rate penalty" 4.5
+				"damage bonus" 7
+				"centerfire projectile" 1
+				"health regen" 1
+			}
+			ItemAttributes
+			{
+				ItemName "Creepy Crawlers"
+				"item style override" 1
+			}
+			Template Zombie_Heavy
+		}
+		
+		Mix_Medic_Milk_Syringe
+		{
+			Class Medic
+			Name "Lactic Lifesaver"
+			ClassIcon medic_syringe_milk2
+			Skill Hard
+			Item "Upgradeable TF_WEAPON_SYRINGEGUN_MEDIC"
+			Item "The Milkman"
+			Item "The Jarmaments"
+			WeaponRestrictions PrimaryOnly
+			Action FetchFlag [$SIGSEGV]
+			// Tag "popext_aimat|flag" //was AimAt Body; flag is approx at the same spot.
+			// AimOffset "0 0 10"  
+			// AimLeadProjectileSpeed 1100   //overaims slightly
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SYRINGEGUN_MEDIC"
+				"mad milk syringes" 1
+			}
+			ItemAttributes
+			{
+				ItemName "The Jarmaments"
+				"set item tint RGB" 15132390
+			}
+		}
+		
+		Mix_Sniper_Jarcher
+		{
+			Template T_TFBot_Sniper_Huntsman
+			Name "Jarcher Bowman"
+			ClassIcon sniper_bow_jarate
+			Item "The Huntsman's Essentials"
+			Item "Sniper's Snipin' Glass"
+			Item "The Jarmaments"
+			Tag "Jarcher"
+			//Until someone fixes this
+			// Tag "popext_addcondonhit|24|4"
+			ItemAttributes
+			{
+				ItemName "The Huntsman"
+				"damage bonus" 0.5
+			}
+		}
+		
+		Mix_Spy
+		{
+			Class Spy
+			Skill Expert
+			Name "Holy Savior Spy"
+			Item "Upgradeable TF_WEAPON_KNIFE"
+			Item "Honest Halo"
+			Item "The Exorcizor"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_KNIFE"
+				"Paintkit_proto_def_index" 242
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x51d17103"
+				"custom_paintkit_seed_hi" "x6efaa1ba"
+			}
+			ItemAttributes
+			{
+				ItemName "Honest Halo"
+				"attach particle effect" 5
+			}
+			Template Zombie_Spy
+		}
+		
+		Mix_Giant_Scout_Jester
+		{
+			Class Scout
+			Name "Masquerade Menace"
+			Health 1600
+			Skill Expert
+			Attributes MiniBoss
+			ClassIcon scout_giant
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			Item "Pestering Jester"
+			Item "The Last Laugh"
+			Item "Jumping Jester"
+			Item "B'aaarrgh-n-Britches"
+			Tag "popext_usehumanmodel"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"Paintkit_proto_def_index" 271
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x27d68a84"
+				"custom_paintkit_seed_hi" "x375437dd"
+			}
+			CharacterAttributes
+			{
+				"override footstep sound set" 5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+			}
+		}
+		Mix_Giant_Scout_Jester_Alt
+		{
+			Class Scout
+			Name "Lowbrow Fooler"
+			Health 1600
+			Skill Expert
+			Attributes MiniBoss
+			ClassIcon scout_giant
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			Item "Pestering Jester"
+			Item "The Last Laugh"
+			Item "Jumping Jester"
+			Item "The Boom Boxers"
+			Tag "popext_usehumanmodel"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"Paintkit_proto_def_index" 271
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x27d68a84"
+				"custom_paintkit_seed_hi" "x375437dd"
+			}
+			CharacterAttributes
+			{
+				"override footstep sound set" 5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+			}
+		}
+		Mix_Giant_Demo_Neon
+		{
+			Template T_TFBot_Giant_Demoman
+			ClassIcon demo_burst_neon
+			Name "Giant Caution Sign Demoman"
+			Item "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+			Item "Hazard Headgear"
+			// Item "Stunt Suit" //TODO: new coat?
+			// Item "Mad Lad"
+			Item "The Gas Guzzler"
+			Tag "neondemo"
+			// Tag "popext_customattr|projectile gravity|200"
+			// Tag "popext_aimat" / changed to Tag, was AimAt Head
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+				"Paintkit_proto_def_index" 226
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x5c015aff"
+				"custom_paintkit_seed_hi" "x135bc923"
+				"override projectile type" 18 //Rescue Ranger Claw
+				// "remove damage type" 536870912  
+				// "add damage type" 64   //Sets damage type to blast instead of bullet.
+				// "weapon never gib" 1  
+				
+				// "damage penalty" 0.65  //Now that they deal no melee damage, no real reason to nerf their damage anymore.
+				"fire rate bonus" 0.25
+				"faster reload rate" 0.6
+				"clip size bonus" 2.5
+				"crit vs wet players" 1
+				"projectile spread angle penalty" 4
+				// "projectile gravity" 200  
+				// "arrow hit kill time" 0.1  
+				
+				"custom projectile model" "models/weapons/w_models/w_drg_ball.mdl"
+				"custom kill icon" "annihilator" [$SIGSEGV]
+				"ragdolls plasma effect" 1
+			}
+			// Tag "popext_fireweapon" / changed to Tag, didn't modify below
+			ItemAttributes
+			{
+				ItemName "Stunt Suit"
+				"item style override" 2
+			}
+			ItemAttributes
+			{
+				ItemName "Mad Lad"
+				"item style override" 1
+			}
+		}
+		
+		Mix_Giant_Heavy_Santa
+		{
+			Template T_TFBot_Giant_Heavyweapons
+			Name "Deadly Morozko"
+			ClassIcon heavy_critcan_fix //critcan only has a stupid lil spot on it!
+			Item "Upgradeable TF_WEAPON_MINIGUN"
+			Item "The B.M.O.C."
+			Item "The All-Father"
+			Item "Reader's Choice"
+			// Item "The Gift Bringer" //broken on robots -- use human bodygroups mod, figure something else out, or get rid of this one
+			Tag "santa"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_MINIGUN"
+				"Paintkit_proto_def_index" 254
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x6a14aae"
+				"custom_paintkit_seed_hi" "x6aaf70bb"
+				"is_festivized" 1
+				"damage bonus" 1.5
+			}
+		}
+		
+		///////////////////////////////////////////////////////////////////
+        ///////////////////////      Invasion Robots    ///////////////////
+        ///////////////////////////////////////////////////////////////////
+		Invasion_Giant_Pyro_Flare_Rain
+		{
+			Class Pyro
+			Name "Fire Nation Colonel"
+			Health 3300
+			MaxVisionRange 1200
+			ClassIcon pyro_flare_rain_nys
+			Skill Hard
+			Attributes MiniBoss
+			WeaponRestrictions SecondaryOnly
+			// Tag "popext_aimat|head"
+			Item "The Flare Gun"
+			Item "Brim of Fire"
+			Item "Propaniac"
+			Item "The Sengoku Scorcher"
+			Item "The Flame Warrior"
+			CharacterAttributes
+			{
+				"move speed bonus" 0.5
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 6
+				"damage force reduction" 0.5
+			}
+			ItemAttributes
+			{
+				ItemName "The Flare Gun"
+				"fire rate bonus" 0.075
+				"projectile spread angle penalty" 5
+				"projectile speed decreased" 0.45
+				// "damage bonus" 1.5
+			}
+		}
+		Invasion_Medic_Armored
+		{
+			Template T_TFBot_Medic
+			Name "Armored Medic"
+			Health 600
+			Scale 1.3
+			ClassIcon medic_uber_armored //idk what the diff is but I trust lite a little more
+			Item "The Physician's Protector"
+			Item "The Vascular Vestment"
+			Item "The Medicine Manpurse"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_MEDIGUN"
+				"heal rate bonus" 25
+			}
+		}
+		
+		Invasion_Giant_Engineer_Widowmaker
+		{
+			Class Engineer
+			Name "Giant Metal Draining Engineer"
+			Health 3000
+			Skill Hard
+			ClassIcon engineer_widowmaker_nys
+			Attributes MiniBoss
+			// Action FetchFlag  
+			Item "The Widowmaker"
+			Item "Head Of Defense"
+			Item "Brain Interface"
+			Item "The Sightliner"
+			Item "Aim Assistant"
+			Item "Iron Lung"
+			ItemAttributes
+			{
+				ItemName "The Widowmaker"
+				"bullets per shot bonus" 1.5 //A small boost to make 'm a little more threatening
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"    0.5
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4
+				"voice pitch scale" 0 //no humane voices
+			}
+		}
+		
+		Invasion_Scout_Shortstop
+		{
+			Class Scout
+			Name "Underprepped Shortstop Scout"
+			Skill Normal
+			ClassIcon scout_shortstop
+			Item "The Shortstop"
+			Item "Antarctic Eyewear"
+			Item "The Flapjack"
+			Item "The Bootenkhamuns"
+			MaxVisionRange 950
+			Attributes AlwaysCrit
+			ItemAttributes
+			{
+				ItemName "The Shortstop"
+				"Paintkit_proto_def_index" 114
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x35a7ad32"
+				"custom_paintkit_seed_hi" "x2d0b2fc9"
+				"fire rate penalty" 2
+				"damage penalty" 0.75
+			}
+		}
+		Invasion_Scout_Shortstop_Minigiant
+		{
+			Template T_TFBot_Scout_Shortstop
+			Name "Overprepped Shortstop Scout"
+			Skill Normal
+			Item "The Cross-Comm Express"
+			Item "Flak Jack"
+			Item "Transparent Trousers"
+			Item "Forest Footwear"
+			
+			ItemAttributes
+			{
+				ItemName "The Shortstop"
+				"Paintkit_proto_def_index" 114
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x35a7ad32"
+				"custom_paintkit_seed_hi" "x2d0b2fc9"
+			}
+		}
+		//This thing is sort of non-functional for now.
+		Invasion_Sniper_UrbanProfessional
+		{
+			Class Sniper
+			Name "Focused Tactical Sniper"
+			Skill Hard
+			Item "The Hitman's Heatmaker"
+			Item "The Cleaner's Carbine"	
+			Item "Cranium Cover"
+			Item "Preventative Measure"
+			Item "The Doublecross-Comm"
+			Item "The Triggerman's Tacticals"
+			Tag "popext_addcond|46"
+			// Tag "popext_stripslot" / changed to Tag
+			// AddCond 46  
+			// Tag "popext_weaponswitch" / changed to Tag, didn't modify below
+			// {
+				// Delay 1
+				// Cooldown 0.5
+				// Repeats 0
+				// Type "Primary"
+				// MinTargetRange 400
+			// }
+			// WeaponSwitch  
+			// {
+				// Delay 1
+				// Cooldown 2
+				// Repeats 0
+				// Type "Secondary"
+				// MaxTargetRange 250
+			// }
+			ItemAttributes
+			{
+				ItemName "The Cleaner's Carbine"
+				// "passive reload" 1
+			}
+			ItemAttributes
+			{
+				ItemName "Cranium Cover"
+				"item style override" 1
+			}
+		}
+		
+		Invasion_Soldier_BurstFire
+		{
+			Class Soldier
+			Name "Burst Fire Soldier"
+			Skill Hard
+			Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+			Item "Soldier's Stash"	
+			Item "The Soldier's Stogie"
+			Item "The Shogun's Shoulder Guard"
+			// Item "Flakcatcher"
+			ClassIcon soldier_burstfire
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+				"Paintkit_proto_def_index" 418
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x20bdefb5"
+				"custom_paintkit_seed_hi" "x6da01a5f"
+				"fire rate bonus" 0.05
+				"Projectile spread angle penalty" 2
+				"projectile speed increased" 0.8
+				"faster reload rate" 1.4 //3.5 second reload, more or less
+				"clip size upgrade atomic" -1
+			}
+		}
+		
+		Invasion_Giant_Demoman_Commander
+		{
+			Template T_TFBot_Giant_Demoman
+			Name "Armored Commander Tavish"
+			Health 15000
+			Attributes UseBossHealthBar
+			Attributes HoldFireUntilFullReload
+			ClassIcon demo_sticky_split
+			
+			Item "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+			Item "Upgradeable TF_WEAPON_PIPEBOMBLAUNCHER"
+			Item "Blast Defense"
+			Item "Wavefinder"
+			Item "The Juggernaut Jacket"
+			Item "Blast Blocker"
+			Item "The Sangu Sleeves"
+			Item "The Scrumpy Strongbox"
+			Tag "popext_usehumananims" //Fixes animations when passive grenade launcher is not possible.
+			Tag "popext_weaponswitch|0|12|0.1"
+			Tag "popext_weaponswitch|1|12|3.6"
+			Tag "infclip"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+				"Paintkit_proto_def_index" 214
+				"Set_item_texture_wear" 0
+				"custom_paintkit_seed_lo" "x24123bb5"
+				"custom_paintkit_seed_hi" "x1d45784a"
+				
+				"faster reload rate" 0.01
+				"fire rate bonus" 0.5
+			}
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_PIPEBOMBLAUNCHER"
+				"Paintkit_proto_def_index" 226
+				"custom_paintkit_seed_lo" "x64afea3c"
+				"custom_paintkit_seed_hi" "x716fb31a"
+				"Set_item_texture_wear" 0
+				
+				"faster reload rate" 0.01
+				"fire rate bonus" 0.5
+				"max pipebombs decreased" -5
+				"stickybomb charge rate" 0.001
+				"projectile range decreased" 0.33
+			}
+		}
+		
+		///////////////////////////////////////////////////////////////////
+        ///////////////////////      Finale Robots    /////////////////////
+        ///////////////////////////////////////////////////////////////////
+		Finale_Soldier_Royal_Guard
+        {
+            Class Soldier
+            Name "Dutiful Guardsman"
+            Skill Hard
+			Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+            Item "Bobby Bonnet"
+            Item "The Classified Coif"
+            Item "The Man in Slacks"
+            Tag "popext_usehumanmodel"
+			ClassIcon soldier_spammer
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+				"faster reload rate" 0 //delicious +100%
+				"fire rate bonus" 0.625
+				"Projectile speed decreased" 0.83
+			}
+			CharacterAttributes
+			{
+				"mod weapon blocks healing" 1
+			}
+        }
+		Finale_Pyro_Tie
+        {
+            Class Pyro
+            Name "Fantasized Formality Pyro"
+			Health 650
+			Scale 1.4
+			MaxVisionRange 1200
+			Skill Hard
+			WeaponRestrictions SecondaryOnly
+			Item "The Flare Gun"
+            Item "The Burning Question"
+            Item "Pyro Monocle"
+            Item "The Soot Suit"
+            Tag "popext_usehumanmodel"
+			ClassIcon pyro_flare_rain_nys
+			ItemAttributes
+			{
+				ItemName "The Flare Gun"
+				"fire rate bonus" 0.2
+				"projectile spread angle penalty" 3
+				"projectile speed decreased" 0.4
+				"health regen" 1
+			}
+			CharacterAttributes
+			{
+				"mod weapon blocks healing" 1
+			}
+        }
+		Finale_Demo_Formal
+        {
+            Class Demoman
+            Name "Dinner Party Demo"
+            Skill Hard
+			Item "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+            Item "The Dapper Dickens"
+            Item "The Bearded Bombardier"
+            Item "The Whiskey Bib"
+            Tag "popext_usehumanmodel"
+			ClassIcon demo_spammer
+            ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+				"fire rate bonus" 0.83
+				"faster reload rate" 0
+			}
+            ItemAttributes
+            {
+                ItemName "The Dapper Dickens"
+                "item style override" 1
+            }
+            
+            ItemAttributes
+            {
+                ItemName "The Bearded Bombardier"
+                "item style override" 1
+            }
+			CharacterAttributes
+			{
+				"mod weapon blocks healing" 1
+			}
+        }
+        Finale_Medic_War_Buddy
+        {
+            Class Medic
+            Name "Lieutenant Medic"
+			ClassIcon medic_uber
+            Skill Hard
+            Item "The Patriot Peak"
+            Item "Medical Monarch"
+			Item "warbird_medigun_blitzkrieg"
+            Tag "popext_usehumanmodel"
+			Tag "the_general_medic"
+			Attributes SuppressFire //Removed upon phase 2 starting
+			Attributes IgnoreEnemies
+			ItemAttributes
+			{
+				ItemName "warbird_medigun_blitzkrieg"
+				"heal rate bonus" 10
+				"ubercharge rate bonus" 2
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.01 //Removed upon phase 2 starting
+				"no_jump" 1
+				"mod weapon blocks healing" 1
+			}
+        }
+		//You have no idea how much I still want to use this one
+		Finale_Sniper_Crocodile
+        {
+            Class Sniper
+            Name "Crocodile Hunter Mundy"
+            Skill Hard
+			Item "The Sydney Sleeper"
+			Item "Darwin's Danger Shield"
+			Item "The Bushwacka"
+            Item "Ol' Snaggletooth"
+            Item "Crocodile Dandy"
+            Item "Li'l Snaggletooth"
+            Item "Rocko"
+            Tag "popext_usehumanmodel"
+			// Tag "popext_fireweapon|"
+			CharacterAttributes
+			{
+				"mod weapon blocks healing" 1
+			}
+        }
+		Finale_Sniper_Regalia
+        {
+            Class Sniper
+            Name "High-Class Hitman"
+            Skill Expert
+			Item "The Hitman's Heatmaker"
+            Item "The Classy Capper"
+            Item "The Most Dangerous Mane"
+            Item "Rifleman's Regalia"
+            Tag "popext_usehumanmodel"
+			Tag "popext_addcond|46"
+			CharacterAttributes
+			{
+				"mod weapon blocks healing" 1
+			}
+        }
+        
+        Finale_Spy_Smoker
+        {
+            Class Spy
+            Name "Pack-a-Day Parisian"
+            Skill Hard
+            Item "Monsieur Grenouille"
+            Item "Stapler's Specs"
+            Item "Smoking Jacket"
+            Tag "popext_usehumanmodel"
+			CharacterAttributes
+			{
+				"mod weapon blocks healing" 1
+			}
+        }
+		Finale_Spy_Turncoat
+        {
+            Class Spy
+            Name "Dignified Deserter"
+            Skill Expert
+            Item "Backbiter's Billycock"
+            Item "The Au Courant Assassin"
+            Item "The Turncoat"
+			Item "gentlemanne_knife_dressedtokill"
+            Tag "popext_usehumanmodel"
+			CharacterAttributes
+			{
+				"mod weapon blocks healing" 1
+			}
+        }
+		Finale_Chief_General
+		{
+			Name "The Honorbound General"
+			Class Heavy
+			Skill Expert
+			Health 52000
+			ClassIcon heavy_ultimate_v2 //temp icon of sorts
+			Attributes UseBossHealthBar
+			Attributes SuppressFire
+			Attributes MiniBoss
+			Tag "the_general"
+			
+			Item "Commissar's Coat"
+			Item "Wiki Cap"
+			Item "The Cuban Bristle Crisis"
+			Item "Sledder's Sidekick"
+			Item "gentlemanne_minigun_topshelf"
+			NoIdleSound 1 [$SIGSEGV]
+			ItemAttributes
+			{
+				ItemName "gentlemanne_minigun_topshelf"
+				"damage bonus" 1.5
+				"set_item_texture_wear" 0
+			}
+			CharacterAttributes
+			{
+				"rage giving scale" 0.2
+				"move speed penalty" 0.45
+				"damage force reduction" 0.1
+				"airblast vulnerability multiplier" 0.1
+				"airblast vertical vulnerability multiplier" 0.1
+			}
+			ItemAttributes
+			{
+				ItemName "Sledder's Sidekick"
+				"set item tint RGB" 15423247
+			}
+			//To be implemented if a proper mod for war paints is re-instated into Potato.tf servers
+			// Item "Upgradeable TF_WEAPON_MINIGUN"
+			// ItemAttributes
+			// {
+				// ItemName "Upgradeable TF_WEAPON_MINIGUN"
+				// "Paintkit_proto_def_index" 77			//Top Shelf
+				// "Set_item_texture_wear" 0
+				// "custom_paintkit_seed_lo" "x704d6f3"	//Specifies skin placement
+				// "custom_paintkit_seed_hi" "x1"
+			// }
+		}
+		
+		///////////////////////////////////////////////////////////////////
+        ///////////////////////      Other Robots    //////////////////////
+        
+        Bonus_Scout_Tie
+        {
+            Class Scout
+            Name "Black Tie Bostonian"
+            Skill Hard
+            Item "The Pomade Prince"
+            Item "The Frenchman's Formals"
+            Item "The Argyle Ace"
+            Tag "popext_usehumanmodel"
+            
+            ItemAttributes
+            {
+                ItemName "The Frenchman's Formals"
+                "item style override" 1
+            }
+        }
+        
+		Bonus_Engineer_Detective
+        {
+            Class Engineer
+            Name "Detective Dell"
+            Skill Hard
+            Item "Clue Hairdo"
+            Item "Sleuth Suit"
+            Tag "popext_usehumanmodel"
+            
+            ItemAttributes
+            {
+                ItemName "Sleuth Suit"
+                "item style override" 2
+            }
+        }
+	}
+	
+	Mission	// Sentry Busters - Wave 1
+	{
+		Objective DestroySentries
+
+		InitialCooldown 15
+		Where spawnbot_mission_sentry_buster
+		BeginAtWave 1
+		RunForThisManyWaves 1
+		CooldownTime 30
+
+		TFBot
+        {
+            Template T_TFBot_SentryBuster
+            Name "Santa's Little Helper"
+            Item "Elf Esteem"
+            Scale 0.9 // form factor - whole bot scale
+            
+            CharacterAttributes
+            {
+                "head scale"  2.8 // head size for hat
+                "torso scale" 0.2 // torso length
+            }
+        }
+	}
+	
+	Mission	// Sentry Busters - Wave 2
+	{
+		Objective DestroySentries
+
+		InitialCooldown 15
+		Where spawnbot_mission_sentry_buster
+		BeginAtWave 2
+		RunForThisManyWaves 1
+		CooldownTime 30
+
+        TFBot
+        {
+            Template T_TFBot_SentryBuster
+            Name "Sunbathing Buster"
+            Item "Summer Hat"
+            
+            ItemAttributes
+            {
+                ItemName "Summer Hat"
+                "item style override" 1
+            }
+            
+            CharacterAttributes
+            {
+                "head scale"  3.0
+                "torso scale" 0.5
+            }
+        }
+	}
+	
+	Mission	// Sentry Busters - Wave 3
+	{
+		Objective DestroySentries
+
+		InitialCooldown 15
+		Where spawnbot_mission_sentry_buster
+		BeginAtWave 3
+		RunForThisManyWaves 1
+		CooldownTime 30
+
+        TFBot
+        {
+            Template T_TFBot_SentryBuster
+            Name "Pumpkin Bomber"
+            Item "Horseless Headless Horseman's Head"
+            
+            CharacterAttributes
+            {
+                "head scale"  2.8
+                "torso scale" 0.5
+            }
+        }
+	}
+	
+	Mission	// Sentry Busters - Wave 4
+	{
+		Objective DestroySentries
+
+		InitialCooldown 15
+		Where spawnbot_mission_sentry_buster
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		CooldownTime 30
+
+        TFBot
+        {
+            Template T_TFBot_SentryBuster
+            Name "The Punchline"
+            Item "The Marxman"
+            
+            CharacterAttributes
+            {
+                "head scale"  2.8
+                "torso scale" 0.1
+            }
+        }
+	}
+	
+	Mission	// Sentry Busters - Wave 5
+	{
+		Objective DestroySentries
+
+		InitialCooldown 15
+		Where spawnbot_mission_sentry_buster
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		CooldownTime 30
+
+        TFBot
+        {
+            Template T_TFBot_SentryBuster
+            Name "EOD Specialist"
+            Item "Head Banger"
+            
+            CharacterAttributes
+            {
+                "head scale"  2.8
+                "torso scale" 0.1
+            }
+        }
+	}
+	
+	Mission	// Sentry Busters - Wave 6
+	{
+		Objective DestroySentries
+
+		InitialCooldown 15
+		Where spawnbot_mission_sentry_buster
+		BeginAtWave 6
+		RunForThisManyWaves 1
+		CooldownTime 30
+
+        TFBot
+        {
+            Template T_TFBot_SentryBuster
+            Name "Sergeant Buster"
+            Item "Full Metal Drill Hat"
+            
+            CharacterAttributes
+            {
+                "head scale"  1.7
+                "torso scale" 0.5
+            }
+        }
+	}
+	
+	Mission	// Jarcher Sniper, wave 4
+	{
+		Objective Sniper
+
+		InitialCooldown 60
+		Where spawnbot_mission_sniper
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		CooldownTime 30
+		DesiredCount 2
+
+		TFBot
+		{
+			Template Mix_Sniper_Jarcher
+		}
+	}
+	Mission	// Professional Sniper, wave 5
+	{
+		Objective Sniper
+
+		InitialCooldown 60
+		Where spawnbot_mission_sniper
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		CooldownTime 30
+		DesiredCount 2
+
+		TFBot
+		{
+			Template Invasion_Sniper_UrbanProfessional
+		}
+	}
+	Mission	// Formal Sniper, wave 6
+	{
+		Objective Sniper
+
+		InitialCooldown 10
+		Where spawnbot_mission_sniper
+		BeginAtWave 6
+		RunForThisManyWaves 1
+		CooldownTime 30
+		DesiredCount 2
+
+		TFBot
+		{
+			Template Finale_Sniper_Regalia
+		}
+	}
+	Mission	// Formal Spy, wave 6
+	{
+		Objective Sniper
+
+		InitialCooldown 15
+		Where spawnbot_mission_spy
+		BeginAtWave 6
+		RunForThisManyWaves 1
+		CooldownTime 20
+		DesiredCount 1
+
+		TFBot
+		{
+			Template Finale_Spy_Smoker
+		}
+	}
+	
+	    ///////////////////////////////////////////////////////////////////
+        ///////////////////////   WAVE 1: COLD WAR      ///////////////////
+        ///////////////////////////////////////////////////////////////////
+	
+	//Subwave 1 - Explosions, deadly or white
+	//- Giant Stickybomb Demo
+	//- Neon Pyros (minigiant)
+	//- Milk Scouts (melee / gun)
+	
+	//Subwave 2 - Alternative Milk Solutions
+	//- Giant Milk Syringe Medic (3.5k hp!)
+	//- Neon Pyros (minigiant)
+	
+	//Subwave 3 - Explosions, highly localized
+	//- Giant DHit Soldier + QFix Medics
+	//- Pyro (no airblast)
+	
+	//Support: non-minigiant mixed with minigiant Neon Pyros
+
+
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target "gamerules"
+			Action "RunScriptCode"
+			Param "
+IncludeScript(`popextensions_main.nut`, getroottable())
+MissionAttrs({
+`ForceHoliday` : 2
+`NoCrumpkins` : 1
+`NoThrillerTaunt` : 1
+})
+PopExt.AddRobotTag(`leave_squad`,
+{
+	OnSpawn = function(bot,tag)
+	{
+		bot.LeaveSquad();
+	}
+})
+PopExt.AddRobotTag(`disband_squad`,
+{
+	OnSpawn = function(bot,tag)
+	{
+		bot.DisbandCurrentSquad();
+	}
+})
+::CalendartillerySkybox <- {
+    Cleanup = function() {
+        SetSkyboxTexture(`sky_trainyard_01`)
+        delete ::CalendartillerySkybox
+    }
+    OnGameEvent_recalculate_holidays = function(_) { if (GetRoundState() == 3) Cleanup() }
+    OnGameEvent_mvm_wave_complete = function(_) { Cleanup() }
+}
+__CollectGameEventCallbacks(CalendartillerySkybox)
+SetSkyboxTexture(`sky_morningsnow_01`)
+//This is a little ugly, but Info() is not cooperating.
+ClientPrint(null,3,`\x07F1C232The General \x078FCE00: Today is \x07FF3F3FOUR\x078FCE00 day, recruits!`)
+ClientPrint(null,3,`\x078FCE00We will storm the village, and claim it for our own!`)
+ClientPrint(null,3,`\x078FCE00The inhabitants won't even know we've arrived, until it's too late.`)
+ClientPrint(null,3,`\x078FCE00Let's wish them a merry Christmas.`)
+"
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w1_s1"
+			WaitBetweenSpawnsAfterDeath 2
+			TotalCount 3
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 300
+			TFBot
+			{
+				Template Winter_Giant_Demoman_Sticky
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where flankers
+			Name "w1_s1a"
+			WaitBeforeStarting 0.5
+			WaitBetweenSpawns 1.5
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 40
+			TFBot
+			{
+				Template Winter_Scout_Milk
+			}
+		}
+		WaveSpawn
+		{
+			Where flankers
+			Name "w1_s1c"
+			WaitForAllDead "w1_s1a"
+			WaitBeforeStarting 18
+			WaitBetweenSpawns 1.5
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			TotalCurrency 40
+			TFBot
+			{
+				Template Winter_Scout_Milk
+			}
+		}
+		WaveSpawn
+		{
+			Where flankers
+			Name "w1_s1c"
+			WaitForAllDead "w1_s1a" //Precaution to bot stacking
+			WaitForAllSpawned "w1_s1"
+			WaitBeforeStarting 0.5
+			WaitBetweenSpawns 0.75
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			TotalCurrency 40
+			TFBot
+			{
+				Template Winter_Scout_Milk
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w1_s1b"
+			WaitForAllSpawned "w1_s1a"
+			WaitBeforeStarting 1.5
+			WaitBetweenSpawns 5
+			TotalCount 35
+			MaxActive 10 //allow max 5 pyros active at once if all scouts die
+			SpawnCount 5
+			TotalCurrency 140
+			Squad
+			{
+				TFBot
+				{
+					Template Winter_Pyro_Neon_Minigiant
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template Winter_Scout_Milk_Melee
+				}
+				TFBot
+				{
+					Template Winter_Scout_Milk_Melee
+				}
+				TFBot
+				{
+					Template Winter_Scout_Milk_Melee
+				}
+				TFBot
+				{
+					Template Winter_Scout_Milk_Melee
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot	
+			Name "w1_s2"
+			WaitForAllDead "w1_s1"
+			TotalCount 8
+			MaxActive 6 //Oh, yeah, this is big brain time.
+			SpawnCount 4
+			TotalCurrency 280
+			LastSpawnOutput
+			{
+				Target "gamerules"
+				Action "RunScriptCode"
+				Param " EntFire(`spawnbot_mission_sniper`,`Disable`)
+						EntFire(`spawnbot_mission_sniper`,`Enable`,null,28)"
+			}
+			DoneOutput
+			{
+				Target "gamerules"
+				Action "RunScriptCode"
+				Param "EntFire(`spawnbot_mission_sniper`,`Enable`)"
+			}
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Template Winter_Pyro_Neon_Minigiant
+					Tag leave_squad
+				}
+				TFBot
+				{
+					Template Winter_Pyro_Neon_Minigiant
+					Tag leave_squad
+				}
+				TFBot
+				{
+					Template Winter_Pyro_Neon_Minigiant
+					Tag leave_squad
+				}
+				TFBot
+				{
+					Template Winter_Giant_Medic_Milk_Syringe
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot	
+			Name "w1_s2c"
+			WaitForAllDead "w1_s1b"
+			WaitBetweenSpawns 7
+			TotalCount 25
+			MaxActive 10
+			SpawnCount 5
+			TotalCurrency 100
+			TFBot
+			{
+				Template Winter_Pyro_M1
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w1_s3"
+			WaitForAllSpawned "w1_s2"
+			WaitBeforeStarting 8
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 80
+			Squad
+			{
+				TFBot
+				{
+					Template Winter_Giant_Soldier_Direct
+				}
+				TFBot
+				{
+					Template Winter_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template Winter_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template Winter_Medic_Quickfix
+				}
+
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w1_s3"
+			WaitForAllSpawned "w1_s2"
+			WaitBeforeStarting 28
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 80
+			Squad
+			{
+				TFBot
+				{
+					Template Winter_Giant_Soldier_Direct
+				}
+				TFBot
+				{
+					Template Winter_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template Winter_Medic_Quickfix
+				}
+				TFBot
+				{
+					Template Winter_Medic_Quickfix
+				}
+
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "Support"
+			WaitForAllSpawned "w1_s3"
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 4
+			TotalCount 20
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 0
+			Support 1
+			TFBot
+			{
+				Template Winter_Pyro_Neon
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "Support"
+			WaitForAllDead "w1_s2c"
+			WaitBetweenSpawns 3.5
+			TotalCount 20
+			MaxActive 8
+			SpawnCount 2
+			TotalCurrency 0
+			Support 1
+			TFBot
+			{
+				Template Winter_Pyro_Neon
+			}
+		}
+	}
+	    ///////////////////////////////////////////////////////////////////
+        ///////////////////////   WAVE 2: SUMMER VACATION      ////////////
+        ///////////////////////////////////////////////////////////////////
+		
+	//Subwave 1
+	//- Giant Golfer Demo + Bunker Buster Soldiers (single squads)
+	
+	//Subwave 2
+	//- Giant DF Pyro (intermittent spawns)
+	//- Cola/Bonk! Scouts
+	
+	//Subwave 3
+	//- Chief Sandvich Heavy
+	//- Gas Passer Pyros w/increased afterburn + Huo-Long Heater Heavies (NoFormation)
+	
+	//Support: Gas Passer Pyros
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+		//PopExtUtil.CreatePlayerWearable(bot, `models/workshop/player/items/heavy/sum21_snack_stack/sum21_snack_stack.mdl`,true, `head`)
+		//Weird indentation to save space (4096 limit)
+		InitWaveOutput
+		{
+			Target "gamerules"
+			Action "RunScriptCode"
+			Param "
+ClientPrint(null,3,`\x07F1C232The General \x078FCE00: This hasn't quite gone as expected. I'd heard word of a defense team based here, but they were invisible to our radar. One of them must have jammed it.`)
+ClientPrint(null,3,`\x078FCE00They might prove to be a problem. We should deal with them quickly.`)
+ClientPrint(null,3,`\x078FCE00Summer break's over, privates. Wipe the floor with them.`)
+IncludeScript(`popextensions_main`,getroottable())
+MissionAttrs({
+`ForceHoliday` : 2
+`NoCrumpkins` : 1
+`NoThrillerTaunt` : 1
+})
+::CalendartillerySkybox <- {
+    Cleanup = function() {
+        SetSkyboxTexture(`sky_trainyard_01`)
+        delete ::CalendartillerySkybox
+    }
+    OnGameEvent_recalculate_holidays = function(_) { if (GetRoundState() == 3) Cleanup() }
+    OnGameEvent_mvm_wave_complete = function(_) { Cleanup() }
+}
+__CollectGameEventCallbacks(CalendartillerySkybox)
+SetSkyboxTexture(`sky_harvest_01`)
+IncludeScript(`seel_ins.nut`,getroottable())
+PopExt.AddRobotTag(`leave_squad`, { OnSpawn = function(bot,tag) { bot.LeaveSquad() } })
+PopExt.AddRobotTag(`disband_squad`, { OnSpawn = function(bot,tag) { bot.DisbandCurrentSquad() } });
+PopExt.AddRobotTag(`cola`, { OnSpawn = function(bot,tag) { 
+		bot.GetScriptScope().PlayerThinkTable.colaThink <- function() {
+			if (GetPropFloat(self,`m_Shared.m_flEnergyDrinkMeter`) < 0.66)
+				self.AddCondEx(19,0.5,self);
+		}
+	}
+})
+PopExt.AddRobotTag(`sandvich`, {
+	OnSpawn = function(bot,tag) {
+		local SANDVICH_ITEM_ID = 863
+		local TAUNT_COND = 7
+		bot.RemoveBotAttribute(8)
+		bot.GetScriptScope().eatSandvich <- false
+		bot.GetScriptScope().eatenSandvich <- false
+		bot.GetScriptScope().doneEating <- false
+		PopExtUtil.ReleaseButton(bot, CONST.IN_ATTACK)
+		bot.GetScriptScope().PlayerThinkTable.sandvichThink <- function() {
+			if (self.GetHealth() <= 0.5 * self.GetMaxHealth() && !(eatSandvich)) {
+				eatSandvich = true;
+				local weapon = CreateByClassname(`tf_weapon_lunchbox`)
+				SetPropInt(weapon, STRING_NETPROP_ITEMDEF, SANDVICH_ITEM_ID)
+				SetPropBool(weapon, `m_AttributeManager.m_Item.m_bInitialized`, true)
+				SetPropBool(weapon, `m_bValidatedAttachedEntity`, true)
+				weapon.AddAttribute(`lunchbox healing decreased`,25,-1);
+				weapon.AddAttribute(`single wep holster time increased`,2,-1);
+				weapon.AddAttribute(`gesture speed increase`,1.25,-1);
+				weapon.AddAttribute(`dmg taken increased`,0.5,-1);
+				weapon.SetTeam(self.GetTeam())
+				DispatchSpawn(weapon)
+				PopExtUtil.GetItemInSlot(self, weapon.GetSlot()).Destroy()
+				self.Weapon_Equip(weapon)
+				self.RemoveWeaponRestriction(1) //MELEE
+				self.AddWeaponRestriction(4) //SECONDARY
+				bot.AddBotAttribute(8)
+			}
+			if (self.GetHealth() <= 0.5 * self.GetMaxHealth() && eatSandvich && !(eatenSandvich) && GetPropEntity(self,`m_hActiveWeapon`) == PopExtUtil.GetItemInSlot(self,SLOT_SECONDARY)) {
+				PopExtUtil.PressButton(self, CONST.IN_ATTACK)
+				if (self.InCond(TAUNT_COND)) {
+					SINS.ChangeClassIcon(self,`heavy_robosandvich_nys`)
+					SINS.ChangeIconByName(`heavy_robosandvich_nys_gru`,`heavy_robosandvich_nys`)
+					eatenSandvich = true
+					self.RemoveBotAttribute(8)
+					SetPropEntity(self,`m_hLastWeapon`,PopExtUtil.GetItemInSlot(self,SLOT_PRIMARY)) //Ensures minigun is last weapon in hand
+					self.AddWeaponRestriction(2)
+					self.RemoveWeaponRestriction(4)
+					PopExtUtil.ReleaseButton(self, CONST.IN_ATTACK)
+				}
+			}
+			if (eatSandvich && eatenSandvich && !(doneEating) && GetPropEntity(self,`m_hActiveWeapon`) == PopExtUtil.GetItemInSlot(self,SLOT_PRIMARY)) {
+				SINS.ChangeClassIcon(self,`heavy`)
+				SINS.ChangeIconByName(`heavy_robosandvich_nys`,`heavy`)
+				PopExtUtil.GetItemInSlot(self, SLOT_SECONDARY).Destroy() //fucking obliterated
+				doneEating = true;
+			}
+		}
+	},
+	OnDeath = function(bot, params) {
+		SetPropInt(bot, `m_afButtonForced`, GetPropInt(bot, `m_afButtonForced`) & ~CONST.IN_ATTACK);
+		SetPropInt(bot, `m_nButtons`, GetPropInt(bot, `m_nButtons`) & ~CONST.IN_ATTACK)
+	}
+})"
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+
+		WaveSpawn
+		{
+			Name "w2_s1"
+			Where spawnbot
+			WaitBetweenSpawns 10
+			TotalCount 10
+			MaxActive 6
+			SpawnCount 5
+			TotalCurrency 150
+			Squad
+			{
+				TFBot
+				{
+					Template Summer_Giant_Demo_Golfer
+				}
+				TFBot
+				{
+					Template Summer_Soldier_Burst
+				}
+				TFBot
+				{
+					Template Summer_Soldier_Burst
+				}
+				TFBot
+				{
+					Template Summer_Soldier_Burst
+					Tag leave_squad
+				}
+				TFBot
+				{
+					Template Summer_Soldier_Burst
+					Tag leave_squad
+				}
+			}
+		}
+	
+		WaveSpawn
+		{
+			Name "w2_s1a"
+			Where flankers
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 10 //Minimum to prevent bowling people over if they kill all the soldiers instantly
+			TotalCount 10
+			MaxActive 6
+			SpawnCount 5
+			TotalCurrency 150
+			Squad
+			{
+				TFBot
+				{
+					Template Summer_Giant_Demo_Golfer
+				}
+				TFBot
+				{
+					Template Summer_Soldier_Burst
+				}
+				TFBot
+				{
+					Template Summer_Soldier_Burst
+				}
+				TFBot
+				{
+					Template Summer_Soldier_Burst
+					Tag leave_squad
+				}
+				TFBot
+				{
+					Template Summer_Soldier_Burst
+					Tag leave_squad
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where flankers
+			Name "w2_s2a"
+			WaitForAllSpawned "w2_s1"
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 0.75
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 1
+			TotalCurrency 48
+			TFBot
+			{
+				Template Summer_Scout_Cola
+			}
+		}
+		WaveSpawn
+		{
+			Where flankers
+			Name "w2_s2b"
+			WaitForAllDead "w2_s1a"
+			WaitBetweenSpawns 0.75
+			TotalCount 12
+			MaxActive 4
+			SpawnCount 1
+			TotalCurrency 36
+			TFBot
+			{
+				Template Summer_Scout_Cola
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w2_s2a"
+			WaitForAllSpawned "w2_s1a"
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 0.75
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 1
+			TotalCurrency 48
+			TFBot
+			{
+				Template Summer_Scout_Bonk
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w2_s2b"
+			WaitForAllDead "w2_s1"
+			WaitBetweenSpawns 0.75
+			TotalCount 12
+			MaxActive 4
+			SpawnCount 1
+			TotalCurrency 36
+			TFBot
+			{
+				Template Summer_Scout_Bonk
+			}
+		}
+		WaveSpawn {	Name "w2_s1_all"
+					WaitForAllDead "w2_s1"	}
+		WaveSpawn {	Name "w2_s1_all"
+					WaitForAllDead "w2_s1a"	}
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w2_s2_1"
+			WaitForAllDead "w2_s1_all"
+			WaitBetweenSpawns 15
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 166
+			TFBot
+			{
+				Template Summer_Giant_Pyro_Dragon
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w2_s2"
+			WaitForAllSpawned "w2_s2a"
+			WaitBeforeStarting 0.5
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 166
+			
+			//Allow Chief Sandvich Heavy to spawn either:
+			//- When this Pyro dies
+			//or
+			//- When 30 seconds have passed since this Pyro spawned
+			FirstSpawnOutput
+			{
+				Target gamerules
+				Action RunScriptCode
+				Param "	EntFire(`flankers`,`Disable`)
+						EntFire(`flankers`,`Enable`,null,30)"
+			}
+			DoneOutput
+			{
+				Target gamerules
+				Action RunScriptCode
+				Param "EntFire(`flankers`,`Enable`)"
+			}
+			TFBot
+			{
+				Template Summer_Giant_Pyro_Dragon
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w2_s3a"
+			WaitForAllDead "w2_s2a"
+			WaitBetweenSpawns 2
+			TotalCount 12
+			MaxActive 8 // have Heavies trickle in, most of the spawn should be gas Pyros
+			SpawnCount 4
+			TotalCurrency 36
+			Squad
+			{
+				TFBot
+				{
+					Template Summer_Heavy_Heater
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template Summer_Pyro_Gas
+				}
+				TFBot
+				{
+					Template Summer_Pyro_Gas
+				}
+				TFBot
+				{
+					Template Summer_Pyro_Gas
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w2_s3a"
+			WaitForAllDead "w2_s2b"
+			WaitBetweenSpawns 2
+			TotalCount 12
+			MaxActive 8 // have Heavies trickle in, most of the spawn should be gas Pyros
+			SpawnCount 4
+			TotalCurrency 36
+			Squad
+			{
+				TFBot
+				{
+					Template Summer_Heavy_Heater
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template Summer_Pyro_Gas
+				}
+				TFBot
+				{
+					Template Summer_Pyro_Gas
+				}
+				TFBot
+				{
+					Template Summer_Pyro_Gas
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where flankers
+			Name "w2_s3"
+			WaitForAllDead "w2_s2_1"
+			WaitBeforeStarting 5 //Real starting time: after 30 seconds.
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 128
+			TFBot
+			{
+				Template Summer_Chief_Heavy_Sandvich
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllSpawned "w2_s3a"
+			Where spawnbot_mission_sniper //haha yes
+			WaitBetweenSpawns 5
+			TotalCount 15
+			MaxActive 3
+			SpawnCount 1
+			Support 1
+			TFBot
+			{
+				Template Summer_Pyro
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "w2_s3a"
+			Where spawnbot
+			Where flankers
+			TotalCount 15
+			MaxActive 6
+			SpawnCount 2
+			Support 1
+			TFBot
+			{
+				Template Summer_Pyro_Gas
+			}
+		}
+		
+		//Custom icons aren't downloaded unless they're on a bot in the wave. Even if the bot never spawns.
+		WaveSpawn
+		{
+			Name "The Laviscuous Luncher"
+			WaitForAllDead "Support"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 0
+			Support Limited
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Scout
+						Name "The Laviscuous Luncher"
+						Attributes IgnoreFlag
+						Attributes IgnoreEnemies
+						ClassIcon heavy_robosandvich_nys //makes the icon precache properly!
+						Health 5
+						Scale 0.1
+						CharacterAttributes
+						{
+							"move speed bonus" 0.01
+							"no_jump" 1
+						}
+					}
+				}
+			}
+		}
+	}
+
+		///////////////////////////////////////////////////////////////////
+        ///////////////////////   WAVE 3: WITCHING HOUR     ///////////////
+        ///////////////////////////////////////////////////////////////////
+		
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action RunScriptCode
+			Param " EntFire(`wave_start_relay_classic`,`Trigger`)
+					IncludeScript(`seel_ins.nut`,getroottable())
+					SINS.ChangeIconFlags(`spy`,0)"
+		}
+		InitWaveOutput
+		{
+			Target "gamerules"
+			Action "RunScriptCode"
+			Param "
+ClientPrint(null,3,`\x07F1C232The General \x078FCE00: You lot may think highly of yourselves, but there's something you've forgotten.`)
+ClientPrint(null,3,`\x078FCE00You're hardly the first to defend this village; dozens have come before you. The fallen grow restless, and rise each night, to find victory at last.`)
+ClientPrint(null,3,`\x078FCE00What will it be? Eternal peace, or eternal damnation? Either way, it buys time.`)
+ClientPrint(null,3,`\x078FCE00So chimes the witching hour. Rest well, mercenaries.`)
+
+IncludeScript(`popextensions_main.nut`,getroottable())
+MissionAttrs({
+`ForceHoliday` : 2
+`NoCrumpkins` : 1
+`NoThrillerTaunt` : 1
+})
+::CalendartillerySkybox <- {
+    Cleanup = function() {
+        SetSkyboxTexture(`sky_trainyard_01`)
+        delete ::CalendartillerySkybox
+    }
+    OnGameEvent_recalculate_holidays = function(_) { if (GetRoundState() == 3) Cleanup() }
+    OnGameEvent_mvm_wave_complete = function(_) { Cleanup() }
+}
+__CollectGameEventCallbacks(CalendartillerySkybox)
+SetSkyboxTexture(`sky_halloween`)
+IncludeScript(`damageable_projectile_shield_calendartillery.nut`,getroottable())
+IncludeScript(`calendartillery_pointtemplates.nut`,getroottable()) //Sets up PointTemplates
+PopExt.AddRobotTag(`wolfhair`, {
+	OnSpawn = function(bot,tag) { PopExtUtil.CreatePlayerWearable(bot, `models/player/items/demo/hwn_demo_hat.mdl`,true, `head`) }
+})
+PopExt.AddRobotTag(`fireball_knight`, {
+	OnSpawn = function(bot,tag) { bot.Weapon_Switch(PopExtUtil.GetItemInSlot(bot, 2)); }
+})
+PopExt.AddRobotTag(`spiderheavy`, {
+	OnSpawn = function(bot,tag)
+	{
+		bot.GetScriptScope().PlayerThinkTable.spawnSpiderTemplates <- function()
+		{
+			for (local projectile; projectile = FindByClassname(projectile, `tf_projectile_rocket`);) {
+				projectile.ValidateScriptScope()
+				if (projectile.IsValid() && projectile.GetOwner() == bot && !(`PetSpider` in projectile.GetScriptScope()))
+				{
+					SpawnTemplate(`SpiderProp`, projectile)
+					projectile.GetScriptScope().PetSpider <- true;
+				}
+			}
+		}
+	}
+})
+::SetShieldColor <- function()
+{
+	for (local projShield; projShield = FindByClassname(projShield, `entity_medigun_shield`);)
+	{
+		if (projShield.GetTeam() == 3)
+		{
+			EntFireByHandle(projShield, `Color`, `18 255 0`, -1, null, null)
+			return;
+		}
+	}
+}
+PopExt.AddRobotTag(`destructible_shield`, {
+	OnSpawn = function(bot,tag) {
+		bot.PressSpecialFireButton(1)
+		EntFire(`gamerules`,`CallScriptFunction`,`SetShieldColor`,0.75)
+		SpawnTemplate(`ProjectileShieldHint`,bot,``,``,true)
+		
+		bot.GetScriptScope().PlayerThinkTable.removeShieldIfDone <- function()
+		{
+			local ragemeter = GetPropFloat(self, `m_Shared.m_flRageMeter`)
+			if (ragemeter <= 0.05)
+				PopExtUtil.GetItemInSlot(self,SLOT_SECONDARY).RemoveAttribute(`generate rage on heal`)
+		}
+	}
+})
+"
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+			Where flankers
+			Name "w3_s1"
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 30
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 75
+			TFBot
+			{
+				Template Halloween_Giant_Demoknight_Fireball
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w3_s1"
+			WaitBeforeStarting 11
+			WaitBetweenSpawns 10
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 75
+			TFBot
+			{
+				Template Halloween_Giant_Demoknight_Fireball
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where flankers
+			Where spawnbot
+			Name "w3_s1b"
+			WaitBetweenSpawns 1.5
+			TotalCount 45
+			MaxActive 15
+			SpawnCount 3
+			TotalCurrency 150
+			TFBot
+			{
+				Template Halloween_Demo_Fist
+			}
+		}
+
+		WaveSpawn 
+		{
+			Name "w3_s2"
+			WaitBeforeStarting 15
+			TotalCount 1
+			TotalCurrency 300
+				
+			FirstSpawnOutput
+			{
+				Target boss_spawn_relay                                            
+				Action Trigger                         
+			}
+			
+			Tank
+			{
+				Health 22000  
+				StartingPathTrackNode "tank_path_a_10"
+				Name "tankboss"
+			
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger                         
+				}
+
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay 
+					Action Trigger                         
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w3_s2a"
+			WaitForAllDead "w3_s1b"
+			WaitBetweenSpawns 4.5
+			TotalCount 18
+			MaxActive 6
+			SpawnCount 2
+			TotalCurrency 90
+			TFBot
+			{
+				Template Halloween_Scout_Fast
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w3_s3"
+			WaitForAllSpawned "w3_s2a"
+			WaitForAllDead "w3_s1"
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			TotalCurrency 200
+			Squad
+			{
+				TFBot
+				{
+					Template Halloween_Giant_Heavy_Shotgun
+				}
+				TFBot
+				{
+					Template Halloween_Giant_Medic_Shield
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "w3_supp"
+			WaitForAllDead "w3_s2a"
+			Where spawnbot
+			Where flankers
+			WaitBetweenSpawns 1
+			WaitBeforeStarting 5
+			TotalCount 48
+			MaxActive 6
+			SpawnCount 2
+			Support 1
+			TFBot
+			{
+				Template Halloween_Scout_Melee
+			}
+		}
+		WaveSpawn
+		{
+			Name "w3_supp"
+			WaitForAllDead "w3_s2a"
+			Where spawnbot
+			Where flankers
+			WaitBetweenSpawns 1
+			WaitBeforeStarting 5
+			TotalCount 24
+			MaxActive 6
+			SpawnCount 2
+			Support Limited
+			TFBot
+			{
+				Template Halloween_Scout_Popper
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "w3_supp"
+			WaitForAllDead "w3_s1b"
+			Where spawnbot
+			TotalCount 10
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 15
+			TotalCurrency 60
+			Support Limited
+			FirstSpawnOutput
+			{
+				Target gamerules
+				Action RunScriptCode
+				Param "SINS.ChangeIconFlags(`spy`,4)"
+			}
+			DoneOutput
+			{
+				Target gamerules
+				Action RunScriptCode
+				Param "SINS.ChangeIconFlags(`spy`,0)"
+			}
+			TFBot
+			{
+				Template Halloween_Spy
+			}
+		}
+	}
+	
+		///////////////////////////////////////////////////////////////////
+        ///////////////////////   WAVE 4: ERROR_SUCCESS     ///////////////
+        ///////////////////////////////////////////////////////////////////
+
+	// Subwave 1 - Wombo Combo Bombo
+	// - Giant Caution Sign Demo
+	// - Milk Syringe Medic
+	// - [Minigiant] Menacing Pyroshark - flankers
+
+	// Subwave 2 - Oops ! All Minigiants
+	// - [Minigiant] Flaming Demoknight
+	// - [Minigiant] Spider-Tossing Heavy
+
+	// Subwave 3 - Festive Conclusion. Spawn the tank some time after all minigiants have spawned! Might have to increase the max amount of bots allowed to be active at once with RobotLimit in WaveSchedule later...
+	// - Reindeer Tank + Reindeer Flare Pyros 
+	// - Giant Crit Canteen Heavy (On tank death)
+	// SUPPORT (more after subwave 2's minigiants are dead): Backburner Pyros
+	// MISSION SUPPORT - so this is in the same spot as Sentry Busters, remember?: Jarchers
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target "gamerules"
+			Action "RunScriptCode"
+			Param "
+IncludeScript(`calendartillery_wave4.nut`,getroottable())
+::CalendartillerySkybox <- {
+    Cleanup = function() {
+        SetSkyboxTexture(`sky_trainyard_01`)
+        delete ::CalendartillerySkybox
+    }
+    OnGameEvent_recalculate_holidays = function(_) { if (GetRoundState() == 3) Cleanup() }
+    OnGameEvent_mvm_wave_complete = function(_) { Cleanup() }
+}
+__CollectGameEventCallbacks(CalendartillerySkybox)
+SetSkyboxTexture(`sky_day01_01`)
+EntFire(`bombpath_choose_relay`,`Disable`)
+EntFire(`bombpath_left`,`Trigger`)"
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action RunScriptCode
+			Param "
+EntFire(`wave_finished_relay`,`Trigger`)
+EntFire(`bombpath_choose_relay`,`Enable`)"
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w4_s1a"
+			WaitBeforeStarting 0.2
+			WaitBetweenSpawns 12
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 60
+			TFBot
+			{
+				Template Mix_Giant_Demo_Neon
+			}
+		}
+		WaveSpawn
+		{
+			Name "w4_s1b"
+			Where flankers
+			WaitBetweenSpawns 12
+			WaitBeforeStarting 0.4
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 60
+			TFBot
+			{
+				Template Mix_Giant_Demo_Neon
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "w4_s1"
+			Where spawnbot
+			Where flankers
+			WaitBetweenSpawns 0.5
+			TotalCount 36
+			MaxActive 12
+			SpawnCount 2
+			TotalCurrency 180 //9999 / you have been in suspension for...
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Template Mix_Demo_Milkman
+					Tag leave_squad
+				}
+				TFBot
+				{
+					Template Mix_Medic_Milk_Syringe
+					Action FetchFlag [$SIGSEGV]
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "w4_s2"
+			Where spawnbot
+			WaitForAllDead "w4_s1a"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 36
+			TFBot { Template Mix_Giant_Scout_Jester }
+			TFBot { Template Mix_Giant_Scout_Jester }
+			TFBot { Template Mix_Giant_Scout_Jester }
+			
+			TFBot { Template Mix_Giant_Scout_Jester_Alt } //The 1 in 7, lucky shot!
+			
+			TFBot { Template Mix_Giant_Scout_Jester }
+			TFBot { Template Mix_Giant_Scout_Jester }
+			TFBot { Template Mix_Giant_Scout_Jester }
+		}
+		WaveSpawn
+		{
+			Name "w4_s2"
+			Where flankers
+			WaitForAllDead "w4_s1b"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 36
+			TFBot { Template Mix_Giant_Scout_Jester }
+			TFBot { Template Mix_Giant_Scout_Jester }
+			TFBot { Template Mix_Giant_Scout_Jester }
+			
+			TFBot { Template Mix_Giant_Scout_Jester_Alt } //The 1 in 7, lucky shot!
+			
+			TFBot { Template Mix_Giant_Scout_Jester }
+			TFBot { Template Mix_Giant_Scout_Jester }
+			TFBot { Template Mix_Giant_Scout_Jester }
+		}
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w4_s2a"
+			WaitForAllDead "w4_s1b"
+			WaitBetweenSpawns 2.5
+			TotalCount 20
+			MaxActive 8
+			SpawnCount 4
+			TotalCurrency 120
+			Squad
+			{
+				TFBot
+				{
+					Template Mix_Demoknight_Fireball_Minigiant
+					Tag leave_squad
+				}
+				TFBot
+				{
+					Template Mix_Heavy_Spider_Tosser
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where flankers
+			Name "w4_s2b"
+			WaitForAllDead "w4_s1a"
+			WaitBetweenSpawns 2.5
+			TotalCount 12
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 72
+			Squad
+			{
+				TFBot
+				{
+					Template Mix_Demoknight_Fireball_Minigiant
+					Tag leave_squad
+				}
+				TFBot
+				{
+					Template Mix_Heavy_Spider_Tosser
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "w4_s2_both"
+			WaitForAllSpawned "w4_s2a"
+		}
+		WaveSpawn
+		{
+			Name "w4_s2_both"
+			WaitForAllSpawned "w4_s2b"
+		}
+		WaveSpawn
+		{
+			Name "w4_s2c"
+			Where flankers
+			WaitForAllSpawned "w4_s2_both"
+			WaitForAllDead "w4_s2"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 36
+			TFBot { Template Mix_Giant_Scout_Jester }
+			TFBot { Template Mix_Giant_Scout_Jester }
+			TFBot { Template Mix_Giant_Scout_Jester }
+			
+			TFBot { Template Mix_Giant_Scout_Jester_Alt } //The 1 in 7, lucky shot!
+			
+			TFBot { Template Mix_Giant_Scout_Jester }
+			TFBot { Template Mix_Giant_Scout_Jester }
+			TFBot { Template Mix_Giant_Scout_Jester }
+		}
+	
+		WaveSpawn 
+		{
+			Name "w4_s3" 
+			WaitForAllDead "w4_s2a"
+			TotalCount 1
+			TotalCurrency 0 //this doesn't spawn any money, because we're having the tank explode out of bounds to spawn Santa Heavy later
+			FirstSpawnWarningSound "vo/mvm/norm/heavy_mvm_cartgoingbackdefense01.mp3" // "Mush, team! Mush!"
+			Where spawnbot
+
+			Tank
+			{
+				Speed 75
+				Health 18000
+				Name "sleightank"
+				StartingPathTrackNode "tank_path_a_10"
+				OnKilledOutput                                  
+				{
+					Target boss_dead_relay
+					Action Trigger                         
+				}
+
+				OnBombDroppedOutput                             
+				{
+					Target sleightank
+					Action DestroyIfAtCapturePoint
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "w4_s3a"
+			WaitForAllSpawned "w4_s3"
+			WaitBeforeStarting 0.5
+			WaitBetweenSpawns 1
+			Where spawnbot
+			//DoneWarningSound "vo/mvm/norm/heavy_mvm_cartgoingbackoffense02.mp3" // "Noooo!"
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 2
+			TotalCurrency 200
+			RandomChoice
+			{
+				TFBot { Template Mix_Pyro_Reindeer }
+				TFBot { Template Mix_Pyro_Reindeer }
+				TFBot { Template Mix_Pyro_Reindeer }
+				TFBot { Template Mix_Pyro_Reindeer }
+				
+				TFBot { Template Mix_Pyro_Reindeer }
+				TFBot { Template Mix_Pyro_Reindeer }
+				TFBot { Template Mix_Pyro_Reindeer }
+				TFBot { Template Mix_Pyro_Reindeer }
+				
+				TFBot { Template Mix_Pyro_Reindeer_Melee } //The 1 in 17 who is s p e c i a l
+				
+				TFBot { Template Mix_Pyro_Reindeer }
+				TFBot { Template Mix_Pyro_Reindeer }
+				TFBot { Template Mix_Pyro_Reindeer }
+				TFBot { Template Mix_Pyro_Reindeer }
+				
+				TFBot { Template Mix_Pyro_Reindeer }
+				TFBot { Template Mix_Pyro_Reindeer }
+				TFBot { Template Mix_Pyro_Reindeer }
+				TFBot { Template Mix_Pyro_Reindeer }
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w4_s3b"
+			WaitForAllDead "w4_s3"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 100 //money laundering
+			TFBot
+			{
+				Template Mix_Giant_Heavy_Santa				
+				Health 10000
+				Attributes UseBossHealthBar
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "w4_s2b"
+			WaitBeforeStarting 0.5
+			WaitBetweenSpawns 2
+			Where spawnbot
+			Where flankers
+			//DoneWarningSound "vo/mvm/norm/heavy_mvm_cartgoingbackoffense02.mp3" // "Noooo!"
+			TotalCount 20
+			MaxActive 4
+			SpawnCount 1
+			Support 1
+			TFBot
+			{
+				Template Mix_Pyro_Flamedeer
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "w4_s3a"
+			WaitBeforeStarting 0.5
+			WaitBetweenSpawns 4
+			Where spawnbot
+			TotalCount 20
+			MaxActive 5
+			SpawnCount 4
+			Support 1
+			TFBot
+			{
+				Template Mix_Pyro_Flamedeer
+			}
+		}
+	}
+	
+		///////////////////////////////////////////////////////////////////
+        ///////////////////////   WAVE 5: Invasion    /////////////////////
+        ///////////////////////////////////////////////////////////////////
+		
+	//Subwave 1 - Mix of continuous fire from the giant + burst fire from the commons
+	// Giant Widowmaker Engineer + Armor Medics (helps break through frontline, good target for demos)
+	// Burst Fire Soldier (in a separate WaveSpawn, make some spawn from the flank, as a cheeky strategic assault!)
+
+	// Subwave 2 - Aerial Denial
+	// Air Raid Soldiers - Ask Atha for template?
+	
+	//For now: 
+	// Giant Flare Rain Pyro
+	// Shortstop Scouts (decent bomb pressure, quite fast!)
+
+	// Subwave 3 - The big bomby boss
+	// Armored Commander Demo + Armor Medic (wow that's bulky)
+	// SUPPORT during this sub: Tactical Snipers (Urban Prof weapons)
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target "gamerules"
+			Action "RunScriptCode"
+			Param "
+::CalendartillerySkybox <- {
+    Cleanup = function() {
+        SetSkyboxTexture(`sky_trainyard_01`)
+        delete ::CalendartillerySkybox
+    }
+    OnGameEvent_recalculate_holidays = function(_) { if (GetRoundState() == 3) Cleanup() }
+    OnGameEvent_mvm_wave_complete = function(_) { Cleanup() }
+}
+__CollectGameEventCallbacks(CalendartillerySkybox)
+SetSkyboxTexture(`sky_gravel_01`)
+ClientPrint(null,3,`\x07F1C232The General \x078FCE00: It's clear that our adversaries have put up a formidable performance.`)
+ClientPrint(null,3,`\x078FCE00Having bested both might and magic, at their highest forms, we have little left to spare.`)
+ClientPrint(null,3,`\x078FCE00If we are to launch a suitable counterattack, it's time we strike with everything we have.`)
+ClientPrint(null,3,`\x078FCE00This will either be our finest hour, or our largest regret.`)
+IncludeScript(`popextensions_main.nut`,getroottable())
+MissionAttrs({
+`ForceHoliday` : 2
+`NoCrumpkins` : 1
+`NoThrillerTaunt` : 1
+})
+PopExt.AddRobotTag(`leave_squad`, {
+	OnSpawn = function(bot,tag) { EntFireByHandle(bot,`RunScriptCode`,`self.LeaveSquad()`,0.1,null,null) }
+});
+PopExt.AddRobotTag(`infclip`, {
+	OnSpawn = function(bot,tag) {
+		bot.GetScriptScope().PlayerThinkTable.regenClip <- function() {
+			if (PopExtUtil.GetItemInSlot(bot,SLOT_PRIMARY) != self.GetActiveWeapon())
+				PopExtUtil.GetItemInSlot(bot,SLOT_PRIMARY).SetClip1(4)
+			if (PopExtUtil.GetItemInSlot(bot,SLOT_SECONDARY) != self.GetActiveWeapon())
+				PopExtUtil.GetItemInSlot(bot,SLOT_SECONDARY).SetClip1(8);
+		}
+	}
+})"
+		}
+		// Explanation  
+		// {
+			// Line "{F1C232}The General {8FCE00}: "
+			// Line "{8FCE00}"
+			// Line "{8FCE00}"
+			// Line "{8FCE00}"
+		// }
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w5_s1"
+			TotalCount 18 // total 6 means 18K HP -- they should be able to shoot that down, hell, maybe more than that
+			MaxActive 9 // more than one should probably exist, but I don't know what's too strong yet
+			SpawnCount 3
+			WaitBetweenSpawns 5 // is this too much pressure? I kinda want them to be a constant presence, but not incredibly overwhelming
+			TotalCurrency 240 // Tojo Clan up in arms over stolen funds
+			Squad
+			{
+				ShouldPreserveSquad 1
+				TFBot
+				{
+					Template Invasion_Soldier_BurstFire
+					Tag leave_squad
+				}
+				TFBot
+				{
+					Template Invasion_Soldier_BurstFire
+					Tag leave_squad
+				}
+				TFBot
+				{
+					Template Invasion_Giant_Engineer_Widowmaker
+					Action FetchFlag [$SIGSEGV]
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w5_s1a"
+			WaitBeforeStarting 4 // this should ensure they spawn after the Engineers begin, but only a little bit
+			TotalCount 20
+			MaxActive 5
+			SpawnCount 4
+			TotalCurrency 140
+			TFBot
+			{
+				Template Invasion_Soldier_BurstFire
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where flankers // spawns at the same time as spawnbot, but at a different place, as directed
+			Name "w5_s1a" // intentionally the same as the spawnbot Soldiers for now, feel free to change
+			WaitBeforeStarting 1
+			TotalCount 20
+			MaxActive 5
+			SpawnCount 4
+			TotalCurrency 140
+			TFBot
+			{
+				Template Invasion_Soldier_BurstFire
+			}
+		}
+		
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w5_s2"
+			WaitForAllDead "w5_s1"
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 2
+			WaitBetweenSpawns 20
+			TotalCurrency 72
+			Squad
+			{
+				TFBot
+				{
+					Template Invasion_Giant_Pyro_Flare_Rain
+				}
+				TFBot
+				{
+					Template Invasion_Medic_Armored
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where flankers
+			Name "w5_s2"
+			WaitForAllDead "w5_s1"
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 2
+			WaitBetweenSpawns 20
+			TotalCurrency 60
+			Squad
+			{
+				TFBot
+				{
+					Template Invasion_Giant_Pyro_Flare_Rain
+				}
+				TFBot
+				{
+					Template Invasion_Medic_Armored
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w5_s2a"
+			WaitForAllDead "w5_s1a"
+			TotalCount 21
+			MaxActive 9
+			SpawnCount 3
+			WaitBetweenSpawns 2.5
+			TotalCurrency 108
+			TFBot
+			{
+				Template Invasion_Scout_Shortstop_Minigiant
+			}
+		}
+		
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "w5_s3"
+			WaitForAllSpawned "w5_s2a"
+			WaitBeforeStarting 10
+			TotalCount 7
+			MaxActive 7
+			SpawnCount 7
+			TotalCurrency 140
+			Squad // Giant Demo (15K HP) + six Medics (3600 HP) = 18.6K 
+			{
+				TFBot
+				{
+					Template Invasion_Giant_Demoman_Commander
+				}
+				
+				TFBot
+				{
+					Template Invasion_Medic_Armored
+				}
+			
+				TFBot
+				{
+					Template Invasion_Medic_Armored
+				}
+				
+				TFBot
+				{
+					Template Invasion_Medic_Armored
+				}
+				
+				TFBot
+				{
+					Template Invasion_Medic_Armored
+				}
+				
+				TFBot
+				{
+					Template Invasion_Medic_Armored
+				}
+				
+				TFBot
+				{
+					Template Invasion_Medic_Armored
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "Support"
+			Where spawnbot
+			Where flankers
+			WaitForAllDead "w5_s2a"
+			WaitBetweenSpawns 3.5
+			TotalCount 24
+			MaxActive 10
+			SpawnCount 2
+			// TotalCurrency 24
+			Support 1
+			TFBot
+			{
+				Template Invasion_Scout_Shortstop
+			}
+		}
+	}
+		///////////////////////////////////////////////////////////////////
+        ///////////////////////   WAVE 6: Betrayal    /////////////////////
+        ///////////////////////////////////////////////////////////////////
+		
+	//BOSS: The General
+	//Phase 1: Rocket car!
+	//Support: Sydney Snipers, Spies, Flare Rain Pyros?
+	
+	//Phase 2: A true leader - Buff and defense buff
+	//Support (extra!): Rapid Fire Soldier, Medics (one spawn), Rapid Fire Demo
+		
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay_classic
+			Action RunScriptCode
+			Param "EntFire(`wave_start_relay_classic`,`Trigger`)
+			IncludeScript(`seel_ins.nut`,getroottable())
+			SINS.ChangeIconFlags(`medic_uber`,2)
+			SetPropInt(SINS.tfor,`m_nMannVsMachineWaveEnemyCount`,1)"
+		}
+		//Weird indentation saves characters!
+		InitWaveOutput
+		{
+			Target "gamerules"
+			Action "RunScriptCode"
+			Param "	IncludeScript(`calendartillery_wave6.nut`,getroottable()) //SINS is loaded here too
+::CalendartillerySkybox <- {
+    Cleanup = function() {
+        SetSkyboxTexture(`sky_trainyard_01`)
+        delete ::CalendartillerySkybox
+    }
+    OnGameEvent_recalculate_holidays = function(_) { if (GetRoundState() == 3) Cleanup() }
+    OnGameEvent_mvm_wave_complete = function(_) { Cleanup() }
+}
+__CollectGameEventCallbacks(CalendartillerySkybox)
+SetSkyboxTexture(`sky_nightfall_01`)
+					SINS.ChangeIconFlags(`medic_uber`,2)
+					SetPropInt(SINS.tfor,`m_nMannVsMachineWaveEnemyCount`,1)
+					ClientPrint(null,3,`\x07F1C232The General \x078FCE00: I'm ashamed to admit it, but it seems I am left with little recourse.`)
+					ClientPrint(null,3,`\x078FCE00My resources have been used up. This mission is all but doomed to failure. I have one final chance.`)
+					ClientPrint(null,3,`\x078FCE00I'll use whatever I have left to take you all down \x07FF3F3Fwith \x078FCE00me, if I have to.`)
+					ClientPrint(null,3,`\x078FCE00This village \x07FF3F3FWILL \x078FCE00fall; even if we must all fall with it.`)
+					"
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		WaveSpawn
+		{
+			Name "w6_boss"
+			Where spawnbot
+			TotalCount 5
+			MaxActive 5
+			SpawnCount 5
+			TotalCurrency 0 //He spent all his money :<
+			Squad
+			{
+				TFBot
+				{
+					Template Finale_Chief_General
+				}
+				//These medics stay in spawn until phase 2.
+				TFBot
+				{
+					Template Finale_Medic_War_Buddy
+				}
+				TFBot
+				{
+					Template Finale_Medic_War_Buddy
+				}
+				TFBot
+				{
+					Template Finale_Medic_War_Buddy
+				}
+				TFBot
+				{
+					Template Finale_Medic_War_Buddy
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support phase 1"
+			Where spawnbot
+			Where flankers
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 8
+			TotalCount 100
+			MaxActive 3
+			SpawnCount 2
+			TotalCurrency 100
+			Support 1
+			TFBot
+			{
+				Template Finale_Pyro_Tie
+			}
+		}
+		WaveSpawn
+		{
+			Name "w6_phase1"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 0
+			Support Limited
+			RandomChoice
+			{
+				RandomChoice
+				{
+					TFBot
+					{
+						Class Scout
+						Name "Reinforcement Caller"
+						Tag "botblocker"
+						Attributes IgnoreFlag
+						Attributes IgnoreEnemies
+						ClassIcon heavy_buff_backup_v1 //makes the icon precache properly!
+						Health 5
+						Scale 0.1
+						CharacterAttributes
+						{
+							"move speed bonus" 0.01
+							"no_jump" 1
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support phase 2"
+			WaitForAllDead "w6_phase1"
+			Where flankers
+			WaitBetweenSpawns 5.5
+			TotalCount 50
+			MaxActive 10
+			SpawnCount 3
+			TotalCurrency 50
+			Support 1
+			RandomChoice
+			{
+				TFBot
+				{
+					Template Finale_Demo_Formal
+				}
+				TFBot
+				{
+					Template Finale_Demo_Formal
+				}
+				TFBot
+				{
+					Template Finale_Soldier_Royal_Guard
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support phase 2"
+			WaitForAllDead "w6_phase1"
+			Where spawnbot
+			Where flankers
+			WaitBetweenSpawns 5.5
+			TotalCount 50
+			MaxActive 3
+			SpawnCount 1
+			TotalCurrency 50
+			Support 1
+			RandomChoice
+			{
+				TFBot
+				{
+					Template Finale_Demo_Formal
+				}
+				TFBot
+				{
+					Template Finale_Soldier_Royal_Guard
+				}
+				TFBot
+				{
+					Template Finale_Soldier_Royal_Guard
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,1704 @@
+// mission by randomguy
+#base	robot_standard.pop
+#base	robot_giant.pop
+
+population
+{
+	CanBotsAttackWhileInSpawnRoom	no
+	RespawnWaveTime					4
+	StartingCurrency				1600
+	Advanced						1
+
+	Templates
+	{
+		T_TFBot_Giant_Soldier_Spammer_Buff
+		{
+			Class				Soldier
+			Name				"Giant Rapid Fire Soldier"
+			ClassIcon			soldier_buff_spammer_giant
+			Health				3800
+			Skill				Expert
+			WeaponRestrictions	PrimaryOnly
+			Attributes			MiniBoss
+			Tag					bot_giant
+			Attributes			SpawnWithFullCharge
+			Item				"the buff banner"
+
+			ItemAttributes
+			{
+				ItemName				TF_WEAPON_ROCKETLAUNCHER
+				"faster reload rate"	-0.8
+				"fire rate bonus"		0.5
+			}
+
+			CharacterAttributes
+			{
+				"move speed bonus"					0.5
+				"damage force reduction"			0.0
+				"airblast vulnerability multiplier"	0.0
+				"override footstep sound set"		3
+				"Projectile speed increased"		0.65
+				"increase buff duration"			6942	// avg told me to
+				"deploy time increased"				0.5
+			}
+		}
+
+		T_TFBot_Giant_Medic_QuickUber
+		{
+			Name				"Giant Quick-Uber Medic"
+			Item				"The Byte'd Beak"
+			Class				Medic
+			Skill				Expert
+			Health				4500
+			ClassIcon			medic_uber_giant
+			WeaponRestrictions	SecondaryOnly
+			Attributes			MiniBoss
+			Attributes			SpawnWithFullCharge
+
+			ItemAttributes
+			{
+				ItemName				TF_WEAPON_MEDIGUN
+				"heal rate bonus"		200
+				"ubercharge rate bonus"	5
+				"uber duration bonus"	-3
+			}
+
+			CharacterAttributes
+			{
+				"move speed bonus"						0.5
+				"damage force reduction"				0.6
+				"airblast vulnerability multiplier"		0.6
+				"bot medic uber health threshold"		3500	// 3000
+				"bot medic uber deploy delay duration"	5
+			}
+		}
+
+		T_TFBot_Medic_Kritz	// YoovyBot_Medic_Kritzkrieg //I like to keep T_TFBot format. OG template by Yoovy.
+		{
+			// TFBot
+			Class		Medic
+			Name		"Kritzkrieg Medic"
+			ClassIcon	medic_kritz
+			Attributes	SpawnWithFullCharge
+			// Attributes AlwaysCrit
+
+			CharacterAttributes
+			{
+				"bot medic uber health threshold"	1987
+			}
+			// Weapons
+			Item		"The Kritzkrieg"
+
+			ItemAttributes
+			{
+				ItemName				"The Kritzkrieg"
+				"uber duration bonus"	3582
+			}
+			// Cosmetics
+			Item		"The Combat Medic's Crusher Cap"
+		}
+	}
+
+	Mission
+	{
+		Objective			Spy
+		InitialCooldown		25
+		Where				spawnbot
+		BeginAtWave			5
+		RunForThisManyWaves	1
+		CooldownTime		40
+		DesiredCount		2
+
+		TFBot
+		{
+			Template	T_TFBot_Spy
+		}
+	}
+
+	Mission
+	{
+		Objective			Engineer
+		Where				spawnbot
+		BeginAtWave			1
+		RunForThisManyWaves	1
+		InitialCooldown		30
+		CooldownTime		30
+		DesiredCount		1
+
+		TFBot
+		{
+			Template		T_TFBot_Engineer_Sentry_Teleporter
+			TeleportWhere	spawnbot
+			TeleportWhere	spawnbot_right
+			TeleportWhere	spawnbot_left
+		}
+	}
+
+	Mission
+	{
+		Objective			Engineer
+		Where				spawnbot
+		BeginAtWave			3
+		RunForThisManyWaves	2
+		InitialCooldown		30
+		CooldownTime		30
+		DesiredCount		1
+
+		TFBot
+		{
+			Template		T_TFBot_Engineer_Sentry_Teleporter
+			TeleportWhere	spawnbot
+			TeleportWhere	spawnbot_right
+			TeleportWhere	spawnbot_left
+		}
+	}
+
+	Mission
+	{
+		Objective			DestroySentries
+		Where				spawnbot
+		InitialCooldown		30
+		CooldownTime		30
+		BeginAtWave			1
+		RunForThisManyWaves	10
+
+		TFBot
+		{
+			Template	T_TFBot_SentryBuster
+		}
+	}
+	// RAFMOD BEGIN
+	// WEAPONS BY randomguy (me)
+
+	CustomWeapon [$SIGSEGV]	// Pyro's Phlogistinator but banner effects.
+	{
+		Name						"The Flagbearer's Flogistinator"
+		OriginalItemName			"The Phlogistinator"
+		"special item description"	"[INFO] Banner Phlogistinator, acts like the phlogistinator but grants you Soldier's banner effects instead of crits."
+		"effect cond override"		1711376	// buffbanner (normal) + concheror (x256) + battalions (x65536)
+	}
+
+	CustomWeapon [$SIGSEGV]	// was originally just a Bison Minigun, PDA Expert gave me ideas for a rework when that ended as horribly as you could imagine.
+	{
+		Name									Railgun
+		OriginalItemName						"Upgradeable TF_WEAPON_MINIGUN"
+		"special item description"				"[INFO] Tesla Minigun, shoots very short ranged, homing laser projectiles. Does no damage to buildings or tanks. Minicrits instead of crits."
+		"custom kill icon"						righteous_bison
+		set_item_texture_wear					0	// Factory New
+		paintkit_proto_def_index				408	// Hypergon, kinda inspired by gg humbridge exp, as in i only know this skin exists cause of that.
+		"attach particle effect"				704
+		"override projectile type"				13
+		"energy weapon penetration"				1
+		// "damage penalty"		//WAIT YOU DON'T EVEN WORK		0.2	// it was op again... 0.33	// you are NOT being op again fuck you
+		"dmg penalty vs players"				0.33
+		"projectile spread angle penalty"		5
+		// big rework ahead!
+		"mod projectile heat seek power"		50	// homing stuff
+		"mod projectile heat aim error"			360	// homing stuff
+		"mod projectile heat aim time"			1	// homing stuff
+		"mod projectile heat aim start time"	0	// homing stuff
+		"set item tint rgb"						5322826	// Noble Hatte Violet at Blacky's suggestion. Pinkish to show homing but darker to intrude on visiblity less.
+		"projectile lifetime"					.5	// less than 1 second lifespan cope
+		"projectile speed decreased"			1	// 0.5
+		"dmg penalty vs buildings"				0	// 0x building damage.
+		"mult dmg vs tanks"						0	// 0x tank damage :3
+		crits_become_minicrits					1	// YOU WILL NOT DO DAMAGE TO THE ENEMY AND YOU WILL BE HAPPY!!!!!!!!!!!!!!!!!!!!!!!!
+	}
+
+	DisallowUpgrade	// Already penetrates.
+	{
+		Upgrade		"projectile penetration heavy"
+		ItemName	Railgun
+	}
+
+	CustomWeapon [$SIGSEGV]	// Pre-JI GRU. Inspured by Drcactus overclocks.
+	{
+		Name						"Gloves of Running Urgently 2015-16 (Pre-JI)"
+		OriginalItemName			"Gloves of Running Urgently MvM"
+		"special item description"	"[INFO] Old GRU. No health drain, mark for death."
+	}
+
+	CustomWeapon	// Engineer passive for more aggressive play
+	{
+		Name						"Frontier's Aggressor"
+		OriginalItemName			"The Cozy Camper"
+		"ammo regen"				0.25
+		"health regen"				10
+		"custom item model"			models/workshop/player/items/engineer/dec15_winter_backup/dec15_winter_backup.mdl
+		"special item description"	"[INFO] Aggressive playstyle. Increases primary firing speed by 30%, reload speed by 70% and provides health/ammo regeneration."
+	}
+
+	PlayerItemEquipSpawnTemplate
+	{
+		Name		PackTemplate
+		ItemName	"Frontier's Aggressor"
+	}
+
+	PointTemplates	// cause i dont want extra melee speed. LITE MADE THIS. ALL CREDIT FOR THIS PART GOES TO LITE. https://steamcommunity.com/profiles/76561198300633951
+	{
+		PackTemplate
+		{
+			OnSpawnOutput
+			{
+				Target	!activator
+				Action	RunScriptCode
+				Param	"
+                    local hPack;
+                    for (local hWearable = self.FirstMoveChild(); hWearable != null; hWearable = hWearable.NextMovePeer()) {
+                        if(NetProps.GetPropInt(hWearable, `m_AttributeManager.m_Item.m_iItemDefinitionIndex`) == 642) {
+                            hPack = hWearable;
+                            break;
+                        }
+                    }
+                    if(hPack && hPack.IsValid() && !hPack.GetScriptScope()) {
+                        hPack.ValidateScriptScope();
+                        local hPackScope = hPack.GetScriptScope();
+                        hPackScope.hOwner <- hPack.GetOwner();
+                        hPackScope.PackThink <- function() {
+                            local hWeapon = hOwner.GetActiveWeapon();
+                            if(hWeapon && hWeapon.GetSlot() == 0) {
+                                hOwner.AddCustomAttribute(`reload time increased hidden`, 0.3, 0.1);
+                                hOwner.AddCustomAttribute(`fire rate penalty HIDDEN`, 0.7, 0.1);
+                            }
+                            return -1;
+                        }
+                        AddThinkToEnt(hPack, `PackThink`);
+                    }
+                "
+			}
+		}
+	}
+	// WEAPON BY Hell-met (used with permission)
+
+	CustomWeapon [$SIGSEGV]	// v1 stats + no jumping at all
+	{
+		Name						"Baby Face's Blaster 2012 (OG)"
+		OriginalItemName			"Baby Face's Blaster"
+		"special item description"	"[INFO] V1 BFB; no drain no jumping more accurate weak shots. Adjusted to only provide speed and remove jumps when active."
+		// "set_item_texture_wear" 1 //Battle Scarred, cause it's old y'know? //doesn't work without a skin, zad.
+		"lose hype on take damage"	0
+		"clip size penalty"			1
+		"damage penalty"			0.7
+		"weapon spread bonus"		0.6
+		no_jump						1
+		"provide on active"			1
+	}
+	// WEAPONS BY PDA Expert (used with permission)
+
+	CustomWeapon [$SIGSEGV]	// "op but fun" - blacky
+	{
+		Name											"The Follower"
+		OriginalItemName								"Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+		"special item description"						"[INFO] Hold alt-fire to shoot rockets that home in to your crosshair instead. These rockets will deal full damage."
+		"no damage falloff"								1
+		"projectile speed decreased"					0.55
+		"mod projectile heat seek power"				225
+		"mod projectile heat aim error"					50
+		"mod projectile heat aim time"					3.25
+		"mod projectile heat aim start time"			0.25
+		"damage penalty"								0.8
+		"blast radius decreased"						0.7
+		"mod projectile heat no predict target speed"	1
+		"alt fire attributes"							"mod projectile heat follow crosshair|1|damage bonus hidden|1.25"
+		paintkit_proto_def_index						420
+		set_item_texture_wear							0
+		"custom weapon fire sound"						=60|weapons/ar2/npc_ar2_altfire.wav
+		"custom weapon reload sound"					=80|weapons/ar2/ar2_reload_push.wav
+		"custom impact sound"							=90|weapons/air_burster_explode2.wav
+		"projectile trail particle"						eyeboss_projectile
+		"alt fire attack"								1
+	}
+
+	CustomWeapon [$SIGSEGV]
+	{
+		Name							"Blast Handcannon"
+		OriginalItemName				"The Detonator"
+		"special item description"		"[INFO] Shoots fireballs instead of flares."
+		"blast dmg to self increased"	5
+		"damage penalty"				1
+		"damage bonus"					2	// 2.5 //cuz i added dmg upgrade to it.
+		"weapon burn time reduced"		0.25
+		"fire rate penalty"				1.2
+		"reload time increased"			1.35
+		"override projectile type"		2
+		paintkit_proto_def_index		414
+		"projectile trail particle"		spell_fireball_small_red
+		"custom projectile model"		models/weapons/w_models/w_drg_ball.mdl
+		"custom kill icon"				spellbook_fireball
+		"explosion particle"			halloween_explosion
+		"Set DamageType Ignite"			1
+		"Projectile speed decreased"	1.25	// changed to not conflict with upgrade
+		set_item_texture_wear			0
+		"minicrit vs burning player"	1	// 0 //hmmm, may have had this disabled for a reason. Oh well!
+		"no damage falloff"				1
+		"custom weapon fire sound"		=30|weapons/flaregun/fire.wav
+		"custom impact sound"			=80|weapons/explode4.wav
+	}
+
+	CustomWeapon [$SIGSEGV]
+	{
+		Name								"The Marble Zone"
+		OriginalItemName					"The Iron Bomber"
+		"special item description"			"[INFO] Burst fire, projectiles bounce off surfaces, gaining constant speed."
+		"fuse bonus"						1.6
+		"projectile speed decreased"		0.6
+		"grenade bounce speed"				1.15
+		"grenade bounce damage"				0.112	// 0.01	// 0.112
+		"damage penalty"					0.95	// 0.8	// 0.9
+		// "fire rate bonus"					0.1
+		// "reload time increased hidden"	3	// 6 //changed cause i removed clip upgrade
+		// "reload full clip at once"		1
+		// changing this to beggars style now.
+		"fire rate bonus HIDDEN"			0.3
+		"auto fires full clip"				1
+		// "can overload"						1
+		"reload time increased hidden"		1.2
+		"projectile spread angle penalty"	3	// 5	// haha
+		paintkit_proto_def_index			226
+		set_item_texture_wear				0
+		"mult projectile scale"				1.66
+		"blast radius decreased"			0.4
+		"explosion particle"				ExplosionCore_sapperdestroyed
+		"projectile trail particle"			rockettrail_airstrike_line
+		"custom projectile model"			models/weapons/c_models/c_xms_festive_ornament.mdl
+		"custom kill icon"					deflect_promode
+		// "custom weapon reload sound"		=65|weapons/cow_mangler_reload.wav	// _final.wav
+	}
+	// DisallowUpgrade	// OP/too hard to balance
+	// {
+	// Upgrade		"clip size upgrade atomic"
+	// ItemName	"The Marble Zone"
+	// }
+	// CustomWeapon [$SIGSEGV]
+	// {
+	// Name									"Signal Sterilizer"
+	// OriginalItemName						"The Detonator"
+	// "special item description"				"[INFO] Shoots tracer rounds, aim at your sentry's target to deal triple damage."
+	// "blast dmg to self increased"			1
+	// "damage bonus"							3	// 1.5 //wild buff but hear me out.
+	// "damage penalty"						1
+	// "damage bonus bullet vs sentry target"	3
+	// "minicrit vs burning player"			0
+	// "set damagetype ignite"					0
+	// "mvm sentry ammo"						1.5
+	// "mark for death"						1
+	// "reload time increased"					1.66
+	// "use original class weapon animations"	1
+	// paintkit_proto_def_index				232
+	// set_item_texture_wear					0
+	// "override projectile type"				1
+	// "sniper fires tracer hidden"			1
+	// "custom weapon fire sound"				=70|weapons/shooting_star_shoot.wav
+	// }
+	// you kinda smell to balance. out.
+
+	CustomWeapon
+	{
+		Name						"Stasis Shock"
+		OriginalItemName			"Upgradeable TF_WEAPON_BONESAW"
+		"special item description"	"[INFO] 100% chance to stun non-giant or non-semigiant robots. Can mark multiple enemies for death."
+		"custom item model"			models/workshop/player/items/medic/tauntdoctors_defibrillators/tauntdoctors_defibrillators.mdl
+		"fire rate penalty"			1.5
+		"damage penalty"			0.385	// 25 dmg.
+		"custom hit sound"			=125|ambient/energy/weld2.wav
+		"ragdolls become ash"		1
+		"add cond on hit"			12338
+		"stun on damage"			60
+		"melee range multiplier"	1.33
+		"add cond on hit duration"	3
+		"damage all connected"		1
+		"custom kill icon"			obj_attachment_sapper
+	}
+
+	CustomWeapon [$SIGSEGV]
+	{
+		Name							"Plasma Bow"
+		OriginalItemName				"The Huntsman"
+		"custom projectile model"		models/weapons/w_models/w_drg_ball.mdl
+		"special item description"		"[INFO] Arrows bounce, can hit the same enemy multiple times."
+		"reset arrow hits on bounce"	1
+		"grenade bounce speed"			1
+		"projectile lifetime"			3
+		"projectile penetration"		1
+		"dmg penalty vs players"		0.85
+		"dmg penalty vs buildings"		0.85
+		// "fire rate bonus"				0.5 //t'was a bit overtuned. Not egregious though.
+		"ragdolls plasma effect"		1
+		"projectile trail particle"		~drg_cow_rockettrail_normal
+		"custom weapon fire sound"		=70|weapons/capper_shoot.wav
+		"custom hit sound"				=50|weapons/fx/rics/bison_projectile_impact_flesh.wav
+		"custom impact sound"			=50|weapons/fx/rics/ric4.wav
+		// "custom item model"				models/weapons/c_models/c_astral_assassin/c_bow.mdl //looks weird.
+		"custom kill icon"				cow_mangler
+		crits_become_minicrits			1
+		"mult crit dmg"					1.25
+		"hidden primary max ammo bonus"	0.8
+		"mult dmg vs tanks"				0.5	// kinda does shred tanks a BIT more than i'd like tbh
+	}
+
+	CustomWeapon [$SIGSEGV]
+	{
+		Name							"Wild Revolver"
+		OriginalItemName				"Upgradeable TF_WEAPON_REVOLVER"
+		"special item description"		"[INFO] Beggars style revolver. Damage can be upgraded. Innate 50% damage bonus."
+		"auto fires full clip"			1
+		"auto fires when full"			1
+		// "spread penalty"				2.2 //fucking atrocity
+		"fire rate penalty hidden"		0.66
+		"reload time increased hidden"	1.2	// 1.1	// 1.3
+		Paintkit_proto_def_index		403
+		Set_item_texture_wear			0
+		"crit mod disabled"				0
+		"clip size penalty"				0.5	// zooks idea.
+		"damage bonus HIDDEN"			1.5	// zooks idea.
+		"custom weapon fire sound"		=85|weapons/357_fire2.wav
+		"custom weapon reload sound"	=80|weapons/357/357_reload3.wav
+	}
+
+	ExtraLoadoutItems [$SIGSEGV]
+	{
+		Scout	// differs from heavy because 2012bfb isn't a melee
+		{
+			Primary	"Baby Face's Blaster 2012 (OG)"
+		}
+
+		Soldier
+		{
+			Primary	"The Follower"
+		}
+
+		Pyro
+		{
+			Primary		"The Flagbearer's Flogistinator"
+			Secondary	"Blast Handcannon"
+		}
+
+		Demoman
+		{
+			Primary	"The Marble Zone"
+		}
+
+		HeavyWeapons	// he gets two because GRU is already in the game
+		{
+			Primary	Railgun
+			Melee	"Gloves of Running Urgently 2015-16 (Pre-JI)"
+		}
+
+		Engineer
+		{
+			Secondary	"Frontier's Aggressor"
+		}
+
+		Medic
+		{
+			Melee	"Stasis Shock"
+		}
+
+		Sniper
+		{
+			Primary	"Plasma Bow"
+		}
+
+		Spy
+		{
+			Secondary	"Wild Revolver"
+		}
+	}
+
+	ExtendedUpgrades [$SIGSEGV]
+	{
+		Handcannon_damage
+		{
+			Name		"+25% damage bonus"
+			Attribute	"damage bonus HIDDEN"
+			Cap			2
+			Increment	0.25
+			Cost		300
+
+			AllowedWeapons
+			{
+				ItemName	"Blast Handcannon"
+			}
+		}
+
+		Handcannon_projspeed
+		{
+			Name		"+25% projectile speed"
+			Attribute	"projectile speed increased"
+			Cap			2
+			Increment	0.25
+			Cost		150
+
+			AllowedWeapons
+			{
+				ItemName	"Blast Handcannon"
+			}
+		}
+
+		Wildrevolver_Damage
+		{
+			Name		"+25% damage bonus"
+			Attribute	"damage bonus"
+			Cap			2
+			Increment	0.25
+			Cost		300
+
+			AllowedWeapons
+			{
+				ItemName	"Wild Revolver"
+			}
+		}
+		// Wildrevolver_Special
+		// {
+		// Name		"High Noon"
+		// Attribute	"killstreak tier"
+		// Description	"Last shot always crits, damage increased by 35%."
+		// Cap			2
+		// Increment	2
+		// Cost		650
+		// AllowedWeapons
+		// {
+		// ItemName	"Wild Revolver"
+		// }
+		// SecondaryAttributes
+		// {
+		// "killstreak idleeffect"	2
+		// "CARD: damage bonus"	0.35
+		// "last shot crits"		1
+		// }
+		// RequiredUpgrade
+		// {
+		// Upgrade	Wildrevolver_Damage
+		// Level	4
+		// }
+		// OnApply
+		// {
+		// OutPut	"!activator,$giveitem,Texas Ten Gallon,0,0"
+		// }
+		// OnUpgrade
+		// {
+		// Output	!activator,$playsoundtoself,weapons/saxxy_impact_gen_06.wav,0
+		// Output	!activator,speakresponseconcept,TLK_MVM_LOOT_RARE,1.5
+		// OutPut	"!activator,$giveitem,Texas Ten Gallon,0,0"
+		// }
+		// }
+	}
+	// RAFMOD END
+	// WAVE 1 //////////CURRENCY 1100///////////////////////////////////
+
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	trigger
+		}
+
+		WaveSpawn
+		{
+			Name				YOU_WANNA_BE_A_BIG_SHOT?
+			Where				spawnbot
+			TotalCount			7	// 8 //7 //6
+			MaxActive			4	// 2
+			SpawnCount			1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	25
+			TotalCurrency		120
+
+			TFBot
+			{
+				Template	T_TFBot_Giant_Soldier_Spammer_Reload	// Demo_Scatter
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage1
+			Where				spawnbot
+			TotalCount			45
+			MaxActive			20
+			SpawnCount			5	// 15
+			WaitBeforeStarting	5
+			WaitBetweenSpawns	4	// 8
+			TotalCurrency		260
+
+			TFBot
+			{
+				Template	T_TFBot_Scout_Bonk
+				Attributes	AlwaysCrit
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage2
+			WaitForAllSpawned	stage1
+			Where				spawnbot
+			TotalCount			32
+			MaxActive			16
+			SpawnCount			8
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	8	// 10
+			TotalCurrency		200
+
+			TFBot
+			{
+				Class	Soldier
+				Skill	Normal
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage2
+			WaitForAllSpawned	stage1
+			Where				spawnbot_right
+			TotalCount			16
+			MaxActive			8
+			SpawnCount			4
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	8	// 10
+			TotalCurrency		160
+
+			TFBot
+			{
+				Class	Heavyweapons
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage3
+			WaitForAllSpawned	stage2
+			Where				spawnbot_left
+			TotalCount			36
+			MaxActive			12	// 20
+			SpawnCount			4
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	5
+			TotalCurrency		360
+			Support				1
+
+			Squad
+			{
+				TFBot
+				{
+					Class		Pyro
+					Attributes	AlwaysFireWeapon
+					Attributes	AlwaysCrit
+				}
+
+				TFBot
+				{
+					Template	T_TFBot_Medic	// _Bigheal //_Kritz
+				}
+
+				TFBot
+				{
+					Class	Demoman
+					Skill	Expert
+				}
+
+				TFBot
+				{
+					Class	Demoman
+					Skill	Expert
+				}
+			}
+		}
+	}
+	// WAVE 2 //////////CURRENCY 1100///////////////////////////////////
+
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	trigger
+		}
+
+		WaveSpawn
+		{
+			Name				stage1
+			Where				spawnbot
+			TotalCount			12	// 16 //12
+			MaxActive			8
+			SpawnCount			4
+			WaitBeforeStarting	0	// 15 //12.5 //15
+			WaitBetweenSpawns	30	// 25 //30
+			TotalCurrency		300
+
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier_Spammer_Buff	// Extended_Buff_Banner
+				}
+
+				TFBot
+				{
+					Class	Heavyweapons
+					Skill	Normal
+				}
+
+				TFBot
+				{
+					Class	Heavyweapons
+					Skill	Normal
+				}
+
+				TFBot
+				{
+					Class	Heavyweapons
+					Skill	Normal
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage1
+			Where				spawnbot
+			TotalCount			12	// 16 //12
+			MaxActive			8
+			SpawnCount			4
+			WaitBeforeStarting	15	// 0
+			WaitBetweenSpawns	30	// 25 //30
+			TotalCurrency		300
+
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_HeavyWeapons	// Demoman
+					Name		"Giant Battalion's Backup Heavy"
+					ClassIcon	heavy_backup_yoovy	// lite //demo_backup_lite
+					// Item "Glengarry Bonnet"
+					Attributes	SpawnWithFullCharge
+					Item		"The Battalion's Backup"
+
+					CharacterAttributes
+					{
+						"increase buff duration"	6942	// avg told me to
+						"deploy time increased"		0.5
+					}
+				}
+
+				TFBot
+				{
+					Class	Heavyweapons
+					Skill	Normal
+				}
+
+				TFBot
+				{
+					Class	Heavyweapons
+					Skill	Normal
+				}
+
+				TFBot
+				{
+					Class	Heavyweapons
+					Skill	Normal
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				suppoop
+			WaitForAllSpawned	stage1
+			Where				spawnbot_left
+			TotalCount			50
+			MaxActive			10
+			SpawnCount			10
+			WaitBeforeStarting	0	// 10 //20
+			WaitBetweenSpawns	15	// 5 //15
+			TotalCurrency		100
+			Support				1
+
+			TFBot
+			{
+				Class	Scout
+				Skill	Expert
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				tanks
+			TotalCount			1
+			SpawnCount			1
+			WaitBeforeStarting	10
+			TotalCurrency		200
+
+			Tank
+			{
+				Health					25000	// 30000
+				Speed					75
+				Name					tankboss
+				Skin					0	// 0 - normal skin, 1 - final wave skin
+				StartingPathTrackNode	tank_path_a_1	// if this is not here have fun with the hatch tank
+
+				OnKilledOutput	// output sent when the Tank is killed (almost never used)
+				{
+					Target	tank_died_relay
+					Action	Trigger
+				}
+
+				OnBombDroppedOutput	// output sent when the Tank drops its bomb once it reaches the end of its path
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target	wave_start_relay
+				Action	RunScriptCode
+				Param	"
+				ClientPrint(null,3,`\x0799CCFFTank deployed with 25k (25000) HP!`)
+				"
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				tanks
+			TotalCount			1
+			SpawnCount			1
+			WaitBeforeStarting	65	// 50 //70
+			TotalCurrency		200
+
+			Tank
+			{
+				Health					25000	// 30000
+				Speed					75
+				Name					tankboss
+				Skin					0	// 0 - normal skin, 1 - final wave skin
+				StartingPathTrackNode	tank_path_a_1	// if this is not here have fun with the hatch tank
+
+				OnKilledOutput	// output sent when the Tank is killed (almost never used)
+				{
+					Target	tank_died_relay
+					Action	Trigger
+				}
+
+				OnBombDroppedOutput	// output sent when the Tank drops its bomb once it reaches the end of its path
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target	wave_start_relay
+				Action	RunScriptCode
+				Param	"
+				ClientPrint(null,3,`\x0799CCFFTank deployed with 25k (25000) HP!`)
+				"
+			}
+		}
+	}
+	// WAVE 3 //////////CURRENCY 1100/////////////////////////////////// feel like this wave might be a bit harsh
+
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	trigger
+		}
+
+		WaveSpawn
+		{
+			Name				stage1
+			Where				spawnbot
+			TotalCount			36
+			MaxActive			18
+			SpawnCount			9
+			WaitBeforeStarting	5
+			WaitBetweenSpawns	10
+			TotalCurrency		200
+
+			TFBot
+			{
+				Class	Soldier
+				Skill	Expert
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage1
+			Where				spawnbot_right
+			TotalCount			4
+			MaxActive			4
+			SpawnCount			2
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	30
+			TotalCurrency		200
+
+			TFBot
+			{
+				Template	T_TFBot_Giant_HeavyWeapons_ShotGun
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage2
+			WaitForAllSpawned	stage1
+			Where				spawnbot
+			TotalCount			4
+			MaxActive			2
+			SpawnCount			2
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	30
+			TotalCurrency		200
+
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier_Spammer_Reload
+				}
+
+				TFBot
+				{
+					Template	T_TFBot_Giant_Medic_QuickUber	// T_TFBot_Giant_Medic //_Regen
+					// ClassIcon medic_pop
+				}
+			}
+		}
+		// Bazooks had an idea where i remove the tank and add in walkin engies like disint. But ppl like this wave so i'm too much of a coward to change it.
+
+		WaveSpawn
+		{
+			// Name stage2
+			WaitForAllSpawned	stage1
+			TotalCount			1
+			SpawnCount			1
+			WaitBeforeStarting	20
+			TotalCurrency		200
+
+			Tank
+			{
+				Health					35000
+				Speed					75
+				Name					tankboss
+				Skin					0	// 0 - normal skin, 1 - final wave skin
+				StartingPathTrackNode	tank_path_a_1	// if this is not here have fun with the hatch tank
+
+				OnKilledOutput	// output sent when the Tank is killed (almost never used)
+				{
+					Target	tank_died_relay
+					Action	Trigger
+				}
+
+				OnBombDroppedOutput	// output sent when the Tank drops its bomb once it reaches the end of its path
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target	wave_start_relay
+				Action	RunScriptCode
+				Param	"
+				ClientPrint(null,3,`\x0799CCFFTank deployed with 35k (35000) HP!`)
+				"
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage2
+			WaitForAllSpawned	stage1
+			Where				spawnbot
+			TotalCount			2
+			MaxActive			2
+			SpawnCount			2
+			WaitBeforeStarting	50
+			TotalCurrency		100
+
+			TFBot
+			{
+				Template	T_TFBot_Giant_Scout_BaseBall
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage3
+			WaitForAllDead		stage2
+			Where				spawnbot
+			TotalCount			30	// 15
+			MaxActive			19	// 15
+			SpawnCount			15
+			WaitBeforeStarting	5
+			TotalCurrency		100
+			Support				Limited
+
+			TFBot
+			{
+				Template	T_TFBot_Soldier_Extended_Concheror
+				Skill		Expert	// blame floro.
+			}
+		}
+
+		WaveSpawn
+		{
+			Name					stage3
+			WaitForAllDead			stage2
+			Where					spawnbot
+			TotalCount				4
+			MaxActive				4
+			SpawnCount				4
+			WaitBeforeStarting		0
+			TotalCurrency			100
+			FirstSpawnWarningSound	vo/mvm/mght/taunts/heavy_mvm_m_taunts12.mp3
+
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_HeavyWeapons_ShotGun
+					ClassIcon	heavy_shotgun_armored
+					Health		15000
+					Attributes	AlwaysCrit
+					Attributes	UseBossHealthBar
+					Name		"Giant Giga-Armor Shotgun Heavy"
+					Item		"The Razorback"
+					Item		"Blast Defense"
+					Item		"Heavy Heating"
+				}
+
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+				}
+
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+				}
+
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+				}
+			}
+		}
+	}
+	// WAVE 4 //////////CURRENCY 1100///////////////////////////////////
+
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	trigger
+		}
+
+		WaveSpawn
+		{
+			Name				tanks
+			TotalCount			8	// 4 mins of tanks
+			MaxActive			5	// 8
+			SpawnCount			1
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	30
+			Support				Limited
+
+			Tank
+			{
+				Health					7500	// 15000
+				Speed					75
+				Name					tankboss
+				Skin					0	// 0 - normal skin, 1 - final wave skin
+				StartingPathTrackNode	tank_path_a_1	// if this is not here have fun with the hatch tank
+
+				OnKilledOutput	// output sent when the Tank is killed (almost never used)
+				{
+					Target	tank_died_relay
+					Action	Trigger
+				}
+
+				OnBombDroppedOutput	// output sent when the Tank drops its bomb once it reaches the end of its path
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target	wave_start_relay
+				Action	RunScriptCode
+				Param	"
+				ClientPrint(null,3,`\x0799CCFF8 support tanks deployed with 7.5k (7500) HP!`)
+				"
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage1
+			Where				spawnbot
+			TotalCount			20
+			MaxActive			10
+			SpawnCount			4
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	2
+			TotalCurrency		100
+
+			Squad
+			{
+				TFBot
+				{
+					Class	Heavyweapons
+					Skill	Expert
+				}
+
+				TFBot
+				{
+					Template	T_TFBot_Medic	// _QuickUber
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage1
+			Where				spawnbot_right
+			TotalCount			20
+			MaxActive			10
+			SpawnCount			4
+			WaitBeforeStarting	0.5
+			WaitBetweenSpawns	2
+			TotalCurrency		100
+
+			Squad
+			{
+				TFBot
+				{
+					Class	Heavyweapons
+					Skill	Normal
+				}
+
+				TFBot
+				{
+					Template	T_TFBot_Medic_Kritz
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				giants
+			// WaitForAllSpawned stage1
+			Where				spawnbot
+			TotalCount			12
+			MaxActive			8
+			SpawnCount			2
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	15
+			TotalCurrency		180
+
+			TFBot
+			{
+				Template	T_TFBot_Giant_Soldier_Crit
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage2
+			WaitForAllSpawned	stage1
+			Where				spawnbot_right
+			TotalCount			32
+			MaxActive			16
+			SpawnCount			4
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	8
+			TotalCurrency		100
+
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Fist
+					Attributes	AlwaysCrit
+				}
+
+				TFBot
+				{
+					Template	T_TFBot_Medic	// _QuickUber
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				giants2
+			WaitForAllDead		giants	// stage2
+			Where				spawnbot
+			TotalCount			6
+			MaxActive			3
+			SpawnCount			1
+			WaitBeforeStarting	5	// 10
+			WaitBetweenSpawns	15
+			TotalCurrency		180
+
+			TFBot
+			{
+				Template	T_TFBot_Giant_Soldier_Spammer
+				// Attributes AlwaysCrit
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage3
+			WaitForAllSpawned	stage2
+			Where				spawnbot
+			TotalCount			32
+			MaxActive			12
+			SpawnCount			4
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	0.5
+			TotalCurrency		160
+
+			TFBot
+			{
+				Class	Heavyweapons
+				Skill	Hard
+			}
+		}
+
+		WaveSpawn
+		{
+			Name			dummy
+			WaitForAllDead	stage3
+		}
+
+		WaveSpawn
+		{
+			Name			dummy
+			WaitForAllDead	giants2
+		}
+
+		WaveSpawn
+		{
+			Name			dummy2
+			WaitForAllDead	dummy
+
+			StartWaveOutput
+			{
+				Target	wave_start_relay
+				Action	RunScriptCode
+				Param	"
+					for (local ent; ent = Entities.FindByName(ent, `tankboss`);) {
+						EntFireByHandle(ent, `RemoveHealth`, `15000`, 0, null, null)
+					}
+				"
+			}
+			// kill tanks when wave is over.
+		}
+
+		WaveSpawn
+		{
+			Name				suppoop
+			WaitForAllSpawned	stage3
+			Where				spawnbot_left
+			TotalCount			60
+			MaxActive			12
+			SpawnCount			10
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	10
+			TotalCurrency		280
+			Support				1
+
+			TFBot
+			{
+				Class		Soldier
+				Skill		Expert
+				Item		"The Direct Hit"
+				ClassIcon	soldier_directhit_lite
+			}
+		}
+	}
+	// WAVE 5 //////////CURRENCY 1100///////////////////////////////////
+
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target	wave_start_2bomb_relay
+			Action	Trigger
+		}
+
+		WaveSpawn
+		{
+			Name						lolnospy
+			Where						spawnbot_left
+			TotalCount					1
+			MaxActive					1
+			SpawnCount					1
+			WaitBeforeStarting			2
+			WaitBetweenSpawnsAfterDeath	3
+			Support						1
+
+			TFBot
+			{
+				Class		Pyro
+				Attributes	AlwaysFireWeapon
+			}
+		}
+
+		WaveSpawn
+		{
+			Name						lolnospy
+			Where						spawnbot_right
+			TotalCount					1
+			MaxActive					1
+			SpawnCount					1
+			WaitBeforeStarting			4
+			WaitBetweenSpawnsAfterDeath	3
+			Support						1
+
+			TFBot
+			{
+				Class		Pyro
+				Attributes	AlwaysFireWeapon
+			}
+		}
+
+		WaveSpawn
+		{
+			Name						lolnospy
+			Where						spawnbot
+			TotalCount					1
+			MaxActive					1
+			SpawnCount					1
+			WaitBeforeStarting			8
+			WaitBetweenSpawnsAfterDeath	3
+			Support						1
+
+			TFBot
+			{
+				Class		Pyro
+				Attributes	AlwaysFireWeapon
+			}
+		}
+
+		WaveSpawn	// add another one in after a minute
+		{
+			Name						lolnospy
+			Where						spawnbot_invasion
+			TotalCount					1
+			MaxActive					1
+			SpawnCount					1
+			WaitBeforeStarting			60
+			WaitBetweenSpawnsAfterDeath	3
+			Support						1
+
+			TFBot
+			{
+				Class		Pyro
+				Attributes	AlwaysFireWeapon
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage1
+			Where				spawnbot_left
+			TotalCount			2
+			MaxActive			2
+			SpawnCount			2
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			TotalCurrency		100
+
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier_RocketPush	// T_TFBot_Soldier_BurstFire
+					// ClassIcon soldier_burstfire_hyper_lite
+					// Name "Giga Burst Fire Soldier"
+					// Item "Armored Authority"
+				}
+
+				TFBot
+				{
+					Template	T_TFBot_Giant_Medic_QuickUber	// T_TFBot_Giant_Medic
+					// ClassIcon medic_pop
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage1
+			Where				spawnbot_right
+			TotalCount			2
+			MaxActive			2
+			SpawnCount			2
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			TotalCurrency		100
+
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier_RocketPush	// T_TFBot_Soldier_BurstFire
+					// ClassIcon soldier_burstfire_hyper_lite
+					// Name "Giga Burst Fire Soldier"
+					// Item "Armored Authority"
+				}
+
+				TFBot
+				{
+					Template	T_TFBot_Giant_Medic_QuickUber	// T_TFBot_Giant_Medic
+					// ClassIcon medic_pop
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage2
+			WaitForAllDead		stage1
+			Where				spawnbot
+			TotalCount			8
+			MaxActive			8
+			SpawnCount			2
+			WaitBeforeStarting	3
+			WaitBetweenSpawns	20	// 15
+			TotalCurrency		100
+
+			TFBot
+			{
+				Template	T_TFBot_Giant_Pyro
+				Attributes	AlwaysCrit
+				Attributes	AlwaysFireWeapon
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage2
+			WaitForAllDead		stage1
+			Where				spawnbot
+			TotalCount			4
+			MaxActive			4
+			SpawnCount			1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	20	// 15
+			TotalCurrency		100
+
+			TFBot
+			{
+				Template	T_TFBot_Giant_Heavyweapons_Deflector
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage2
+			WaitForAllDead		stage1
+			TotalCount			1
+			SpawnCount			1
+			WaitBeforeStarting	15
+			TotalCurrency		200
+
+			Tank
+			{
+				Health					35000
+				Speed					75
+				Name					tankboss
+				Skin					0	// 0 - normal skin, 1 - final wave skin
+				StartingPathTrackNode	tank_path_a_1	// if this is not here have fun with the hatch tank
+
+				OnKilledOutput	// output sent when the Tank is killed (almost never used)
+				{
+					Target	tank_died_relay
+					Action	Trigger
+				}
+
+				OnBombDroppedOutput	// output sent when the Tank drops its bomb once it reaches the end of its path
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target	wave_start_relay
+				Action	RunScriptCode
+				Param	"
+				ClientPrint(null,3,`\x0799CCFFTank deployed with 35k (35000) HP!`)
+				"
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage3
+			WaitForAllSpawned	stage2
+			Where				spawnbot
+			TotalCount			8	// 12
+			MaxActive			8	// 12
+			SpawnCount			2
+			WaitBeforeStarting	30	// 15
+			WaitBetweenSpawns	15
+			TotalCurrency		100
+
+			TFBot
+			{
+				Template	T_TFBot_Giant_Scout_Fast
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage3
+			WaitForAllSpawned	stage2
+			Where				spawnbot
+			TotalCount			6	// 10
+			MaxActive			6	// 10
+			SpawnCount			2
+			WaitBeforeStarting	30	// 15
+			WaitBetweenSpawns	15
+			TotalCurrency		100
+
+			TFBot
+			{
+				Template	T_TFBot_Giant_Soldier_Spammer
+			}
+		}
+
+		WaveSpawn
+		{
+			Name				stage4
+			WaitForAllSpawned	stage3
+			TotalCount			1
+			SpawnCount			1
+			WaitBeforeStarting	0
+			TotalCurrency		150
+
+			Tank
+			{
+				Health					35000	// 45000 //25000
+				Speed					75
+				Name					tankboss
+				Skin					1	// 0 - normal skin, 1 - final wave skin
+				StartingPathTrackNode	tank_path_a_1	// if this is not here have fun with the hatch tank
+
+				OnKilledOutput	// output sent when the Tank is killed (almost never used)
+				{
+					Target	tank_died_relay
+					Action	Trigger
+				}
+
+				OnBombDroppedOutput	// output sent when the Tank drops its bomb once it reaches the end of its path
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+
+			FirstSpawnOutPut
+			{
+				Target	wave_start_relay
+				Action	RunScriptCode
+				Param	"
+				ClientPrint(null,3,`\x0799CCFFTank deployed with 35k (35000) HP!`)
+				"
+			}
+		}
+
+		WaveSpawn
+		{
+			Name					stage4
+			WaitForAllSpawned		stage3
+			Where					spawnbot
+			TotalCount				3
+			MaxActive				3
+			SpawnCount				3
+			WaitBeforeStarting		5	// 15
+			WaitBetweenSpawns		0
+			TotalCurrency			150
+			FirstSpawnWarningSound	vo/mvm/mght/heavy_mvm_m_domination08.mp3
+
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_HeavyWeapons
+					Attributes	AlwaysCrit
+					ClassIcon	heavy_armored
+					Health		15000
+					Attributes	UseBossHealthBar
+					Name		"Giant Giga-Armor Heavy"
+					Item		"The Razorback"
+					Item		"Blast Defense"
+					Item		"Heavy Heating"
+				}
+
+				TFBot
+				{
+					Template	T_TFBot_Giant_Medic_Regen
+
+					CharacterAttributes
+					{
+						"health from healers increased"	0
+					}
+				}
+
+				TFBot
+				{
+					Template	T_TFBot_Giant_Medic_Regen
+
+					CharacterAttributes
+					{
+						"health from healers increased"	0
+					}
+				}
+			}
+		}
+	}
+}

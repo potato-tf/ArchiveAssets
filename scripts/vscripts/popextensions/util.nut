@@ -22,7 +22,20 @@
 		"models/weapons/c_models/c_engineer_bot_arms.mdl",
 		"", // Civilian
 	]
-
+	HUMAN_ARM_PATHS =
+	[
+		"models/weapons/c_models/c_medic_arms.mdl", //dummy
+		"models/weapons/c_models/c_scout_arms.mdl",
+		"models/weapons/c_models/c_sniper_arms.mdl",
+		"models/weapons/c_models/c_soldier_arms.mdl",
+		"models/weapons/c_models/c_demo_arms.mdl",
+		"models/weapons/c_models/c_medic_arms.mdl",
+		"models/weapons/c_models/c_heavy_arms.mdl",
+		"models/weapons/c_models/c_pyro_arms.mdl",
+		"models/weapons/c_models/c_spy_arms.mdl",
+		"models/weapons/c_models/c_engineer_arms.mdl",
+		"models/weapons/c_models/c_engineer_gunslinger.mdl",	//CIVILIAN/Gunslinger
+	]
 	MaxAmmoTable = {
 		[TF_CLASS_SCOUT] = {
 			["tf_weapon_scattergun"]            = 32,
@@ -148,11 +161,12 @@
 	Worldspawn = FindByClassname(null, "worldspawn")
 	StartRelay = FindByName(null, "wave_start_relay")
 	FinishedRelay = FindByName(null, "wave_finished_relay")
+	TriggerHurt = CreateByClassname("trigger_hurt")
 
 	CurrentWaveNum = GetPropInt(FindByClassname(null, "tf_objective_resource"), "m_nMannVsMachineWaveCount")
 
 	ClientCommand = SpawnEntityFromTable("point_clientcommand", {targetname = "_clientcommand"})
-	GameRoundWin = SpawnEntityFromTable("game_round_win", {targetname = "__utilroundwin", TeamNum = 3, force_map_reset = 1})
+	GameRoundWin = SpawnEntityFromTable("game_round_win", {targetname = "__utilroundwin", TeamNum = TF_TEAM_PVE_INVADERS, force_map_reset = 1})
 	RespawnOverride = SpawnEntityFromTable("trigger_player_respawn_override", {spawnflags = SF_TRIGGER_ALLOW_CLIENTS})
 
 	Events = {
@@ -168,10 +182,10 @@
 
 				// printl(player)
 
-				if (player != null && player.IsBotOfType(1337) && PopExtUtil.BotArray.find(player) == null)
+				if (player != null && player.IsBotOfType(TF_BOT_TYPE) && PopExtUtil.BotArray.find(player) == null)
 					PopExtUtil.BotArray.append(player)
 
-				else if (player != null && PopExtUtil.HumanArray.find(player) == null)
+				else if (player != null && !player.IsBotOfType(TF_BOT_TYPE) && PopExtUtil.HumanArray.find(player) == null)
 					PopExtUtil.HumanArray.append(player)
 
 				if (player != null && PopExtUtil.PlayerArray.find(player) == null)
@@ -189,10 +203,29 @@
 			//sort weapons by slot
 			local myweapons = {}
 			for (local i = 0; i < SLOT_COUNT; i++) {
+
 				local wep = GetPropEntityArray(player, "m_hMyWeapons", i)
 				if (wep == null) continue
 
 				myweapons[wep.GetSlot()] <- wep
+
+				//add weapon think table while we're here
+
+				wep.ValidateScriptScope()
+				local scope = wep.GetScriptScope()
+
+				scope.ItemThinkTable <- {}
+
+				scope.ItemThinks <- function() { foreach (name, func in scope.ItemThinkTable) func.call(scope); return -1 }
+
+				_AddThinkToEnt(wep, "ItemThinks")
+			}
+
+			for (local child = player.FirstMoveChild(); child != null; child = child.NextMovePeer())
+			{
+				child.ValidateScriptScope()
+				local scope = child.GetScriptScope()
+				if (!("ItemThinkTable" in scope)) scope.ItemThinkTable <- {}
 			}
 			foreach(slot, wep in myweapons)
 			{
@@ -201,10 +234,10 @@
 				SetPropEntityArray(player, "m_hMyWeapons", wep, slot)
 			}
 
-			if (player.IsBotOfType(1337) && PopExtUtil.BotArray.find(player) == null)
+			if (player.IsBotOfType(TF_BOT_TYPE) && PopExtUtil.BotArray.find(player) == null)
 				PopExtUtil.BotArray.append(player)
 
-			else if (PopExtUtil.HumanArray.find(player) == null)
+			else if (!player.IsBotOfType(TF_BOT_TYPE) && PopExtUtil.HumanArray.find(player) == null)
 				PopExtUtil.HumanArray.append(player)
 
 			if (PopExtUtil.PlayerArray.find(player) == null)
@@ -216,7 +249,7 @@
 
 			local player = GetPlayerFromUserID(params.userid)
 
-			if (!player.IsBotOfType(1337) && PopExtUtil.HumanArray.find(player) == null)
+			if (!player.IsBotOfType(TF_BOT_TYPE) && PopExtUtil.HumanArray.find(player) == null)
 				PopExtUtil.HumanArray.append(player)
 
 			else if (PopExtUtil.PlayerArray.find(player) == null)
@@ -236,6 +269,8 @@
 		}
 	}
 }
+
+PopExtUtil.TriggerHurt.DispatchSpawn()
 
 NavMesh.GetAllAreas(PopExtUtil.AllNavAreas)
 
@@ -277,7 +312,7 @@ function PopExtUtil::PlayerClassCount()
 	return classes
 }
 
-function PopExtUtil::ChangePlayerTeamMvM(player, teamnum = 3)
+function PopExtUtil::ChangePlayerTeamMvM(player, teamnum = TF_TEAM_PVE_INVADERS)
 {
 	if (PopExtUtil.GameRules) {
 		SetPropBool(PopExtUtil.GameRules, "m_bPlayingMannVsMachine", false);
@@ -397,8 +432,8 @@ function PopExtUtil::SetParentLocalOriginDo(child, parent, attachment = null) {
 	child.SetLocalAngles(origAngles)
 
 	local origVel = child.GetVelocity()
-	child.SetVelocity(origVel + Vector(0, 0, 1))
-	child.SetVelocity(origVel)
+	child.SetAbsVelocity(origVel + Vector(0, 0, 1))
+	child.SetAbsVelocity(origVel)
 
 	EntFireByHandle(child, "SetParent", "!activator", 0, parent, parent)
 	if (attachment != null) {
@@ -412,9 +447,9 @@ function PopExtUtil::SetParentLocalOriginDo(child, parent, attachment = null) {
 function PopExtUtil::SetParentLocalOrigin(child, parent, attachment = null) {
 	if (typeof child == "array")
 		foreach(i, childIn in child)
-			SetParentLocalOriginDo(childIn, parent, attachment)
+			PopExtUtil.SetParentLocalOriginDo(childIn, parent, attachment)
 	else
-		SetParentLocalOriginDo(child, parent, attachment)
+		PopExtUtil.SetParentLocalOriginDo(child, parent, attachment)
 }
 
 // Setup collision bounds of a trigger entity
@@ -436,7 +471,7 @@ function PopExtUtil::SetupTriggerBounds(trigger, mins = null, maxs = null) {
 function PopExtUtil::PrintTable(table) {
 	if (table == null) return;
 
-	DoPrintTable(table, 0)
+	PopExtUtil.DoPrintTable(table, 0)
 }
 
 function PopExtUtil::DoPrintTable(table, indent) {
@@ -459,7 +494,7 @@ function PopExtUtil::DoPrintTable(table, indent) {
 
 		if (typeof v == "table" || typeof v == "array") {
 			ClientPrint(null, 2, line)
-			DoPrintTable(v, indent)
+			PopExtUtil.DoPrintTable(v, indent)
 		}
 		else {
 			try {
@@ -489,7 +524,7 @@ function PopExtUtil::CreatePlayerWearable(player, model, bonemerge = true, attac
 	if (modelIndex == -1)
 		modelIndex = PrecacheModel(model)
 
-	local wearable = Entities.CreateByClassname("tf_wearable")
+	local wearable = CreateByClassname("tf_wearable")
 	SetPropInt(wearable, "m_nModelIndex", modelIndex)
 	wearable.SetSkin(player.GetTeam())
 	wearable.SetTeam(player.GetTeam())
@@ -503,8 +538,8 @@ function PopExtUtil::CreatePlayerWearable(player, model, bonemerge = true, attac
 	SetPropInt(wearable, "m_AttributeManager.m_Item.m_iItemIDHigh", 0)
 
 	wearable.SetOwner(player)
-	Entities.DispatchSpawn(wearable)
-	SetPropInt(wearable, "m_fEffects", bonemerge ? 129 : 0)
+	DispatchSpawn(wearable)
+	SetPropInt(wearable, "m_fEffects", bonemerge ? EF_BONEMERGE|EF_BONEMERGE_FASTCULL : 0)
 	PopExtUtil.SetParentLocalOrigin(wearable, player, attachment)
 
 	player.ValidateScriptScope()
@@ -554,7 +589,7 @@ function PopExtUtil::Explanation(message, printColor = COLOR_YELLOW, messagePref
 		y = 0.3
 	})
 	SetPropBool(txtent, "m_bForcePurgeFixedupStrings", true)
-	SetTargetname(txtent, format("__ExplanationText%d",txtent.entindex()))
+	SetTargetname(txtent, format("__utilExplanationText%d",txtent.entindex()))
 	local strarray = []
 
 	//avoid needing to do a ton of function calls for multiple announcements.
@@ -564,7 +599,7 @@ function PopExtUtil::Explanation(message, printColor = COLOR_YELLOW, messagePref
 		if (n.len() > 0) {
 			strarray.append(n)
 			if (!startswith(n, "PAUSE") && !syncChatWithGameText)
-				ClientPrint(null, 3, format("\x07%s %s\x07%s %s", COLOR_YELLOW, messagePrefix, TF_COLOR_DEFAULT, n))
+				ClientPrint(null, 3, format("\x07%s %s\x07%s %s", printColor, messagePrefix, TF_COLOR_DEFAULT, n))
 		}
 
 	local i = -1
@@ -689,19 +724,19 @@ function PopExtUtil::_SetOwner(ent, owner) {
 	SetPropEntity(ent, "m_hOwnerEntity", owner)
 }
 
-function PopExtUtil::ShowAnnotation(text = "This is an annotation", lifetime = 10, pos = Vector(), id = 0, distance = true, sound = "misc/null.wav", entindex = 0, visbit = 0, effect = true) {
+function PopExtUtil::ShowAnnotation(args = {text = "This is an annotation", lifetime = 10, pos = Vector(), id = 0, distance = true, sound = "misc/null.wav", entindex = 0, visbit = 0, effect = true}) {
 	SendGlobalGameEvent("show_annotation", {
-		text = text
-		lifetime = lifetime
-		worldPosX = pos.x
-		worldPosY = pos.y
-		worldPosZ = pos.z
-		id = id
-		play_sound = sound
-		show_distance = distance
-		show_effect = effect
-		follow_entindex = entindex
-		visibilityBitfield = visbit
+		text = args.text
+		lifetime = args.lifetime
+		worldPosX = args.pos.x
+		worldPosY = args.pos.y
+		worldPosZ = args.pos.z
+		id = args.id
+		play_sound = args.sound
+		show_distance = args.distance
+		show_effect = args.effect
+		follow_entindex = args.entindex
+		visibilityBitfield = args.visbit
 	})
 }
 
@@ -739,6 +774,9 @@ function PopExtUtil::InButton(player, button) {
 
 function PopExtUtil::PressButton(player, button) {
 	SetPropInt(player, "m_afButtonForced", GetPropInt(player, "m_afButtonForced") | button); SetPropInt(player, "m_nButtons", GetPropInt(player, "m_nButtons") | button)
+}
+function PopExtUtil::ReleaseButton(player, button) {
+	SetPropInt(player, "m_afButtonForced", GetPropInt(player, "m_afButtonForced") & ~button); SetPropInt(player, "m_nButtons", GetPropInt(player, "m_nButtons") & ~button)
 }
 
 function PopExtUtil::IsPointInRespawnRoom(point)
@@ -816,12 +854,12 @@ function PopExtUtil::PlayerRobotModel(player, model) {
 	SetPropEntity(wearable, "m_hOwnerEntity", player)
 	wearable.SetTeam(player.GetTeam())
 	wearable.SetOwner(player)
-	wearable.DispatchSpawn()
+	DispatchSpawn(wearable)
 	EntFireByHandle(wearable, "SetParent", "!activator", -1, player, player)
-	SetPropInt(wearable, "m_fEffects", 129)
+	SetPropInt(wearable, "m_fEffects", EF_BONEMERGE|EF_BONEMERGE_FASTCULL)
 	scope.wearable <- wearable
 
-	SetPropInt(player, "m_nRenderMode", 1)
+	SetPropInt(player, "m_nRenderMode", kRenderTransColor)
 	SetPropInt(player, "m_clrRender", 0)
 
 	scope.PlayerThinkTable.BotModelThink <- function() {
@@ -878,7 +916,7 @@ function PopExtUtil::StunPlayer(player, duration = 5, type = 1, delay = 0, speed
 	utilstun.KeyValueFromFloat("trigger_delay", delay.tofloat())
 	utilstun.KeyValueFromInt("spawnflags", SF_TRIGGER_ALLOW_CLIENTS)
 
-	utilstun.DispatchSpawn()
+	DispatchSpawn(utilstun)
 
 	EntFireByHandle(utilstun, "EndTouch", "", -1, player, player)
 }
@@ -952,7 +990,7 @@ function PopExtUtil::ShowModelToPlayer(player, model = ["models/player/heavy.mdl
 	proxy_entity.SetSolid(SOLID_NONE)
 
 	SetPropBool(proxy_entity, "m_bPlacing", true)
-	SetPropInt(proxy_entity, "m_fObjectFlags", 2) // sets "attachment" flag, prevents entity being snapped to player feet
+	SetPropInt(proxy_entity, "m_fObjectFlags", OF_MUST_BE_BUILT_ON_ATTACHMENT) // sets "attachment" flag, prevents entity being snapped to player feet
 
 	// m_hBuilder is the player who the entity will be networked to only
 	SetPropEntity(proxy_entity, "m_hBuilder", player)
@@ -1040,6 +1078,11 @@ function PopExtUtil::RemovePlayerWearables(player) {
 
 function PopExtUtil::GiveWeapon(player, className, itemID)
 {
+	if (typeof itemID == "string" && className == "tf_wearable")
+	{
+		CTFBot.GenerateAndWearItem.call(player, itemID)
+		return
+	}
     local weapon = CreateByClassname(className)
     SetPropInt(weapon, STRING_NETPROP_ITEMDEF, itemID)
     SetPropBool(weapon, "m_AttributeManager.m_Item.m_bInitialized", true)
@@ -1306,6 +1349,65 @@ function PopExtUtil::capwords(s, sep = null) {
     return finalResult;
 }
 
+function PopExtUtil::EndWaveReverse(doteamswitch = true)
+{
+	local temp = CreateByClassname("info_teleport_destination")
+
+	if (!PopExtUtil.IsWaveStarted) return
+
+	//move to red
+	if (doteamswitch)
+		foreach (player in PopExtUtil.HumanArray)
+			PopExtUtil.ChangePlayerTeamMvM(player, TF_TEAM_PVE_DEFENDERS)
+
+	temp.ValidateScriptScope()
+	temp.GetScriptScope().ClearWave <- function()
+	{
+		if (!PopExtUtil.IsWaveStarted) {
+
+			if (doteamswitch)
+				foreach (player in PopExtUtil.HumanArray)
+					PopExtUtil.ChangePlayerTeamMvM(player, TF_TEAM_PVE_INVADERS)
+
+			SetPropString(self, "m_iszScriptThinkFunction", "")
+			EntFireByHandle(self, "Kill", "", -1, null, null)
+		}
+		//kill all bots
+		foreach (bot in PopExtUtil.BotArray)
+			if (PopExtUtil.IsAlive(bot) && bot.GetTeam() == TF_TEAM_PVE_DEFENDERS)
+				PopExtUtil.KillPlayer(bot);
+	}
+
+	AddThinkToEnt(temp, "ClearWave")
+}
+
+function PopExtUtil::AddThinkToEnt(ent, func)
+{
+	local scope = ent.GetScriptScope()
+	local thinktable = ""
+
+	if (ent.IsPlayer())
+		thinktable = "PlayerThinkTable"
+
+	else if ((ent.GetClassname() == "tank_boss"))
+		thinktable = "TankThinkTable"
+
+	else if (startswith(ent.GetClassname(), "tf_projectile"))
+		thinktable = "ProjectileThinkTable"
+
+	else if (HasProp(ent, "m_bValidatedAttachedEntity"))
+		thinktable = "ItemThinkTable"
+	else
+		_AddThinkToEnt(ent, func)
+
+	if (thinktable == "") return
+
+	if (!(thinktable in scope)) scope[thinktable] <- {}
+
+	func == null ? scope[thinktable].clear() : scope[format("%s", thinktable)][func] <- func
+}
+
+
 function PopExtUtil::SilentDisguise(player, target = null, tfteam = TF_TEAM_PVE_INVADERS, tfclass = TF_CLASS_SCOUT) {
 	if (player == null || !player.IsPlayer()) return
 
@@ -1442,7 +1544,7 @@ function PopExtUtil::TeleportNearVictim(ent, victim, attempt) {
 		local which = RandomInt(0, ambush_areas.len() - 1)
 		local where = ambush_areas[which].GetCenter() + Vector(0, 0, STEP_HEIGHT)
 
-		if (IsSpaceToSpawnHere(where, ent.GetBoundingMins(), ent.GetBoundingMaxs())) {
+		if (PopExtUtil.IsSpaceToSpawnHere(where, ent.GetBoundingMins(), ent.GetBoundingMaxs())) {
 			ent.SetAbsOrigin(where)
 			return true
 		}
@@ -1465,7 +1567,6 @@ function PopExtUtil::IsSpaceToSpawnHere(where, hullmin, hullmax) {
 	return trace.fraction >= 1.0
 }
 
-
 function PopExtUtil::ClearLastKnownArea(bot) {
 
 	local trigger = SpawnEntityFromTable("trigger_remove_tf_player_condition", {
@@ -1474,4 +1575,42 @@ function PopExtUtil::ClearLastKnownArea(bot) {
 	})
 	EntFireByHandle(trigger, "StartTouch", "!activator", -1, bot, bot)
 	EntFireByHandle(trigger, "Kill", "", -1, null, null)
+}
+
+function PopExtUtil::KillPlayer(player) {
+	player.TakeDamage(INT_MAX, 0, PopExtUtil.TriggerHurt);
+}
+
+function PopExtUtil::KillAllBots() {
+	foreach (bot in PopExtUtil.BotArray)
+		if (PopExtUtil.IsAlive(bot))
+			PopExtUtil.KillPlayer(bot)
+}
+
+function PopExtUtil::SetDestroyCallback(entity, callback)
+{
+	entity.ValidateScriptScope();
+	local scope = entity.GetScriptScope();
+	scope.setdelegate({}.setdelegate({
+			parent   = scope.getdelegate()
+			id       = entity.GetScriptId()
+			index    = entity.entindex()
+			callback = callback
+			_get = function(k)
+			{
+				return parent[k];
+			}
+			_delslot = function(k)
+			{
+				if (k == id)
+				{
+					entity = EntIndexToHScript(index);
+					local scope = entity.GetScriptScope();
+					scope.self <- entity;
+					callback.pcall(scope);
+				}
+				delete parent[k];
+			}
+		})
+	);
 }

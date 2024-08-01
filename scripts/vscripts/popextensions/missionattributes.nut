@@ -61,13 +61,33 @@ if (!("ScriptUnloadTable" in ROOT))
 		function OnGameEvent_player_changeclass(params) { foreach (_, func in MissionAttributes.ChangeClassTable) func(params) }
 		function OnGameEvent_player_team(params) {
 			local player = GetPlayerFromUserID(params.userid)
-			if (!player.IsBotOfType(1337) && params.team == TEAM_SPECTATOR && params.oldteam == TF_TEAM_PVE_INVADERS)
+			if (player && !player.IsBotOfType(TF_BOT_TYPE) && params.team == TEAM_SPECTATOR && params.oldteam == TF_TEAM_PVE_INVADERS)
 			{
 				EntFireByHandle(player, "RunScriptCode", "PopExtUtil.ChangePlayerTeamMvM(self, TF_TEAM_PVE_INVADERS)", -1, null, null)
 				EntFireByHandle(player, "RunScriptCode", "self.ForceRespawn()", SINGLE_TICK, null, null)
 			}
 		}
-		// Hook all wave inits to reset parsing error counter.
+
+		function OnGameEvent_pumpkin_lord_summoned(params) {
+
+			if ("HalloweenBossNotSolidToPlayers" in MissionAttributes && MissionAttributes.HalloweenBossNotSolidToPlayers)
+				for (local boss; boss = FindByClassname(boss, "headless_hatman");)
+					boss.SetCollisionGroup(COLLISION_GROUP_PUSHAWAY)
+		}
+
+		function OnGameEvent_eyeball_boss_summoned(params) {
+
+			if ("HalloweenBossNotSolidToPlayers" in MissionAttributes && MissionAttributes.HalloweenBossNotSolidToPlayers)
+				for (local boss; boss = FindByClassname(boss, "eyeball_boss");)
+					boss.SetCollisionGroup(COLLISION_GROUP_PUSHAWAY)
+		}
+
+		function OnGameEvent_merasmus_summoned(params) {
+
+			if ("HalloweenBossNotSolidToPlayers" in MissionAttributes && MissionAttributes.HalloweenBossNotSolidToPlayers)
+				for (local boss; boss = FindByClassname(boss, "merasmus");)
+					boss.SetCollisionGroup(COLLISION_GROUP_PUSHAWAY)
+		}
 
 		function OnGameEvent_player_death(params) {
 			if (MissionAttributes.SoundsToReplace.len() != 0)
@@ -77,7 +97,7 @@ if (!("ScriptUnloadTable" in ROOT))
 					{
 						StopSoundOn(sound, player)
 						if (override == null) continue
-						EmitSoundEx({sound_name = MissionAttributes.SoundsToReplace[override], entity = player})
+						EmitSoundEx({sound_name = MissionAttributes.SoundsToReplace[sound], entity = player})
 					}
 			}
 
@@ -129,9 +149,10 @@ foreach (_, func in ScriptLoadTable) func()
 __CollectGameEventCallbacks(MissionAttributes.Events);
 
 MissionAttributes.DeathHookTable.ForceRedMoneyKill <- function(params) {
+
 	local shouldCollect = false
 
-	if (MissionAttributes.RedMoneyValue > 1)
+	if (MissionAttributes.RedMoneyValue >= 1)
 		shouldCollect = true
 	else
 	{
@@ -139,8 +160,7 @@ MissionAttributes.DeathHookTable.ForceRedMoneyKill <- function(params) {
 
 		if (attacker)
 		{
-			local weaponName = params.weapon
-			local className = format("tf_weapon_%s", weaponName)
+			local weaponDefIndex = params.weapon_def_index
 
 			for (local i = 0; i < SLOT_COUNT; i++)
 			{
@@ -148,7 +168,7 @@ MissionAttributes.DeathHookTable.ForceRedMoneyKill <- function(params) {
 				if (weapon == null)
 					continue
 
-				if (weapon.GetClassname() != className)
+				if (PopExtUtil.GetItemIndex(weapon)!= weaponDefIndex)
 					continue
 
 				weapon.ValidateScriptScope()
@@ -203,7 +223,7 @@ MissionAttributes.DeathHookTable.ForceRedMoneyKill <- function(params) {
 			local fakePack = CreateByClassname("item_currencypack_custom")
 			SetPropBool(fakePack, "m_bDistributed", true)
 			SetPropEntity(fakePack, "m_hOwnerEntity", owner)
-			fakePack.DispatchSpawn()
+			DispatchSpawn(fakePack)
 			fakePack.SetModel(modelPath)
 
 			// position to ground, as fake pack won't have any velocity
@@ -222,6 +242,17 @@ MissionAttributes.DeathHookTable.ForceRedMoneyKill <- function(params) {
 			else
 				fakePack.SetAbsOrigin(origin)
 
+
+			fakePack.ValidateScriptScope()
+			fakePack.GetScriptScope().despawnTime <- Time() + TF_POWERUP_LIFETIME
+			fakePack.GetScriptScope().DespawnThink <- function () {
+				if (Time() < despawnTime)
+					return
+
+				fakePack.Kill()
+			}
+
+			AddThinkToEnt(fakePack, "DespawnThink")
 		}
 
 		entity.SetAbsOrigin(Vector(-1000000, -1000000, -1000000))
@@ -264,6 +295,7 @@ function MissionAttributes::ResetConvars(hideChatMessage = true)
 
 local noromecarrier = false
 function MissionAttributes::MissionAttr(...) {
+
 	local args = vargv
 	local attr
 	local value
@@ -293,17 +325,18 @@ function MissionAttributes::MissionAttr(...) {
 	// =========================================
 
 	case "ForceHoliday":
+
 		// @param Holiday		Holiday number to force.
 		// @error TypeError		If type is not an integer.
 		// @error IndexError	If invalid holiday number is passed.
 			// Error Handling
 		try (value.tointeger()) catch(_) {RaiseTypeError(attr, "int"); success = false; break}
 		if (type(value) != "integer") {RaiseTypeError(attr, "int"); success = false; break}
-		if (value < 0 || value > 11) {RaiseIndexError(attr, [0, 11]); success = false; break}
+		if (value < kHoliday_None || value >= kHolidayCount) {RaiseIndexError(attr, [kHoliday_None, kHolidayCount - 1]); success = false; break}
 
 		// Set Holiday logic
-		SetConvar("tf_forced_holiday", value)
-		if (value == 0) break
+		this.SetConvar("tf_forced_holiday", value)
+		if (value == kHoliday_None) break
 
 		local ent = FindByName(null, "MissionAttrHoliday");
 		if (ent != null) ent.Kill();
@@ -324,10 +357,12 @@ function MissionAttributes::MissionAttr(...) {
 		MissionAttributes.SpawnHookTable.RedBotsNoRandomCrit <- function(params)
 		{
 			local player = GetPlayerFromUserID(params.userid)
-			if (!player.IsBotOfType(1337) && player.GetTeam() != TF_TEAM_PVE_DEFENDERS) return
+			if (!player.IsBotOfType(TF_BOT_TYPE) && player.GetTeam() != TF_TEAM_PVE_DEFENDERS) return
 
 			PopExtUtil.AddAttributeToLoadout(player, "crit mod disabled hidden", 0)
 		}
+
+	break
 
 	// =====================
 	// disable crit pumpkins
@@ -369,6 +404,22 @@ function MissionAttributes::MissionAttr(...) {
 
 	break
 
+
+	// ====================
+	// set all mobber cvars
+	// ====================
+
+	case "AllMobber":
+
+		if (value < 1) return
+
+		this.SetConvar("tf_bot_escort_range", INT_MAX)
+		this.SetConvar("tf_bot_flag_escort_range", INT_MAX)
+		this.SetConvar("tf_bot_flag_escort_max_count", 0)
+
+	break
+
+
 	// ===========================
 	// allow standing on bot heads
 	// ===========================
@@ -378,7 +429,7 @@ function MissionAttributes::MissionAttr(...) {
 		local movekeys = IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT
 		MissionAttributes.SpawnHookTable.StandableHeads <- function(params) {
 			local player = GetPlayerFromUserID(params.userid)
-			if (player.IsBotOfType(1337)) return
+			if (player.IsBotOfType(TF_BOT_TYPE)) return
 
 			player.GetScriptScope().PlayerThinkTable.StandableHeads <- function() {
 				local groundent = GetPropEntity(player, "m_hGroundEntity")
@@ -414,7 +465,7 @@ function MissionAttributes::MissionAttr(...) {
 
 	case "MaxWaveNum":
 		MissionAttributes.StartWaveTable.SetMaxWaveNum <- function(params) { SetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineMaxWaveCount", value) }
-	MissionAttributes.StartWaveTable.SetMaxWaveNum(null)
+		MissionAttributes.StartWaveTable.SetMaxWaveNum(null)
 	break
 
 	// =========================================================
@@ -441,9 +492,11 @@ function MissionAttributes::MissionAttr(...) {
 	// ==============================================================
 
 	case "MultiSapper":
+
 		MissionAttributes.SpawnHookTable.MultiSapper <- function(params) {
+
 			local player = GetPlayerFromUserID(params.userid)
-			if (player.IsBotOfType(1337) || player.GetPlayerClass() < TF_CLASS_SPY) return
+			if (player.IsBotOfType(TF_BOT_TYPE) || player.GetPlayerClass() < TF_CLASS_SPY) return
 
 			player.GetScriptScope().BuiltObjectTable.MultiSapper <- function(params) {
 				if (params.object != OBJ_ATTACHMENT_SAPPER) return
@@ -458,58 +511,58 @@ function MissionAttributes::MissionAttr(...) {
 	//all of these could just be set directly in the pop easily, however popfile's have a 4096 character limit for vscript so might as well save space
 
 	case "NoRefunds":
-		SetConvar("tf_mvm_respec_enabled", 0);
+		this.SetConvar("tf_mvm_respec_enabled", 0);
 	break
 
 	// =========================================================
 
 	case "RefundLimit":
-		SetConvar("tf_mvm_respec_enabled", 1)
-		SetConvar("tf_mvm_respec_limit", value)
+		this.SetConvar("tf_mvm_respec_enabled", 1)
+		this.SetConvar("tf_mvm_respec_limit", value)
 	break
 
 	// =========================================================
 
 	case "RefundGoal":
-		SetConvar("tf_mvm_respec_enabled", 1)
-		SetConvar("tf_mvm_respec_credit_goal", value)
+		this.SetConvar("tf_mvm_respec_enabled", 1)
+		this.SetConvar("tf_mvm_respec_credit_goal", value)
 	break
 
 	// =========================================================
 
 	case "FixedBuybacks":
-		SetConvar("tf_mvm_buybacks_method", 1)
+		this.SetConvar("tf_mvm_buybacks_method", 1)
 	break
 
 	// =========================================================
 
 	case "BuybacksPerWave":
-		SetConvar("tf_mvm_buybacks_per_wave", value)
+		this.SetConvar("tf_mvm_buybacks_per_wave", value)
 	break
 
 	// =========================================================
 
 	case "NoBuybacks":
-		SetConvar("tf_mvm_buybacks_method", value)
-		SetConvar("tf_mvm_buybacks_per_wave", 0)
+		this.SetConvar("tf_mvm_buybacks_method", value)
+		this.SetConvar("tf_mvm_buybacks_per_wave", 0)
 	break
 
 	// =========================================================
 
 	case "DeathPenalty":
-		SetConvar("tf_mvm_death_penalty", value)
+		this.SetConvar("tf_mvm_death_penalty", value)
 	break
 
 	// =========================================================
 
 	case "BonusRatioHalf":
-		SetConvar("tf_mvm_currency_bonus_ratio_min", value)
+		this.SetConvar("tf_mvm_currency_bonus_ratio_min", value)
 	break
 
 	// =========================================================
 
 	case "BonusRatioFull":
-		SetConvar("tf_mvm_currency_bonus_ratio_max", value)
+		this.SetConvar("tf_mvm_currency_bonus_ratio_max", value)
 	break
 
 	// =========================================================
@@ -521,194 +574,208 @@ function MissionAttributes::MissionAttr(...) {
 	// =========================================================
 
 	case "FlagEscortCount":
-		SetConvar("tf_bot_flag_escort_max_count", value)
+		this.SetConvar("tf_bot_flag_escort_max_count", value)
 	break
 
 	// =========================================================
 
 	case "BombMovementPenalty":
-		SetConvar("tf_mvm_bot_flag_carrier_movement_penalty", value)
+		this.SetConvar("tf_mvm_bot_flag_carrier_movement_penalty", value)
 	break
 
 	// =========================================================
 
 	case "MaxSkeletons":
-		SetConvar("tf_max_active_zombie", value)
+		this.SetConvar("tf_max_active_zombie", value)
 	break
 
 	// =========================================================
 
 	case "TurboPhysics":
-		SetConvar("sv_turbophysics", value)
+		this.SetConvar("sv_turbophysics", value)
 	break
 
 	// =========================================================
 
 	case "Accelerate":
-		SetConvar("sv_accelerate", value)
+		this.SetConvar("sv_accelerate", value)
 	break
 
 	// =========================================================
 
 	case "AirAccelerate":
-		SetConvar("sv_airaccelerate", value)
+		this.SetConvar("sv_airaccelerate", value)
 	break
 
 	// =========================================================
 
 	case "BotPushaway":
-		SetConvar("tf_avoidteammates_pushaway", value)
+		this.SetConvar("tf_avoidteammates_pushaway", value)
 	break
 
 	// =========================================================
 
 	case "TeleUberDuration":
-		SetConvar("tf_mvm_engineer_teleporter_uber_duration", value)
+		this.SetConvar("tf_mvm_engineer_teleporter_uber_duration", value)
 	break
 
 	// =========================================================
 
 	case "RedMaxPlayers":
-		SetConvar("tf_mvm_defenders_team_size", value)
+		this.SetConvar("tf_mvm_defenders_team_size", value)
 	break
 
 	// =========================================================
 
 	case "MaxVelocity":
-		SetConvar("sv_maxvelocity", value)
+		this.SetConvar("sv_maxvelocity", value)
 	break
 
 	// =========================================================
 
 	case "ConchHealthOnHitRegen":
-		SetConvar("tf_dev_health_on_damage_recover_percentage", value)
+		this.SetConvar("tf_dev_health_on_damage_recover_percentage", value)
 	break
 
 	// =========================================================
 
 	case "MarkForDeathLifetime":
-		SetConvar("tf_dev_marked_for_death_lifetime", value)
+		this.SetConvar("tf_dev_marked_for_death_lifetime", value)
 	break
 
 	// =========================================================
 
 	case "GrapplingHookEnable":
-		SetConvar("tf_grapplinghook_enable", value)
+		this.SetConvar("tf_grapplinghook_enable", value)
 	break
 
 	// =========================================================
 
 	case "GiantScale":
-		SetConvar("tf_mvm_miniboss_scale", value)
+		this.SetConvar("tf_mvm_miniboss_scale", value)
 	break
 
 	// =========================================================
 
 	case "VacNumCharges":
-		SetConvar("weapon_medigun_resist_num_chunks", value)
+		this.SetConvar("weapon_medigun_resist_num_chunks", value)
 	break
 
 	// =========================================================
 
 	case "DoubleDonkWindow":
-		SetConvar("tf_double_donk_window", value)
+		this.SetConvar("tf_double_donk_window", value)
 	break
 
 	// =========================================================
 
 	case "ConchSpeedBoost":
-		SetConvar("tf_whip_speed_increase", value)
+		this.SetConvar("tf_whip_speed_increase", value)
 	break
 
 	// =========================================================
 
 	case "StealthDmgReduction":
-		SetConvar("tf_stealth_damage_reduction", value)
+		this.SetConvar("tf_stealth_damage_reduction", value)
 	break
 
 	// =========================================================
 
 	case "FlagCarrierCanFight":
-		SetConvar("tf_mvm_bot_allow_flag_carrier_to_fight", value)
+		this.SetConvar("tf_mvm_bot_allow_flag_carrier_to_fight", value)
 	break
 
 	// =========================================================
 
 	case "HHHChaseRange":
-		SetConvar("tf_halloween_bot_chase_range", value)
+		this.SetConvar("tf_halloween_bot_chase_range", value)
 	break
 
 	// =========================================================
 
 	case "HHHAttackRange":
-		SetConvar("tf_halloween_bot_attack_range", value)
+		this.SetConvar("tf_halloween_bot_attack_range", value)
 	break
 
 	// =========================================================
 
 	case "HHHQuitRange":
-		SetConvar("tf_halloween_bot_quit_range", value)
+		this.SetConvar("tf_halloween_bot_quit_range", value)
 	break
 
 	// =========================================================
 
 	case "HHHTerrifyRange":
-		SetConvar("tf_halloween_bot_terrify_radius", value)
+		this.SetConvar("tf_halloween_bot_terrify_radius", value)
 	break
 
 	// =========================================================
 
 	case "HHHHealthBase":
-		SetConvar("tf_halloween_bot_health_base", value)
+		this.SetConvar("tf_halloween_bot_health_base", value)
 	break
 
 	// =========================================================
 
 	case "HHHHealthPerPlayer":
-		SetConvar("tf_halloween_bot_health_per_player", value)
+		this.SetConvar("tf_halloween_bot_health_per_player", value)
+	break
+
+	// =========================================================
+
+	case "HalloweenBossNotSolidToPlayers":
+		MissionAttributes.HalloweenBossNotSolidToPlayers <- true
 	break
 
 	// =========================================================
 
 	case "SentryHintBombForwardRange":
-		SetConvar("tf_bot_engineer_mvm_sentry_hint_bomb_forward_range", value)
+		this.SetConvar("tf_bot_engineer_mvm_sentry_hint_bomb_forward_range", value)
 	break
 
 	// =========================================================
 
 	case "SentryHintBombBackwardRange":
-		SetConvar("tf_bot_engineer_mvm_sentry_hint_bomb_backward_range", value)
+		this.SetConvar("tf_bot_engineer_mvm_sentry_hint_bomb_backward_range", value)
 	break
 
 	// =========================================================
 
 	case "SentryHintMinDistanceFromBomb":
-		SetConvar("tf_bot_engineer_mvm_hint_min_distance_from_bomb", value)
+		this.SetConvar("tf_bot_engineer_mvm_hint_min_distance_from_bomb", value)
 	break
 
 	// =========================================================
 
 	case "NoBusterFF":
 		if (value != 1 || value != 0 ) RaiseIndexError(attr)
-		SetConvar("tf_bot_suicide_bomb_friendly_fire", value = 1 ? 0 : 1)
+		this.SetConvar("tf_bot_suicide_bomb_friendly_fire", value = 1 ? 0 : 1)
 	break
+
+	// =========================================================
+
+	case "HalloweenBossNotSolidToPlayers":
+		for (local hatman; hatman = FindByClassname(hatman, "headless_hatman");)
+			hatman.SetCollisionGroup(COLLISION_GROUP_PUSHAWAY)
+	break
+
+	// =========================================================
 
 	// =====================
 	// Disable sniper lasers
 	// =====================
 
 	case "SniperHideLasers":
+
 		if (value < 1) return
 
-		function MissionAttributes::SniperHideLasers() {
+		MissionAttributes.ThinkTable.SniperHideLasers <- function() {
 			for (local dot; dot = FindByClassname(dot, "env_sniperdot");)
 				if (dot.GetOwner().GetTeam() == TF_TEAM_PVE_INVADERS)
 					EntFireByHandle(dot, "Kill", "", -1, null, null)
 
 			return -1;
 		}
-
-		MissionAttributes.ThinkTable.SniperHideLasers <- MissionAttributes.SniperHideLasers
 	break
 
 	// ===================================
@@ -716,6 +783,7 @@ function MissionAttributes::MissionAttr(...) {
 	// ===================================
 
 	case "TeamWipeWaveLoss":
+
 		MissionAttributes.DeathHookTable.TeamWipeWaveLoss <- function(params) {
 			if (!PopExtUtil.IsWaveStarted) return
 			EntFire("tf_gamerules", "RunScriptCode", "if (PopExtUtil.CountAlivePlayers() == 0) EntFire(`__utilroundwin`, `RoundWin`)")
@@ -748,34 +816,35 @@ function MissionAttributes::MissionAttr(...) {
 	// ========================================================================
 
 	case "FlagResetTime":
+
 		MissionAttributes.FlagResetTime <- function() {
 			for (local flag; flag = FindByClassname(flag, "item_teamflag");)
 			{
 				if (typeof value == "table")
 					foreach (k, v in value)
-						EntFire(k, "SetReturnTime", v)
+						EntFire(k, "SetReturnTime", v.tostring())
 
 				else if (typeof value == "integer" || typeof value == "float")
-					EntFire("item_teamflag", "SetReturnTime", value)
+					EntFire("item_teamflag", "SetReturnTime", value.tostring())
 			}
 		}
 		MissionAttributes.FlagResetTime()
 	break
 
-	// ===========================
-	// enable bot headshots (jank)
-	// ===========================
+	// =============================
+	// enable bot/blu team headshots
+	// =============================
 
 	case "BotHeadshots":
+
 		if (value < 1) return
 
 		MissionAttributes.TakeDamageTable.BotHeadshots <- function(params) {
+
 			local player = params.attacker, victim = params.const_entity
-			victim.ValidateScriptScope()
-			local scope = victim.GetScriptScope()
 			local wep = params.weapon
 
-			if (!player.IsPlayer() || victim.IsPlayer()) return
+			if (!player.IsPlayer() || !victim.IsPlayer()) return
 
 			function CanHeadshot()
 			{
@@ -783,7 +852,7 @@ function MissionAttributes::MissionAttr(...) {
 				if (GetPropInt(victim, "m_LastHitGroup") == HITGROUP_HEAD || (params.damage_stats == TF_DMG_CUSTOM_HEADSHOT && !(params.damage_type & DMG_CRITICAL)))
 				{
 					//are we sniper and do we have a non-sleeper primary?
-					if (player.GetPlayerClass() == TF_CLASS_SNIPER && wep.GetSlot() != SLOT_SECONDARY && PopExtUtil.GetItemIndex(wep) != ID_SYDNEY_SLEEPER)
+					if (player.GetPlayerClass() == TF_CLASS_SNIPER && wep && wep.GetSlot() != SLOT_SECONDARY && PopExtUtil.GetItemIndex(wep) != ID_SYDNEY_SLEEPER)
 						return true
 
 					//are we using classic and is charge meter > 150?  This isn't correct but no GetAttributeValue
@@ -818,6 +887,7 @@ function MissionAttributes::MissionAttr(...) {
 	// ==============================================================
 
 	case "PlayersAreRobots":
+
 		// TODO: Make PlayersAreRobots 16 and HandModelOverride incompatible
 		// Doesn't work
 		/*
@@ -830,7 +900,7 @@ function MissionAttributes::MissionAttr(...) {
 
 				EntFireByHandle(player, "SetCustomModelWithClassAnimations", format("models/player/%s.mdl", PopExtUtil.Classes[player.GetPlayerClass()]), -1, null, null)
 				SetPropInt(player, "m_clrRender", 0xFFFFFF)
-				SetPropInt(player, "m_nRenderMode", 0)
+				SetPropInt(player, "m_nRenderMode", kRenderNormal)
 			}
 			delete ScriptLoadTable.PlayersAreRobotsReset
 		}
@@ -838,7 +908,7 @@ function MissionAttributes::MissionAttr(...) {
 
 		MissionAttributes.SpawnHookTable.PlayersAreRobots <- function(params) {
 			local player = GetPlayerFromUserID(params.userid)
-			if (player.IsBotOfType(1337)) return
+			if (player.IsBotOfType(TF_BOT_TYPE)) return
 
 			player.ValidateScriptScope()
 			local scope = player.GetScriptScope()
@@ -875,7 +945,7 @@ function MissionAttributes::MissionAttr(...) {
 				function StepThink() {
 					if (self.GetPlayerClass() == TF_CLASS_MEDIC) return
 
-					if (GetPropInt(self,"m_Local.m_nStepside") != stepside)
+					if (GetPropInt(self,"m_Local.m_nStepside") != scope.stepside)
 						EmitSoundOn("MVM.BotStep", self)
 
 					scope.stepside = GetPropInt(self,"m_Local.m_nStepside")
@@ -891,10 +961,10 @@ function MissionAttributes::MissionAttr(...) {
 				MissionAttributes.ThinkTable.RobotVOThink <- function() {
 
 					for (local ent; ent = FindByClassname(ent, "instanced_scripted_scene"); ) {
-						if (ent.GetEFlags() & EFL_USER) continue
+						if (ent.IsEFlagSet(EFL_USER)) continue
 						ent.AddEFlags(EFL_USER)
 						local owner = GetPropEntity(ent, "m_hOwner")
-						if (owner != null && !owner.IsBotOfType(1337)) {
+						if (owner != null && !owner.IsBotOfType(TF_BOT_TYPE)) {
 
 							local vcdpath = GetPropString(ent, "m_szInstanceFilename");
 							if (!vcdpath || vcdpath == "") return -1
@@ -930,27 +1000,33 @@ function MissionAttributes::MissionAttr(...) {
 
 			if (value & 16) {
 
-				if ("HandModelOverride" in MissionAttributes.SpawnHookTable) return
+				//run this with a delay for LoadoutControl
 
-				local vmodel   = PopExtUtil.ROBOT_ARM_PATHS[player.GetPlayerClass()]
-				local playervm = GetPropEntity(player, "m_hViewModel")
-				if (playervm == null) return
-				playervm.GetOrigin()
+				EntFireByHandle(player, "RunScriptCode", @"
 
-				if (playervm == null) return
+					if (`HandModelOverride` in MissionAttributes.SpawnHookTable) return
 
-				if (playervm.GetModelName() != vmodel) playervm.SetModelSimple(vmodel)
+					local vmodel   = PopExtUtil.ROBOT_ARM_PATHS[self.GetPlayerClass()]
+					local playervm = GetPropEntity(self, `m_hViewModel`)
+					if (playervm == null) return
+					playervm.GetOrigin()
 
-				for (local i = 0; i < SLOT_COUNT; i++) {
+					if (playervm == null) return
 
-					local wep = GetPropEntityArray(player, "m_hMyWeapons", i)
-					if (wep == null || wep.GetModelName() == vmodel) continue
+					if (playervm.GetModelName() != vmodel) playervm.SetModelSimple(vmodel)
 
-					wep.SetModelSimple(vmodel)
-					wep.SetCustomViewModel(vmodel)
-				}
+					for (local i = 0; i < SLOT_COUNT; i++) {
 
-			} else if ("RobotArmThink" in scope.PlayerThinkTable) delete scope.PlayerThinkTable.RobotArmThink
+						local wep = GetPropEntityArray(self, `m_hMyWeapons`, i)
+						if (wep == null || wep.GetModelName() == vmodel) continue
+
+						wep.SetModelSimple(vmodel)
+						wep.SetCustomViewModel(vmodel)
+					}
+
+				", SINGLE_TICK, null, null)
+
+			}
 		}
 	break
 
@@ -962,43 +1038,43 @@ function MissionAttributes::MissionAttr(...) {
 	// 4 = Red bots use zombie models. Overrides human models.
 	// =======================================================
 
-		case "BotsAreHumans":
-			MissionAttributes.SpawnHookTable.BotsAreHumans <- function(params) {
+	case "BotsAreHumans":
 
-				local player = GetPlayerFromUserID(params.userid)
-				if (!player.IsBotOfType(1337)) return
+		MissionAttributes.SpawnHookTable.BotsAreHumans <- function(params) {
 
-				MissionAttributes.HumanModel <- function(player)
+			local player = GetPlayerFromUserID(params.userid)
+			if (!player.IsBotOfType(TF_BOT_TYPE)) return
+
+			MissionAttributes.HumanModel <- function(player)
+			{
+				local classname = PopExtUtil.Classes[player.GetPlayerClass()]
+				if (player.GetTeam() == TF_TEAM_PVE_INVADERS && value > 0)
 				{
-					local classname = PopExtUtil.Classes[player.GetPlayerClass()]
-					if (player.GetTeam() == TF_TEAM_PVE_INVADERS && value > 0)
+					player.SetCustomModelWithClassAnimations(format("models/player/%s.mdl", classname))
+					if (value & 2)
 					{
-						player.SetCustomModelWithClassAnimations(format("models/player/%s.mdl", classname))
-						if (value & 2) 
-						{
-							PopExtUtil.CreatePlayerWearable(player, format("models/player/items/%s/%s_zombie.mdl", classname, classname))
-							SetPropBool(player, "m_bForcedSkin", true)
-							SetPropInt(player, "m_nForcedSkin", player.GetSkin() + 4)
-						}
-					}
-	
-					if (player.GetTeam() == TF_TEAM_PVE_INVADERS && value & 4)
-					{
-
-						player.SetCustomModelWithClassAnimations(format("models/player/%s.mdl", classname))						
-						if (value & 8) 
-						{
-							format(PopExtUtil.CreatePlayerWearable(player, "models/player/items/%s/%s_zombie.mdl"), classname, classname)
-							SetPropBool(player, "m_bForcedSkin", true)
-							SetPropInt(player, "m_nForcedSkin", player.GetSkin() + 4)
-						}
-						
+						PopExtUtil.CreatePlayerWearable(player, format("models/player/items/%s/%s_zombie.mdl", classname, classname))
+						SetPropBool(player, "m_bForcedSkin", true)
+						SetPropInt(player, "m_nForcedSkin", player.GetSkin() + 4)
 					}
 				}
 
-				EntFireByHandle(player, "RunScriptCode", "try MissionAttributes.HumanModel(self) catch(_) return", 0.033, null, null)
+				if (player.GetTeam() == TF_TEAM_PVE_INVADERS && value & 4)
+				{
+
+					player.SetCustomModelWithClassAnimations(format("models/player/%s.mdl", classname))
+					if (value & 8)
+					{
+						format(PopExtUtil.CreatePlayerWearable(player, "models/player/items/%s/%s_zombie.mdl"), classname, classname)
+						SetPropBool(player, "m_bForcedSkin", true)
+						SetPropInt(player, "m_nForcedSkin", player.GetSkin() + 4)
+					}
+				}
 			}
-		break
+
+			EntFireByHandle(player, "RunScriptCode", "try MissionAttributes.HumanModel(self) catch(_) return", 0.033, null, null)
+		}
+	break
 
 	// ==============================================================
 	// 1 = disables romevision on bots 2 = disables rome carrier tank
@@ -1013,7 +1089,7 @@ function MissionAttributes::MissionAttr(...) {
 			local bot = GetPlayerFromUserID(params.userid)
 
 			EntFireByHandle(bot, "RunScriptCode", @"
-				if (self.IsBotOfType(1337))
+				if (self.IsBotOfType(TF_BOT_TYPE))
 					// if (!self.HasBotTag(`popext_forceromevision`)) //handle these elsewhere
 						for (local child = self.FirstMoveChild(); child != null; child = child.NextMovePeer())
 							if (child.GetClassname() == `tf_wearable` && startswith(child.GetModelName(), `models/workshop/player/items/`+PopExtUtil.Classes[self.GetPlayerClass()]+`/tw`))
@@ -1033,7 +1109,7 @@ function MissionAttributes::MissionAttr(...) {
 				}
 
 			}
-			SetPropIntArray(carrier, "m_nModelIndexOverrides", carrierPartsIndex, 3)
+			SetPropIntArray(carrier, "m_nModelIndexOverrides", carrierPartsIndex, VISION_MODE_ROME)
 			noromecarrier = true
 		}
 	break
@@ -1041,14 +1117,15 @@ function MissionAttributes::MissionAttr(...) {
 	// =========================================================
 
 	case "SpellRateCommon":
-		SetConvar("tf_spells_enabled", 1)
+
+		this.SetConvar("tf_spells_enabled", 1)
 		MissionAttributes.DeathHookTable.SpellRateCommon <- function(params) {
 			if (RandomFloat(0, 1) > value) return
 
 			local bot = GetPlayerFromUserID(params.userid)
-			if (!bot.IsBotOfType(1337) || bot.IsMiniBoss()) return
+			if (!bot.IsBotOfType(TF_BOT_TYPE) || bot.IsMiniBoss()) return
 
-			local spell = SpawnEntityFromTable("tf_spell_pickup", {targetname = "_commonspell" origin = bot.GetLocalOrigin() TeamNum = 2 tier = 0 "OnPlayerTouch": "!self,Kill,,0,-1" })
+			local spell = SpawnEntityFromTable("tf_spell_pickup", {targetname = "_commonspell" origin = bot.GetLocalOrigin() TeamNum = TF_TEAM_PVE_DEFENDERS tier = 0 "OnPlayerTouch": "!self,Kill,,0,-1" })
 		}
 
 	break
@@ -1056,14 +1133,15 @@ function MissionAttributes::MissionAttr(...) {
 	// =========================================================
 
 	case "SpellRateGiant":
-		SetConvar("tf_spells_enabled", 1)
+
+		this.SetConvar("tf_spells_enabled", 1)
 		MissionAttributes.DeathHookTable.SpellRateGiant <- function(params) {
 			if (RandomFloat(0, 1) > value) return
 
 			local bot = GetPlayerFromUserID(params.userid)
-			if (!bot.IsBotOfType(1337) || !bot.IsMiniBoss()) return
+			if (!bot.IsBotOfType(TF_BOT_TYPE) || !bot.IsMiniBoss()) return
 
-			local spell = SpawnEntityFromTable("tf_spell_pickup", {targetname = "_giantspell" origin = bot.GetLocalOrigin() TeamNum = 2 tier = 0 "OnPlayerTouch": "!self,Kill,,0,-1" })
+			local spell = SpawnEntityFromTable("tf_spell_pickup", {targetname = "_giantspell" origin = bot.GetLocalOrigin() TeamNum = TF_TEAM_PVE_DEFENDERS tier = 0 "OnPlayerTouch": "!self,Kill,,0,-1" })
 		}
 
 	break
@@ -1071,14 +1149,15 @@ function MissionAttributes::MissionAttr(...) {
 	// =========================================================
 
 	case "RareSpellRateCommon":
-		SetConvar("tf_spells_enabled", 1)
+
+		this.SetConvar("tf_spells_enabled", 1)
 		MissionAttributes.DeathHookTable.RareSpellRateCommon <- function(params) {
 			if (RandomFloat(0, 1) > value) return
 
 			local bot = GetPlayerFromUserID(params.userid)
-			if (!bot.IsBotOfType(1337) || bot.IsMiniBoss()) return
+			if (!bot.IsBotOfType(TF_BOT_TYPE) || bot.IsMiniBoss()) return
 
-			local spell = SpawnEntityFromTable("tf_spell_pickup", {targetname = "_commonspell" origin = bot.GetLocalOrigin() TeamNum = 2 tier = 1 "OnPlayerTouch": "!self,Kill,,0,-1" })
+			local spell = SpawnEntityFromTable("tf_spell_pickup", {targetname = "_commonspell" origin = bot.GetLocalOrigin() TeamNum = TF_TEAM_PVE_DEFENDERS tier = 1 "OnPlayerTouch": "!self,Kill,,0,-1" })
 		}
 
 	break
@@ -1086,14 +1165,15 @@ function MissionAttributes::MissionAttr(...) {
 	// =========================================================
 
 	case "RareSpellRateGiant":
-		SetConvar("tf_spells_enabled", 1)
+
+		this.SetConvar("tf_spells_enabled", 1)
 		MissionAttributes.DeathHookTable.RareSpellRateGiant <- function(params) {
 			if (RandomFloat(0, 1) > value) return
 
 			local bot = GetPlayerFromUserID(params.userid)
-			if (!bot.IsBotOfType(1337) || !bot.IsMiniBoss()) return
+			if (!bot.IsBotOfType(TF_BOT_TYPE) || !bot.IsMiniBoss()) return
 
-			local spell = SpawnEntityFromTable("tf_spell_pickup", {targetname = "_giantspell" origin = bot.GetLocalOrigin() TeamNum = 2 tier = 1 "OnPlayerTouch": "!self,Kill,,0,-1" })
+			local spell = SpawnEntityFromTable("tf_spell_pickup", {targetname = "_giantspell" origin = bot.GetLocalOrigin() TeamNum = TF_TEAM_PVE_DEFENDERS tier = 1 "OnPlayerTouch": "!self,Kill,,0,-1" })
 		}
 
 	break
@@ -1103,6 +1183,7 @@ function MissionAttributes::MissionAttr(...) {
 	// ===========================================================================================
 
 	case "NoSkeleSplit":
+
 		MissionAttributes.ThinkTable.NoSkeleSplit <- function() {
 
 			//kill skele spawners before they split from tf_zombie_spawner
@@ -1113,7 +1194,7 @@ function MissionAttributes::MissionAttr(...) {
 			// m_hThrower does not change when the skeletons split for spell-casted skeles, just need to kill them after spawning
 			for (local skeles; skeles = FindByClassname(skeles, "tf_zombie");  ) {
 				//kill blu split skeles
-				if (skeles.GetModelScale() == 0.5 && (skeles.GetOwner() == null || skeles.GetOwner().IsBotOfType(1337))) {
+				if (skeles.GetModelScale() == 0.5 && (skeles.GetOwner() == null || skeles.GetOwner().IsBotOfType(TF_BOT_TYPE))) {
 					EntFireByHandle(skeles, "Kill", "", -1, null, null)
 					return
 				}
@@ -1131,6 +1212,7 @@ function MissionAttributes::MissionAttr(...) {
 	// ====================================================================
 
 	case "WaveStartCountdown":
+
 		MissionAttributes.ThinkTable.WaveStartCountdown <- function() {
 			if (PopExtUtil.IsWaveStarted) return
 
@@ -1157,6 +1239,7 @@ function MissionAttributes::MissionAttr(...) {
 	// ======================================================================================================================
 
 	case "ExtraTankPath":
+
 		if (typeof value != "array") {
 			this.RaiseValueError("ExtraTankPath", value, "Value must be array")
 			success = false
@@ -1198,8 +1281,9 @@ function MissionAttributes::MissionAttr(...) {
 	case "HandModelOverride":
 
 		MissionAttributes.SpawnHookTable.HandModelOverride <- function(params) {
+
 			local player = GetPlayerFromUserID(params.userid)
-			if (player.IsBotOfType(1337)) return
+			if (player.IsBotOfType(TF_BOT_TYPE)) return
 
 			player.ValidateScriptScope()
 			local scope = player.GetScriptScope()
@@ -1247,9 +1331,11 @@ function MissionAttributes::MissionAttr(...) {
 	// ===========================================================
 
 	case "AddCond":
+
 		MissionAttributes.SpawnHookTable.AddCond <- function(params) {
+
 			local player = GetPlayerFromUserID(params.userid)
-			if (player.IsBotOfType(1337)) return
+			if (player.IsBotOfType(TF_BOT_TYPE)) return
 
 			if (typeof value == "array") {
 
@@ -1269,18 +1355,11 @@ function MissionAttributes::MissionAttr(...) {
 	// ======================================================
 
 	case "PlayerAttributes":
-		//setting maxhealth attribs doesn't update current HP
-		local healthattribs = {
-			"max health additive bonus" : null,
-			"max health additive penalty": null,
-			"SET BONUS: max health additive bonus": null,
-			"hidden maxhealth non buffed": null,
-		}
+
 		MissionAttributes.SpawnHookTable.PlayerAttributes <- function(params) {
 
 			local player = GetPlayerFromUserID(params.userid)
-			if (player.IsBotOfType(1337)) return
-
+			if (player.IsBotOfType(TF_BOT_TYPE)) return
 			if (typeof value != "table") {
 				this.RaiseValueError("PlayerAttributes", value, "Value must be table")
 				success = false
@@ -1290,35 +1369,13 @@ function MissionAttributes::MissionAttr(...) {
 			local tfclass = player.GetPlayerClass()
 			foreach (k, v in value)
 			{
-				if (typeof k == "string" && (typeof v == "integer" || typeof v == "float"))
-					if (k in CustomAttributes.Attrs)
-						CustomAttributes.AddAttr(player, k, v, player.GetActiveWeapon())
-					else
-						EntFireByHandle(player, "RunScriptCode", format("self.AddCustomAttribute(`%s`, %1.8e, -1)", k, v.tofloat()), -1, null, null)
-
-				if (!(tfclass in value)) continue
-				local table = value[tfclass]
-				foreach (k, v in table) {
-					if (k in CustomAttributes.Attrs && !player.IsBotOfType(1337))
-						CustomAttributes.AddAttr(player, k, v, player.GetActiveWeapon())
-					else {
-						local valformat = ""
-						if (typeof v == "integer")
-							valformat = format("self.AddCustomAttribute(`%s`, %d, -1)", k, v)
-
-						else if (typeof v == "float")
-							valformat = format("self.AddCustomAttribute(`%s`, %f, -1)", k, v)
-
-						else if (typeof v == "string") {
-							this.RaiseValueError("PlayerAttributes", v, "Cannot set string attributes!")
-							success = false
-							continue
-						}
-
-
-						EntFireByHandle(player, "RunScriptCode", valformat, -1, null, null)
-						if (k in healthattribs) EntFireByHandle(player, "RunScriptCode", "self.SetHealth(self.GetMaxHealth())", -1, null, null)
-
+				if (typeof v != "table")
+				MissionAttributes.SetPlayerAttributes(player, k, v)
+				else if (tfclass in value)
+				{
+					local table = value[tfclass]
+					foreach (k, v in table) {
+						MissionAttributes.SetPlayerAttributes(player, k, v)
 					}
 				}
 			}
@@ -1330,9 +1387,11 @@ function MissionAttributes::MissionAttr(...) {
 	// ======================================================================
 
 	case "ItemAttributes":
+
 		MissionAttributes.SpawnHookTable.ItemAttributes <- function(params) {
+
 			local player = GetPlayerFromUserID(params.userid)
-			if (player.IsBotOfType(1337)) return
+			if (player.IsBotOfType(TF_BOT_TYPE)) return
 
 			if (typeof value != "table") {
 				this.RaiseValueError("ItemAttributes", value, "Value must be table")
@@ -1346,28 +1405,20 @@ function MissionAttributes::MissionAttr(...) {
 				local wep = PopExtUtil.HasItemInLoadout(player, item)
 				if (wep == null) return
 
-				foreach (a, b in attr)
+				foreach (attrib, value in attr)
 				{
-					if (a in CustomAttributes.Attrs)
-						CustomAttributes.AddAttr(player, a, b, wep)
-					else
-					{
-						wep.AddAttribute(a, b, -1)
-						wep.ReapplyProvision()
-					}
+					MissionAttributes.SetPlayerAttributes(player, attrib, value, item)
 				}
 			}
 
 			foreach(k, v in value)
 			{
-				local idarray = []
-
 				if (typeof k == "string" && k.find(","))
 				{
-					idarray = split(k, ",")
+					local idarray = split(k, ",")
 
 					if (idarray.len() > 1)
-						idarray.apply(function (val) {return val.tointeger()})
+						idarray.apply(function (val) {return val.tofloat()})
 					k = idarray
 				}
 				if (typeof k == "array")
@@ -1390,19 +1441,26 @@ function MissionAttributes::MissionAttr(...) {
 		MissionAttributes.SpawnHookTable.LoadoutControl <- function(params) {
 
 			local player = GetPlayerFromUserID(params.userid)
-			if (player.IsBotOfType(1337)) return
+			if (player.IsBotOfType(TF_BOT_TYPE)) return
 
 			player.ValidateScriptScope()
 			local scope = player.GetScriptScope()
 
-			foreach (item, replacement in value)
+
+			function LoadoutControl(item, replacement)
 			{
 				local wep = PopExtUtil.HasItemInLoadout(player, item)
-				if (wep == null) continue
+				if (wep == null) return
+
+				if (GetPropEntity(wep, "m_hExtraWearable") != null)
+				{
+					GetPropEntity(wep, "m_hExtraWearableViewModel").Kill()
+					GetPropEntity(wep, "m_hExtraWearable").Kill()
+				}
 
 				wep.Kill()
 
-				if (replacement == null) continue
+				if (replacement == null) return
 
 				try
 					PopExtUtil.GiveWeapon(player, PopExtItems[replacement].item_class, PopExtItems[replacement].id)
@@ -1412,6 +1470,23 @@ function MissionAttributes::MissionAttr(...) {
 							PopExtUtil.GiveWeapon(player, classname, itemid)
 					else
 						this.RaiseValueError("LoadoutControl", value, "Item replacement must be a table")
+			}
+
+			foreach (item, replacement in value)
+			{
+				if (typeof item == "string" && item.find(","))
+				{
+					local idarray = split(item, ",")
+
+					if (idarray.len() > 1)
+						idarray.apply(function (val) {return val.tointeger()})
+					item = idarray
+				}
+				if (typeof item == "array")
+					foreach (i in item)
+						LoadoutControl(i, replacement)
+				else
+					LoadoutControl(item, replacement)
 			}
 
 			EntFireByHandle(player, "RunScriptCode", "PopExtUtil.SwitchToFirstValidWeapon(self)", SINGLE_TICK, null, null)
@@ -1506,32 +1581,33 @@ function MissionAttributes::MissionAttr(...) {
 		}
 	break
 
-	case "DisableSound":
-		if (typeof value != "array") this.RaiseValueError("DisableSound", value, "value must be an array")
+	// case "DisableSound":
 
-		MissionAttributes.ThinkTable.DisableSounds <- function() {
+	// 	if (typeof value != "array") this.RaiseValueError("DisableSound", value, "value must be an array")
 
-			foreach (sound in value)
-			{
+	// 	MissionAttributes.ThinkTable.DisableSounds <- function() {
 
-				foreach (player in PopExtUtil.HumanArray)
-				{
-					StopSoundOn(sound, player)
-					player.StopSound(sound)
-				}
+	// 		foreach (sound in value)
+	// 		{
 
-				StopSoundOn(sound, PopExtUtil.Worldspawn)
-				PopExtUtil.Worldspawn.StopSound(sound)
-			}
-		}
-	break
+	// 			foreach (player in PopExtUtil.HumanArray)
+	// 			{
+	// 				StopSoundOn(sound, player)
+	// 				player.StopSound(sound)
+	// 			}
 
-	// ============================================================================
-	// very inconsistent
-	// currently can only override death and teamplay_broadcast_audio sounds
-	// any other sounds played by weapons or players cannot be easily replaced here
-	// see `replace weapon fire sound` and more in customattributes.nut
-	// ============================================================================
+	// 			StopSoundOn(sound, PopExtUtil.Worldspawn)
+	// 			PopExtUtil.Worldspawn.StopSound(sound)
+	// 		}
+	// 	}
+	// break
+
+	// =================================================================================
+	// hardcoded to only be able to replace specific sounds
+	// spamming stopsound in a think function is very laggy, gotta be smarter than that
+	// see `replace weapon fire sound` and more in customattributes.nut for wep sounds
+	// see the tank sound overrides in hooks.nut for disabling tank explosions
+	// =================================================================================
 
 	case "SoundOverrides":
 
@@ -1543,68 +1619,126 @@ function MissionAttributes::MissionAttr(...) {
 			"MVM.SentryBusterExplode": null
 			"MVM.PlayerDied": null
 		}
-		local BroadcastAudioSounds = {
-			"Game.YourTeamWon": null
-			"MVM.Warning": null
-			"music.mvm_end_last_wave": null
-			"music.mvm_end_tank_wave": null
-			"Announcer.MVM_Final_Wave_End": null
-			"Announcer.MVM_Get_To_Upgrade": null
-			"Announcer.MVM_Robots_Planted": null
-			"Announcer.MVM_Final_Wave_End": null
-			"Announcer.MVM_Tank_Alert_Spawn": null
-			"Announcer.MVM_Tank_Alert_Another": null
-			"Announcer.MVM_An_Engineer_Bot_Is_Dead": null
-			"Announcer.MVM_An_Engineer_Bot_Is_Dead_But_Not_Teleporter": null
+
+		local TankSounds = {
+
+			"MVM.TankStart" : null
+			// "MVM.TankEnd" : null
+			"MVM.TankPing" : null
+			"MVM.TankEngineLoop" : null
+			// "MVM.TankSmash" : null
+			"MVM.TankDeploy" : null
+			"MVM.TankExplodes" : null
 		}
+		local names = []
+
+		// local BroadcastAudioSounds = {
+
+		// 	"Game.YourTeamWon": null
+		// 	"MVM.Warning": null
+		// 	"music.mvm_end_last_wave": null
+		// 	"music.mvm_end_tank_wave": null
+		// 	"Announcer.MVM_Final_Wave_End": null
+		// 	"Announcer.MVM_Get_To_Upgrade": null
+		// 	"Announcer.MVM_Robots_Planted": null
+		// 	"Announcer.MVM_Final_Wave_End": null
+		// 	"Announcer.MVM_Tank_Alert_Spawn": null
+		// 	"Announcer.MVM_Tank_Alert_Another": null
+		// 	"Announcer.MVM_An_Engineer_Bot_Is_Dead": null
+		// 	"Announcer.MVM_An_Engineer_Bot_Is_Dead_But_Not_Teleporter": null
+		// }
 
 		//teamplay_broadcast_audio overrides
 		foreach (sound, override in value)
-			MissionAttributes.SoundsToReplace[sound] <- override
+		{
+			PrecacheSound(sound)
+			PrecacheScriptSound(sound)
 
-		//sounds played on bot death (giant/buster explosions)
-		MissionAttributes.TakeDamageTable.SoundOverrides <- function(params) {
-			local victim = params.const_entity
-
-			if (params.damage < victim.GetHealth()) return
-
-			foreach (sound, override in value)
+			if (override != null)
 			{
-				if (sound in DeathSounds)
+				PrecacheSound(override)
+				PrecacheScriptSound(override)
+			}
+
+			if (sound in DeathSounds)
+			{
+				DeathSounds[sound] <- []
+				if (override != null) DeathSounds[sound].append(override)
+			}
+			// sound.split(sound, "k")[1]
+			if (sound in TankSounds)
+			{
+				TankSounds[sound] <- []
+				if (override != null) TankSounds[sound].append(override)
+			}
+
+			{
+				MissionAttributes.ThinkTable.SetTankSounds <- function()
 				{
-					StopSoundOn(sound, victim)
-					victim.StopSound(sound)
+					for (local tank; tank = FindByClassname(tank, "tank_boss");)
+					{
+						local scope = tank.GetScriptScope()
 
-					if (override == null) return
+						if (!("popProperty" in scope)) scope.popProperty <- {}
+						if (!("SoundOverrides" in scope)) scope.popProperty.SoundOverrides <- {}
+						foreach (tanksound, tankoverride in TankSounds) if (!(split(tanksound, "k")[1] in scope.popProperty.SoundOverrides)) scope.popProperty.SoundOverrides[split(tanksound, "k")[1]] <- tankoverride
+						if ("created" in scope) delete scope.created
+					}
+				}
 
-					EmitSoundEx({sound_name = override, entity = victim})
+			}
+
+			MissionAttributes.SoundsToReplace[sound] <- override
+		}
+
+		//sounds played on death (giant/buster explosions)
+		MissionAttributes.DeathHookTable.SoundOverrides <- function(params) {
+
+			local victim = GetPlayerFromUserID(params.userid)
+
+			foreach (sound, override in DeathSounds)
+			{
+				if (override != null)
+				{
+					// StopSoundOn(sound, victim)
+					MissionAttributes.EmitSoundFunc <- function() { if (override.len()) EmitSoundEx({sound_name = override[0], entity = victim}) }
+					EntFireByHandle(victim, "RunScriptCode", format("StopSoundOn(`%s`, self)", sound), -1, null, null)
+					EntFireByHandle(victim, "RunScriptCode", "MissionAttributes.EmitSoundFunc()", -1, null, null)
 				}
 			}
+		}
+
+		MissionAttributes.TakeDamageTablePost.SoundOverrides <- function(params) {
+
 		}
 
 		//catch-all for disabling non teamplay_broadcast_audio sfx
-		MissionAttributes.ThinkTable.DisableSounds <- function() {
+		//nukes perf, don't do this.
 
-			foreach (sound, override in value)
-			{
-				if (override == null && !(sound in DeathSounds) && !(sound in BroadcastAudioSounds))
-				{
-					foreach (player in PopExtUtil.PlayerArray)
-					{
-						StopSoundOn(sound, player)
-						player.StopSound(sound)
-					}
+		// MissionAttributes.ThinkTable.DisableSounds <- function() {
 
-					StopSoundOn(sound, PopExtUtil.Worldspawn)
-					PopExtUtil.Worldspawn.StopSound(sound)
-				}
-			}
-		}
+		// 	foreach (sound, override in value)
+		// 	{
+		// 		if (override == null && !(sound in DeathSounds) && !(sound in BroadcastAudioSounds))
+		// 		{
+		// 			foreach (player in PopExtUtil.PlayerArray)
+		// 			{
+		// 				StopSoundOn(sound, player)
+		// 				player.StopSound(sound)
+		// 			}
+
+		// 			StopSoundOn(sound, PopExtUtil.Worldspawn)
+		// 			PopExtUtil.Worldspawn.StopSound(sound)
+		// 		}
+		// 	}
+		// }
 
 	break
 
 	case "NoThrillerTaunt":
+
 		MissionAttributes.SpawnHookTable.NoThrillerTaunt <- function(params) {
+
 			local player = GetPlayerFromUserID(params.userid)
 			player.ValidateScriptScope()
 
@@ -1639,6 +1773,7 @@ function MissionAttributes::MissionAttr(...) {
 	// =====================================
 
 	case "EnableRandomCrits":
+
 		if (value == 0.0) return
 
 		local user_chance = (args.len() > 2) ? args[2] : null
@@ -1668,13 +1803,14 @@ function MissionAttributes::MissionAttr(...) {
 		}
 
 		MissionAttributes.ThinkTable.EnableRandomCritsThink <- function() {
+
 			if (!PopExtUtil.IsWaveStarted) return -1
 
 			foreach (player in PopExtUtil.PlayerArray)
 			{
-				if (!( (value & 1 && player.GetTeam() == TF_TEAM_PVE_INVADERS && !player.IsBotOfType(1337)) ||
-					   (value & 2 && player.GetTeam() == TF_TEAM_PVE_INVADERS && player.IsBotOfType(1337))  ||
-					   (value & 4 && player.GetTeam() == TF_TEAM_PVE_DEFENDERS && player.IsBotOfType(1337)) ))
+				if (!( (value & 1 && player.GetTeam() == TF_TEAM_PVE_INVADERS && !player.IsBotOfType(TF_BOT_TYPE)) ||
+					   (value & 2 && player.GetTeam() == TF_TEAM_PVE_INVADERS && player.IsBotOfType(TF_BOT_TYPE))  ||
+					   (value & 4 && player.GetTeam() == TF_TEAM_PVE_DEFENDERS && player.IsBotOfType(TF_BOT_TYPE)) ))
 					continue
 
 				player.ValidateScriptScope()
@@ -1753,8 +1889,9 @@ function MissionAttributes::MissionAttr(...) {
 		}
 
 		MissionAttributes.DeathHookTable.EnableRandomCritsKill <- function(params) {
+
 			local attacker = GetPlayerFromUserID(params.attacker)
-			if (attacker == null || !attacker.IsBotOfType(1337)) return
+			if (attacker == null || !attacker.IsBotOfType(TF_BOT_TYPE)) return
 
 			attacker.ValidateScriptScope()
 			local scope = attacker.GetScriptScope()
@@ -1775,7 +1912,7 @@ function MissionAttributes::MissionAttr(...) {
 			if (!("inflictor" in params)) return
 
 			local attacker = params.inflictor
-			if (attacker == null || !attacker.IsPlayer() || !attacker.IsBotOfType(1337)) return
+			if (attacker == null || !attacker.IsPlayer() || !attacker.IsBotOfType(TF_BOT_TYPE)) return
 
 			attacker.ValidateScriptScope()
 			local scope = attacker.GetScriptScope()
@@ -1817,21 +1954,79 @@ function MissionAttributes::MissionAttr(...) {
 	// =======================================
 
 	case "ReverseMVM":
+
 		// Prevent bots on red team from hogging slots so players can always join and get switched to blue
 		// TODO: Needs testing
 		// also need to reset it
 		//MissionAttributes.SetConvar("tf_mvm_defenders_team_size", 999)
+		MissionAttributes.DeployBombStart <- function(player) {
+
+			//do this so we can do CancelPending
+			local deployrelay = SpawnEntityFromTable("logic_relay" {
+				targetname = "__bombdeploy"
+				"OnTrigger#1": "bignetRunScriptCodePopExtUtil.EndWaveReverse()2-1"
+				"OnTrigger#2": "boss_deploy_relay,Trigger,,2,-1"
+			})
+			if (GetPropEntity(player, "m_hItem") == null) return
+
+			player.DisableDraw()
+
+			for (local child = player.FirstMoveChild(); child != null; child = child.NextMovePeer())
+				child.DisableDraw()
+
+			player.AddCustomAttribute("move speed bonus", 0.00001, -1)
+			player.AddCustomAttribute("no_jump", 1, -1)
+
+			local dummy = CreateByClassname("prop_dynamic")
+
+			PopExtUtil.SetTargetname(dummy, format("__deployanim%d", player.entindex()))
+			dummy.SetOrigin(player.GetOrigin())
+			dummy.SetAbsAngles(player.GetAbsAngles())
+			dummy.SetModel(player.GetModelName())
+			dummy.SetSkin(player.GetSkin())
+
+			DispatchSpawn(dummy)
+			dummy.ResetSequence(dummy.LookupSequence("primary_deploybomb"))
+
+			player.IsMiniBoss() ? EmitSoundEx({sound_name = "MVM.DeployBombGiant", entity = player, flags = SND_CHANGE_VOL, volume = 0.5}) : EmitSoundEx({sound_name = "MVM.DeployBombSmall", entity = player, flags = SND_CHANGE_VOL, volume = 0.5})
+
+			EntFireByHandle(player, "SetForcedTauntCam", "1", -1, null, null)
+			EntFireByHandle(player, "SetHudVisibility", "0", -1, null, null)
+			EntFire("__bombdeploy", "Trigger")
+		}
+
+		MissionAttributes.DeployBombStop <- function(player) {
+
+			if (GetPropEntity(player, "m_hItem") == null) return
+
+			player.EnableDraw()
+
+			for (local child = player.FirstMoveChild(); child != null; child = child.NextMovePeer())
+				child.EnableDraw()
+
+			player.RemoveCustomAttribute("move speed bonus")
+			player.RemoveCustomAttribute("no_jump")
+
+			FindByName(null, format("__deployanim%d", player.entindex())).Kill()
+
+			player.IsMiniBoss() ? StopSoundOn("MVM.DeployBombGiant", player) : StopSoundOn("MVM.DeployBombSmall", player)
+
+			EntFireByHandle(player, "SetForcedTauntCam", "0", -1, null, null)
+			EntFireByHandle(player, "SetHudVisibility", "1", -1, null, null)
+			EntFire("__bombdeploy", "CancelPending")
+			EntFire("__bombdeploy", "Kill")
+		}
+
 		MissionAttributes.ThinkTable.ReverseMVMThink <- function() {
 			// Enforce max team size
 			local player_count  = 0
 			local max_team_size = 6
 			foreach (player in PopExtUtil.HumanArray) {
 
-				if (player_count + 1 > max_team_size && player.GetTeam() != TEAM_SPECTATOR && !player.IsBotOfType(1337)) {
+				if (player_count + 1 > max_team_size && player.GetTeam() != TEAM_SPECTATOR && !player.IsBotOfType(TF_BOT_TYPE)) {
 					player.ForceChangeTeam(TEAM_SPECTATOR, false)
 					continue
 				}
-
 				player_count++
 			}
 
@@ -1846,7 +2041,7 @@ function MissionAttributes::MissionAttr(...) {
 		MissionAttributes.SpawnHookTable.ReverseMVMSpawn <- function(params) {
 
 			local player = GetPlayerFromUserID(params.userid)
-			if (player.IsBotOfType(1337)) return
+			if (player.IsBotOfType(TF_BOT_TYPE)) return
 			player.ValidateScriptScope()
 			local scope = player.GetScriptScope()
 
@@ -1856,7 +2051,6 @@ function MissionAttributes::MissionAttr(...) {
 			if ("ReverseMVMDrainAmmoThink" in scope.PlayerThinkTable)  delete scope.PlayerThinkTable.ReverseMVMDrainAmmoThink
 
 			// Switch to blue team
-			// TODO: Need to fix players getting stuck in spec on wave fail, mission complete, etc
 			if (player.GetTeam() != TF_TEAM_PVE_INVADERS) {
 				EntFireByHandle(player, "RunScriptCode", "PopExtUtil.ChangePlayerTeamMvM(self, TF_TEAM_PVE_INVADERS)", SINGLE_TICK, null, null)
 				EntFireByHandle(player, "RunScriptCode", "self.ForceRespawn()", SINGLE_TICK, null, null)
@@ -1963,6 +2157,23 @@ function MissionAttributes::MissionAttr(...) {
 
 					EmitSoundOn("MVM.MoneyPickup", player)
 
+					// scout money healing
+					if (self.GetPlayerClass() == TF_CLASS_SCOUT)
+					{
+						local curHealth = self.GetHealth()
+						local maxHealth = self.GetMaxHealth()
+						local healthAddition = curHealth < maxHealth ? 50 : 25
+
+						// If we cross the border into insanity, scale the reward
+						local healthCap = maxHealth * 4
+						if ( curHealth > healthCap )
+						{
+							healthAddition = PopExtUtil.RemapValClamped( curHealth, healthCap, (healthCap * 1.5), 20, 5 )
+						}
+
+						self.SetHealth(curHealth + healthAddition)
+					}
+
 					// OLD COLLECTION METHOD
 					// // Move the money to the origin and respawn it to allow us to collect it after it touches the ground
 					// for (local hurt; hurt = FindByClassname(hurt, "trigger_hurt");)
@@ -2007,7 +2218,7 @@ function MissionAttributes::MissionAttr(...) {
 			scope.PlayerThinkTable.ReverseMVMPackThink <- function() {
 				local origin = self.GetOrigin()
 				for ( local ent; ent = FindByClassnameWithin(ent, "item_*", origin, 40); ) {
-					if (ent.GetEFlags() & EFL_USER) continue
+					if (ent.IsEFlagSet(EFL_USER)) continue
 					if (GetPropInt(ent, "m_fEffects") & EF_NODRAW) continue
 
 					local classname = ent.GetClassname()
@@ -2094,6 +2305,7 @@ function MissionAttributes::MissionAttr(...) {
 
 			// Drain player ammo on weapon usage
 			scope.PlayerThinkTable.ReverseMVMDrainAmmoThink <- function() {
+
 				if (value & 4) return
 				local buttons = GetPropInt(self, "m_nButtons");
 
@@ -2164,7 +2376,7 @@ function MissionAttributes::MissionAttr(...) {
 						}
 						else if (buttons & IN_ATTACK2) {
 							local cost = 20
-							if (itemid == ID_BACKBURNER || itemid == ID_FESTIVE_BACKBURNER) // Backburner
+							if (itemid == ID_BACKBURNER || itemid == ID_FESTIVE_BACKBURNER_2014) // Backburner
 								cost = 50
 							else if (itemid == ID_DEGREASER) // Degreaser
 								cost = 25
@@ -2207,7 +2419,7 @@ function MissionAttributes::MissionAttr(...) {
 					else if (classname == "tf_weapon_mechanical_arm") {
 						// Reset hack
 						SetPropIntArray(self, "m_iAmmo", 0, TF_AMMO_GRENADES1)
-						SetPropInt(wep, "m_iPrimaryAmmoType", 3)
+						SetPropInt(wep, "m_iPrimaryAmmoType", TF_AMMO_METAL)
 
 						local nextattack1 = GetPropFloat(wep, "m_flNextPrimaryAttack")
 						local nextattack2 = GetPropFloat(wep, "m_flNextSecondaryAttack")
@@ -2328,11 +2540,12 @@ function MissionAttributes::MissionAttr(...) {
 				}
 			}
 
-			if (value & 64)  {
+			// disable footsteps
+			if (value & 64) {
 				// player.AddCond(TF_COND_DISGUISED)
-				scope.PlayerThinkTable.RemoveFootsteps <- function() {
-					if (!player.IsMiniBoss()) player.SetIsMiniBoss(true)
-				}
+				// scope.PlayerThinkTable.RemoveFootsteps <- function() {
+				// 	if (!player.IsMiniBoss()) player.SetIsMiniBoss(true)
+				// }
 
 				//stop explosion sound
 				MissionAttributes.DeathHookTable.RemoveFootsteps <- function(params) {
@@ -2340,15 +2553,29 @@ function MissionAttributes::MissionAttr(...) {
 						StopSoundOn("MVM.GiantCommonExplodes", player)
 				}
 			}
+			//disable bomb deploy
+			if (!(value & 128)) {
+
+				for (local roundwin; roundwin = FindByClassname(roundwin, "game_round_win");)
+					if (roundwin.GetTeam() == TF_TEAM_PVE_INVADERS)
+						EntFireByHandle(roundwin, "Kill", "", -1, null, null)
+
+				for (local capturezone; capturezone = FindByClassname(capturezone, "func_capturezone");)
+				{
+					AddOutput(capturezone, "OnStartTouch", "!activator", "RunScriptCode", "MissionAttributes.DeployBombStart(self)", -1, -1)
+					AddOutput(capturezone, "OnEndTouch", "!activator", "RunScriptCode", "MissionAttributes.DeployBombStop(self)", -1, -1)
+				}
+			}
 		}
 	break
 
 	// =========================================================
 	case "ClassLimits":
+
 		MissionAttributes.ChangeClassTable.ClassLimits <- function(params) {
 
 			local player = GetPlayerFromUserID(params.userid)
-			if (player.IsBotOfType(1337)) return
+			if (player.IsBotOfType(TF_BOT_TYPE)) return
 			// Note that player_changeclass fires before swap occurs
 			// This means that GetPlayerClass() can be used to get the previous player class,
 			//  and that PopExtUtil::PlayerClassCount() will return the current class array.
@@ -2404,6 +2631,12 @@ function MissionAttributes::MissionAttr(...) {
 
 		break
 
+	// =========================================================
+
+	case "ShowHiddenAttributes":
+		MissionAttributes.CurAttrs[value] <- true
+	break
+
 	// Options to revert global fixes below:
 	// View globalfixes.nut for more info
 
@@ -2421,16 +2654,15 @@ function MissionAttributes::MissionAttr(...) {
 			delete GlobalFixes.TakeDamageTable.YERDisguiseFix
 	break
 
-	case "DefaultGiantFoosteps":
-		foreach(bot in PopExtUtil.BotArray)
-		{
-			if ("RestoreGiantFootsteps" in bot.GetScriptScope().PlayerThinkTable)
-				delete bot.GetScriptScope().PlayerThinkTable.RestoreGiantFootsteps
+	// case "DefaultGiantFoosteps":
+	// 	foreach(bot in PopExtUtil.BotArray) {
+	// 		if ("RestoreGiantFootsteps" in bot.GetScriptScope().PlayerThinkTable)
+	// 			delete bot.GetScriptScope().PlayerThinkTable.RestoreGiantFootsteps
 
-			bot.AddCustomAttribute("override footstep sound set", 2.0, -1)
-		}
+	// 		bot.AddCustomAttribute("override footstep sound set", 2.0, -1)
+	// 	}
 
-	break
+	// break
 	// =========================================================
 
 	// Don't add attribute to clean-up list if it could not be found.
@@ -2478,6 +2710,47 @@ function MAtr(...) {
 	MissionAttr.acall(vargv.insert(0, MissionAttributes))
 }
 
+function MissionAttributes::SetPlayerAttributes(player, attrib, value, item = null)
+{
+	local items = {}
+	//setting maxhealth attribs doesn't update current HP
+	local healthattribs = {
+		"max health additive bonus" : null,
+		"max health additive penalty": null,
+		"SET BONUS: max health additive bonus": null,
+		"hidden maxhealth non buffed": null,
+	}
+	if (item)
+		items[PopExtUtil.HasItemInLoadout(player, item)] <- [attrib, value]
+	else
+		for (local i = 0; i < GetPropArraySize(player, "m_hMyWeapons"); i++)
+			if (GetPropEntityArray(player, "m_hMyWeapons", i))
+				items[GetPropEntityArray(player, "m_hMyWeapons", i)] <- [attrib, value]
+	// printl(PopExtUtil.HasItemInLoadout(player, item))
+	//do the customattributes check first, since we replace some vanilla attributes
+	if (attrib in CustomAttributes.Attrs)
+		CustomAttributes.AddAttr(player, attrib, value, items)
+
+	else if ("Attributes" in PopExtItems && attrib in PopExtItems.Attributes)
+	{
+		if ("attribute_type" in PopExtItems.Attributes[attrib] && PopExtItems.Attributes[attrib]["attribute_type"] == "string")
+			MissionAttributes.RaiseValueError("PlayerAttributes", attrib, "Cannot set string attributes!")
+		else
+		{
+			item == null ? EntFireByHandle(player, "RunScriptCode", format("self.AddCustomAttribute(`%s`, %1.8e, -1)", attrib, value.tofloat()), -1, null, null) : EntFireByHandle(item, "RunScriptCode", format("self.AddAttribute(`%s`, %1.8e, -1); self.ReapplyProvision()", attrib, value.tofloat()), -1, null, null)
+			if (attrib in healthattribs) EntFireByHandle(player, "RunScriptCode", "self.SetHealth(self.GetMaxHealth())", -1, null, null)
+		}
+		//add hidden attributes to our custom attribute display
+		if ("hidden" in PopExtItems.Attributes[attrib] && PopExtItems.Attributes[attrib]["hidden"] == "1" && "ShowHiddenAttributes" in MissionAttributes.CurAttrs && MissionAttributes.CurAttrs.ShowHiddenAttributes)
+		{
+			local scope = player.GetScriptScope()
+			if (!("attribinfo" in scope)) scope.attribinfo <- {}
+
+			scope.attribinfo[attrib] <- format("%s: %s" attrib, value.tostring())
+			CustomAttributes.RefreshDescs(player)
+		}
+	}
+}
 // Logging Functions
 // =========================================================
 // Generic debug message that is visible if PrintDebugText is true.

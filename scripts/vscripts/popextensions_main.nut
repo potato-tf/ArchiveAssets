@@ -1,7 +1,7 @@
 //date = last major version push (new features)
 //suffix = patch
-::popExtensionsVersion <- "04.14.2024.1"
-local root = getroottable()
+::popExtensionsVersion <- "06.14.2024.2"
+local _root = getroottable()
 
 local o = Entities.FindByClassname(null, "tf_objective_resource")
 ::__popname <- NetProps.GetPropString(o, "m_iszMvMPopfileName")
@@ -13,16 +13,16 @@ local o = Entities.FindByClassname(null, "tf_objective_resource")
 //don't want to lead them astray by allowing adding multiple thinks with AddThinkToEnt in our library and our library only.
 
 local banned_think_classnames = {
-	player = "PlayerThinkTable" 
+	player = "PlayerThinkTable"
 	tank_boss = "TankThinkTable"
 	tf_projectile_ = "ProjectileThinkTable"
 }
 
-if (!("_AddThinkToEnt" in root))
+if (!("_AddThinkToEnt" in _root))
 {
 	//rename so we can still use it elsewhere
 	::_AddThinkToEnt <- AddThinkToEnt
-	
+
 	::AddThinkToEnt <- function(ent, func)
 	{
 		foreach (k, v in banned_think_classnames)
@@ -32,8 +32,8 @@ if (!("_AddThinkToEnt" in root))
 				ClientPrint(null, HUD_PRINTTALK, format("\x08FFB4B4FF**WARNING: Adding thinks to %s entities is forbidden!**\n\n Add your function to \"%s\" instead.\n\nExample: AddThinkToEnt(ent, \"MyFunction\") would become: ent.%s.MyFunction <- MyFunction", k, v, v))
 				return
 			}
-			
-		_AddThinkToEnt(ent, func)	
+
+		_AddThinkToEnt(ent, func)
 	}
 }
 ::PopExtMain <- {
@@ -41,7 +41,8 @@ if (!("_AddThinkToEnt" in root))
 	//save popfile name in global scope when we first initialize
 	//if the popfile name changed, a new pop has loaded, clean everything up.
 	function PlayerCleanup(player) {
-		NetProps.SetPropInt(player, "m_nRenderMode", 0)
+
+		NetProps.SetPropInt(player, "m_nRenderMode", kRenderNormal)
 		NetProps.SetPropInt(player, "m_clrRender", 0xFFFFFF)
 		player.ValidateScriptScope()
 		local scope = player.GetScriptScope()
@@ -60,17 +61,36 @@ if (!("_AddThinkToEnt" in root))
 				delete scope[k]
 	}
 
-	function OnGameEvent_player_spawn(params) {
-
-		this.PlayerCleanup(GetPlayerFromUserID(params.userid))
+	function OnGameEvent_post_inventory_application(params) {
 
 		local player = GetPlayerFromUserID(params.userid)
+
+		this.PlayerCleanup(player)
+
 		player.ValidateScriptScope()
 		local scope = player.GetScriptScope()
 
+		scope.userid <- params.userid
+
 		if (!("PlayerThinkTable" in scope)) scope.PlayerThinkTable <- {}
 
-		scope.PlayerThinks <- function() { foreach (name, func in scope.PlayerThinkTable) func(); return -1 }
+		if (player.IsBotOfType(TF_BOT_TYPE))
+		{
+			EntFireByHandle(player, "RunScriptCode", @"
+				PopExtTags.EvaluateTags(self)
+				aibot <- AI_Bot(self)
+
+				PlayerThinkTable.BotThink <- function() {
+					try
+						aibot.OnUpdate()
+					catch(e)
+						if (e == `the index 'bot' does not exist`) return
+				}
+			", -1, player, player);
+
+		}
+
+		scope.PlayerThinks <- function() { foreach (name, func in scope.PlayerThinkTable) func.call(scope); return -1 }
 
 		_AddThinkToEnt(player, "PlayerThinks")
 
@@ -80,18 +100,9 @@ if (!("_AddThinkToEnt" in root))
 			scope.buildings <- []
 		}
 
-		local bot = player
-		if (bot.IsBotOfType(1337))
-		{
-			scope.BotThink <- PopExtTags.BotThink
-
-			EntFireByHandle(bot, "RunScriptCode", "_AddThinkToEnt(self, `BotThink`)", -1, null, null)
-			EntFireByHandle(bot, "RunScriptCode", "PopExtTags.AI_BotSpawn(self)", -1, null, null)
-		}
-
-		foreach (_, func in MissionAttributes.SpawnHookTable) func(params)
-		foreach (_, func in GlobalFixes.SpawnHookTable) func(params)
-		foreach (_, func in CustomAttributes.SpawnHookTable) func(params)
+		if ("MissionAttributes" in _root) foreach (_, func in MissionAttributes.SpawnHookTable) func(params)
+		if ("GlobalFixes" in _root) foreach (_, func in GlobalFixes.SpawnHookTable) func(params)
+		if ("CustomAttributes" in _root) foreach (_, func in CustomAttributes.SpawnHookTable) func(params)
 	}
 	function OnGameEvent_player_changeclass(params) {
 		local player = GetPlayerFromUserID(params.userid)
@@ -105,7 +116,8 @@ if (!("_AddThinkToEnt" in root))
 	function OnGameEvent_player_death(params) {
 
 		local player = GetPlayerFromUserID(params.userid)
-		if (!player.IsBotOfType(1337)) return
+
+		if (!player.IsBotOfType(TF_BOT_TYPE)) return
 
 		this.PlayerCleanup(player)
 	}
@@ -117,7 +129,7 @@ if (!("_AddThinkToEnt" in root))
 				EntFireByHandle(wearable, "Kill", "", -1, null, null)
 
 		//same pop, don't run clean-up
-		// if (__popname == GetPropString(o, "m_iszMvMPopfileName")) return
+		if (__popname == GetPropString(o, "m_iszMvMPopfileName")) return
 
 		EntFire("_popext*", "Kill")
 		EntFire("__util*", "Kill")
@@ -139,6 +151,8 @@ if (!("_AddThinkToEnt" in root))
 		try delete ::PopExtHooks catch(e) return
 		try delete ::GlobalFixes catch(e) return
 		try delete ::SpawnTemplate catch(e) return
+		try delete ::SpawnTemplateWaveSchedule catch(e) return
+		try delete ::SpawnTemplates catch(e) return
 		try delete ::VCD_SOUNDSCRIPT_MAP catch(e) return
 		try delete ::PopExtUtil catch(e) return
 		try delete ::__popname catch(e) return
@@ -155,13 +169,14 @@ for (local i = 1; i <= MaxClients().tointeger(); i++)
 		EntFireByHandle(PlayerInstanceFromIndex(i), "RunScriptCode", "self.Regenerate(true)", 0.015, null, null)
 
 function Include(path) {
-	try IncludeScript(format("popextensions/%s", path), root) catch(e) printl(e)
+	try IncludeScript(format("popextensions/%s", path), _root) catch(e) printl(e)
 }
 
 Include("constants") //constants must include first
 Include("itemdef_constants") //constants must include first
 Include("item_map") //must include second
-Include("util") //must include third
+Include("attribute_map") //must include third (after item_map)
+Include("util") //must include fourth
 
 Include("hooks") //must include before popextensions
 Include("popextensions")
@@ -169,6 +184,7 @@ Include("popextensions")
 Include("robotvoicelines") //must include before missionattributes
 Include("customattributes") //must include before missionattributes
 Include("missionattributes")
+Include("customweapons")
 
 Include("botbehavior") //must include before tags
 Include("tags")
