@@ -64,6 +64,7 @@ __potato.MapFixes.Events <- {
             })
             forcefield.SetSize(Vector(-256, -68, -1056), Vector(256, 68, 1056))
             forcefield.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            break
 
         // Lotus B6, Mansion RC1D, Watermine RC11
         // - Fixes the respawn room visualizers rendering behind props that are behind them.
