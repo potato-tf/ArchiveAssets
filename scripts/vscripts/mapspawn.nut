@@ -9,7 +9,22 @@
     IsSigmod = Convars.GetInt("sig_color_console") != null ? true : false
     //  Length of the current map name.
     len_mapname = GetMapName().len()
+
+    // Preserved entity handles; we only need to grab them once.
+    gamerules = null    // tf_gamerules
+    objres = null   // tf_objective_resource
+    plyrmgr = null  // tf_player_manager
+
+    // mapspawn.nut executes too early to grab entities immediately.
+    function PopulatePreservedEnts() {
+        gamerules = Entities.FindByClassname(null, "tf_gamerules")
+        objres = Entities.FindByClassname(null, "tf_objective_resource")
+        plyrmgr = Entities.FindByClassname(null, "tf_player_manager")
+        plyrmgr.ValidateScriptScope()
+    }
 }
+
+EntFire("worldspawn", "RunScriptCode", "__potato.PopulatePreservedEnts()")
 
 IncludeScript("potato/mapfixes.nut")    // Fixes for the base versions of some maps on Potato.
 IncludeScript("potato/nameformatter.nut")   // Automatically formats the mission display name.

@@ -5,10 +5,7 @@ __potato.NameFormatter <- {
     WinPanelDelay = 1.0         // Until the mission complete screen is shown
     HumiliationTime = 5.0       // Length of humiliation period, hardcoded to 5s in MvM
 
-    // Entity handles
-    objres = null   // tf_objective_resource
-    popscript = null    // Sigmod $script_manager
-
+    popscript = null    // Sigmod $script_manager handle.
     CustomMissionName = null  // Stores the mission maker's custom mission name.
 
     // EntFire checks so we don't format at the wrong time.
@@ -157,8 +154,6 @@ __potato.NameFormatter <- {
         function OnGameEvent_teamplay_round_start(_) {
             InVictory = false
             InHumiliation = false
-
-            objres = Entities.FindByClassname(null, "tf_objective_resource")
 
             if (IsSigmod) {
                 // The mission itself will make this entity if it has any raflua features.
