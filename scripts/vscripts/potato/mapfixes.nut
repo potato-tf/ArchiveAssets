@@ -21,16 +21,56 @@ __potato.MapFixes.Events <- {
             }
             break
 
-        // Lotus B6
-        // - Fixes the spawn holograms rendering behind props that are behind them.
-        case "mvm_lotus_b6":
+        // Decompose RC6B
+        // - Adds a trigger_teleport to fix bots getting stuck in the wrong spawn door.
+        // - Fixes the respawn room visualizers rendering behind props that are behind them.
+        // - Hides the front vis as it has a black alpha layer on first map load.
+        case "mvm_decompose_rc6b":
             for (local vis; vis = Entities.FindByClassname(vis, "func_respawnroomvisualizer");)
                 NetProps.SetPropInt(vis, "m_nRenderMode", Constants.ERenderMode.kRenderTransColor)
+            local frontvis = Entities.FindByClassnameNearest("func_respawnroomvisualizer", 
+                                Vector(172, -2506.02, 355.5), 10.0)
+            NetProps.SetPropInt(frontvis, "m_nRenderMode", Constants.ERenderMode.kRenderNone)
+
+            // Setup gate teleport entities.
+            SpawnEntityFromTable("info_teleport_destination", {
+                targetname = "unstuck_dest"
+                origin = Vector(164, -3048, 247)
+            })
+            local door_unstuck = SpawnEntityFromTable("trigger_teleport", {
+                targetname = "unstuck_trigger"
+                target = "unstuck_dest"
+                origin = Vector(-3336, -3416, 295)
+                spawnflags = 1  // Clients only
+            })
+            door_unstuck.SetSize(Vector(-808, -344, -295), Vector(808, 344, 295))
+            door_unstuck.SetSolid(Constants.ESolidType.SOLID_BBOX)
+
+            // Enable/disable based on gate capture status.
+            EntityOutputs.AddOutput(Entities.FindByName(null, "wave_reset_relay"),
+                "OnTrigger", "unstuck_trigger", "Enable", "", -1, -1)
+            EntityOutputs.AddOutput(Entities.FindByName(null, "gate01_relay"),
+                "OnTrigger", "unstuck_trigger", "Disable", "", -1, -1)
             break
 
-        // Mansion RC1D
-        // - Fixes the spawn holograms rendering behind props that are behind them.
+        // Giza B7
+        // - Fix an out-of-bounds access spot.
+        case "mvm_giza_b7":
+            local forcefield = SpawnEntityFromTable("func_forcefield", {
+                origin = Vector(-1024, -1980, 2016)
+                rendermode = Constants.ERenderMode.kRenderNone
+                TeamNum = Constants.ETFTeam.TEAM_SPECTATOR
+                model = "models/weapons/w_models/w_rocket.mdl"
+            })
+            forcefield.SetSize(Vector(-256, -68, -1056), Vector(256, 68, 1056))
+            forcefield.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            break
+
+        // Lotus B6, Mansion RC1D, Watermine RC11
+        // - Fixes the respawn room visualizers rendering behind props that are behind them.
+        case "mvm_lotus_b6":
         case "mvm_mansion_rc1d":
+        case "mvm_watermine_rc11":
             for (local vis; vis = Entities.FindByClassname(vis, "func_respawnroomvisualizer");)
                 NetProps.SetPropInt(vis, "m_nRenderMode", Constants.ERenderMode.kRenderTransColor)
             break
@@ -88,12 +128,21 @@ __potato.MapFixes.Events <- {
             tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
             break
 
+        // Hanami RC1
+        // - Fixes the tank barricade turning invisible after breaking once.
+        // - Fixes client prediction errors on the tank barricade.
+        case "mvm_hanami_rc1":
+            local barricade = Entities.FindByName(null, "prop_barricade")
+            barricade.AddEFlags(Constants.FEntityEFlags.EFL_IN_SKYBOX)
+            barricade.SetSolidFlags(Constants.ESolidType.SOLID_NONE)
+            break
         // Rottenburg
         // - Fixes the tank barricade turning invisible after breaking once.
         // - Fixes client prediction errors on the tank barricade.
         case "mvm_rottenburg":
-            EntFire("Barricade", "SetParent", "Tank_Barricade_Particle")
-            EntFire("Barricade", "DisableCollision")
+            local barricade = Entities.FindByName(null, "Barricade")
+            barricade.AddEFlags(Constants.FEntityEFlags.EFL_IN_SKYBOX)
+            barricade.SetSolidFlags(Constants.ESolidType.SOLID_NONE)
             break
     }}
 }

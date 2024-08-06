@@ -4,9 +4,6 @@ __potato.HideRespawnText <- {
     // Set to 1.0 to always show "Prepare to respawn" instead.
     texttype = 0.0
 
-    plyrmgr = null  // tf_player_manager handle
-    gamerules = null    // tf_gamerules handle
-
     // Check if we should hide text for this mission (RespawnWaveTime exceeds 1000s).
     function TestAndApply() {
         // Hack to guess if players are on RED or BLU
@@ -33,12 +30,6 @@ __potato.HideRespawnText <- {
     }
 
     Events = {
-        // Fired every mission change, wave jump or (post) wave fail.
-        function OnGameEvent_teamplay_round_start(_){
-            gamerules = Entities.FindByClassname(null, "tf_gamerules")
-            plyrmgr = Entities.FindByClassname(null, "tf_player_manager")
-            plyrmgr.ValidateScriptScope()
-        }
         // Fired every wave start.
         function OnGameEvent_mvm_begin_wave(_) {
             if (__potato.HideRespawnText.Disable) return
