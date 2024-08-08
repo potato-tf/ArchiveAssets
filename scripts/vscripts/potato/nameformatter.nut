@@ -10,7 +10,7 @@ __potato.NameFormatter <- {
 
     // EntFire checks so we don't format at the wrong time.
     InVictory = false   // Has the mission been completed?
-    InHumiliation = false  // Is the mission in the humiliation period?
+    //InHumiliation = false  // Is the mission in the humiliation period?
 
     // Mapping for difficulty phrases to their respective display names.
     DifficultyMap = {
@@ -153,7 +153,7 @@ __potato.NameFormatter <- {
         // Fired every mission change, wave jump or (post) wave fail.
         function OnGameEvent_teamplay_round_start(_) {
             InVictory = false
-            InHumiliation = false
+            //InHumiliation = false
 
             if (IsSigmod) {
                 // The mission itself will make this entity if it has any raflua features.
@@ -173,7 +173,7 @@ __potato.NameFormatter <- {
         }
 
         // Fired every wave loss (or on reverse mode win). Triggers 5s humiliation period.
-        function OnGameEvent_teamplay_round_win(_) {
+        /* function OnGameEvent_teamplay_round_win(_) {
             InHumiliation = true
 
             // Set the mission name without "(Difficulty)" before the loss summary panel shows.
@@ -188,7 +188,7 @@ __potato.NameFormatter <- {
                 // Advance fire by 1s to account for client latency.
                 HumiliationTime - 1.0, null, null)
             }
-        }
+        } */
 
         // Event is fired when the mission is complete.
         // Note that debug methods may not always fire this event, but regular play will.
@@ -237,14 +237,3 @@ __potato.NameFormatter.setdelegate(__potato)
 __potato.NameFormatter.Events.setdelegate(__potato.NameFormatter)
 
 __CollectGameEventCallbacks(__potato.NameFormatter.Events)
-
-// Addendum: Mission name-changing logic is (in part) complex because the Potato plugin that
-//   serves the mission name to the Potato website retrieves the popfile name directly from
-//   the NetProp, causing the website to track progress incorrectly if it is modified.
-//  Aspiring plugin authors should consider instead using a method like this instead in a
-//   static function to reduce overhead,
-//    https://github.com/mtxfellen/tf2-plugins/blob/3a83742/addons/sourcemod/scripting/include/tfmvm_stocks.inc#L21
-//   or set up the appropriate SDKCall to CPopulationManager::GetPopulationFilename().
-//  It is also the case that as a result of this, missions that change their display name
-//   typically use Sigmod $SetClientProp, so additional complexity is incurred by the need to
-//   test for both name changes by $SetClientProp or SetPropString().
