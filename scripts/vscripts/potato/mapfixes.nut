@@ -66,10 +66,12 @@ __potato.MapFixes.Events <- {
             forcefield.SetSolid(Constants.ESolidType.SOLID_BBOX)
             break
 
-        // Lotus B6, Mansion RC1D, Watermine RC11
+        // Autumnull RC2, Lotus B6, Mansion RC1D, Null B9A, Watermine RC11
         // - Fixes the respawn room visualizers rendering behind props that are behind them.
+        case "mvm_autumnull_rc2":
         case "mvm_lotus_b6":
         case "mvm_mansion_rc1d":
+        case "mvm_null_b9a":
         case "mvm_watermine_rc11":
             for (local vis; vis = Entities.FindByClassname(vis, "func_respawnroomvisualizer");)
                 NetProps.SetPropInt(vis, "m_nRenderMode", Constants.ERenderMode.kRenderTransColor)
