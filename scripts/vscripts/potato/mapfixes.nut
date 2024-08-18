@@ -82,10 +82,10 @@ __potato.MapFixes.Events <- {
             break
 
         // Madhattan RC5A
-        // - Fix the forward upgrade station breaking on wave fail.
+        // - Fix the forward upgrade station breaking on wave fail/mission swap.
         case "mvm_madhattan_rc5a":
-            EntityOutputs.AddOutput(Entities.FindByName(null, "bots_win"),
-                "OnRoundWin", "open_upgrade_relay", "Trigger", "", -1, 1)
+            EntityOutputs.AddOutput(Entities.FindByClassname(null, "logic_auto"),
+                "OnMapSpawn", "open_upgrade_relay", "Trigger", "", -1, 1)
             break
 
         // Oilrig RC5A
@@ -173,6 +173,12 @@ __potato.MapFixes.Events <- {
             local barricade = Entities.FindByName(null, "Barricade")
             barricade.AddEFlags(Constants.FEntityEFlags.EFL_IN_SKYBOX)
             barricade.SetSolidFlags(Constants.ESolidType.SOLID_NONE)
+            break
+        // Whitecliff Event RC2
+        // - Fix the forward upgrade station breaking on mission swap.
+        case "mvm_whitecliff_event_rc2":
+            EntityOutputs.AddOutput(Entities.FindByClassname(null, "logic_auto"),
+                "OnMapSpawn", "FowardUpgradeStationTrigger", "Enable", "", -1, 1)
             break
     }}
 }
