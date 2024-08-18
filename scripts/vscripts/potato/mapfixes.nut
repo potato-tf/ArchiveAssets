@@ -7,12 +7,12 @@ __potato.MapFixes.Events <- {
         // - Fixes performance issues and large demos caused by bone followers on map engibots.
         // - Fixes death pit not killing ubered players.
         case "mvm_bronx_rc2":
-            // 
+            // Disable bone followers.
             for (local props; props = Entities.FindByClassname(props, "prop_dynamic");)
                 if (props.GetModelName() == "models/bots/engineer/bot_engineer.mdl")
                     NetProps.SetPropInt(props, "m_BoneFollowerManager.m_iNumBones", 0)
 
-            // Fix the death pit not killing ubered players
+            // Fix the death pit not killing ubered players.
             for (local deathpit; deathpit = Entities.FindByClassname(deathpit, "trigger_hurt");) {
                 if (deathpit.GetName() != "trigger_hurt_hatch_fire") {
                     NetProps.SetPropInt(deathpit, "m_bitsDamageInflict", Constants.FDmgType.DMG_ACID)   // DMG_CRITICAL
@@ -134,12 +134,19 @@ __potato.MapFixes.Events <- {
 
         // Outlands RC2
         // - Fixes cash getting stuck in hatch.
+        // - Fixes cash getting stuck in tank spawn.
         case "mvm_outlands_rc2":
             local hatchcollect = SpawnEntityFromTable("trigger_hurt", {
                 origin = Vector(-192, -2560, -500)
             })
             hatchcollect.SetSize(Vector(), Vector(384, 385, 150))
             hatchcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
+
+            local tankcollect = SpawnEntityFromTable("trigger_hurt", {
+                origin = Vector(-1627, 2937, -274)
+            })
+            tankcollect.SetSize(Vector(), Vector(862, 626, 491))
+            tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
             break
 
         // Hanami RC1
