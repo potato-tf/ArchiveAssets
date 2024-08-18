@@ -56,19 +56,21 @@ __potato.MapFixes.Events <- {
         // Giza B7
         // - Fix an out-of-bounds access spot.
         case "mvm_giza_b7":
-            local forcefield = SpawnEntityFromTable("func_forcefield", {
-                origin = Vector(-1024, -1980, 2016)
-                rendermode = Constants.ERenderMode.kRenderNone
-                TeamNum = Constants.ETFTeam.TEAM_SPECTATOR
-                model = "models/weapons/w_models/w_rocket.mdl"
-            })
-            forcefield.SetSize(Vector(-256, -68, -1056), Vector(256, 68, 1056))
-            forcefield.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            local f = Entities.CreateByClassname("func_forcefield")
+            f.SetModel("models/empty.mdl")
+            f.SetAbsOrigin(Vector(-1024, -1980, 2016))
+            NetProps.SetPropVector(f, "m_Collision.m_vecMinsPreScaled", Vector(-256, -68, -1056))
+            NetProps.SetPropVector(f, "m_Collision.m_vecMaxsPreScaled", Vector(256, 68, 1056))
+            f.SetSize(Vector(-256, -68, -1056), Vector(256, 68, 1056))
+            f.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            f.SetTeam(Constants.ETFTeam.TEAM_SPECTATOR)
+            NetProps.SetPropInt(f, "m_nRenderMode", Constants.ERenderMode.kRenderNone)
             break
 
         // Autumnull RC2, Lotus B6, Mansion RC1D, Null B9A, Watermine RC11
         // - Fixes the respawn room visualizers rendering behind props that are behind them.
         case "mvm_autumnull_rc2":
+        case "mvm_coaltown":
         case "mvm_lotus_b6":
         case "mvm_mansion_rc1d":
         case "mvm_null_b9a":
@@ -128,6 +130,16 @@ __potato.MapFixes.Events <- {
             })
             tankcollect.SetSize(Vector(), Vector(400, 410, 200))
             tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            break
+
+        // Outlands RC2
+        // - Fixes cash getting stuck in hatch.
+        case "mvm_outlands_rc2":
+            local hatchcollect = SpawnEntityFromTable("trigger_hurt", {
+                origin = Vector(-192, -2560, -500)
+            })
+            hatchcollect.SetSize(Vector(), Vector(384, 385, 150))
+            hatchcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
             break
 
         // Hanami RC1
