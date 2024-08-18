@@ -21,6 +21,16 @@ __potato.MapFixes.Events <- {
             }
             break
 
+        // Bloodlust B6
+        // - Fix cash getting stuck in tank spawn.
+        case "mvm_bloodlust_b6":
+            local tankcollect = SpawnEntityFromTable("trigger_hurt", {
+                origin = Vector(-5138, 3072, -370)
+            })
+            tankcollect.SetSize(Vector(), Vector(1426, 1001, 154))
+            tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            break
+
         // Decompose RC6B
         // - Adds a trigger_teleport to fix bots getting stuck in the wrong spawn door.
         // - Fixes the respawn room visualizers rendering behind props that are behind them.
