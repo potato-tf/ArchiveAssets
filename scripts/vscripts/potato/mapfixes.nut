@@ -158,6 +158,16 @@ __potato.MapFixes.Events <- {
             tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
             break
 
+        // Oxidize RR18
+        // - Fix cash getting stuck in tank spawn.
+        case "mvm_oxidize_rr18":
+            local tankcollect = SpawnEntityFromTable("trigger_hurt", {
+                origin = Vector(-2688, 2688, 0)
+            })
+            tankcollect.SetSize(Vector(), Vector(768, 640, 60))
+            tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            break
+
         // Production RC6
         // - Fixes cash getting stuck in tank spawn.
         case "mvm_production_rc6":
