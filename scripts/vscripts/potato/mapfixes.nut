@@ -13,12 +13,9 @@ __potato.MapFixes.Events <- {
                     NetProps.SetPropInt(props, "m_BoneFollowerManager.m_iNumBones", 0)
 
             // Fix the death pit not killing ubered players.
-            for (local deathpit; deathpit = Entities.FindByClassname(deathpit, "trigger_hurt");) {
-                if (deathpit.GetName() != "trigger_hurt_hatch_fire") {
-                    NetProps.SetPropInt(deathpit, "m_bitsDamageInflict", Constants.FDmgType.DMG_ACID)   // DMG_CRITICAL
-                    deathpit.AcceptInput("SetDamage", "10000", null, null)
-                }
-            }
+            for (local pit; pit = Entities.FindByClassname(pit, "trigger_hurt");)
+                if (pit.GetName() != "trigger_hurt_hatch_fire")
+                    pit.AcceptInput("SetDamage", "10000", null, null)
             break
 
         // Bloodlust B6
@@ -61,6 +58,13 @@ __potato.MapFixes.Events <- {
                 "OnTrigger", "unstuck_trigger", "Enable", "", -1, -1)
             EntityOutputs.AddOutput(Entities.FindByName(null, "gate01_relay"),
                 "OnTrigger", "unstuck_trigger", "Disable", "", -1, -1)
+            break
+
+        // Dockyard RC7
+        // - Fixes death pit not killing ubered players.
+        case "mvm_dockyard_rc7":
+            for (local pit; pit = Entities.FindByClassname(pit, "trigger_hurt");)
+                pit.AcceptInput("SetDamage", "10000", null, null)
             break
 
         // Giza B7
