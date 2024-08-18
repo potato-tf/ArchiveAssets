@@ -158,6 +158,16 @@ __potato.MapFixes.Events <- {
             tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
             break
 
+        // Production RC6
+        // - Fixes cash getting stuck in tank spawn.
+        case "mvm_production_rc6":
+            local tankcollect = SpawnEntityFromTable("trigger_hurt", {
+                origin = Vector(-1888, 1015, -136)
+            })
+            tankcollect.SetSize(Vector(), Vector(624, 280, 30))
+            tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            break
+
         // Hanami RC1
         // - Fixes the tank barricade turning invisible after breaking once.
         // - Fixes client prediction errors on the tank barricade.
@@ -174,6 +184,7 @@ __potato.MapFixes.Events <- {
             barricade.AddEFlags(Constants.FEntityEFlags.EFL_IN_SKYBOX)
             barricade.SetSolidFlags(Constants.ESolidType.SOLID_NONE)
             break
+
         // Whitecliff Event RC2
         // - Fix the forward upgrade station breaking on mission swap.
         case "mvm_whitecliff_event_rc2":
