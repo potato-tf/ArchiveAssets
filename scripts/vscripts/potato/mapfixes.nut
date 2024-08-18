@@ -28,7 +28,7 @@ __potato.MapFixes.Events <- {
         case "mvm_decompose_rc6b":
             for (local vis; vis = Entities.FindByClassname(vis, "func_respawnroomvisualizer");)
                 NetProps.SetPropInt(vis, "m_nRenderMode", Constants.ERenderMode.kRenderTransColor)
-            local frontvis = Entities.FindByClassnameNearest("func_respawnroomvisualizer", 
+            local frontvis = Entities.FindByClassnameNearest("func_respawnroomvisualizer",
                                 Vector(172, -2506.02, 355.5), 10.0)
             NetProps.SetPropInt(frontvis, "m_nRenderMode", Constants.ERenderMode.kRenderNone)
 
@@ -68,11 +68,13 @@ __potato.MapFixes.Events <- {
             break
 
         // Autumnull RC2, Lotus B6, Mansion RC1D, Null B9A, Watermine RC11
+        // Autumnull RC2, Lotus B6, Mansion RC1D, Null B9A, Watermine RC11
         // - Fixes the respawn room visualizers rendering behind props that are behind them.
         case "mvm_autumnull_rc2":
         case "mvm_coaltown":
         case "mvm_lotus_b6":
         case "mvm_mansion_rc1d":
+        case "mvm_null_b9a":
         case "mvm_null_b9a":
         case "mvm_watermine_rc11":
             for (local vis; vis = Entities.FindByClassname(vis, "func_respawnroomvisualizer");)
