@@ -90,7 +90,7 @@ function LaserOnAim(_, activator)
 			return
 		end
 
-		if activator:InCond(0) ~= 1 then
+		if not activator:InCond(0) then
 			if started then
 				hideLaser()
 

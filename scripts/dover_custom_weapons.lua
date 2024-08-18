@@ -386,7 +386,7 @@ function SeducerHit(_, activator, caller)
 		return
 	end
 
-	if caller:InCond(TF_COND_INVULNERABLE_HIDE_UNLESS_DAMAGED) ~= 0 then
+	if caller:InCond(TF_COND_INVULNERABLE_HIDE_UNLESS_DAMAGED) then
 		return
 	end
 
@@ -895,7 +895,7 @@ function PHDEquip(_, activator)
 
 			local parachuting = activator:InCond(TF_COND_PARACHUTE_ACTIVE)
 
-			if parachuting ~= 0 then
+			if parachuting then
 				timeSpentParachuting = timeSpentParachuting + 0.1
 			end
 
@@ -904,7 +904,7 @@ function PHDEquip(_, activator)
 			end
 		end
 
-		if jumping == 0 then
+		if not jumping then
 			if phdData.JumpStartTime then
 				timeSpentParachuting = 0
 

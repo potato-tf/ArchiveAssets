@@ -7,18 +7,25 @@ __potato.MapFixes.Events <- {
         // - Fixes performance issues and large demos caused by bone followers on map engibots.
         // - Fixes death pit not killing ubered players.
         case "mvm_bronx_rc2":
-            // 
+            // Disable bone followers.
             for (local props; props = Entities.FindByClassname(props, "prop_dynamic");)
                 if (props.GetModelName() == "models/bots/engineer/bot_engineer.mdl")
                     NetProps.SetPropInt(props, "m_BoneFollowerManager.m_iNumBones", 0)
 
-            // Fix the death pit not killing ubered players
-            for (local deathpit; deathpit = Entities.FindByClassname(deathpit, "trigger_hurt");) {
-                if (deathpit.GetName() != "trigger_hurt_hatch_fire") {
-                    NetProps.SetPropInt(deathpit, "m_bitsDamageInflict", Constants.FDmgType.DMG_ACID)   // DMG_CRITICAL
-                    deathpit.AcceptInput("SetDamage", "10000", null, null)
-                }
-            }
+            // Fix the death pit not killing ubered players.
+            for (local pit; pit = Entities.FindByClassname(pit, "trigger_hurt");)
+                if (pit.GetName() != "trigger_hurt_hatch_fire")
+                    pit.AcceptInput("SetDamage", "10000", null, null)
+            break
+
+        // Bloodlust B6
+        // - Fix cash getting stuck in tank spawn.
+        case "mvm_bloodlust_b6":
+            local tankcollect = SpawnEntityFromTable("trigger_hurt", {
+                origin = Vector(-5138, 3072, -370)
+            })
+            tankcollect.SetSize(Vector(), Vector(1426, 1001, 154))
+            tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
             break
 
         // Decompose RC6B
@@ -28,7 +35,7 @@ __potato.MapFixes.Events <- {
         case "mvm_decompose_rc6b":
             for (local vis; vis = Entities.FindByClassname(vis, "func_respawnroomvisualizer");)
                 NetProps.SetPropInt(vis, "m_nRenderMode", Constants.ERenderMode.kRenderTransColor)
-            local frontvis = Entities.FindByClassnameNearest("func_respawnroomvisualizer", 
+            local frontvis = Entities.FindByClassnameNearest("func_respawnroomvisualizer",
                                 Vector(172, -2506.02, 355.5), 10.0)
             NetProps.SetPropInt(frontvis, "m_nRenderMode", Constants.ERenderMode.kRenderNone)
 
@@ -53,28 +60,46 @@ __potato.MapFixes.Events <- {
                 "OnTrigger", "unstuck_trigger", "Disable", "", -1, -1)
             break
 
+        // Dockyard RC7
+        // - Fixes death pit not killing ubered players.
+        case "mvm_dockyard_rc7":
+            for (local pit; pit = Entities.FindByClassname(pit, "trigger_hurt");)
+                pit.AcceptInput("SetDamage", "10000", null, null)
+            break
+
         // Giza B7
         // - Fix an out-of-bounds access spot.
         case "mvm_giza_b7":
-            local forcefield = SpawnEntityFromTable("func_forcefield", {
-                origin = Vector(-1024, -1980, 2016)
-                rendermode = Constants.ERenderMode.kRenderNone
-                TeamNum = Constants.ETFTeam.TEAM_SPECTATOR
-                model = "models/weapons/w_models/w_rocket.mdl"
-            })
-            forcefield.SetSize(Vector(-256, -68, -1056), Vector(256, 68, 1056))
-            forcefield.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            local f = Entities.CreateByClassname("func_forcefield")
+            f.SetModel("models/empty.mdl")
+            f.SetAbsOrigin(Vector(-1024, -1980, 2016))
+            NetProps.SetPropVector(f, "m_Collision.m_vecMinsPreScaled", Vector(-256, -68, -1056))
+            NetProps.SetPropVector(f, "m_Collision.m_vecMaxsPreScaled", Vector(256, 68, 1056))
+            f.SetSize(Vector(-256, -68, -1056), Vector(256, 68, 1056))
+            f.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            f.SetTeam(Constants.ETFTeam.TEAM_SPECTATOR)
+            NetProps.SetPropInt(f, "m_nRenderMode", Constants.ERenderMode.kRenderNone)
             break
 
         // Autumnull RC2, Lotus B6, Mansion RC1D, Null B9A, Watermine RC11
+        // Autumnull RC2, Lotus B6, Mansion RC1D, Null B9A, Watermine RC11
         // - Fixes the respawn room visualizers rendering behind props that are behind them.
         case "mvm_autumnull_rc2":
+        case "mvm_coaltown":
         case "mvm_lotus_b6":
         case "mvm_mansion_rc1d":
+        case "mvm_null_b9a":
         case "mvm_null_b9a":
         case "mvm_watermine_rc11":
             for (local vis; vis = Entities.FindByClassname(vis, "func_respawnroomvisualizer");)
                 NetProps.SetPropInt(vis, "m_nRenderMode", Constants.ERenderMode.kRenderTransColor)
+            break
+
+        // Madhattan RC5A
+        // - Fix the forward upgrade station breaking on wave fail/mission swap.
+        case "mvm_madhattan_rc5a":
+            EntityOutputs.AddOutput(Entities.FindByClassname(null, "logic_auto"),
+                "OnMapSpawn", "open_upgrade_relay", "Trigger", "", -1, 1)
             break
 
         // Oilrig RC5A
@@ -130,6 +155,43 @@ __potato.MapFixes.Events <- {
             tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
             break
 
+        // Outlands RC2
+        // - Fixes cash getting stuck in hatch.
+        // - Fixes cash getting stuck in tank spawn.
+        case "mvm_outlands_rc2":
+            local hatchcollect = SpawnEntityFromTable("trigger_hurt", {
+                origin = Vector(-192, -2560, -500)
+            })
+            hatchcollect.SetSize(Vector(), Vector(384, 385, 150))
+            hatchcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
+
+            local tankcollect = SpawnEntityFromTable("trigger_hurt", {
+                origin = Vector(-1627, 2937, -274)
+            })
+            tankcollect.SetSize(Vector(), Vector(862, 626, 491))
+            tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            break
+
+        // Oxidize RR18
+        // - Fix cash getting stuck in tank spawn.
+        case "mvm_oxidize_rr18":
+            local tankcollect = SpawnEntityFromTable("trigger_hurt", {
+                origin = Vector(-2688, 2688, 0)
+            })
+            tankcollect.SetSize(Vector(), Vector(768, 640, 60))
+            tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            break
+
+        // Production RC6
+        // - Fixes cash getting stuck in tank spawn.
+        case "mvm_production_rc6":
+            local tankcollect = SpawnEntityFromTable("trigger_hurt", {
+                origin = Vector(-1888, 1015, -136)
+            })
+            tankcollect.SetSize(Vector(), Vector(624, 280, 30))
+            tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
+            break
+
         // Hanami RC1
         // - Fixes the tank barricade turning invisible after breaking once.
         // - Fixes client prediction errors on the tank barricade.
@@ -145,6 +207,13 @@ __potato.MapFixes.Events <- {
             local barricade = Entities.FindByName(null, "Barricade")
             barricade.AddEFlags(Constants.FEntityEFlags.EFL_IN_SKYBOX)
             barricade.SetSolidFlags(Constants.ESolidType.SOLID_NONE)
+            break
+
+        // Whitecliff Event RC2
+        // - Fix the forward upgrade station breaking on mission swap.
+        case "mvm_whitecliff_event_rc2":
+            EntityOutputs.AddOutput(Entities.FindByClassname(null, "logic_auto"),
+                "OnMapSpawn", "FowardUpgradeStationTrigger", "Enable", "", -1, 1)
             break
     }}
 }

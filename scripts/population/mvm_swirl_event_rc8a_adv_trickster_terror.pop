@@ -1,0 +1,5253 @@
+// Mvm_Swirl_Event_rc3 for Halloween 2
+// An Advanced mission made by Yuugi Hoshiguma 
+// Making more of a silly than serious mission just for fun
+// Goal: Use a little bit of Rafmod as possible
+
+// Spawns for using this map
+// spawnbot
+// spawnbot_main // main + left upper area
+// spawnbot_right // main right
+// spawnbot_left // main left
+// spawnbot_flank // upper area, Don't use it. Doesn't have a spawn on the gate
+// spawnbot_upper // upper area
+// spawnbot_dud
+// spawmbot_dud_kill
+// spawnbot_chief
+
+// upper gate area spawn
+// spawnbot_ambush_upper
+
+// lower gate area spawn
+// spawnbot_ambush_lower
+
+// spawnbot_sentrybuster
+
+// Relays because that is important?
+// relay_mission_use_ambush ??
+// relay_disable_teleporter_post_capture ??
+// relay_add_bomb ??
+
+// wave_prepare_relay_lower
+// wave_prepare_relay_upper
+// wave_init_lower_relay
+// wave_init_upper_relay
+// wave_init_relay
+// wave_start_relay
+// wave_start_boss_relay
+// wave_start_relay_notimer
+// wave_start_boss_notimer
+
+#base robot_giant.pop
+#base robot_standard.pop
+#base robot_gatebot.pop
+#base overclock_cactus_general.pop
+
+bozo_mission_be_liek
+{
+    StartingCurrency 1000
+	RespawnWaveTime 4
+    CanBotsAttackWhileInSpawnRoom No
+	AddSentryBusterWhenDamageDealtExceeds 2500
+	AddSentryBusterWhenKillCountExceeds 20
+    Advanced 1
+    RobotLimit 24
+    ForceHoliday 2 // Eh?
+    NoThrillerTaunt 1 // Fuck that taunt
+    //TextPrintTime 0
+    NoRomevisionCosmetics 1 // Dude fuck off
+    //FixHuntsmanDamageBonus 0 // How about, no. 720 damage on headshot wtf
+    NoCritPumpkin 1 
+    NoHolidayPickups 1
+    BodyPartScaleSpeed 10
+    FastNPCupdate 1
+    NoSkeletonSplit 1
+    WaveStartCountdown 5
+    UpgradeStationKeepWeapons 1
+
+    // Disable Sounds
+    DisableSound "Announcer.MVM_Get_To_Upgrade"
+    DisableSound "Announcer.MVM_Game_Over_Loss"
+    DisableSound "Announcer.MVM_Tank_Alert_Spawn"
+	DisableSound "Announcer.MVM_Tank_Alert_Another"
+	DisableSound "Announcer.MVM_Tank_Alert_Multiple"
+	DisableSound "Announcer.MVM_Tank_Alert_Halfway"
+	DisableSound "Announcer.MVM_Tank_Alert_Halfway_Multiple"
+	DisableSound "Announcer.MVM_Tank_Alert_Near_Hatch"
+	DisableSound "Announcer.MVM_Tank_Alert_Deploying"
+
+    // I'm a dumbass
+    //PrecacheModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+    //PrecacheModel "models/workshop/player/items/pyro/eotl_ducky/eotl_bonus_duck.mdl"
+    //PrecacheModel "models/props_mvm/mvm_human_skull.mdl"
+
+    // Custom Assets
+    PrecacheModel "models/player/items/all_class/gately_gibus_heavy.mdl"
+    PrecacheModel "models/player/vatican/joker/spy.mdl"
+    PrecacheModel "models/props_mvm/mvm_comically_small_player_shield.mdl" // What the fuck is this
+    PrecacheSound "trickster_terror_joker_laugh.mp3"
+    PrecacheGeneric "materials/models/player/vatican/jokerspy/hand.vtf"
+    PrecacheGeneric "materials/models/player/vatican/jokerspy/material_39.vmt" // ??
+    PrecacheGeneric "materials/models/player/vatican/jokerspy/joker_diff.vtf"
+    PrecacheGeneric "materials/models/player/vatican/jokerspy/joker_head_diff.vtf"
+    PrecacheGeneric "materials/models/player/vatican/jokerspy/joker_head_normals.vtf"
+    PrecacheGeneric "materials/models/player/vatican/jokerspy/joker_normals.vtf"
+
+    OverrideSounds
+	{
+		"MVM.BombWarning" "ambient_mp3/alarms/doomsday_lift_alarm.mp3"
+        "music.mvm_end_wave" "ui/halloween_boss_defeated.wav"
+        "music.mvm_end_tank_wave" "ui/halloween_boss_defeated.wav"
+        "music.mvm_end_mid_wave" "ui/halloween_boss_defeated.wav"
+        "music.mvm_end_last_wave" "ui/halloween_boss_defeated.wav"
+        "MVM.GiantHeavyExplodes"	"physics/body/body_medium_break2.wav"
+		"MVM.GiantCommonExplodes"	"physics/body/body_medium_break2.wav"
+    }
+
+    ExtraSpawnPoint
+	{
+		Name bombhatch
+		TeamNum 3
+		X	"-2950"                     
+		Y	"-550"                  
+		Z	"720"   
+	}
+
+    Mission // Sentry Buster
+	{
+		Objective DestroySentries
+		Where spawnbot_sentrybuster
+		BeginAtWave	1
+		RunForThisManyWaves	2
+		InitialCooldown	20
+		CooldownTime 40
+		DesiredCount 1
+		TFBot
+		{
+			Template The_Funny_Buster_Bot
+            DeathSound "mvm/sentrybuster/mvm_sentrybuster_explode.wav"
+            Tag bot_giant
+		}
+	}
+    Mission // Sentry Buster
+	{
+		Objective DestroySentries
+		Where spawnbot_sentrybuster
+		BeginAtWave	3
+		RunForThisManyWaves	1
+		InitialCooldown	25
+		CooldownTime 45
+		DesiredCount 1
+        SuppressSentryBusterModel 1
+		TFBot
+		{
+			Template The_Funny_Skeleton_Bot
+            Tag bot_giant
+		}
+	}
+    Mission // Sentry Buster
+	{
+		Objective DestroySentries
+		Where spawnbot_sentrybuster
+		BeginAtWave	4
+		RunForThisManyWaves	3
+		InitialCooldown	35
+		CooldownTime 40
+		DesiredCount 1
+		TFBot
+		{
+			Template The_Funny_Buster_Bot
+            DeathSound "mvm/sentrybuster/mvm_sentrybuster_explode.wav"
+            Tag bot_giant
+		}
+	}
+    Mission // Sentry Buster
+	{
+		Objective DestroySentries
+		Where spawnbot_sentrybuster
+		BeginAtWave	7
+		RunForThisManyWaves	1
+		InitialCooldown	15
+		CooldownTime 30
+		DesiredCount 1
+		TFBot
+		{
+			Template The_Funny_Buster_Bot
+            DeathSound "mvm/sentrybuster/mvm_sentrybuster_explode.wav"
+            Tag bot_giant
+		}
+	}
+    Mission // Sniper
+    {
+        Objective Sniper
+        Where spawnbot_main
+        BeginAtWave 2
+        RunForThisManyWaves 1
+        InitialCooldown 50
+        CooldownTime 45
+        DesiredCount 2
+        TFBot
+        {
+            Template T_TFBot_Sniper
+            Name "Owl Sniper"
+            UsehumanModel 2 [$SIGSEGV]
+            Item "Zombie Sniper"
+            Item "Sir Shootsalot"
+            Item "Sir Hootsalot"
+            Item "The Triggerman's Tacticals"
+            CharacterAttributes
+            {
+                "voice pitch scale" 0.8
+            }
+        }
+    }
+    Mission // Spy
+    {
+        Objective Spy
+        Where spawnbot_main
+        BeginAtWave 3
+        RunForThisManyWaves 1
+        InitialCooldown 55
+        CooldownTime 40
+        DesiredCount 3
+        TFBot
+        {
+            Template T_TFBot_Spy
+            UsehumanModel 2 [$SIGSEGV]
+            Item "Zombie Spy"
+            Item "The Dead Head"
+            Item "dec2014 The Puffy Provocateur"
+            Item "Robin Walkers"
+            CharacterAttributes
+            {
+                "voice pitch scale" 0.8
+            }
+        }
+    }
+    Mission // Spy
+    {
+        Objective Spy
+        Where spawnbot_main
+        BeginAtWave 5
+        RunForThisManyWaves 1
+        InitialCooldown 15
+        CooldownTime 50
+        DesiredCount 3
+        TFBot
+        {
+            Template T_TFBot_Spy
+            UsehumanModel 2 [$SIGSEGV]
+            Item "Zombie Spy"
+            Item "The Dead Head"
+            Item "dec2014 The Puffy Provocateur"
+            Item "Robin Walkers"
+            CharacterAttributes
+            {
+                "voice pitch scale" 0.8
+            }
+        }
+    }
+    Mission // Sniper
+    {
+        Objective Sniper
+        Where spawnbot_main
+        BeginAtWave 6
+        RunForThisManyWaves 1
+        InitialCooldown 45
+        CooldownTime 40
+        DesiredCount 2
+        TFBot
+        {
+            Template T_TFBot_Sniper
+            ClassIcon sniper_machina_nys
+            Name "Machina Sniper"
+            UsehumanModel 2 [$SIGSEGV]
+            Item "Zombie Sniper"
+            Item "Holy Hunter"
+            Item "Silver Bullets"
+            Item "The Triggerman's Tacticals"
+            Item "The Machina"
+            ItemAttributes
+			{
+				ItemName "The Machina"
+				"sniper charge per sec" 10
+			}
+            CharacterAttributes
+            {
+                "voice pitch scale" 0.8
+            }
+        }
+    }
+    Mission // Spy
+    {
+        Objective Spy
+        Where spawnbot_main
+        BeginAtWave 7
+        RunForThisManyWaves 1
+        InitialCooldown 25
+        CooldownTime 30
+        DesiredCount 4
+        TFBot
+        {
+            Template T_TFBot_Spy
+            UsehumanModel 2 [$SIGSEGV]
+            Item "Zombie Spy"
+            Item "The Dead Head"
+            Item "dec2014 The Puffy Provocateur"
+            Item "Robin Walkers"
+            CharacterAttributes
+            {
+                "voice pitch scale" 0.8
+                "kill forces attacker to laugh" 1
+            }
+        }
+    }
+    Mission // Sentry Buster
+	{
+		Objective DestroySentries
+		Where spawnbot_sentrybuster
+		BeginAtWave	8
+		RunForThisManyWaves	1
+		InitialCooldown	0
+		CooldownTime 0
+		DesiredCount 1
+        SuppressSentryBusterModel 1
+		TFBot
+		{
+			Template The_Funny_Skeleton_Bot
+		}
+	}
+
+    PointTemplates
+    {
+        literally_nothing
+        {
+            
+        }
+        gately_gibus_wearer
+		{
+			OnParentKilledOutput
+			{
+				Target "@c@!activator"
+				Action Kill
+			}
+		}
+        improved_relay
+        {
+            logic_relay
+            {
+                "targetname" "improved_upper_relay"
+                "ontrigger" "wave_init_relay,Trigger,,0.1,-1"
+                "ontrigger" "wave_prepare_relay_upper,Trigger,,0.15,-1"
+            }
+            logic_relay
+            {
+                "targetname" "improved_lower_relay"
+                "ontrigger" "wave_init_relay,Trigger,,0.1,-1"
+                "ontrigger" "wave_prepare_relay_lower,Trigger,,0.15,-1"
+            }
+            logic_relay
+            {
+                "targetname" "improved_wave3_relay"
+
+                //"targetname" "wave3_spawner"
+                //"OnTrigger" "tf_objective_resource,$SetProp$m_nMannVsMachineWaveEnemyCount,128,0.001,0.001,-1"
+                "OnTrigger" "tf_objective_resource,$setprop$m_iszMannVsMachineWaveClassNames$1,scout,,-1"
+                "OnTrigger" "tf_objective_resource,$setprop$m_iszMannVsMachineWaveClassNames$0,demo_giant,,-1"
+                "OnTrigger" "tf_objective_resource,$setprop$m_iszMannVsMachineWaveClassNames$3,tank,,-1" // ??
+                "OnTrigger" "tf_objective_resource,$setprop$m_iszMannVsMachineWaveClassNames$8,demo_bomber,,-1"
+                "OnTrigger" "wave_prepare_relay_upper,Trigger,0.5,-1"
+                "OnTrigger" "wave_init_relay,Trigger,,0.1,-1"
+                "OnTrigger" "wave_prepare_relay_upper,Trigger,,0.15,-1"
+            }
+        }
+        general_template
+        {
+            NoFixup 1
+            logic_relay
+            {
+                "targetname" "please_shake_it"
+                "ontrigger" "just_shake_it,StartShake,,0.1,-1"
+            }
+            env_shake // Earthquake
+            {
+                "targetname" "just_shake_it"
+                "spawnflags" "1"
+                "radius" "99999"
+                "frequency" "50"
+                "duration" "6"
+                "amplitude" "8"
+				"origin" "0 0 0"
+            }
+            // Joker entrance
+            info_particle_system // kinda boring ngl
+            {
+                "targetname" "joker_effect"
+                "angles" "-45 180 0"
+                "effect_name" "flamethrower_giant_mvm"
+                "flag_as_weather" "0"
+				"start_active" "0"
+                "origin" "744 -264 80"
+            }
+            info_particle_system
+            {
+                "targetname" "joker_effect"
+                "angles" "-45 0 -180"
+                "effect_name" "flamethrower_giant_mvm"
+                "flag_as_weather" "0"
+				"start_active" "0"
+                "origin" "304 -264 80"
+            }
+            ambient_generic
+			{
+				"targetname" "joker_sound"
+				"health" "10"
+				"message" "ui/halloween_boss_summoned.wav"
+				"radius" "2500"
+				"spawnflags" "49"
+				"origin" "0 0 0"
+                "volume" "10"
+			}
+            ambient_generic
+			{
+				"targetname" "joker_laugh"
+				"health" "10"
+				"message" "#trickster_terror_joker_laugh.mp3"
+				"radius" "99999"
+				"spawnflags" "49"
+				"origin" "0 0 0"
+                "volume" "10"
+			}
+            ambient_generic
+			{
+				"targetname" "joker_laugh"
+				"health" "10"
+				"message" "#trickster_terror_joker_laugh.mp3"
+				"radius" "99999"
+				"spawnflags" "49"
+				"origin" "0 0 0"
+                "volume" "10"
+			}
+            ambient_generic
+			{
+				"targetname" "half_life_song"
+				"health" "7"
+				"message" "#music/hl1_song15.mp3"
+				"radius" "99999"
+				"spawnflags" "17"
+				"origin" "0 0 0"
+                "volume" "6"
+			}
+            ambient_generic
+			{
+				"targetname" "half_life_song"
+				"health" "7"
+				"message" "#music/hl1_song15.mp3"
+				"radius" "99999"
+				"spawnflags" "17"
+				"origin" "0 0 0"
+                "volume" "6"
+			}
+            logic_relay
+            {
+                "targetname" "joker_entrance"
+                "ontrigger" "joker_sound,PlaySound,,0.1,-1"
+                "ontrigger" "joker_laugh,PlaySound,,0.1,-1"
+                "ontrigger" "just_shake_it,StartShake,,0.1,-1"
+                "ontrigger" "joker_effect,Start,,0.1,-1"
+                "ontrigger" "joker_effect,Stop,,6.1,-1"
+                "ontrigger" "half_life_song,PlaySound,,6.1,-1"
+                "ontrigger" "player,$DisplayTextChat,{2EFF00}♫ Now Playing ♫ {FFFFFF} : {FF8000} Half Life 1 - Nuclear Mission Jam {FFFFFF},9,-1"
+                "ontrigger" "upper_text,Display,,0.1,-1"
+                "ontrigger" "middle_text,Display,,0.3,-1"
+            }
+            game_text
+			{
+				"origin" "1984 1984 0"
+				"targetname" "upper_text"
+				"message" "THE HOMICIDAL MANIAC HIMSELF"
+				"x" "-1"
+				"y" "0.4"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "2"
+				"color" "255 255 255"
+				"fxtime" "0.2"
+				"fadeout" "1"
+				//"fadein" "0"
+				"holdtime" "5"
+			}
+			game_text
+			{
+				"origin" "1984 1984 0"
+				"targetname" "middle_text"
+				"message" "THE JOKER"
+				"x" "-1"
+				"y" "0.45"
+				"channel" "0"
+				"spawnflags" "1"
+				"color" "255 255 255"
+				"fadein" "0.2"
+				"fadeout" "1"
+				"holdtime" "4.8"
+			}
+        }
+        haha_you_fool
+        {
+            NoFixup 1
+            logic_relay
+            {
+                "targetname" "icon_changon"
+                "OnTrigger" "!activator,$SetProp$m_iszClassIcon,spellbook_lite,0.1,-1"
+			}
+        }
+        skeleton
+        {
+            NoFixup 1
+            logic_relay
+            {
+                "targetname" "skelly_haha_relay"
+                "OnTrigger" "skelly_laugh,PickRandom,,0,-1"
+            }
+            logic_case
+            {
+                "targetname" "skelly_laugh"
+                "OnCase01" "skelly_laugh01,PlaySound,,0,-1"
+                "OnCase02" "skelly_laugh02,PlaySound,,0,-1"
+                "OnCase03" "skelly_laugh03,PlaySound,,0,-1"
+                "OnCase03" "skelly_laugh04,PlaySound,,0,-1"
+                "OnCase03" "skelly_laugh05,PlaySound,,0,-1"
+            }
+            ambient_generic
+            {
+                "health" "10"
+                "message" "/misc/halloween/skeletons/skelly_medium_01.wav"
+                "radius" "2000"
+                "spawnflags" "48"
+                "targetname" "skelly_laugh01"
+                "volume" "10"
+            }
+            ambient_generic
+            {
+                "health" "10"
+                "message" "/misc/halloween/skeletons/skelly_medium_02.wav"
+                "radius" "2000"
+                "spawnflags" "48"
+                "targetname" "skelly_laugh02"
+                "volume" "10"
+            }
+            ambient_generic
+            {
+                "health" "10"
+                "message" "/misc/halloween/skeletons/skelly_medium_03.wav"
+                "radius" "2000"
+                "spawnflags" "48"
+                "targetname" "skelly_laugh03"
+                "volume" "10"
+            }
+            ambient_generic
+            {
+                "health" "10"
+                "message" "/misc/halloween/skeletons/skelly_medium_04.wav"
+                "radius" "2000"
+                "spawnflags" "48"
+                "targetname" "skelly_laugh04"
+                "volume" "10"
+            }
+            ambient_generic
+            {
+                "health" "10"
+                "message" "/misc/halloween/skeletons/skelly_medium_05.wav"
+                "radius" "2000"
+                "spawnflags" "48"
+                "targetname" "skelly_laugh05"
+                "volume" "10"
+            }
+        }
+        skeleton_tank
+        {
+            NoFixup 1
+            OnSpawnOutput
+			{
+				Target "!activator"
+				Action "DisableShadow"
+			}
+            prop_dynamic
+			{
+                "model" "models/props_mvm/mvm_human_skull.mdl"
+                "disableshadows" "1"
+                "solid" "0"
+                "origin" "90 0 55"
+				"angles" "0 0 0"
+                "modelscale" "3.5"
+			}
+			prop_dynamic
+			{
+				"targetname" "skullhat"
+				"disableshadows" "1"
+				"model" "models/passtime/skull/passtime_skull.mdl"
+				"origin" "-47 -13 163"
+				"angles" "0 90 -30"
+				"modelscale" "7"
+			}
+			info_target
+			{
+				"targetname" "skeleton_target"
+				"origin" "0 0 170"
+			}
+        }
+        tank_sillyhat
+        {
+			prop_dynamic
+            {
+                "model" "models/workshop/player/items/all_class/xms2013_sniper_shako/xms2013_sniper_shako_sniper.mdl"
+                "angles" "-10 0 0"
+				"origin" "44 0 -222"
+				"modelscale" "4.5"
+                "skin" "1"
+            }
+        }
+        tank_sillyhat2
+        {
+			prop_dynamic
+            {
+                "model" "models/workshop/player/items/all_class/xms2013_sniper_shako/xms2013_sniper_shako_sniper.mdl"
+				"angles" "-10 0 0"
+                "origin" "30 0 -154"
+				"modelscale" "3"
+                "skin" "1"
+            }
+        }
+        tank_sillyhat3
+        {
+			prop_dynamic
+            {
+                "model" "models/workshop/player/items/all_class/xms2013_sniper_shako/xms2013_sniper_shako_sniper.mdl"
+				"angles" "-10 0 0"
+				"origin" "16 0 -89"
+				"modelscale" "1.75"
+                "skin" "1"
+            }
+        }
+        ubertank
+		{
+    		NoFixup 1
+    		// Ubertank
+			logic_relay // relay that disables damage to tanks named "ubertank"
+			{
+				"targetname" "tank_uber_on"
+				"OnTrigger" "matryoshka_tank2*,SetDamageFilter,filter_yes,0.1,-1"
+                "OnTrigger" "matryoshka_tank3*,SetDamageFilter,filter_yes_2,0.1,-1"
+			}
+			logic_relay // relay that enables damage to tanks named "ubertank"
+			{
+				"targetname" "tank_uber_off_1"
+				"OnTrigger" "matryoshka_tank2*,SetDamageFilter,filter_red,0,-1"
+				//"OnTrigger" "tank_boss_thingy*,Skin,0,0,-1" // Doesn't have uber tank model anymore :(
+			}
+			logic_relay // relay that enables damage to tanks named "ubertank"
+			{
+				"targetname" "tank_uber_off_2"
+				"OnTrigger" "matryoshka_tank3*,SetDamageFilter,filter_red,0,-1"
+				//"OnTrigger" "tank_boss_thingy*,Skin,0,0,-1" // Doesn't have uber tank model anymore :(
+			}
+			filter_activator_name // Ecksdee
+			{
+				"filtername" "absolutely"
+				"Negated" "0"
+				"targetname" "filter_yes"
+			}
+            filter_activator_name // Ecksdee
+			{
+				"filtername" "absolutely_2"
+				"Negated" "0"
+				"targetname" "filter_yes_2"
+			}
+		}
+        Yakuza_Title_Card_Matryoshka // Permission Granted by Royal
+		{
+			OnSpawnOutput
+			{
+				Target "upper_text"
+				Action "Display"
+				Delay 0
+			}
+			OnSpawnOutput
+			{
+				Target "middle_text"
+				Action "Display"
+				Delay 0.2
+			}
+            //OnSpawnOutput
+			//{
+			//	Target "tanky_bois"
+			//	Action "Show"
+			//	Delay 7
+			//}
+			game_text
+			{
+				"origin" "1984 1984 0"
+				"targetname" "upper_text"
+				"message" "ACCELERATED ARMORED STACKABLE POWERHOUSE"
+				"x" "-1"
+				"y" "0.4"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "2"
+				"color" "255 255 255"
+				"fxtime" "0.2"
+				"fadeout" "1"
+				//"fadein" "0"
+				"holdtime" "5"
+			}
+			game_text
+			{
+				"origin" "1984 1984 0"
+				"targetname" "middle_text"
+				"message" "MATRYOSHKA TANK"
+				"x" "-1"
+				"y" "0.45"
+				"channel" "0"
+				"spawnflags" "1"
+				"color" "255 255 255"
+				"fadein" "0.2"
+				"fadeout" "1"
+				"holdtime" "4.8"
+			}
+            //training_annotation
+            //{
+            //    "targetname"   "tanky_bois"
+			//	"display_text" "Destroy the bigger tank first!"
+			//	"lifetime"     "5"
+			//	"origin" "0 0 140"
+            //}
+		}
+    }
+    SpawnTemplate "improved_relay"
+    SpawnTemplate "general_template"
+    SpawnTemplate "ubertank"
+    Templates
+    {
+        The_Funny_Buster_Bot // Yes, I'm bringing this funny bot back from Freezing Frenzy
+        {
+            Class Demoman
+			Name "Trickster Bomber"
+			Skill Expert
+			Health 2500
+			Item "The Ullapool Caber"
+            Item "A Well Wrapped Hat"
+            Item "EOTL_demopants"
+			WeaponRestrictions PrimaryOnly
+			ClassIcon sentry_buster
+			Attributes MiniBoss
+			Attributes DisableDodge
+            ItemAttributes
+            {
+                ItemName "tf_weapon_grenadelauncher"
+                "override projectile type" 7 // Fires nothing lmao
+                "damage bonus" 0
+                "fire rate bonus" 9999
+            }
+			CharacterAttributes
+			{
+                "head scale" 3
+                "torso scale" 0.2
+                "voice pitch scale" 1.5
+				"move speed bonus" 2
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 7
+				"cannot be backstabbed" 1
+			}
+            Tag bot_giant
+        }
+        The_Funny_Skeleton_Bot
+        {
+            Class Demoman
+			Name "Skeleton Buster"
+			Skill Expert
+			Health 2500
+			Item "The Ullapool Caber"
+            Item "Explosive Mind"
+            Item "Aerobatics Demonstrator"
+            Item "The Crocodile Smile"
+            ItemModel
+            {
+                ItemName "The Crocodile Smile"
+				Model "models/workshop/player/items/demo/tw_sentrybuster/tw_sentrybuster.mdl"
+            }
+			WeaponRestrictions PrimaryOnly
+			ClassIcon sentry_buster
+			Attributes MiniBoss
+			Attributes DisableDodge
+            UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+            DeathSound "misc/halloween/skeleton_break.wav"
+            UseHumanAnimations 1 [$SIGSEGV]
+            ItemAttributes
+            {
+                ItemName "tf_weapon_grenadelauncher"
+                "is invisible" 1
+                "override projectile type" 7 // Fires nothing lmao
+                "damage bonus" 0
+                "fire rate bonus" 9999
+            }
+			CharacterAttributes
+			{
+                "voice pitch scale" 0
+				"move speed bonus" 2
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 7
+				"cannot be backstabbed" 1
+			}
+            Tag bot_giant
+        }
+        The_skeleton_gatebot // Looks good
+        {
+            SpawnTemplate "skeleton"
+            Class Sniper
+            ClassIcon dead_ylw_lite
+            Name "Skeleton"
+            Skill Normal
+            Health 200
+            Scale 1.002
+            WeaponRestrictions MeleeOnly
+            UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+            DeathSound "misc/halloween/skeleton_break.wav"
+            Aimtrackinginterval 0.15 [$SIGSEGV]
+            EventChangeAttributes
+            {
+                Default
+                {
+                    Attributes IgnoreFlag
+                    BehaviorModifiers Push
+                    Attributes DisableDodge
+                    Tag nav_prefer_gate1_flank
+                    Tag bot_gatebot
+                    Skin 3
+                    ItemAttributes
+                    {
+                        ItemName    "tf_weapon_club"
+                        "custom kill icon" "spellbook_skeleton"
+                        "is invisible" 1
+                    }
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0
+                    }
+                }
+                RevertGateBotsBehavior
+                {
+                    Skin 1
+                    ItemAttributes
+                    {
+                        ItemName    "tf_weapon_club"
+                        "custom kill icon" "spellbook_skeleton"
+                        "is invisible" 1
+                    }
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0
+                    }
+                }
+            }
+        }
+        The_skeleton_gatebot_but_arrows
+        {
+            SpawnTemplate "skeleton"
+            Class Sniper
+            ClassIcon sniper_bow
+            Name "Skeleton Archer"
+            Skill Hard
+            Health 125
+            Scale 1.002
+            WeaponRestrictions PrimaryOnly
+            UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+            DeathSound "misc/halloween/skeleton_break.wav"
+			Item "The Huntsman"
+            Item "Larrikin Robin"
+			ItemAttributes
+			{
+				ItemName "The Huntsman"
+				"damage bonus" 0.5
+			}
+            EventChangeAttributes
+            {
+                Default
+                {
+                    Attributes IgnoreFlag
+                    BehaviorModifiers Push
+                    Attributes DisableDodge
+                    Tag nav_prefer_gate1_flank
+                    Tag bot_gatebot
+                    Skin 3
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0
+                    }
+                }
+                RevertGateBotsBehavior
+                {
+                    Skin 1
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0
+                    }
+                }
+            }
+        }
+        T_TFGateBot_Giant_Duck_Soldier
+		{
+			Class Soldier
+			Name "Giant Duck Soldier"
+			ClassIcon soldier_giant
+			Health 3800
+            //Item "Duck Billed Hatypus"
+            Item "The Deadliest Duckling"
+            //Item "Mr. Quackers" // This is cursed
+            Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+            UsehumanModel 2 [$SIGSEGV]
+            Item "Zombie Soldier"
+            ItemAttributes
+            {
+                ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+                "paintkit_proto_def_index" 302
+				"set_item_texture_wear" 0
+                "custom projectile model" "models/workshop/player/items/pyro/eotl_ducky/eotl_bonus_duck.mdl"
+                "custom weapon fire sound" "ambient/bumper_car_quack11.wav"
+                "custom impact sound" "ambient/bumper_car_quack5.wav"
+                "custom weapon reload sound" "ambient/bumper_car_quack3.wav"
+                "projectile trail particle" "flamethrower_underwater"
+                "projectile speed decreased" 0.65
+                "mult projectile scale" 2
+            }
+			EventChangeAttributes
+			{
+				Default
+				{
+					BehaviorModifiers push			// having these will cause bots to run towards gates
+					Attributes IgnoreFlag			// having these will cause bots to run towards gates
+					Tag nav_prefer_gate1_flank 		// having these will cause bots to run towards gates
+					Tag bot_gatebot 				// having these will cause bots to run towards gates
+
+					Item "Duck Billed Hatypus"
+					Tag bot_giant
+					Skill Expert
+					WeaponRestrictions PrimaryOnly
+					Attributes HoldFireUntilFullReload
+					Attributes MiniBoss
+					CharacterAttributes
+					{
+                        "voice pitch scale" 0
+						"move speed bonus"	0.5
+						"damage force reduction" 0.4
+						"airblast vulnerability multiplier" 0.4
+						"override footstep sound set" 3
+					}
+				}
+				RevertGateBotsBehavior
+				{
+					Item "Duck Billed Hatypus"
+					ItemAttributes
+					{
+						ItemName "Duck Billed Hatypus"
+						"set item tint RGB" 5801378
+					}
+					Tag bot_giant
+					Skill Expert
+					WeaponRestrictions PrimaryOnly
+					Attributes HoldFireUntilFullReload
+					Attributes MiniBoss
+					CharacterAttributes
+					{
+                        "voice pitch scale" 0
+						"move speed bonus"	0.5
+						"damage force reduction" 0.4
+						"airblast vulnerability multiplier" 0.4
+						"override footstep sound set" 3
+					}
+				}
+			}
+		}
+        T_TFBot_Giant_Normal_Heavyweapons_Shotgun
+		{
+			Class Heavyweapons
+			Name "Undead Military Warrior"
+			ClassIcon heavy_shotgun
+			//Item "MvM GateBot Light Heavy" // I always hated this cosmetic
+			Skill Expert
+			Health 5000
+			WeaponRestrictions SecondaryOnly
+			MaxVisionRange 1200
+			Attributes MiniBoss
+			//Attributes HoldFireUntilFullReload
+            UsehumanModel 2 [$SIGSEGV]
+            Item "Zombie Heavy"
+            Item "Commando Elite"
+            Item "Siberian Tigerstripe"
+            Item "Gone Commando"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SHOTGUN_HWG"
+				"fire rate bonus" 2.5
+				"bullets per shot bonus" 10
+				"damage penalty" 0.5
+				"faster reload rate" 0.1
+			}
+			CharacterAttributes
+			{
+                "voice pitch scale" 0
+				"move speed bonus"	0.7
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"attack projectiles" 1	// force ability to shoot down projectiles
+				"override footstep sound set" 2
+			}
+		}
+    }
+    Wave // wave 1 Payout: $1000. Being random party themed 
+    {
+        CustomWaveNumber 1 [$SIGSEGV]
+		CustomMaxWaveNumber 6 [$SIGSEGV]
+        StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+        InitWaveOutput
+        {
+            Target improved_lower_relay
+            Action Trigger
+        }
+        //DoneOutput
+        //{
+        //    Target wave_init_relay
+        //    Action Trigger
+        //}
+        WaveSpawn
+        {
+            WaitBeforeStarting 2
+            FirstSpawnWarningSound "vo/soldier_sf12_zombie03.mp3"
+        }
+        WaveSpawn // Gduck soldier
+        {
+            Name a1_1
+            TotalCurrency 50
+            TotalCount 2
+            MaxActive 2
+            SpawnCount 1
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 4
+            WaitBetweenSpawns 16
+            TFBot
+            {
+                Template T_TFGateBot_Giant_Duck_Soldier
+            }
+        }
+        WaveSpawn // Gduck soldier
+        {
+            Name a1_2
+            WaitForAllDead a1_1
+            TotalCurrency 50
+            TotalCount 2
+            MaxActive 2
+            SpawnCount 1
+            Where spawnbot_chief
+            WaitBeforeStarting 4
+            WaitBetweenSpawns 16
+            TFBot
+            {
+                Template T_TFBot_Giant_Soldier
+                Name "Giant Duck Soldier"
+                Item "The Deadliest Duckling"
+                Item "Duck Billed Hatypus"
+				ItemAttributes
+				{
+					ItemName "Duck Billed Hatypus"
+					"set item tint RGB" 5801378
+				}
+                Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Soldier"
+                ItemAttributes
+                {
+                    ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+                    "paintkit_proto_def_index" 302
+				    "set_item_texture_wear" 0
+                    "custom projectile model" "models/workshop/player/items/pyro/eotl_ducky/eotl_bonus_duck.mdl"
+                    "custom weapon fire sound" "ambient/bumper_car_quack11.wav"
+                    "custom impact sound" "ambient/bumper_car_quack5.wav"
+                    "custom weapon reload sound" "ambient/bumper_car_quack3.wav"
+                    "projectile trail particle" "flamethrower_underwater"
+                    "projectile speed decreased" 0.65
+                    "mult projectile scale" 2
+                }
+                CharacterAttributes { "voice pitch scale" 0 }
+                Tag bot_giant
+            }
+        }
+        WaveSpawn // Jacked up Pyro
+        {
+            Name a1_3
+            TotalCurrency 150
+            TotalCount 48
+            MaxActive 9
+            SpawnCount 4
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 4
+            WaitBetweenSpawns 3
+            TFBot
+            {
+                Class Pyro
+                ClassIcon pyro_homewrecker_lite
+                Name "Jacked Up Pyro"
+                Skill Hard
+                WeaponRestrictions MeleeOnly
+                //Attributes AlwaysCrit
+                UseCustomModel "models/player/pyro.mdl"
+                Skin 5
+                Item "Zombie Pyro"
+                Item "Burly Beast"
+                Item "Nose Candy"
+                Item "Flavorful Baggies"
+                Item "The Homewrecker"
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+                SpawnTemplate "gately_gibus_wearer"
+				EventChangeAttributes
+				{
+					Default
+					{
+						Tag bot_gatebot 				// having these will cause bots to run towards gates
+						Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+						BehaviorModifiers push			// having these will cause bots to run towards gates
+						Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+
+						Item "Ghostly Gibus"
+						ItemAttributes
+						{
+							ItemName "Ghostly Gibus"
+							"custom item model" "models/player/items/all_class/gately_gibus_heavy.mdl"
+							"attachment name" "head"
+							"attachment scale" "0.95"
+							"attachment offset" "1 0.2 -9.8"
+							"attachment angles" "-42 0 3"
+						}
+						
+					}
+					RevertGateBotsBehavior
+					{
+						Item "Ghostly Gibus"
+					}
+				}
+            }
+        }
+        WaveSpawn // Balloon popper Medic
+        {
+            Name a1_4
+            TotalCurrency 100
+            TotalCount 24
+            MaxActive 7
+            SpawnCount 3
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 7
+            WaitBetweenSpawns 4
+            TFBot
+            {
+                Class Medic
+                ClassIcon medic_crossbow
+                Name "Balloon Popper Zombie"
+                Skill Hard
+                Action FetchFlag [$SIGSEGV] // Might not be needed since it's the leader?
+                WeaponRestrictions PrimaryOnly
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Medic" 
+                Item "TF Birthday Hat 2011"
+                Item "The Boo Balloon"
+                Item "the crusader's crossbow"
+                ItemAttributes
+                {
+                    ItemName "the crusader's crossbow"
+			        //"damage penalty" 0.75
+			        "projectile penetration" 1
+                }
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+            }
+        }
+        WaveSpawn // Magical Fireball Pyro
+        {
+            Name a2_1
+            WaitForAllSpawned a1_2
+            TotalCurrency 100
+            TotalCount 5
+            MaxActive 2
+            SpawnCount 1
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 9
+            WaitBetweenSpawns 13
+            TFBot
+            {
+                Class Pyro
+			    Name "Giant Fireball Wizard"
+			    ClassIcon pyro_dragon_fury_swordstone
+			    Skill Expert
+			    Health 3000
+			    Item "The Flare Gun"
+                Item "The Seared Sorcerer"
+                Item "The Hot Case"
+			    WeaponRestrictions SecondaryOnly
+			    Attributes MiniBoss
+			    ItemAttributes
+			    {
+				    ItemName "The Flare Gun"
+				    "set damagetype ignite" 1
+				    "projectile speed decreased" 0.4
+				    //"mod projectile heat seek power" 60
+				    //"fire rate bonus" 0.5
+				    "damage bonus" 2
+				    "override projectile type" 2
+				    "projectile trail particle"	"spell_fireball_small_red"
+				    "custom projectile model" "models/weapons/w_models/w_drg_ball.mdl"
+				    "custom kill icon" "spellbook_fireball"
+			    }
+			    CharacterAttributes
+			    {
+				    "move speed bonus"	0.5
+				    "damage force reduction" 0.6
+				    "airblast vulnerability multiplier" 0.6
+				    "override footstep sound set" 6
+			    }
+                Tag bot_giant
+                DeathSound "mvm/sentrybuster/mvm_sentrybuster_explode.wav"
+            }
+        }
+        WaveSpawn // Normal Demoman
+        {
+            Name a2_2
+            WaitForAllSpawned a1_3
+            TotalCurrency 100
+            TotalCount 18
+            MaxActive 7
+            SpawnCount 2
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 8
+            TFBot
+            {
+                Class Demoman
+			    Name "Jacked up Demo"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Demo"
+                Item "Binoculus"
+                Item "Dynamite Abs"
+                Item "EOTL_demopants"
+                CharacterAttributes
+                {
+                    "voice pitch scale" 0.8
+                }
+                SpawnTemplate "gately_gibus_wearer"
+			    EventChangeAttributes
+			    {
+				    Default
+				    {
+					    BehaviorModifiers push			// having these will cause bots to run towards gates
+					    Attributes IgnoreFlag			// having these will cause bots to run towards gates
+					    Tag nav_prefer_gate1_flank 		// having these will cause bots to run towards gates
+					    Tag bot_gatebot 				// having these will cause bots to run towards gates
+					    Skill Normal
+                        Item "Ghostly Gibus"
+					    ItemModel
+					    {
+						    ItemName "Ghostly Gibus"
+						    Model "models/player/items/all_class/gately_gibus_heavy.mdl"
+					    }
+					    ItemAttributes
+					    {
+						    ItemName "Ghostly Gibus"
+						    "custom item model" "models/player/items/all_class/gately_gibus_heavy.mdl"
+						    "attachment name" "head"
+						    "attachment scale" "1.03"
+						    "attachment offset" "0.2 0.2 -11.2"
+						    "attachment angles" "-22 0 4"
+					    }
+				    }
+				    RevertGateBotsBehavior
+				    {
+                        Item "Ghostly Gibus"
+				    }
+			    }
+            }
+        }
+        WaveSpawn // Pyro
+        {
+            Name a2_3
+            WaitForAllSpawned a1_3
+            TotalCurrency 100
+            TotalCount 26
+            MaxActive 6
+            SpawnCount 2
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 4
+            Squad
+            {
+                TFBot
+                {
+                    Class Pyro
+                    //ClassIcon pyro_backburner_nys
+                    Skill Easy
+                    Name "Undead Pyromaniac"
+                    //Attributes AlwaysFireWeapon
+                    UseCustomModel "models/player/pyro.mdl"
+                    Skin 5
+                    Item "Zombie Pyro"
+                    //Item "The Spectralnaut"
+                    Item "The Space Diver"
+                    //Item "The Backburner"
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    SpawnTemplate "gately_gibus_wearer"
+				    EventChangeAttributes
+				    {
+					    Default
+					    {
+						    Tag bot_gatebot 				// having these will cause bots to run towards gates
+						    Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+						    BehaviorModifiers push			// having these will cause bots to run towards gates
+						    Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+
+						    Item "Ghostly Gibus"
+						    ItemAttributes
+						    {
+							    ItemName "Ghostly Gibus"
+							    "custom item model" "models/player/items/all_class/gately_gibus_heavy.mdl"
+							    "attachment name" "head"
+							    "attachment scale" "0.95"
+							    "attachment offset" "1 0.2 -9.8"
+							    "attachment angles" "-42 0 3"
+						    }
+					    }
+					    RevertGateBotsBehavior
+					    {
+						    Item "Ghostly Gibus"
+					    }
+				    }
+                }
+                //TFBot
+                //{
+                //    Template T_TFBot_Medic_BigHeal
+                //    Name "Odd Treatment Zombie"
+                //    UseCustomModel "models/player/medic.mdl"
+                //    Skin 5
+                //    Item "Zombie Medic"
+                //    Item "Berlin Brain Bowl"
+                //    Item "The Smock Surgeon"
+                //    CharacterAttributes
+				//    {
+				//	    "voice pitch scale" 0.8
+				//    }
+                //    Tag bot_squad_member // Might be needed?
+                //}
+            }
+        }
+        WaveSpawn // Gshotgun heavy + bigheal meds
+        {
+            Name a3_1
+            WaitForAllDead a2_1
+            TotalCurrency 100
+            TotalCount 4
+            MaxActive 4
+            SpawnCount 4
+            Where spawnbot_right
+            Where spawnbot_left
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 22
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Normal_Heavyweapons_Shotgun
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_BigHeal
+                    Name "Odd Treatment Zombie"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "Berlin Brain Bowl"
+                    Item "The Smock Surgeon"
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    Tag bot_squad_member // Might be needed?
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_BigHeal
+                    Name "Odd Treatment Zombie"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "Berlin Brain Bowl"
+                    Item "The Smock Surgeon"
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    Tag bot_squad_member // Might be needed?
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_BigHeal
+                    Name "Odd Treatment Zombie"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "Berlin Brain Bowl"
+                    Item "The Smock Surgeon"
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    Tag bot_squad_member // Might be needed?
+                }
+            }
+        }
+        WaveSpawn // Dead af scout
+        {
+            Name a3_2
+            WaitForAllDead a2_1
+            TotalCurrency 50
+            TotalCount 15
+            MaxActive 7
+            SpawnCount 3
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 3
+            WaitBetweenSpawns 4
+            TFBot
+            {
+                Class Scout
+                ClassIcon scout_blaster_nys
+                Skill Easy
+                Name "Blaster Zombie"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Scout"
+                Item "Baby Face's Blaster"
+                Item "The Flapjack"
+                Item "dec2014 CoPilot_2014"
+                ItemAttributes
+			    {
+				    ItemName "Baby Face's Blaster"
+				    "lose hype on take damage" 0
+				    "move speed penalty" 1
+				    //"boost on damage" 0
+			    }
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+            }
+        }
+        // Support
+        WaveSpawn // Drunk
+        {
+            WaitForAlldead a2_3
+            TotalCurrency 200
+            TotalCount 70
+            MaxActive 7
+            SpawnCount 2
+            Where spawnbot_main
+            Support 1
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 6
+            RandomChoice
+            {
+                TFBot
+                {
+                    Class Demoman
+                    ClassIcon demoknight_bottle_lite
+                    Name "Annoying Party Fella"
+                    Skill Hard
+                    WeaponRestrictions MeleeOnly
+                    Item "TF Birthday Hat 2011"
+                    Item "Noise Maker - TF Birthday"
+                    Item "EOTL_demopants"
+                    Item "The Tide Turner"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    ItemAttributes
+                    {
+                        ItemName "The Tide Turner"
+                        "lose demo charge on damage when charging" 0 // I hate this stupid attribute
+                        "attack not cancel charge" 1
+                        "charge recharge rate increased" 2
+                    }
+                    CharacterAttributes
+                    {
+                        "kill forces attacker to laugh" 1
+                    }
+                }
+                TFBot
+                {
+                    Class Demoman
+                    ClassIcon demoknight_bottle_lite
+                    Name "Drunken Dumbass"
+                    Skill Hard
+                    WeaponRestrictions MeleeOnly
+                    Item "TF Birthday Hat 2011"
+                    Item "EOTL_demopants"
+                    Item "The Tide Turner"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    ItemAttributes
+                    {
+                        ItemName "The Tide Turner"
+                        "lose demo charge on damage when charging" 0 // I hate this stupid attribute
+                        "attack not cancel charge" 1
+                        "charge recharge rate increased" 2
+                    }
+                    CharacterAttributes
+                    {
+                        "kill forces attacker to laugh" 1
+                    }
+                }
+                TFBot
+                {
+                    Class Demoman
+                    ClassIcon demoknight_bottle_lite
+                    Name "Late to the Party Dude"
+                    Skill Hard
+                    WeaponRestrictions MeleeOnly
+                    Item "TF Birthday Hat 2011"
+                    Item "EOTL_demopants"
+                    Item "The Tide Turner"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    ItemAttributes
+                    {
+                        ItemName "The Tide Turner"
+                        "lose demo charge on damage when charging" 0 // I hate this stupid attribute
+                        "attack not cancel charge" 1
+                        "charge recharge rate increased" 2
+                    }
+                    CharacterAttributes
+                    {
+                        "kill forces attacker to laugh" 1
+                    }
+                }
+                TFBot
+                {
+                    Class Demoman
+                    ClassIcon demoknight_bottle_lite
+                    Name "Tripping Smartass"
+                    Skill Hard
+                    WeaponRestrictions MeleeOnly
+                    Item "TF Birthday Hat 2011"
+                    Item "EOTL_demopants"
+                    Item "The Tide Turner"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    ItemAttributes
+                    {
+                        ItemName "The Tide Turner"
+                        "lose demo charge on damage when charging" 0 // I hate this stupid attribute
+                        "attack not cancel charge" 1
+                        "charge recharge rate increased" 2
+                    }
+                    CharacterAttributes
+                    {
+                        "kill forces attacker to laugh" 1
+                    }
+                }
+                TFBot
+                {
+                    Class Demoman
+                    ClassIcon demoknight_bottle_lite
+                    Name "Stoned Demoman"
+                    Skill Hard
+                    WeaponRestrictions MeleeOnly
+                    Item "TF Birthday Hat 2011"
+                    Item "EOTL_demopants"
+                    Item "The Tide Turner"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    ItemAttributes
+                    {
+                        ItemName "The Tide Turner"
+                        "lose demo charge on damage when charging" 0 // I hate this stupid attribute
+                        "attack not cancel charge" 1
+                        "charge recharge rate increased" 2
+                    }
+                    CharacterAttributes
+                    {
+                        "kill forces attacker to laugh" 1
+                    }
+                }
+                TFBot
+                {
+                    Class Demoman
+                    ClassIcon demoknight_bottle_lite
+                    Name "Crazy Driver"
+                    Skill Hard
+                    WeaponRestrictions MeleeOnly
+                    Item "TF Birthday Hat 2011"
+                    Item "EOTL_demopants"
+                    Item "The Tide Turner"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    ItemAttributes
+                    {
+                        ItemName "The Tide Turner"
+                        "lose demo charge on damage when charging" 0 // I hate this stupid attribute
+                        "attack not cancel charge" 1
+                        "charge recharge rate increased" 2
+                    }
+                    CharacterAttributes
+                    {
+                        "kill forces attacker to laugh" 1
+                    }
+                }
+                TFBot
+                {
+                    Class Demoman
+                    ClassIcon demoknight_bottle_lite
+                    Name "Lunatic Lad"
+                    Skill Hard
+                    WeaponRestrictions MeleeOnly
+                    Item "TF Birthday Hat 2011"
+                    Item "EOTL_demopants"
+                    Item "The Tide Turner"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    ItemAttributes
+                    {
+                        ItemName "The Tide Turner"
+                        "lose demo charge on damage when charging" 0 // I hate this stupid attribute
+                        "attack not cancel charge" 1
+                        "charge recharge rate increased" 2
+                    }
+                    CharacterAttributes
+                    {
+                        "kill forces attacker to laugh" 1
+                    }
+                }
+                TFBot
+                {
+                    Class Demoman
+                    ClassIcon demoknight_bottle_lite
+                    Name "Silly Bloke"
+                    Skill Hard
+                    WeaponRestrictions MeleeOnly
+                    Item "TF Birthday Hat 2011"
+                    Item "EOTL_demopants"
+                    Item "The Tide Turner"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    ItemAttributes
+                    {
+                        ItemName "The Tide Turner"
+                        "lose demo charge on damage when charging" 0 // I hate this stupid attribute
+                        "attack not cancel charge" 1
+                        "charge recharge rate increased" 2
+                    }
+                    CharacterAttributes
+                    {
+                        "kill forces attacker to laugh" 1
+                    }
+                }
+                TFBot
+                {
+                    Class Demoman
+                    ClassIcon demoknight_bottle_lite
+                    Name "Idiotic Robot"
+                    Skill Hard
+                    WeaponRestrictions MeleeOnly
+                    Item "TF Birthday Hat 2011"
+                    Item "EOTL_demopants"
+                    Item "The Tide Turner"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    ItemAttributes
+                    {
+                        ItemName "The Tide Turner"
+                        "lose demo charge on damage when charging" 0 // I hate this stupid attribute
+                        "attack not cancel charge" 1
+                        "charge recharge rate increased" 2
+                    }
+                    CharacterAttributes
+                    {
+                        "kill forces attacker to laugh" 1
+                    }
+                }
+            }
+        }
+    }
+    Wave // wave 2 Payout $1050 Total: $1800 A+ $1900. Somewhat Animal themed wave.
+    {
+        CustomWaveNumber 2 [$SIGSEGV]
+		CustomMaxWaveNumber 6 [$SIGSEGV]
+        WaitWhenDone 65
+		Checkpoint Yes
+        StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+        InitWaveOutput
+        {
+            Target improved_upper_relay
+            Action Trigger
+        }
+        //DoneOutput
+        //{
+        //    Target wave_init_relay
+        //    Action Trigger
+        //}
+        WaveSpawn
+        {
+            Name dummy
+            WaitBeforeStarting 2
+            FirstSpawnWarningSound "vo/scout_meleedare03.mp3"
+        }
+        WaveSpawn // Super cheetah scout
+        {
+            Name b1_1
+            TotalCurrency 75
+            TotalCount 4
+            MaxActive 2
+            SpawnCount 1
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 2
+            WaitBetweenSpawns 14
+            RandomChoice
+            {
+                TFBot
+                {
+                    Class Scout
+			        Name "Super Cheetah Scout"
+			        ClassIcon scout_giant_fast
+			        Skill Easy
+			        Item "The Holy Mackerel"
+			        Health 1200
+			        WeaponRestrictions MeleeOnly
+			        Attributes MiniBoss
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Scout"
+                    Item "The Beastly Bonnet"
+                    //Item "The Cheet Sheet"
+			        CharacterAttributes
+			        {
+				        "move speed bonus"	2
+				        "damage force reduction" 0.7
+				        "airblast vulnerability multiplier" 0.7
+				        "override footstep sound set" 5
+			        }
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Class Scout
+			        Name "Super Cheetah Scout"
+			        ClassIcon scout_giant_fast
+			        Skill Easy
+			        Item "The Holy Mackerel"
+			        Health 1200
+			        WeaponRestrictions MeleeOnly
+			        Attributes MiniBoss
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Scout"
+                    Item "The Beastly Bonnet"
+                    //Item "The Cheet Sheet"
+			        CharacterAttributes
+			        {
+				        "move speed bonus"	2
+				        "damage force reduction" 0.7
+				        "airblast vulnerability multiplier" 0.7
+				        "override footstep sound set" 5
+			        }
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Class Scout
+			        Name "Super Cheetah Scout"
+			        ClassIcon scout_giant_fast
+			        Skill Easy
+			        Item "The Holy Mackerel"
+			        Health 1200
+			        WeaponRestrictions MeleeOnly
+			        Attributes MiniBoss
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Scout"
+                    Item "The Beastly Bonnet"
+                    //Item "The Cheet Sheet"
+			        CharacterAttributes
+			        {
+				        "move speed bonus"	2
+				        "damage force reduction" 0.7
+				        "airblast vulnerability multiplier" 0.7
+				        "override footstep sound set" 5
+			        }
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Class Scout
+			        Name "Super Cheetah Scout"
+			        ClassIcon scout_giant_fast
+			        Skill Easy
+			        Item "The Holy Mackerel"
+			        Health 1200
+			        WeaponRestrictions MeleeOnly
+			        Attributes MiniBoss
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Scout"
+                    Item "The Beastly Bonnet"
+                    //Item "The Cheet Sheet"
+			        CharacterAttributes
+			        {
+				        "move speed bonus"	2
+				        "damage force reduction" 0.7
+				        "airblast vulnerability multiplier" 0.7
+				        "override footstep sound set" 5
+			        }
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Class Scout
+			        Name "Super Cheetah Man"
+			        ClassIcon scout_giant_fast
+			        Skill Easy
+			        Item "The Holy Mackerel"
+			        Health 1200
+			        WeaponRestrictions MeleeOnly
+			        Attributes MiniBoss
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Scout"
+                    Item "The Beastly Bonnet"
+                    //Item "The Cheet Sheet"
+			        CharacterAttributes
+			        {
+				        "move speed bonus"	2
+				        "damage force reduction" 0.7
+				        "airblast vulnerability multiplier" 0.7
+				        "override footstep sound set" 5
+			        }
+                    Tag bot_giant
+                }
+            }
+        }
+        WaveSpawn // Circus Master
+        {
+            Name b1_2
+            TotalCurrency 25
+            TotalCount 2
+            MaxActive 2
+            SpawnCount 1
+            Where spawnbot_chief
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 20
+            FirstSpawnWarningSound "vo/soldier_sf12_taunts15.mp3"
+            TFBot
+            {
+                Template T_TFBot_Giant_Soldier_Spammer_Reload
+                Name "Swifty Circus Master"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Soldier"
+                Item "The Diplomat"
+                Item "The Man in Slacks"
+                Item "The Colonial Clogs"
+                //Item "Scotsman's Stove Pipe"
+                Tag bot_giant
+
+                EventChangeAttributes
+			    {
+				    Default
+				    {
+					    BehaviorModifiers push			// having these will cause bots to run towards gates
+					    Attributes IgnoreFlag			// having these will cause bots to run towards gates
+					    Tag nav_prefer_gate1_flank 		// having these will cause bots to run towards gates
+					    Tag bot_gatebot 				// having these will cause bots to run towards gates
+
+                        Item "Scotsman's Stove Pipe" // Doesn't work?
+                        ItemAttributes
+					    {
+						    ItemName "Scotsman's Stove Pipe"
+						    "set item tint RGB" 15787660
+					    }
+				    }
+				    RevertGateBotsBehavior
+				    {
+					    Item "Scotsman's Stove Pipe"
+				    }
+			    }
+            }
+        }
+        WaveSpawn // Chicken wing Scout
+        {
+            Name b1_3
+            TotalCurrency 140
+            TotalCount 36
+            MaxActive 7
+            SpawnCount 2
+            Where spawnbot_main
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 3
+            TFBot
+            {
+                Class Scout
+                ClassIcon scout_winger_lite
+                Name "Chicken Wing Zombie"
+                Skill Easy
+                WeaponRestrictions SecondaryOnly
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Scout"
+                Item "The Winger"
+                Item "Nugget Noggin"
+				Item "Fowl Fists"
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+            }
+        }
+        WaveSpawn // Gate Monkey Soldier
+        {
+            Name b1_4
+            TotalCurrency 60
+            TotalCount 18
+            MaxActive 5
+            SpawnCount 2
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 7
+            TFBot
+            {
+                Class Soldier
+                Skill Normal
+                Name "Monkey Soldier"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Soldier"
+                Item "Poopy Doe"
+                Item "The Man in Slacks"
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+                SpawnTemplate "gately_gibus_wearer"
+				EventChangeAttributes
+				{
+					Default
+					{
+						Tag bot_gatebot 				// having these will cause bots to run towards gates
+						Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+						BehaviorModifiers push			// having these will cause bots to run towards gates
+						Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+	
+						Item "Ghostly Gibus"
+						ItemAttributes
+						{
+							ItemName "Ghostly Gibus"
+							"custom item model" "models/player/items/all_class/gately_gibus_heavy.mdl"
+							"attachment name" "head"
+							"attachment scale" "1.04"
+							"attachment offset" "-2.2 0.45 -11.5"
+							"attachment angles" "0 0 6"
+						}
+					}
+					RevertGateBotsBehavior
+					{
+						Item "Ghostly Gibus"
+					}
+				}
+            }
+        }
+        WaveSpawn // GPyro + Rapid Bowman
+        {
+            Name b2_1
+            WaitForAllDead b1_1
+            TotalCurrency 90
+            TotalCount 9
+            MaxActive 6
+            SpawnCount 3
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 12
+            Squad
+            {
+                TFBot // Lmao Eve bot
+                {
+                    Class Pyro
+                    ClassIcon pyro_backburner_nys
+			        Name "Abysmal Shark Pyro"
+			        Skill Expert
+			        Health 3300
+			        WeaponRestrictions PrimaryOnly
+			        Attributes MiniBoss
+                    Attributes AlwaysFireWeapon
+                    Item "Pyro Shark"
+                    Item "The Sub Zero Suit"
+                    Item "Spooky Head-Bouncers"
+                    Item "The Backburner"
+			        CharacterAttributes
+			        {
+				        "move speed bonus"	0.5
+				        "damage force reduction" 0.6
+				        "airblast vulnerability multiplier" 0.6
+				        "override footstep sound set" 6
+			        }
+                    Tag bot_giant
+                    DeathSound "mvm/sentrybuster/mvm_sentrybuster_explode.wav"
+                }
+                TFBot
+                {
+                    Template T_TFBot_Sniper_Huntsman_Spammer
+                    ClassIcon sniper_bow_multi
+                    Name "Rapid Kangaroo Bowman"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Sniper"
+                    Item "Roo rippers"
+                    Item "Marsupial Muzzle"
+                    Item "The Triggerman's Tacticals"
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Template T_TFBot_Sniper_Huntsman_Spammer
+                    ClassIcon sniper_bow_multi
+                    Name "Rapid Kangaroo Bowman"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Sniper"
+                    Item "Roo rippers"
+                    Item "Marsupial Muzzle"
+                    Item "The Triggerman's Tacticals"
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    Tag bot_giant
+                }
+            }
+        }
+        WaveSpawn // Crocodile that is pissed off
+        {
+            Name b2_2
+            WaitForAllSpawned b1_3
+            TotalCurrency 110
+            TotalCount 30
+            MaxActive 9
+            SpawnCount 3
+            Where spawnbot_main
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 5
+            TFBot
+            {
+                Class Sniper
+                ClassIcon sniper_jarate_bushwacka
+                Name "Pissed off Crocodile"
+                Skill Hard
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Sniper"
+                Item "Crocodile Mun-Dee"
+                Item "Scopers Scales"
+                Item "Rocko"
+                Item "Jarate"
+                Item "The Bushwacka"
+                StripItemSlot 0 [$SIGSEGV]
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+            }
+        }
+        WaveSpawn // GATEBOT shotgunners!!!
+        {
+            Name b2_3
+            WaitForAllSpawned b1_3
+            TotalCurrency 150
+            TotalCount 20
+            MaxActive 6
+            SpawnCount 2
+            Where spawnbot_main
+            WaitBeforeStarting 7
+            WaitBetweenSpawns 5
+            TFBot
+            {
+                Template T_TFBot_Heavyweapons_Shotgun
+                Name "Undead Gunner"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Heavy"
+                Item "Commando Elite"
+                Item "Siberian Tigerstripe"
+                Item "Gone Commando"
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+                SpawnTemplate "gately_gibus_wearer"
+				EventChangeAttributes
+				{
+					Default
+					{
+						Tag bot_gatebot 				// having these will cause bots to run towards gates
+						Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+						BehaviorModifiers push			// having these will cause bots to run towards gates
+						Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+
+						Item "Ghostly Gibus"
+						ItemAttributes
+						{
+							ItemName "Ghostly Gibus"
+							"custom item model" "models/player/items/all_class/gately_gibus_heavy.mdl"
+						}
+					}
+					RevertGateBotsBehavior
+					{
+						Item "Ghostly Gibus"
+					}
+				}
+            }
+        }
+        WaveSpawn // Gheater heavy + Uber meds
+        {
+            Name b3_1
+            WaitForAllDead b2_1
+            TotalCurrency 100
+            TotalCount 8
+            MaxActive 8
+            SpawnCount 4
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 25
+            FirstSpawnWarningSound "vo/heavy_item_birdhead_round_start04.mp3"
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Heavyweapons_Heater
+                    Name "Mystical Bird Heavy"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Heavy"
+                    Item "The Chicken Kiev"
+                    Item "The Red Army Robin"
+                    Item "The Mann of the House" // Shut up, Pants are fucking funny the heavy
+                    ItemAttributes
+			        {
+				        ItemName "The Huo Long Heatmaker"
+				        "damage bonus"	1.25
+                        "damage penalty" 1
+			        }
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    Name "Uber Bird Medic"
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "Medimedes"
+                    Item "Archimedes"
+                    Item "The Heat of Winter"
+                    Tag bot_squad_member // Might be needed?
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    Name "Uber Bird Medic"
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "Medimedes"
+                    Item "Archimedes"
+                    Item "The Heat of Winter"
+                    Tag bot_squad_member // Might be needed?
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    Name "Uber Bird Medic"
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "Medimedes"
+                    Item "Archimedes"
+                    Item "The Heat of Winter"
+                    Tag bot_squad_member // Might be needed?
+                }
+            }
+        }
+        WaveSpawn // AMERICAN EAGLE
+        {
+            Name b3_2
+            WaitForAllSpawned b2_1
+            TotalCurrency 175
+            TotalCount 18
+            MaxActive 5
+            SpawnCount 2
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 3
+            WaitBetweenSpawns 5
+            //FirstSpawnWarningSound "vo/soldier_item_birdhead_round_start02.mp3"
+            TFBot
+            {
+                Class Soldier
+                Skill Normal
+                Name "Bald Eagle Soldier"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Soldier"
+                Item "The Freedom Feathers"
+                Item "The Compatriot"
+                Item "Private Maggot Muncher"
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+            }
+        }
+        // Support 
+        WaveSpawn // Pyro monkey
+        {
+            WaitForAllSpawned b2_2
+            TotalCurrency 125
+            TotalCount 44
+            MaxActive 6
+            SpawnCount 2
+            Where spawnbot_left
+            Where spawnbot_right
+            Support 1
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 5
+            TFBot
+            {
+                Class Pyro
+                Skill Easy
+                Name "Monkey Pyro"
+                //Attributes AlwaysFireWeapon
+                UseCustomModel "models/player/pyro.mdl"
+                Skin 5
+                Item "Zombie Pyro"
+                Item "Poopy Doe"
+                Item "The Sub Zero Suit"
+                //Item "Spooky Head-Bouncers"
+                CharacterAttributes
+                {
+                    "voice pitch scale" 0.8
+                }
+            }
+        }
+    }
+    Wave // Wave 3 Payout: $1050 Total: $2850 A+ $2950. The skeleton appears... 
+    {
+        CustomWaveNumber 3 [$SIGSEGV]
+		CustomMaxWaveNumber 6 [$SIGSEGV]
+        WaitWhenDone 65
+		Checkpoint Yes
+        StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+        InitWaveOutput
+        {
+            Target improved_wave3_relay
+            Action Trigger
+        }
+        //InitWaveOutput
+        //{
+        //    Target wave_prepare_relay_upper
+        //    Action Trigger
+        //}
+        //DoneOutput
+        //{
+        //    Target wave_init_relay
+        //    Action Trigger
+        //}
+        WaveSpawn // Add shake effect
+        {
+            WaitBeforeStarting 2
+            FirstSpawnWarningSound "misc/halloween_eyeball/vortex_eyeball_died.wav"
+            FirstSpawnMessage "{red}The Skeleton appears..."
+            FirstSpawnOutput
+            {
+                Target "please_shake_it"
+                Action Trigger
+            }
+        }
+        WaveSpawn // Calcium Crusader
+        {
+            Name c1_1
+            TotalCurrency 75
+            TotalCount 4
+            MaxActive 2
+            SpawnCount 1
+            Where spawnbot_chief
+            WaitBeforeStarting 7
+            WaitBetweenSpawns 16
+            TFBot
+            {
+                Template T_TFBot_Giant_Demo_Burst
+                ClassIcon demo_milky //demo_giant
+                Name "Giant Calcium Crusader"
+                UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                DeathSound "misc/halloween/skeleton_break.wav"
+                UseHumanAnimations 1 [$SIGSEGV]
+                Item "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+                Item "The Milkman"
+                ItemAttributes
+			    {
+				    ItemName "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+				    "paintkit_proto_def_index" 130 //bovine blazemaker bc I am very funny
+				    "set_item_texture_wear" 0
+				
+				    "add cond on hit" 27
+				    "add cond on hit duration" 4
+				
+				    "grenade explode on impact" 1
+				
+				    "custom projectile model" "models/weapons/c_models/c_madmilk/c_madmilk.mdl"
+				    "explosion particle" "peejar_impact_milk"
+				    //"projectile trail particle" "peejar_trail_blue"
+				
+				    "fire rate bonus" 0.1
+				    "faster reload rate" 0.65
+				    "clip size upgrade atomic" 7
+				    "blast radius decreased" 0.6
+                    "projectile spread angle penalty" 5
+			    }
+                CharacterAttributes
+                {
+                    "voice pitch scale" 0
+                }
+                Tag bot_giant
+            }
+        }
+        WaveSpawn // Gate skeletons
+        {
+            Name c1_2
+            TotalCurrency 125
+            TotalCount 45
+            MaxActive 8
+            SpawnCount 3
+            Where spawnbot_main
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 3
+            TFBot
+            {
+                Template The_skeleton_gatebot
+                //ClassIcon scout
+            }
+        }
+        WaveSpawn // Armored Rattler Skeletons
+        {  
+            Name c1_3
+            TotalCurrency 50
+            TotalCount 21
+            MaxActive 5
+            SpawnCount 3
+            Where spawnbot_right
+            Where spawnbot_left
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 8
+            TFBot
+            {
+                SpawnTemplate "skeleton"
+                Class Sniper
+                ClassIcon sniper_smg_tind
+                Name "Armored Rattler Skeleton"
+                Skill Normal
+                Scale 1.4
+                Health 650
+                UseHumanAnimations 1 [$SIGSEGV]
+                WeaponRestrictions SecondaryOnly
+                UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                DeathSound "misc/halloween/skeleton_break.wav"
+                Item "The Triggerman's Tacticals"
+                Item "Brim-Full Of Bullets"
+                Item "Poacher's Safari Jacket"
+                CharacterAttributes
+                {
+                    "voice pitch scale" 0
+                }
+                Tag bot_giant
+            }
+        }
+        WaveSpawn // Skele tank?
+        {
+            Name c2_1
+            WaitForAllDead c1_1
+            TotalCurrency 100
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            Where spawnbot_main // Might not be needed?
+            FirstSpawnWarningSound "misc/halloween/spell_skeleton_horde_cast.wav"
+            WaitBeforeStarting 8
+            DoneOutput
+            {
+                Target "spawnbot_dud"
+                Action Disable
+            }
+            Tank
+            {
+                ClassIcon tank_skeleton
+                Health 23000
+                Speed 70
+                Name "tankboss_skele"
+                Skin 0	// Only Use Skin 1 as the final tank
+				StartingPathTrackNode "path_tank_default"
+                DisableSmokestack 1
+                NoCrushDamage 1 // Stupid Skeleton NPC's getting clipped me inside the tank causing the instant death
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+                SpawnTemplate "skeleton_tank"
+            }
+        }
+        WaveSpawn // More Skeletons
+        {
+            Name c2_2
+            WaitForAllSpawned c2_1
+            TotalCount 9
+            MaxActive 9
+            SpawnCount 3
+            Support 1
+            Where spawnbot_dud // Important because i can disable it later
+            WaitBeforeStarting 17
+            WaitBetweenSpawns 4
+            HalloweenBoss
+            {
+                FastUpdate 1
+                BossType SkeletonNormal
+                Teamnum 3
+                Health 100
+                Lifetime 10
+                Origin "0 0 0"
+				Skin 2
+				SpreadRadius "250 250 50"
+                SpawnAtEntity "tankboss_skele"
+            }
+        }
+        WaveSpawn // Giant punchie
+        {
+            Name c2_1
+            WaitForAllDead c1_1
+            TotalCurrency 75
+            TotalCount 3
+            MaxActive 2
+            SpawnCount 1
+            Where spawnbot_chief
+            WaitBeforeStarting 7
+            WaitBetweenSpawns 18
+            TFBot
+            {
+                Template T_TFBot_Giant_Boxing_Heavy
+                Name "Giant Punchie"
+                Item "Weight Room Warmer"
+				Item "The Heavy-Weight Champ"
+                DeathSound "mvm/sentrybuster/mvm_sentrybuster_explode.wav"
+                Tag bot_giant
+				EventChangeAttributes
+				{
+					Default
+					{
+						Tag bot_gatebot 				// having these will cause bots to run towards gates
+						Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+						BehaviorModifiers push			// having these will cause bots to run towards gates
+						Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+                        Item "Pugilist's Protector"
+						ItemAttributes
+						{
+							ItemName "Pugilist's Protector"
+							"set item tint rgb" 15787660
+						}
+					}
+					RevertGateBotsBehavior
+					{
+						Item "Pugilist's Protector"
+					}
+				}
+            }
+        }
+        WaveSpawn // Not-so-charged soldier + popper medic
+        {
+            Name c2_4
+            WaitForAllSpawned c2_1
+            TotalCurrency 125
+            TotalCount 32
+            MaxActive 12
+            Spawncount 4
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 5
+            Squad
+            {
+                TFBot
+                {
+                    Class Soldier
+                    ClassIcon soldier_crit
+                    Skill Normal
+                    Name "Not-so-Charged Soldier"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Soldier"
+                    Item "The Chaser"
+                    Item "Twisted Topper"
+                    Item "The Original"
+                    ItemAttributes
+			        {
+				        ItemName "The Original"
+				        "faster reload rate" 0.2
+				        "fire rate bonus" 2
+				        "Projectile speed increased" 0.5
+			        }
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0.8
+                    }
+                }
+                TFBot
+                {
+                    Class Medic
+                    ClassIcon medic_kritz
+                    Skill Hard
+                    Name "Candy Popper Medic"
+                    WeaponRestrictions SecondaryOnly
+                    Attributes SpawnWithFullCharge
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "Candy Crown"
+                    Item "Gingerbread Mann"
+                    Item "Fizzy Pharmacist"
+                    Item "The Kritzkrieg"
+                    ItemAttributes
+                    {
+                        ItemName "The Kritzkrieg"
+                        "ubercharge rate bonus" 201
+                        "uber duration bonus" 200
+                    }
+                    CharacterAttributes
+                    {
+                        "bot medic uber health threshold" 151
+                        "voice pitch scale" 0.8
+                    }
+                    Tag bot_squad_member
+                }
+            }
+        }
+        WaveSpawn // Skeleton king
+        {
+            Name c3_1
+            WaitForAllDead c2_1
+            TotalCurrency 300
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            Where spawnbot_chief
+            WaitBeforeStarting 6
+            TFBot
+            {
+                //Action Mobber
+                Class Sniper
+                ClassIcon dead_king_lite //demoknight_giant
+                Name "Mysterious Mage Skeleton"
+                Skill Expert
+                Health 25000
+                //WeaponRestrictions MeleeOnly // Doing this disables the bot using the spell
+                StripItemSlot 0
+                StripItemSlot 1
+                Attributes MiniBoss
+                Attributes UseBossHealthBar
+                UseHumanAnimations 1 [$SIGSEGV]
+                UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                Skin 2
+                DeathSound "misc/halloween/skeleton_break.wav"
+                Item "The Crone's Dome"
+                Item "The Hot Case"
+                Item "The Tartantaloons"
+                Item "The Teufort Tooth Kicker"
+                Item "The Freedom Staff"
+                Item "tf_weapon_spellbook"
+                ItemAttributes
+                {
+                   ItemName "The Freedom Staff" 
+                   "damage bonus" 1.5
+                   //"fire rate penalty" 2
+                }
+                ItemAttributes
+				{
+					ItemName "tf_weapon_spellbook"
+					"Projectile speed increased" 0.5
+                    "blast radius decreased" 0.75
+				}
+                CharacterAttributes
+      		    {
+                    "deploy time decreased" 0.001
+        		    "move speed bonus" 0.32
+        		    "damage force reduction" 0.1
+        		    "airblast vulnerability multiplier" 0.1
+        		    "override footstep sound set" 7 
+                    "rage giving scale" 0.1
+				    "voice pitch scale" 0
+      		    }
+                Spell [$SIGSEGV]
+                {
+                    Delay 7
+                    Cooldown 15
+                    IfSeeTarget 0
+                    Charges 1
+                    Limit 1
+                    Type "Summon Skeletons"
+                }
+                Spell [$SIGSEGV]
+                {
+                    Delay 15
+                    Cooldown 20
+                    IfSeeTarget 0
+                    Charges 1
+                    Limit 1
+                    Type "Summon Monoculus"
+                }
+                Spell [$SIGSEGV]
+                {
+                    Delay 9
+                    Cooldown 12
+                    IfSeeTarget 0
+                    Charges 1
+                    Limit 1
+                    Type "Pumpkin MIRV"
+                }
+                Spell [$SIGSEGV]
+                {
+                    Delay 45
+                    Cooldown 60
+                    IfSeeTarget 0
+                    Charges 1
+                    Limit 1
+                    Type "Healing Aura"
+                }
+                Spell [$SIGSEGV]
+                {
+                    Delay 20
+                    Cooldown 10
+                    IfSeeTarget 0
+                    Charges 1
+                    Limit 1
+                    Type "Fireball"
+                }
+                Tag bot_giant
+            }
+        }
+        WaveSpawn // Idle Scout
+        {
+            Name c3_2
+            WaitForAllSpawned c3_1
+            TotalCurrency 69
+            TotalCount 21
+            MaxActive 7
+            SpawnCount 3
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 3
+            TFBot
+            {
+                SpawnTemplate "skeleton"
+                Class Scout
+                ClassIcon scout_fanowar_milk
+                Skill Expert
+                Scale 1.002
+                Name "Calcium Delivery Skeleton"
+                Item "Mad Milk"
+			    Item "The Fan O'War"
+			    Item "The Milkman"
+			    Item "The Ticket Boy"
+			    Item "The Mustachioed Mann"
+                UseHumanAnimations 1 [$SIGSEGV]
+                StripItemSlot 0  [$SIGSEGV]
+                UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                DeathSound "misc/halloween/skeleton_break.wav"
+                CharacterAttributes
+                {
+                    "voice pitch scale" 0
+                }
+            }
+        }
+        // Support
+        WaveSpawn // Knights
+        {
+            WaitForAllSpawned c1_3
+            TotalCurrency 131
+            TotalCount 50
+            MaxActive 5
+            SpawnCount 3
+            Support 1
+            Where spawnbot_main
+            WaitBetweenSpawns 7
+            RandomChoice
+            {
+                TFBot
+                {
+                    Template T_TFBot_Demoman_Knight
+                    Name "Skeleton Knight"
+                    Scale 1.002
+                    UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                    DeathSound "misc/halloween/skeleton_break.wav"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    Item "The Tartan Spartan"
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0
+                    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Demoman_Knight
+                    Name "Skeleton Knight"
+                    Scale 1.002
+                    UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                    DeathSound "misc/halloween/skeleton_break.wav"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    Item "The Stormin' Norman"
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0
+                    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Demoman_Knight
+                    Name "Skeleton Knight"
+                    Scale 1.002
+                    UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                    DeathSound "misc/halloween/skeleton_break.wav"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    Item "The Tartan Spartan"
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0
+                    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Demoman_Knight
+                    Name "Skeleton Knight"
+                    Scale 1.002
+                    UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                    DeathSound "misc/halloween/skeleton_break.wav"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    Item "The Stormin' Norman"
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0
+                    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Demoman_Knight
+                    Name "Skeleton Knight"
+                    Scale 1.002
+                    UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                    DeathSound "misc/halloween/skeleton_break.wav"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    Item "The Tartan Spartan"
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0
+                    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Demoman_Knight
+                    Name "Skeleton Knight"
+                    Scale 1.002
+                    UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                    DeathSound "misc/halloween/skeleton_break.wav"
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    Item "The Stormin' Norman"
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0
+                    }
+                }
+                TFBot
+                {
+                    Class Demoman
+                    ClassIcon demoknight
+                    Skill Hard
+                    Name "Horseless Headless Horsemann Jr"
+                    Health 175
+                    Item "The Bootlegger"
+                    Item "The Chargin' Targe"
+                    Item "Horseless Headless Horseman's Head"
+                    Item "The Horsemann's Hand-Me-Down"
+			        Item "The Horseless Headless Horseman's Headtaker"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Demo"
+			        WeaponRestrictions MeleeOnly
+                    ItemAttributes
+			        {
+				        ItemName "The Horseless Headless Horseman's Headtaker"
+				        "critboost on kill" 3
+				        "max health additive penalty" -0
+			        }
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0.8
+                    }
+                }
+            }
+        }
+    }
+    Wave // Wave 4 Payout: $1200 Total: $3900 A+ $4000 Knockback gone...
+    {
+        CustomWaveNumber 4 [$SIGSEGV]
+		CustomMaxWaveNumber 6 [$SIGSEGV]
+        WaitWhenDone 65
+		Checkpoint Yes
+        StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+        InitWaveOutput
+        {
+            Target improved_upper_relay
+            Action Trigger
+        }
+        //DoneOutput
+        //{
+        //    Target wave_init_relay
+        //    Action Trigger
+        //}
+        WaveSpawn
+        {
+            WaitBeforeStarting 2
+            FirstSpawnWarningSound "ambient/alarms/train_horn_distant1.wav"
+        }
+        WaveSpawn // Giant burst homing Soldier + uber meds
+        {
+            Name d1_1 
+            TotalCurrency 150
+            TotalCount 15
+            MaxActive 10
+            SpawnCount 5
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 22
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Soldier_Spammer_Reload
+                    ClassIcon soldier_burstfire_homing_nys
+                    Name "Giant Burst Homing Soldier"
+                    RocketCustomParticle eyeboss_projectile
+                    RocketCustomModel "models/props_halloween/eyeball_projectile.mdl"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Soldier"
+                    Item "The Caped Crusader"
+                    AddCond [$SIGSEGV] { Name TF_COND_SODAPOPPER_HYPE }
+                    HomingRockets [$SIGSEGV]
+			        {
+                        Enable 1
+				        IgnoreDisguisedSpies 1
+				        IgnoreStealthedSpies 1
+				        RocketSpeed 0.65 // Multiplier of rocket speed. 1 for default speed
+				        TurnPower 45 //How fast should the rocket rotate to face the target
+				        MaxAimError 90 //Max angle between rocket and the target
+                        AimTime 2.5 //How long should the rocket be aiming (Default: 9999)
+			        }
+                    //SpawnTemplate "gately_gibus_wearer"
+                    EventChangeAttributes
+			        {
+				        Default
+				        {
+					        BehaviorModifiers push			// having these will cause bots to run towards gates
+					        Attributes IgnoreFlag			// having these will cause bots to run towards gates
+					        Tag nav_prefer_gate1_flank 		// having these will cause bots to run towards gates
+					        Tag bot_gatebot 				// having these will cause bots to run towards gates
+					        Tag bot_giant
+                            Item "Ghostly Gibus"
+						    ItemAttributes
+						    {
+							    ItemName "Ghostly Gibus"
+							    "set item tint rgb" 15787660
+						    }
+				        }
+				        RevertGateBotsBehavior
+				        {
+					        Item "Ghostly Gibus"
+					        Tag bot_giant
+			            }
+                    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "The Ruffled Ruprecht"
+                    Item "Self-Care"
+                    Tag bot_squad_member // Might be needed?
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "The Ruffled Ruprecht"
+                    Item "Self-Care"
+                    Tag bot_squad_member // Might be needed?
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "The Ruffled Ruprecht"
+                    Item "Self-Care"
+                    Tag bot_squad_member // Might be needed?
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "The Ruffled Ruprecht"
+                    Item "Self-Care"
+                    Tag bot_squad_member // Might be needed?
+                }
+            }
+        }
+        WaveSpawn // Reverse shooter bozo
+        {
+            Name d1_2
+            TotalCurrency 75
+            TotalCount 36
+            MaxActive 8
+            SpawnCount 3
+            Where spawnbot_main
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 4
+            TFBot
+            {
+                Class Pyro
+                ClassIcon shotgun_reserve_lite
+                Name "Reserve Shooter Zombie"
+                Skill Expert
+                WeaponRestrictions SecondaryOnly
+                UseCustomModel "models/player/pyro.mdl"
+                Skin 5
+                Item "Zombie Pyro" 
+                Item "Nose Candy"
+                Item "Flavorful Baggies"
+                Item "The Reserve Shooter"
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+                SpawnTemplate "gately_gibus_wearer"
+				EventChangeAttributes
+				{
+					Default
+					{
+						Tag bot_gatebot 				// having these will cause bots to run towards gates
+						Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+						BehaviorModifiers push			// having these will cause bots to run towards gates
+						Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+
+						Item "Ghostly Gibus"
+						ItemAttributes
+						{
+							ItemName "Ghostly Gibus"
+							"custom item model" "models/player/items/all_class/gately_gibus_heavy.mdl"
+							"attachment name" "head"
+							"attachment scale" "0.95"
+							"attachment offset" "1 0.2 -9.8"
+							"attachment angles" "-42 0 3"
+						}
+					}
+					RevertGateBotsBehavior
+					{
+						Item "Ghostly Gibus"
+					}
+				}
+            }
+        }
+        WaveSpawn // Stackable Tank
+        {
+            Name d1_3
+            TotalCurrency 25
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            Where spawnbot_main
+            WaitBeforeStarting 25
+            FirstSpawnWarningSound "vo/mvm_tank_alerts01.mp3"
+            FirstSpawnOutput
+            {
+                Target tank_uber_on
+                Action Trigger
+            }
+            Tank
+            {
+                Health 10000
+                Speed 125
+                Name "matryoshka_tank1"
+                Skin 0
+                StartingPathTrackNode "path_tank_default"
+                IsMiniBoss 0
+                Scale 0.8
+                Pingsound "common/null.wav"
+                EngineLoopSound "common/null.wav"
+                SpawnTemplate "tank_sillyhat"
+                OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+                OnKilledOutput
+                {
+                    Target	tank_uber_off_1
+				    Action	Trigger
+                }
+                SpawnTemplate "Yakuza_Title_Card_Matryoshka"
+            }
+        }
+        WaveSpawn // Stackable Tank
+        {
+            Name d1_3
+            TotalCurrency 25
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            Where spawnbot_main
+            WaitBeforeStarting 25
+            //FirstSpawnWarningSound "mvm/mvm_tank_start.wav"
+            Tank
+            {
+                Health 8000
+                Speed 125
+                Name "matryoshka_tank2"
+                Skin 0
+                StartingPathTrackNode "path_tank_default"
+                IsMiniBoss 0
+                Scale 0.5
+                Pingsound "common/null.wav"
+                EngineLoopSound "common/null.wav"
+                //DisableSmokestack 1 [$SIGSEGV] // Very optional
+                SpawnTemplate tank_sillyhat2
+                OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+                OnKilledOutput
+                {
+                    Target	tank_uber_off_2
+				    Action	Trigger
+                }
+            }
+        }
+        WaveSpawn // Stackable Tank
+        {
+            Name d1_3
+            TotalCurrency 25
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            Where spawnbot_main
+            WaitBeforeStarting 25
+            Tank
+            {
+                Health 6000
+                Speed 125
+                Name "matryoshka_tank3"
+                Skin 0
+                StartingPathTrackNode "path_tank_default"
+                IsMiniBoss 0
+                Scale 0.3
+                //Pingsound "common/null.wav"
+                //EngineLoopSound "common/null.wav"
+                DisableSmokestack 1 [$SIGSEGV]
+                SpawnTemplate "tank_sillyhat3"
+                OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+            }
+        }
+        WaveSpawn // Giant Gas Jar Pyro + Gregen medic
+        {
+            Name d2_1
+            WaitForAllSpawned d1_1
+            TotalCurrency 100
+            TotalCount 4
+            MaxActive 4
+            SpawnCount 2
+            Where spawnbot_left
+            WaitBeforeStarting 20
+            WaitBetweenSpawns 30
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Pyro
+                    Name "Abysmal Jar Unicorn"
+                    ClassIcon pyro_gascann_jarate
+                    WeaponRestrictions SecondaryOnly
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Pyro"
+                    Item "The Magical Mercenary"
+                    Item "The Maniac's Manacles"
+                    Item "Flavorful Baggies"
+                    Item "The Gas Passer"
+                    ItemAttributes
+                    {
+                        ItemName "tf_weapon_flamethrower"
+                        "airblast disabled" 1 // bozo attribute
+                    }
+                    ItemAttributes
+                    {
+                        ItemName "The Gas Passer"
+                        "mult_item_meter_charge_rate" 0.5
+                        "effect cond override" 1775739 // You know where this is going
+                    }
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Medic_Regen
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Name "Giant Regenerative Zombie"
+                    Item "The Surgeon's Stahlhelm"
+                    Tag bot_giant
+                }
+            }
+        }
+        WaveSpawn // Bowman
+        {
+            Name d2_2
+            WaitForAllSpawned d1_2
+            TotalCurrency 30
+            TotalCount 16
+            MaxActive 7
+            SpawnCount 3
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 14
+            WaitBetweenSpawns 6
+            TFBot
+            {
+                Template The_skeleton_gatebot_but_arrows
+            }
+        }
+        WaveSpawn // Bowman
+        {
+            Name d2_3
+            WaitForAllDead d2_2
+            TotalCurrency 45
+            TotalCount 16
+            MaxActive 7
+            SpawnCount 3
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 6
+            TFBot
+            {
+                Template T_TFBot_Sniper_Huntsman
+                Name "Skeleton Archer"
+                Scale 1.002
+                WeaponRestrictions PrimaryOnly
+                UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                DeathSound "misc/halloween/skeleton_break.wav"
+                Item "Larrikin Robin"
+                CharacterAttributes
+                {
+                    "voice pitch scale" 0
+                }
+            }
+        }
+        WaveSpawn // Blunderbuss Scout
+        {
+            Name d2_4
+            WaitForAllSpawned d1_2
+            TotalCurrency 125
+            TotalCount 12
+            MaxActive 3
+            SpawnCount 1
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 7
+            TFBot
+            {
+                Class Scout
+                ClassIcon scout_pop_armored
+                Skill Expert
+                Name "Blunderbuss Pirate Zombie"
+                Scale 1.4
+                Health 650
+                MaxVisionRange 500
+                //Attributes AlwaysCrit
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Scout"
+                Item "Speedy Scoundrel"
+                Item "The Pompous Privateer"
+                Item "The Soda Popper"
+                ItemAttributes
+                {
+                    ItemName "The Soda Popper"
+                    "fire full clip at once" 1
+                    "faster reload rate" 1.6 // 60% slower reload
+				    "damage bonus" 0.65		// 35% damage reduction
+                    "bullets per shot bonus" 1.5
+                }
+                CharacterAttributes
+				{
+				    "voice pitch scale" 0.8
+                    "move speed bonus" 0.9
+				}
+                Tag bot_giant
+            }
+        }
+        WaveSpawn // something about the trains, ummmmmmm...
+        {
+            WaitForAllDead d2_1
+            WaitBeforeStarting 6
+            FirstSpawnWarningSound "ambient/alarms/train_horn2.wav"
+        }
+        WaveSpawn // Oh wait here they are
+        {
+            Name d3_1
+            WaitForAllDead d2_1
+            TotalCurrency 300
+            TotalCount 5
+            MaxActive 5
+            SpawnCount 1
+            Where spawnbot_main
+            WaitBeforeStarting 12
+            WaitBetweenSpawns 3
+            FirstSpawnWarningSound "vo/mvm_tank_alerts09.mp3"
+            Tank
+            {
+                Health 5555
+                Speed 95
+                Name "another_silly_tank"
+                Skin 0
+                StartingPathTrackNode "path_tank_default"
+                IsMiniBoss 0
+                Scale 0.3
+                Pingsound "common/null.wav"
+                //EngineLoopSound "common/null.wav"
+                SpawnTemplate "tank_sillyhat3"
+                OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+            }
+        }
+        WaveSpawn // GBB soldier + Vac meds
+        {
+            Name d3_2
+            WaitForAllDead d2_1
+            TotalCurrency 75
+            TotalCount 12
+            MaxActive 6
+            SpawnCount 3
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 7
+            WaitBetweenSpawns 17
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Soldier_RocketShotgun
+                    Attributes AlwaysCrit
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Soldier"
+                    Item "Grub Grenades"
+                    Item "The Larval Lid"
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Class Medic
+                    ClassIcon medic_vac_duo_bb
+                    Skill Expert
+                    Name "Bullet Vaccinator Medic"
+                    ItemAttributes
+                    {
+                        ItemName "TF_WEAPON_MEDIGUN"
+                        "lunchbox adds minicrits" 3
+                        "medigun bullet resist deployed" 0.95
+                        "medigun bullet resist passive"  0.95
+                        "medigun charge is resists" 3
+                        "ubercharge rate bonus" 200
+                    }
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "The Ruffled Ruprecht"
+                    Item "Self-Care"
+                    Tag bot_squad_member // Might be needed?
+                }
+                TFBot
+                {
+                    Class Medic
+                    ClassIcon medic_vac_duo_bb
+                    Skill Expert
+                    Name "Blast Vaccinator Medic"
+                    ItemAttributes
+                    {
+                        ItemName "TF_WEAPON_MEDIGUN"
+                        "lunchbox adds minicrits" 3
+                        "medigun bullet resist deployed" 0.95
+                        "medigun bullet resist passive"  0.95
+                        "medigun charge is resists" 4
+                        "ubercharge rate bonus" 200
+                    }
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "The Ruffled Ruprecht"
+                    Item "Self-Care"
+                    Tag bot_squad_member // Might be needed?
+                }
+            }
+        }
+        WaveSpawn // Cluster Pirate Zombie
+        {
+            Name d3_3
+            WaitForAllSpawned d2_3
+            TotalCurrency 25
+            TotalCount 16
+            MaxActive 9
+            SpawnCount 4
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 7
+            TFBot
+            {
+                Class Demoman
+                ClassIcon demo_clusterbomb
+                Skill Expert
+                Name "Cluster Zombified Pirate"
+                Attributes HoldFireUntilFullReload
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Demo"
+                Item "The Buccaneer's Bicorne"
+                Item "Polly Putrid"
+                Item "Mann of the Seven Sees"
+                Item "The Iron Bomber"
+                ItemAttributes
+                {
+                    ItemName "The Iron Bomber"
+                    //"damage causes airblast" 1
+                    "fire rate bonus" 0.2
+                    "faster reload rate" 1.45
+                    "clip size upgrade atomic" 3
+				    "projectile spread angle penalty" 3
+                }
+                CharacterAttributes
+				{
+				    "voice pitch scale" 0.8
+				}
+            }
+        }
+        // Support
+        WaveSpawn // Hyper league Scout
+        {
+            WaitForAllSpawned d3_3
+            TotalCurrency 200
+            TotalCount 42
+            MaxActive 7
+            SpawnCount 2
+            Support 1
+            Where spawnbot_main
+            TFBot
+            {
+                Template T_TFBot_Scout_Sandman_FastCharge
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Scout"
+                //Item "MNC Mascot Outfit"
+                CharacterAttributes
+				{
+				    "voice pitch scale" 0.8
+				}
+            }
+        }
+        WaveSpawn // funni direct hit soldier
+        {
+            Name funni_directhit_soldier
+            TotalCount 4
+            MaxActive 2
+            SpawnCount 2
+            Support 1
+            Where spawnbot_main
+            WaitBeforeStarting 45
+            WaitBetweenSpawns 20
+            TFBot
+            {
+                Class Soldier
+                ClassIcon soldier_directhit_lite
+                Skill Hard
+                AimLeadProjectileSpeed 1 [$SIGSEGV]
+                Name "Direct Hit Soldier"
+                Item "The Direct Hit"
+                //Action Mobber
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Soldier"
+                Item "The Hellmet"
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+            }
+        }
+    }
+    Wave // Wave 5 Payout: $1400 Total: $5100 A+ $5200. I ran out of idea's what this theme wave is
+    {
+        CustomWaveNumber 5 [$SIGSEGV]
+		CustomMaxWaveNumber 6 [$SIGSEGV]
+        WaitWhenDone 65
+		Checkpoint Yes
+        StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+        InitWaveOutput
+        {
+            Target improved_lower_relay
+            Action Trigger
+        }
+        //DoneOutput
+        //{
+        //    Target wave_init_relay
+        //    Action Trigger
+        //}
+        WaveSpawn
+        {
+            WaitBeforeStarting 2
+            FirstSpawnWarningSound "vo/scout_domination06.mp3"
+        }
+        WaveSpawn // Gdemo with crits
+        {
+            Name e1_1
+            TotalCurrency 250
+            TotalCount 12
+            MaxActive 4
+            SpawnCount 1
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 4
+            WaitBetweenSpawns 7
+            TFBot
+            {
+                Template T_TFBot_Giant_Demoman
+                ClassIcon demo_spammer
+                Attributes AlwaysCrit
+                //Item "The Chargin' Targe"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Demo"
+                Item "The Boom Boxers"
+                Item "EOTL_demo_dynamite"
+                Item "Head Banger"
+                Tag bot_giant
+            }
+        }
+        WaveSpawn // Major league scout
+        {
+            Name e1_2
+            TotalCurrency 100
+            TotalCount 5
+            MaxActive 2
+            SpawnCount 1
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 3
+            WaitBetweenSpawns 14
+            TFBot
+            {
+                Template T_TFBot_Giant_Scout_Baseball
+                Item "MNC Mascot Outfit"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Scout"
+                Tag bot_giant
+                EventChangeAttributes
+				{
+					Default
+					{
+						Tag bot_gatebot 				// having these will cause bots to run towards gates
+						Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+						BehaviorModifiers push			// having these will cause bots to run towards gates
+						Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+	
+						Item "Batter's Helmet"
+						ItemAttributes
+						{
+							ItemName "Batter's Helmet"
+							"set item tint rgb" 15787660
+						}
+					}
+					RevertGateBotsBehavior
+					{
+						Item "Batter's Helmet"
+					}
+				}
+            }
+        }
+        WaveSpawn // Conch Soldier
+        {
+            Name e1_3
+            TotalCurrency 100
+            TotalCount 36
+            MaxActive 7
+            SpawnCount 3
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 6
+            RandomChoice
+            {
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Extended_Concheror
+                    Name "Honk Honk!"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Soldier"
+                    Item "The Man in Slacks"
+                    Item "The Shogun's Shoulder Guard"
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0.8
+                    }
+                    SpawnTemplate "gately_gibus_wearer"
+				    EventChangeAttributes
+				    {
+					    Default
+					    {
+						    Tag bot_gatebot 				// having these will cause bots to run towards gates
+						    Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+						    BehaviorModifiers push			// having these will cause bots to run towards gates
+						    Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+	
+						    Item "Ghostly Gibus"
+						    ItemAttributes
+						    {
+							    ItemName "Ghostly Gibus"
+							    "custom item model" "models/player/items/all_class/gately_gibus_heavy.mdl"
+							    "attachment name" "head"
+							    "attachment scale" "1.04"
+							    "attachment offset" "-2.2 0.45 -11.5"
+							    "attachment angles" "0 0 6"
+						    }
+					    }
+					    RevertGateBotsBehavior
+					    {
+						    Item "Ghostly Gibus"
+					    }
+				    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Extended_Concheror
+                    Name "Honk Honk!"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Soldier"
+                    Item "The Man in Slacks"
+                    Item "The Shogun's Shoulder Guard"
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0.8
+                    }
+                    SpawnTemplate "gately_gibus_wearer"
+				    EventChangeAttributes
+				    {
+					    Default
+					    {
+						    Tag bot_gatebot 				// having these will cause bots to run towards gates
+						    Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+						    BehaviorModifiers push			// having these will cause bots to run towards gates
+						    Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+	
+						    Item "Ghostly Gibus"
+						    ItemAttributes
+						    {
+							    ItemName "Ghostly Gibus"
+							    "custom item model" "models/player/items/all_class/gately_gibus_heavy.mdl"
+							    "attachment name" "head"
+							    "attachment scale" "1.04"
+							    "attachment offset" "-2.2 0.45 -11.5"
+							    "attachment angles" "0 0 6"
+						    }
+					    }
+					    RevertGateBotsBehavior
+					    {
+						    Item "Ghostly Gibus"
+					    }
+				    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Extended_Concheror
+                    Name "Honk Honk!"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Soldier"
+                    Item "The Caribbean Conqueror"
+                    Item "The Colonial Clogs"
+                    Item "The Brawling Buccaneer"
+                    CharacterAttributes
+                    {
+                        "voice pitch scale" 0.8
+                    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Extended_Concheror
+                    Scale 1.002
+                    UseHumanAnimations 1 [$SIGSEGV]
+                    Name "Doot!"
+                    SpawnTemplate "skeleton"
+                    RocketCustomModel "models/props_mvm/mvm_human_skull.mdl"
+                    UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                    DeathSound "misc/halloween/skeleton_break.wav"
+                    Item "The Caribbean Conqueror"
+                    Item "The Colonial Clogs"
+                    Item "The Brawling Buccaneer"
+                }
+            }
+        }
+        WaveSpawn // Gheavy + uber meds
+        {  
+            Name e2_1
+            WaitForAllDead e1_1
+            TotalCurrency 100
+            TotalCount 9
+            MaxActive 6
+            SpawnCount 3
+            Where spawnbot_chief
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 18
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Heavyweapons
+                    Name "Prettiest Princess"
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Heavy"
+                    Item "The Grand Duchess Tutu"
+				    Item "The Grand Duchess Fairy Wings"
+				    Item "The Grand Duchess Tiara"
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    Name "Uber Unicorn"
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "The Colonel's Coat"
+                    Item "The Magical Mercenary"
+                    Tag bot_squad_member // Might be needed?
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    Name "Uber Unicorn"
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "The Colonel's Coat"
+                    Item "The Magical Mercenary"
+                    Tag bot_squad_member // Might be needed?
+                }
+            }
+        }
+        WaveSpawn // scattered brain zombie
+        {
+            Name e2_2
+            WaitForAllSpawned e1_3
+            TotalCurrency 150
+            TotalCount 14
+            MaxActive 3
+            SpawnCount 1
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 7
+            WaitBetweenSpawns 8
+            TFBot
+            {
+                Class Demoman
+                ClassIcon demo_scatter
+                Name "Scattered Brain Zombie"
+                Skill Expert
+                Health 650
+                Scale 1.4
+                Attributes HoldFireUntilFullReload
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Demo"
+                Item "The Bomber Knight"
+				Item "The Bolted Bombardier"
+				Item "EOTL_demopants"
+                ItemAttributes
+			    {
+				    ItemName "TF_WEAPON_GRENADELAUNCHER"
+				    "clip size upgrade atomic" 11.0
+				    //"damage penalty" 0.3
+				    "fire rate bonus" 0.14
+				    "Projectile speed increased" 1.1 //1.35
+				    "projectile spread angle penalty" 7 //2.33
+				    "faster reload rate" 0.75 //0.3
+				    //"heal on hit for rapidfire" 3
+				    "fuse bonus" 2 //0.85
+			    }
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+                SpawnTemplate "gately_gibus_wearer"
+			    EventChangeAttributes
+			    {
+				    Default
+				    {
+					    BehaviorModifiers push			// having these will cause bots to run towards gates
+					    Attributes IgnoreFlag			// having these will cause bots to run towards gates
+					    Tag nav_prefer_gate1_flank 		// having these will cause bots to run towards gates
+					    Tag bot_gatebot 				// having these will cause bots to run towards gates
+                        Item "Ghostly Gibus"
+					    ItemModel
+					    {
+						    ItemName "Ghostly Gibus"
+						    Model "models/player/items/all_class/gately_gibus_heavy.mdl"
+					    }
+					    ItemAttributes
+					    {
+						    ItemName "Ghostly Gibus"
+						    "custom item model" "models/player/items/all_class/gately_gibus_heavy.mdl"
+						    "attachment name" "head"
+						    "attachment scale" "1.03"
+						    "attachment offset" "0.2 0.2 -11.2"
+						    "attachment angles" "-22 0 4"
+					    }
+				    }
+				    RevertGateBotsBehavior
+				    {
+                        Item "Ghostly Gibus"
+				    }
+			    }
+                Tag bot_giant
+            }
+        }
+        WaveSpawn // Rainbow bison Soldier
+        {
+            Name e2_3
+            WaitForAllSpawned e1_3
+            TotalCurrency 150
+            TotalCount 48
+            MaxActive 9
+            SpawnCount 3
+            Where spawnbot_main
+            WaitBeforeStarting 4
+            WaitBetweenSpawns 3
+            TFBot
+            {
+                Class Soldier
+                ClassIcon soldier_bison_rng // personal preference, Go fuck yourself Package
+                Name "Undead Rainbow Pony"
+                Skill Normal // Hard
+                WeaponRestrictions SecondaryOnly
+                Attributes AlwaysCrit
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Soldier"
+                Item "The Righteous Bison"
+                Item "The Magical Mercenary"
+                ItemAttributes
+                {
+                    ItemName "The Righteous Bison"
+                    "particle color rainbow" 420
+                }
+                CharacterAttributes
+                {
+                    "voice pitch scale" 0.8
+                }
+            }
+        }
+        WaveSpawn // GRapid soldier with Gkritz med
+        {
+            Name e3_1
+            WaitForAllDead e2_1
+            TotalCurrency 125
+            TotalCount 4
+            MaxActive 4
+            SpawnCount 2
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 12
+            WaitBetweenSpawns 20
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Soldier_Spammer
+                    Name "Annoying Duck Wizard"
+                    Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+                    RocketCustomModel "models/workshop/player/items/pyro/eotl_ducky/eotl_bonus_duck.mdl" [$SIGSEGV]
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Soldier"
+                    Item "The Spellbinder's Bonnet"
+                    Item "The All-Father"
+                    ItemAttributes
+                    {
+                        ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+                        "paintkit_proto_def_index" 302
+				        "set_item_texture_wear" 0
+                        //"custom projectile model" "models/workshop/player/items/pyro/eotl_ducky/eotl_bonus_duck.mdl"
+                        "custom weapon fire sound" "ambient/bumper_car_quack11.wav"
+                        "custom impact sound" "ambient/bumper_car_quack5.wav"
+                        "custom weapon reload sound" "ambient/bumper_car_quack3.wav"
+                        "projectile trail particle" "flamethrower_underwater"
+                        //"mult projectile scale" 2
+
+                        //"damage bonus" 1.5
+                        //"clip size upgrade atomic" 26.0
+				        "faster reload rate" -0.8
+				        "fire rate bonus" 0.5
+				        //"projectile spread angle penalty" 5
+                        "Projectile speed decreased" 0.65
+                    }
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Class Medic
+			        ClassIcon medic_kritz_giant
+                    Name "Mad Scientist"
+			        Health 4500
+			        Skill Expert
+			        Item "The Kritzkrieg"
+			        Item "The Trepanabotomizer"
+                    Item "The Lo-Grav Loafers"
+                    Item "The Surgeon's Space Suit"
+			        WeaponRestrictions SecondaryOnly
+			        Attributes MiniBoss
+			        Attributes SpawnWithFullCharge
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+			        ItemAttributes
+			        {
+				        ItemName "The Kritzkrieg"
+				        "ubercharge rate bonus" 201
+				        "uber duration bonus" 200
+			        }
+			        CharacterAttributes
+			        {
+                        "heal rate bonus" 200
+				        "move speed bonus"	0.5
+				        "damage force reduction" 0.6
+				        "airblast vulnerability multiplier" 0.6
+				        "bot medic uber health threshold" 7500
+			        }
+                    Tag bot_giant
+                }
+            }
+        }
+        WaveSpawn // Mafia heavy
+        {
+            Name e3_2
+            WaitForAllDead e2_1
+            TotalCurrency 175
+            TotalCount 16
+            MaxActive 8
+            SpawnCount 2
+            Where spawnbot_left
+            Where spawnbot_right
+            Randomspawn 1
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 3
+            TFBot
+            {
+                Class Heavyweapons
+                ClassIcon heavy_accurate_lite
+                Skill Easy
+                Name "Undead Mafia"
+                Item "tomislav"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Heavy"
+                Item "The Siberian Sophisticate"
+				Item "The Mann of the House"
+				Item "Capone's Capper"
+            }
+        }
+        // Support
+        WaveSpawn // Bunch of scouts
+        {
+            WaitForAllDead e2_2
+            TotalCurrency 100
+            TotalCount 28
+            MaxActive 5
+            SpawnCount 2
+            Support 1
+            Where spawnbot_main
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 6
+            TFBot
+            {
+                Class Scout
+                ClassIcon scout_blaster_nys
+                Skill Normal
+                Name "Blaster Zombie"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Scout"
+                Item "Baby Face's Blaster"
+                Item "The Flapjack"
+                Item "dec2014 CoPilot_2014"
+                ItemAttributes
+			    {
+				    ItemName "Baby Face's Blaster"
+				    "lose hype on take damage" 0
+				    "move speed penalty" 1
+				    //"boost on damage" 0
+			    }
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+            }
+        }
+        WaveSpawn // bunch of demo's
+        {
+            WaitForAllDead e2_2
+            TotalCurrency 150
+            TotalCount 50
+            MaxActive 4
+            SpawnCount 2
+            Support 1
+            Where spawnbot_main
+            WaitBeforeStarting 25
+            WaitBetweenSpawns 7
+            TFBot
+            {
+                Class Demoman
+                Skill Normal
+                UsehumanModel 2 [$SIGSEGV]
+                Item "EOTL_demopants"
+                Item "Explosive Mind"
+                Item "Zombie Demo"
+            }
+        }
+    }
+    Wave // Wave 6 Payout: $1500 Total: $6500 A+ $6600. Just a normal wave.
+    {
+        CustomWaveNumber 6 [$SIGSEGV]
+		CustomMaxWaveNumber 6 [$SIGSEGV]
+        WaitWhenDone 65
+		Checkpoint Yes
+        StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+        InitWaveOutput
+        {
+            Target improved_upper_relay
+            Action Trigger
+        }
+        //DoneOutput
+        //{
+        //    Target wave_init_relay
+        //    Action Trigger
+        //}
+        WaveSpawn // FaN Scouts
+        {
+            Name f1_1
+            TotalCurrency 150
+            TotalCount 4
+            MaxActive 4
+            SpawnCount 4
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 3
+            TFBot
+            {
+                Template T_TFGateBot_Giant_Scout_FAN
+                Tag bot_giant
+                DeathSound "mvm/sentrybuster/mvm_sentrybuster_explode.wav"
+            }
+        }
+        WaveSpawn
+        {
+            WaitForAllSpawned f1_2
+            FirstSpawnWarningSound "mvm/giant_heavy/giant_heavy_entrance.wav"
+        }
+        WaveSpawn // Overkill refrence
+        {
+            Name f1_2
+            TotalCurrency 100
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            Where spawnbot_chief
+            WaitBeforeStarting 5
+            FirstSpawnWarningSound "vo/mvm/norm/soldier_mvm_dominationengineer03.mp3" // Stolen from my cringe exp reverse
+			DoneWarningSound "vo/mvm/norm/soldier_mvm_paincrticialdeath01.mp3"
+            TFBot
+            {
+                Class Soldier
+                ClassIcon soldier_libertylauncher_giant
+                Skill Expert
+                Name "Sergeant Blastoff"
+                Health 38000
+                Attributes MiniBoss
+			    Attributes HoldFireUntilFullReload
+                Attributes UseBossHealthBar
+                Item "The Liberty Launcher"
+                Item "The Diplomat"
+			    Item "The Man in Slacks"
+                Item "The Mantreads"
+                ItemAttributes
+			    {
+				    ItemName "The Mantreads"
+				    "stomp player time" 0.25
+				    "stomp player damage" 12
+				    "stomp player force" 690
+			    }
+                CharacterAttributes
+			    {
+                    "rage giving scale" 0.2
+				    "move speed bonus"	0.5
+				    "override footstep sound set" 3
+				    "damage force reduction" 0.1
+				    "airblast vulnerability multiplier" 0.1
+				    "airblast vertical vulnerability multiplier" 0.1
+                    "increased jump height" 1.5
+			    }
+                DeathSound "mvm/sentrybuster/mvm_sentrybuster_explode.wav"
+                EventChangeAttributes
+			    {
+				    Default
+				    {
+					    BehaviorModifiers push			// having these will cause bots to run towards gates
+					    Attributes IgnoreFlag			// having these will cause bots to run towards gates
+					    Tag nav_prefer_gate1_flank 		// having these will cause bots to run towards gates
+					    Tag bot_gatebot 				// having these will cause bots to run towards gates
+					    Item "MvM GateBot Light Soldier"
+					    Tag bot_giant
+					    ItemAttributes
+					    {
+						    ItemName "The Liberty Launcher"
+                            "damage causes airblast" 1
+                            "apply z velocity on damage" 50
+                            "apply look velocity on damage" 50
+				            "damage bonus" 1.3
+				            "fire rate bonus" 0.2
+				            "clip size upgrade atomic" 8
+				            "faster reload rate" 0.6
+				            "Blast radius decreased" 1.2
+				            "projectile spread angle penalty" 4
+				            "Projectile speed increased" 0.65
+					    }
+				    }
+				    RevertGateBotsBehavior
+				    {
+                        Aimtrackinginterval 0 [$SIGSEGV]
+                        AimLeadProjectileSpeed 1 [$SIGSEGV]
+					    Item "MvM GateBot Light Soldier"
+					    ItemAttributes               // turn off light hat
+					    {
+						    ItemName "MvM GateBot Light Soldier"
+						    "item style override" 1
+					    }
+					    Tag bot_giant
+					    //Attributes AlwaysCrit
+					    ItemAttributes
+					    {
+						    ItemName "The Liberty Launcher"
+                            "damage causes airblast" 1
+                            "apply z velocity on damage" 50
+                            "apply look velocity on damage" 50
+                            "damage bonus" 1.6
+				            "fire rate bonus" 0.2
+				            "clip size upgrade atomic" 11
+				            "faster reload rate" 0.6
+				            "Blast radius decreased" 1.2
+				            "projectile spread angle penalty" 4
+				            "Projectile speed increased" 1.1
+					    }
+				    }
+			    }
+            }
+        }
+        WaveSpawn // Bunch of bozo's
+        {
+            Name f1_3
+            WaitForAllSpawned f1_2
+            TotalCurrency 45
+            TotalCount 28
+            MaxActive 8
+            SpawnCount 4
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 6
+            TFBot
+            {
+                Class Pyro
+                ClassIcon pyro_dragon_fury_swordstone
+                Skill Normal
+                Name "Furious Bozo Pyro"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Pyro"
+                Item "Nose Candy"
+                Item "Flavorful Baggies"
+                Item "Bozo's Bouffant"
+                Item "The Dragon's Fury"
+                MaxVisionRange 800
+                //Attributes AlwaysFireWeapon
+                ItemAttributes
+                {
+                    ItemName "The Dragon's Fury"
+                    "airblast disabled" 1
+                }
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+                SpawnTemplate "gately_gibus_wearer"
+				EventChangeAttributes
+				{
+					Default
+					{
+						Tag bot_gatebot 				// having these will cause bots to run towards gates
+						Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+						BehaviorModifiers push			// having these will cause bots to run towards gates
+						Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+
+						Item "Ghostly Gibus"
+						ItemAttributes
+						{
+							ItemName "Ghostly Gibus"
+							"custom item model" "models/player/items/all_class/gately_gibus_heavy.mdl"
+							"attachment name" "head"
+							"attachment scale" "0.95"
+							"attachment offset" "1 0.2 -9.8"
+							"attachment angles" "-42 0 3"
+						}
+					}
+					RevertGateBotsBehavior
+					{
+					    Item "Ghostly Gibus"
+					}
+				}
+            }
+        }
+        WaveSpawn // Bunch of buff soldiers
+        {
+            Name f1_6
+            WaitForAllSpawned f1_2
+            TotalCurrency 55
+            TotalCount 18
+            MaxActive 5
+            SpawnCount 2
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 4
+            TFBot
+            {
+                Template T_TFBot_Soldier_Extended_Buff_Banner
+                Skill Hard
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Soldier"
+                Item "Fancy Dress Uniform"
+                Item "The Man in Slacks"
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+                SpawnTemplate "gately_gibus_wearer"
+				EventChangeAttributes
+				{
+					Default
+					{
+						Tag bot_gatebot 				// having these will cause bots to run towards gates
+						Tag nav_prefer_gate1_flank		// having these will cause bots to run towards gates
+						BehaviorModifiers push			// having these will cause bots to run towards gates
+						Attributes IgnoreFlag 			// having these will cause bots to run towards gates
+	
+						Item "Ghostly Gibus"
+						ItemAttributes
+						{
+							ItemName "Ghostly Gibus"
+							"custom item model" "models/player/items/all_class/gately_gibus_heavy.mdl"
+							"attachment name" "head"
+							"attachment scale" "1.04"
+							"attachment offset" "-2.2 0.45 -11.5"
+							"attachment angles" "0 0 6"
+						}
+					}
+					RevertGateBotsBehavior
+					{
+						Item "Ghostly Gibus"
+					}
+				}
+            }
+        }
+        WaveSpawn // Gdeflector + Gmedic
+        {
+            Name f2_1
+            WaitForAllDead f1_2
+            TotalCurrency 100
+            TotalCount 4
+            MaxActive 4
+            SpawnCount 2
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 20
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Heavyweapons_Deflector
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Heavy"
+                    Item "The Mann of the House"
+                    Tag bot_giant
+                }
+                TFBot // NEEDS DRIP
+                {
+                    Template T_TFBot_Giant_Medic
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "Self-Care"
+                    Item "Derangement Garment"
+                    Tag bot_giant
+                }
+            }
+        }
+        WaveSpawn // Airblast Ape
+        {
+            Name f2_2
+            WaitForAllDead f1_2
+            TotalCurrency 169
+            TotalCount 12
+            MaxActive 4
+            SpawnCount 2
+            Where spawnbot_right
+            Where spawnbot_right
+            WaitBeforeStarting 4
+            WaitBetweenSpawns 12
+            RandomChoice
+            {
+                TFBot
+                {
+                    Class Pyro
+                    ClassIcon pyro_reflect_daan
+                    Skill Expert
+                    Name "Abysmal Airblast Ape"
+                    Scale 1.35
+                    Health 750
+                    //MaxVisionRange 500
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Pyro"
+                    Item "The Degreaser"
+				    Item "Traffic Cone"
+                    Item "Poopy Doe"
+                    ItemAttributes
+                    {
+                        ItemName "The Degreaser"
+                        "damage penalty" 0.65
+                        //"airblast pushback scale" 1.5
+                        "mult airblast refire time" 0.5
+                        //"deflection size multiplier" 1.5
+                    }
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Class Pyro
+                    ClassIcon pyro_reflect_daan
+                    Skill Expert
+                    Name "Abysmal Airblast Ape"
+                    Scale 1.35
+                    Health 750
+                    //MaxVisionRange 500
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Pyro"
+                    Item "The Degreaser"
+				    Item "Traffic Cone"
+                    Item "Poopy Doe"
+                    ItemAttributes
+                    {
+                        ItemName "The Degreaser"
+                        "damage penalty" 0.65
+                        //"airblast pushback scale" 1.5
+                        "mult airblast refire time" 0.5
+                        //"deflection size multiplier" 1.5
+                        "airblast_deflect_projectiles_disabled" 1 // CANNOT EVEN REFLECT PROJECTILES WHAT
+                    }
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    FireWeapon // Randomly airblast for no real reason
+                    {
+                        Delay 6
+                        Cooldown 3
+                        Repeats 666
+                        Duration 0.1
+                        Type "Secondary"
+                    }
+                    Tag bot_giant
+                }
+            }
+        }
+        WaveSpawn // Burst Demo
+        {
+            Name f2_3
+            WaitForAllSpawned f1_3
+            TotalCurrency 150
+            TotalCount 33
+            MaxActive 9
+            SpawnCount 3
+            Where spawnbot_main
+            WaitBeforeStarting 12
+            WaitBetweenSpawns 6
+            TFBot
+            {
+                //Template T_TFGateBot_Demo_Burst_Normal
+                Class Demoman
+			    Name "Burst Fire Demo"
+			    ClassIcon demo_burst
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Demo"
+                Item "EOTL_demopants"
+                CharacterAttributes
+                {
+                    "voice pitch scale" 0.8
+                }
+                SpawnTemplate "gately_gibus_wearer"
+			    EventChangeAttributes
+			    {
+				    Default
+				    {
+					    BehaviorModifiers push			// having these will cause bots to run towards gates
+					    Attributes IgnoreFlag			// having these will cause bots to run towards gates
+					    Tag nav_prefer_gate1_flank 		// having these will cause bots to run towards gates
+					    Tag bot_gatebot 				// having these will cause bots to run towards gates
+					    Skill Hard
+					    WeaponRestrictions PrimaryOnly
+					    Attributes HoldFireUntilFullReload
+					    ItemAttributes
+					    {
+						    ItemName "TF_WEAPON_GRENADELAUNCHER"
+						    "faster reload rate" 1.75
+						    "fire rate bonus" 0.05
+						    "clip size penalty" 0.5
+						    "projectile spread angle penalty" 3
+					    //	"Projectile speed increased"	1.1
+					    }
+                        Item "Ghostly Gibus"
+					    ItemModel
+					    {
+						    ItemName "Ghostly Gibus"
+						    Model "models/player/items/all_class/gately_gibus_heavy.mdl"
+					    }
+					    ItemAttributes
+					    {
+						    ItemName "Ghostly Gibus"
+						    "custom item model" "models/player/items/all_class/gately_gibus_heavy.mdl"
+						    "attachment name" "head"
+						    "attachment scale" "1.03"
+						    "attachment offset" "0.2 0.2 -11.2"
+						    "attachment angles" "-22 0 4"
+					    }
+				    }
+				    RevertGateBotsBehavior
+				    {
+                        Item "Ghostly Gibus"
+					    Skill Hard
+					    WeaponRestrictions PrimaryOnly
+					    Attributes HoldFireUntilFullReload
+					    ItemAttributes
+					    {
+						    ItemName "TF_WEAPON_GRENADELAUNCHER"
+						    "faster reload rate" 1.75
+						    "fire rate bonus" 0.05
+						    "clip size penalty" 0.5
+						    "projectile spread angle penalty" 3
+					    //	"Projectile speed increased"	1.1
+					    }
+				    }
+			    }
+            }
+        }
+        WaveSpawn // Funny subwave
+        {
+            Name f2_4
+            WaitForAllDead f2_1
+            TotalCurrency 131
+            TotalCount 16
+            MaxActive 16
+            SpawnCount 16
+            Where spawnbot_left
+            WaitBeforeStarting 7
+            TFBot
+            {
+                Template T_TFBot_Soldier_Extended_Battalion
+                Skill Expert
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Soldier"
+                Item "Full Metal Drill Hat"
+                Attributes AlwaysCrit
+                CharacterAttributes { "deploy time decreased" 0.5 }
+            }
+        }
+        WaveSpawn // Another funny subwave
+        {
+            Name f3_1
+            WaitForAllSpawned f2_4
+            TotalCurrency 250
+            TotalCount 10
+            MaxActive 10
+            SpawnCount 5
+            Where spawnbot_right
+            Where spawnbot_left
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 24
+            Squad
+            {
+                TFBot
+                {
+                    Class Soldier
+			        ClassIcon soldier_fire_burst
+			        Name "Giga Burst Ignite Soldier"
+			        Health 4200
+			        Skill Expert
+			        WeaponRestrictions PrimaryOnly
+			        Attributes MiniBoss
+			        Attributes HoldFireUntilFullReload
+                    Attributes AlwaysCrit
+                    Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+                    Item "The Diplomat"
+			        Item "The Man in Slacks"
+			        Item "Battle Bird"
+			        ItemAttributes 
+			        {
+				        ItemName "Battle Bird"
+                        "attach particle effect" 13
+				        "set item tint rgb" 1315860
+			        }
+			        ItemAttributes
+			        {
+				        ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+                        "paintkit_proto_def_index" 258
+				        "set_item_texture_wear" 0
+                        "attach particle effect" 704
+				        "damage bonus" 2
+				        "set damagetype ignite" 1
+				        "projectile trail particle" superrare_burning1
+				        "weapon burn dmg increased" 2
+				        "fire rate bonus" 0.2
+				        "clip size upgrade atomic" 5
+				        "faster reload rate" 0.4
+                        "Projectile speed increased" 0.9
+			        }
+			        CharacterAttributes
+			        {
+				        "move speed bonus"	0.5
+				        "damage force reduction" 0.4
+				        "airblast vulnerability multiplier" 0.4
+				        "override footstep sound set" 3
+			        }
+                    Tag bot_giant
+                    DeathSound "mvm/sentrybuster/mvm_sentrybuster_explode.wav"
+                }
+                TFBot // you're right, that is not an quick uber medic!
+                {
+                    Template T_TFBot_Medic
+                    ClassIcon medic_uber_armored_lite
+                    Scale 1.35
+                    Health 450
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "The Colonel's Coat"
+                    Item "The Magical Mercenary"
+                    Tag bot_squad_member // Might be needed?
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic
+                    ClassIcon medic_uber_armored_lite
+                    Scale 1.35
+                    Health 450
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Medic"
+                    Item "The Colonel's Coat"
+                    Item "The Magical Mercenary"
+                    Tag bot_squad_member // Might be needed?
+                }
+                TFBot
+                {
+                    Class Pyro
+                    ClassIcon pyro_reflect_daan
+                    Skill Expert
+                    Name "Abysmal Airblast Ape"
+                    Scale 1.35
+                    Health 750
+                    //MaxVisionRange 500
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Pyro"
+                    Item "The Degreaser"
+				    Item "Traffic Cone"
+                    Item "Poopy Doe"
+                    ItemAttributes
+                    {
+                        ItemName "The Degreaser"
+                        "damage penalty" 0.65
+                        //"airblast pushback scale" 1.5
+                        "mult airblast refire time" 0.5
+                        //"deflection size multiplier" 1.5
+                    }
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    Tag bot_giant
+                }
+                TFBot
+                {
+                    Class Pyro
+                    ClassIcon pyro_reflect_daan
+                    Skill Expert
+                    Name "Abysmal Airblast Ape"
+                    Scale 1.35
+                    Health 750
+                    //MaxVisionRange 500
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Pyro"
+                    Item "The Degreaser"
+				    Item "Traffic Cone"
+                    Item "Poopy Doe"
+                    ItemAttributes
+                    {
+                        ItemName "The Degreaser"
+                        "damage penalty" 0.65
+                        //"airblast pushback scale" 1.5
+                        "mult airblast refire time" 0.5
+                        //"deflection size multiplier" 1.5
+                        "airblast_deflect_projectiles_disabled" 1
+                    }
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                    FireWeapon // Randomly airblast for no real reason
+                    {
+                        Delay 6
+                        Cooldown 3
+                        Repeats 666
+                        Duration 0.1
+                        Type "Secondary"
+                    }
+                    Tag bot_giant
+                }
+            }
+        }
+        WaveSpawn // heater heavy
+        {
+            Name f3_2
+            WaitForAllSpawned f2_4
+            TotalCurrency 100
+            TotalCount 14
+            MaxActive 8
+            SpawnCount 4
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 8
+            TFBot
+            {
+                Class Heavyweapons
+                ClassIcon heavy_heater
+                Skill Normal
+                Name "Heater Heavy"
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Heavy"
+                Item "The Huo Long Heatmaker"
+                Item "Mad Mask"
+                Item "The Bunsen Brave"
+                CharacterAttributes
+                {
+                    "voice pitch scale" 0.8
+                }
+            }
+        }
+        // Support
+        WaveSpawn // Pyro
+        {
+            WaitForAllSpawned f2_4
+            TotalCurrency 150
+            TotalCount 999
+            MaxActive 6
+            SpawnCount 2
+            Support 1
+            Where spawnbot_upper
+            WaitBeforeStarting 7
+            WaitBetweenSpawns 6
+            TFBot
+            {
+                Class Pyro
+                Skill Hard
+                Name "Submerged Zombie"
+                Attributes AlwaysCrit
+                UseCustomModel "models/player/pyro.mdl"
+                Skin 5
+                Item "Zombie Pyro"
+                Item "The Spectralnaut"
+                Item "The Space Diver"
+                ItemAttributes
+                {
+                    ItemName "tf_weapon_flamethrower"
+                    "airblast disabled" 1
+                }
+                CharacterAttributes
+				{
+				    "voice pitch scale" 0.8
+				}
+            }
+        }
+        WaveSpawn // Direct hit Soldier
+        {
+            WaitForAllSpawned f2_4
+            TotalCurrency 100
+            TotalCount 999
+            MaxActive 5
+            SpawnCount 2
+            Support 1
+            Where spawnbot_main
+            WaitBeforeStarting 12
+            WaitBetweenSpawns 15
+            TFBot
+            {
+                Class Soldier
+                ClassIcon soldier_directhit_lite
+                Skill Hard
+                AimLeadProjectileSpeed 1 [$SIGSEGV]
+                Name "Direct Hit Soldier"
+                Item "The Direct Hit"
+                //Action Mobber
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Soldier"
+                Item "The Hellmet"
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+            }
+        }
+    }
+    Wave // Wave 7 Payout: $11869 Total: $8000 A+ $8100. A joker + sweet tooth wave. Gate cannot be captured
+    {
+        CustomWaveNumber 404 [$SIGSEGV]
+		CustomMaxWaveNumber 0 [$SIGSEGV]
+        WaitWhenDone 65
+		Checkpoint Yes
+        StartWaveOutput
+		{
+			Target wave_start_relay_notimer
+			Action Trigger
+		}
+        InitWaveOutput
+        {
+            Target improved_upper_relay
+            Action Trigger
+        }
+        //DoneOutput
+        //{
+        //    Target wave_init_relay
+        //    Action Trigger
+        //}
+        Explanation
+		{
+			Line "{red}3rR04 D3tEc73d!!!"
+            Line "{red}W4v3 ??? N0t f0UnD!11"
+            Line "{red}tErM1n4tIn9 M1s2iOn FFFFF4Aaaii1!i11lle3Eddd11!!!!"
+		}
+        WaveSpawn // Bomb trololololo
+        {
+            Name g1_1
+            TotalCurrency 0
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            Support limited
+            Where bombhatch
+            FirstSpawnMessage "{red}Bomb is at the Hatch!"
+            //FirstSpawnWarningSound "vo/mvm_bomb_alerts04.mp3"
+            RandomChoice { RandomChoice { TFBot { Class Scout Name "Bomb is at the hatch!" CharacterAttributes { "is suicide counter" 999 "move speed bonus" 0.001 } } } }
+        }
+        WaveSpawn // Then like 12 super scouts
+        {
+            Name g1_2
+            TotalCurrency 200
+            TotalCount 12
+            MaxActive 5
+            SpawnCount 1
+            Where spawnbot_left
+            Where spawnbot_right
+            WaitBeforeStarting 3
+            WaitBetweenSpawns 2
+            TFBot
+            {
+                Template T_TFBot_Giant_Scout_Fast 
+                AlwaysGlow 1
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Zombie Scout"
+                Item "Nugget Noggin"
+				Item "Fowl Fists"
+				//Item "Talon Trotters"
+            }
+        }
+        WaveSpawn // the Joker himself
+        {
+            Name g2_1
+            WaitForAllDead g1_2
+            TotalCurrency 10000 // Joker is rich and you steal his money
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            Where spawnbot_right
+            WaitBeforeStarting 3
+            FirstSpawnOutput
+            {
+                Target joker_entrance
+                Action Trigger
+            }
+            TFBot
+            {
+                AlwaysGlow 1
+                Action FetchFlag [$SIGSEGV]
+                Class Spy
+                ClassIcon spy_revolver_hyper
+                Name "The Joker"
+                Skill Expert
+                Health 42000
+                WeaponRestrictions PrimaryOnly
+                Attributes MiniBoss
+                Attributes UseBossHealthBar
+                ExtAttr SuppressCanteenUse
+                UseCustomModel "models/player/vatican/joker/spy.mdl"
+                UseHumanAnimations 1 [$SIGSEGV]
+                //Item "The Enforcer"
+                Item "Upgradeable TF_WEAPON_REVOLVER"
+                Item "Default Power Up Canteen (MvM)"
+				ItemAttributes
+				{
+					ItemName "Default Power Up Canteen (MvM)"
+                    "is invisible" 1
+					"critboost" 3
+					"powerup duration" 5
+                	"powerup charges" 3
+                    //"powerup max charges" 99
+				}
+                ItemAttributes
+                {
+                    //ItemName "The Enforcer"
+                    ItemName "Upgradeable TF_WEAPON_REVOLVER"
+                    "paintkit_proto_def_index" 202
+				    "set_item_texture_wear" 0
+                    "damage bonus" 4
+                    "clip size bonus" 3
+                    "fire rate bonus" 0.65
+                    //"spread penalty" 2 // Fuck this nerf, basically hits nothing
+                    "reload time increased" 2.5
+                    "projectile penetration" 1
+                    "fire rate bonus with reduced health" 0.2
+                }
+                CharacterAttributes
+			    {
+                    "voice pitch scale" 0
+                    "cannot disguise" 1
+				    "move speed bonus"	0.32
+				    "damage force reduction" 0.001
+				    "airblast vulnerability multiplier" 0.001
+				    "override footstep sound set" 7
+                    "rage giving scale" 0.1
+                    "health regen" 15
+			    }
+                FireWeapon
+				{
+					IfHealthBelow 30000
+					Delay 1
+                	Repeats 1
+					IfSeeTarget 1
+                	Duration 0.1
+					Type "Action"
+				}
+                FireWeapon
+				{
+					IfHealthBelow 19000
+					Delay 1
+                	Repeats 1
+					IfSeeTarget 1
+                	Duration 0.1
+					Type "Action"
+				}
+                FireWeapon
+				{
+					IfHealthBelow 8000
+					Delay 1
+                	Repeats 1
+					IfSeeTarget 1
+                	Duration 0.1
+					Type "Action"
+				}
+            }
+        }
+        WaveSpawn // Some discount Sweet tooth
+        {
+            Name g2_1
+            WaitForAllDead g1_2
+            TotalCurrency 169
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            Where spawnbot_left
+            WaitBeforeStarting 5
+            TFBot
+            {
+                AlwaysGlow 1
+                Class Pyro
+                ClassIcon pyro_hyper_lite
+                Name "The Sweet Tooth"
+                Skill Expert
+                Health 46000
+                Attributes MiniBoss
+                Attributes UseBossHealthBar
+                UseHumanAnimations 1 [$SIGSEGV]
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Flavorful Baggies"
+                Item "Burly Beast"
+                Item "The Fire Tooth"
+                ItemAttributes
+                {
+                    ItemName "The Fire Tooth"
+                    "attach particle effect" 13
+                }
+                CharacterAttributes
+			    {
+				    "move speed bonus"	0.32
+				    "damage force reduction" 0.001
+				    "airblast vulnerability multiplier" 0.001
+				    "override footstep sound set" 6
+                    "rage giving scale" 0.1
+                    "health regen" 20
+			    }
+                ChangeAttributes [$SIGSEGV]  
+                {
+                    Delay 0
+                    Repeats 1
+                    IfHealthBelow 46001
+                    Name "phase1"
+                }
+                ChangeAttributes [$SIGSEGV]  
+                {
+                    Delay 0
+                    Repeats 1
+                    IfHealthBelow 34001
+                    Name "phase2"
+                }
+                ChangeAttributes [$SIGSEGV]  
+                {
+                    Delay 0
+                    Repeats 1
+                    IfHealthBelow 22001
+                    Name "phase3"
+                }
+                EventChangeAttributes [$SIGSEGV]
+                {
+                    phase1 // Kinda regular ish
+                    {
+                        Item "The Axtinguisher"
+                        WeaponRestrictions PrimaryOnly
+                        ItemAttributes
+                        {  
+                            ItemName "tf_weapon_flamethrower"
+                            "custom item model" "models/weapons/c_models/c_axtinguisher/c_axtinguisher_pyro.mdl"
+                            "airblast disabled" 1
+                            "damage bonus" 2
+                        }
+                        ItemAttributes
+                        {
+                            ItemName "The Axtinguisher"
+                            "is_passive_weapon" 1
+                            "damage bonus" 2
+                        }
+                    }
+                    phase2 // Torpedo like rockets
+                    {
+                        Item "tf_weapon_rocketlauncher"
+                        Item "The Flare Gun"
+                        Item "The Third Degree"
+                        WeaponRestrictions PrimaryOnly
+                        ItemAttributes // Torpedo Rocket?
+					    {
+						    ItemName "tf_weapon_rocketlauncher"
+						    "custom item model" "models/weapons/c_models/c_flaregun_pyro/c_flaregun_pyro.mdl"
+                            "damage bonus" 1.5
+                            "reload full clip at once" 1
+                            "fire rate bonus" 0.001
+                            "clip size upgrade atomic" 7
+						    "reload time increased" 6
+						    "Blast radius increased" 1.5
+						    "clip size penalty" 0.75
+						    "projectile spread angle penalty" 13
+						    "projectile speed decreased" 0.1
+						    "projectile acceleration" 1650
+						    "projectile acceleration start time" 1.5
+						    "projectile acceleration time" 0.75
+						    //"custom kill icon" "tf_projectile_rocket" //?
+					    }
+                        ItemAttributes
+			            {
+				            ItemName "The Flare Gun"
+                            "is_passive_weapon" 1
+				            "set damagetype ignite" 1
+				            "projectile speed increased" 0.25
+				            "mod projectile heat seek power" 60
+                            "mod projectile heat aim time" 10
+                            "projectile spread angle penalty" 50
+                            "mult projectile count" 3
+				            "fire rate bonus" 0.5
+				            "damage bonus" 1.5
+				            "override projectile type" 2
+                            "projectile no deflect" 1
+				            "projectile trail particle"	"spell_fireball_small_red"
+				            "custom projectile model" "models/weapons/w_models/w_drg_ball.mdl"
+				            "custom kill icon" "spellbook_fireball"
+                        }
+                    }
+                    phase3 // Flare wall idk
+                    {
+                        Item "The Dragon's Fury"
+                        Item "The Flare Gun"
+                        Item "The Third Degree"
+                        WeaponRestrictions SecondaryOnly
+                        ItemAttributes
+                        {  
+                            ItemName "The Dragon's Fury"
+                            "is_passive_weapon" 1
+						    "is invisible" 1
+                            "airblast disabled" 1
+                            "damage bonus" 1.5
+                            "item_meter_charge_rate" 0.75
+                        }
+                        ItemAttributes // Like wall of flares
+                        {
+                            ItemName "The Flare Gun"
+                            "custom item model" "models/weapons/c_models/c_flameball/c_flameball.mdl"
+                            "reload time increased" 3
+                            "mult projectile count" 13
+                            "damage bonus" 1.25
+                            "Projectile speed increased" 0.4
+				            "projectile spread angle penalty" 7
+                        }
+                    }
+                }
+            }
+        }
+        // Support
+        WaveSpawn // Buster
+        {
+            WaitForAllSpawned g2_1
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            Support 1
+            Where spawnbot_main
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 25
+            TFBot { Template The_Funny_Buster_Bot Action SuicideBomber UseBusterModel 1 [$SIGSEGV] }
+        }
+        WaveSpawn // Jacked up pyro
+        {
+            WaitForAllSpawned g2_1
+            TotalCurrency 250
+            TotalCount 250
+            MaxActive 5
+            SpawnCount 2
+            Support 1
+            Where spawnbot_main
+            WaitBeforeStarting 20
+            WaitBetweenSpawns 8
+            TFBot
+            {
+                Action Mobber [$SIGSEGV]
+                Class Pyro
+                ClassIcon pyro_homewrecker_lite_armored
+                Name "Jacked Up Pyro"
+                Skill Expert
+                WeaponRestrictions MeleeOnly
+                Attributes AlwaysCrit
+                scale 1.35
+                Health 750
+                UsehumanModel 2 [$SIGSEGV]
+                Item "Flavorful Baggies"
+                Item "Burly Beast"
+                Item "The Fire Tooth"
+                Item "The Homewrecker"
+                CharacterAttributes
+				{
+					"voice pitch scale" 0.8
+				}
+            }
+        }
+        WaveSpawn // Skeleton Archer
+        {
+            WaitForAllSpawned g2_1
+            TotalCurrency 250
+            TotalCount 250
+            MaxActive 7
+            SpawnCount 3
+            Support 1
+            Where spawnbot_main
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 5
+            TFBot
+            {
+                Action Mobber [$SIGSEGV]
+                SpawnTemplate "skeleton"
+                Template T_TFBot_Sniper_Huntsman
+                ClassIcon sniper_bow_penetrator
+                Name "Skeleton Archer"
+                Scale 1.002
+                UseCustomModel "models/bots/skeleton_sniper/skeleton_sniper.mdl"
+                DeathSound "misc/halloween/skeleton_break.wav"
+                Item "Larrikin Robin"
+                ItemAttributes
+                {
+                    ItemName "The Huntsman"
+                    "projectile penetration" 1
+                }
+                CharacterAttributes
+				{
+				    "voice pitch scale" 0
+				}
+            }
+        }
+        WaveSpawn // Fireball pyro + df pyro
+        {
+            WaitForAllSpawned g2_1
+            TotalCurrency 1000
+            TotalCount 500
+            MaxActive 8
+            SpawnCount 2
+            Support 1
+            Where spawnbot_main
+            WaitBeforeStarting 7
+            WaitBetweenSpawns 3
+            RandomChoice
+            {
+                TFBot
+                {
+                    Action Mobber [$SIGSEGV]
+                    Class Pyro
+                    ClassIcon pyro_dragon_fury_swordstone
+                    Skill Hard
+                    Name "Furious Bozo Pyro"
+                    MaxVisionRange 800
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Pyro"
+                    //Item "Nose Candy"
+                    Item "Flavorful Baggies"
+                    Item "Bozo's Bouffant"
+                    Item "Pestering Jester"
+                    Item "The Dragon's Fury"
+                    ItemAttributes
+                    {
+                        ItemName "The Dragon's Fury"
+                        "airblast disabled" 1
+                    }
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                }
+                TFBot
+                {
+                    Action Mobber [$SIGSEGV]
+                    Class Pyro
+                    ClassIcon pyro_dragon_fury_swordstone
+                    Skill Hard
+                    Name "Furious Bozo Pyro"
+                    MaxVisionRange 800
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Pyro"
+                    //Item "Nose Candy"
+                    Item "Flavorful Baggies"
+                    Item "Bozo's Bouffant"
+                    Item "Pestering Jester"
+                    Item "The Dragon's Fury"
+                    ItemAttributes
+                    {
+                        ItemName "The Dragon's Fury"
+                        "airblast disabled" 1
+                    }
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                }
+                TFBot
+                {
+                    Action Mobber [$SIGSEGV]
+                    Class Pyro
+                    ClassIcon pyro_dragon_fury_swordstone
+                    Skill Hard
+                    Name "Furious Bozo Pyro"
+                    MaxVisionRange 800
+                    UsehumanModel 2 [$SIGSEGV]
+                    Item "Zombie Pyro"
+                    //Item "Nose Candy"
+                    Item "Flavorful Baggies"
+                    Item "Bozo's Bouffant"
+                    Item "Pestering Jester"
+                    Item "The Dragon's Fury"
+                    ItemAttributes
+                    {
+                        ItemName "The Dragon's Fury"
+                        "airblast disabled" 1
+                    }
+                    CharacterAttributes
+				    {
+					    "voice pitch scale" 0.8
+				    }
+                }
+                TFBot
+                {
+                    Action Mobber [$SIGSEGV]
+                    Class Pyro
+                    ClassIcon pyro_dragon_fury_swordstone
+			        Name "Fireball Wizard"
+			        Skill Expert
+			        Item "The Flare Gun"
+                    Item "The Seared Sorcerer"
+                    Item "The Hot Case"
+			        WeaponRestrictions SecondaryOnly
+			        ItemAttributes
+			        {
+				        ItemName "The Flare Gun"
+				        "set damagetype ignite" 1
+				        "projectile speed increased" 0.4
+				        "damage bonus" 1.5
+				        "override projectile type" 2
+				        "projectile trail particle"	"spell_fireball_small_red"
+				        "custom projectile model" "models/weapons/w_models/w_drg_ball.mdl"
+				        "custom kill icon" "spellbook_fireball"
+			        }
+                }
+                TFBot
+                {
+                    Action Mobber [$SIGSEGV]
+                    Class Pyro
+                    ClassIcon pyro_dragon_fury_swordstone
+			        Name "Fireball Wizard"
+			        Skill Expert
+			        Item "The Flare Gun"
+                    Item "The Seared Sorcerer"
+                    Item "The Hot Case"
+			        WeaponRestrictions SecondaryOnly
+			        ItemAttributes
+			        {
+				        ItemName "The Flare Gun"
+				        "set damagetype ignite" 1
+				        "projectile speed increased" 0.4
+				        "damage bonus" 1.5
+				        "override projectile type" 2
+				        "projectile trail particle"	"spell_fireball_small_red"
+				        "custom projectile model" "models/weapons/w_models/w_drg_ball.mdl"
+				        "custom kill icon" "spellbook_fireball"
+			        }
+                }
+            }
+        }
+    }
+}

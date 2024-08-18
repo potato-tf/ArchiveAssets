@@ -1387,6 +1387,47 @@ WaveSchedule
 
 	Wave // WAVE 5 - 700$
 	{
+		InitWaveOutput
+		{	// Hack to get Bushido squads to leave spawn promptly.
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				::OutdatedProcessing <- {
+					ThinkingBots = []
+
+					function AddBlindThink() {
+						if (!self.HasBotTag(`blindme`)) return
+						self.RemoveBotTag(`blindme`)
+
+						OutdatedProcessing.ThinkingBots.push(self)
+						self.AddBotAttribute(Constants.FTFBotAttributeType.IGNORE_ENEMIES)
+
+						this.BlindMe <- function() {
+							if (self.InCond(Constants.ETFCond.TF_COND_INVULNERABLE_HIDE_UNLESS_DAMAGED)) return -1
+							self.RemoveBotAttribute(Constants.FTFBotAttributeType.IGNORE_ENEMIES)
+							self.FlagForUpdate(true)
+							AddThinkToEnt(self, null)
+							NetProps.SetPropString(self, `m_iszScriptThinkFunction`, ``)
+						}
+						AddThinkToEnt(self, `BlindMe`)
+					}
+
+					function OnGameEvent_teamplay_round_start(_) {
+						foreach (bot in ThinkingBots) AddThinkToEnt(bot, null)
+						delete ::OutdatedProcessing
+					}
+
+					function OnGameEvent_player_spawn(params) {
+						local bot = GetPlayerFromUserID(params.userid)
+						if (!bot.IsBotOfType(Constants.EBotType.TF_BOT_TYPE)) return
+
+						bot.ValidateScriptScope()
+						EntFireByHandle(bot, `RunScriptCode`, `OutdatedProcessing.AddBlindThink.call(this)`, 0.2, null, null)
+					}
+				}
+				__CollectGameEventCallbacks(OutdatedProcessing)
+			"
+		}
 		StartWaveOutput
 		{
 			Target wave_start_relay
@@ -1414,6 +1455,7 @@ WaveSchedule
 				TFBot
 				{
 					Template T_TFBot_Giant_Soldier_Bushido
+					Tag blindme
 				}
 				TFBot
 				{
@@ -1424,16 +1466,19 @@ WaveSchedule
 					ItemAttributes
 					{
 						ItemName "The Concheror"
-						"deploy time increased" 1.01
+						"deploy time decreased" 0.01
 					}
+					Tag blindme
 				}
 				TFBot
 				{
 					Template T_TFBot_Soldier_Concheror_Samurai
+					Tag blindme
 				}
 				TFBot
 				{
 					Template T_TFBot_Soldier_Concheror_Samurai
+					Tag blindme
 				}
 			}
 		}
