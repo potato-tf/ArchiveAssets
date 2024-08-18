@@ -81,6 +81,13 @@ __potato.MapFixes.Events <- {
                 NetProps.SetPropInt(vis, "m_nRenderMode", Constants.ERenderMode.kRenderTransColor)
             break
 
+        // Madhattan RC5A
+        // - Fix the forward upgrade station breaking on wave fail.
+        case "mvm_madhattan_rc5a":
+            EntityOutputs.AddOutput(Entities.FindByName(null, "bots_win"),
+                "OnRoundWin", "open_upgrade_relay", "Trigger", "", -1, 1)
+            break
+
         // Oilrig RC5A
         // - Replaces missing rain particles that were not packed with the map.
         // - Fixes the tank spawn not being setup as a bot spawn.
