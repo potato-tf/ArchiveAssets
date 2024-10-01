@@ -48,7 +48,9 @@ function __potato::GetPreservedEnts() {
 }
 
 // You can run script code after entities first spawn with this pattern.
-EntFireByHandle(::__potato.hWorldspawn, "RunScriptCode", "::__potato.GetPreservedEnts()", -1, null, null)
+EntFireByHandle(::__potato.hWorldspawn,
+	"RunScriptCode", "::__potato.GetPreservedEnts()"
+, -1, null, null)
 
 // The modules here can be found in the "vscripts/potato" folder.
 // They are not dependent on each other.

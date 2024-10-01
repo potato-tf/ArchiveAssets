@@ -1,4 +1,4 @@
-__potato.NameFormatter <- {
+::__potato.NameFormatter <- {
     // Format name delays (in seconds)
     InitialFormatDelay = 1.0    // Before checking if the mission has a custom name
     PluginReloadDelay = 10.0    // Before the mission is reloaded on completion
@@ -41,7 +41,7 @@ __potato.NameFormatter <- {
 
     /**
      * Tests if a mission name appears to be a population file path.
-     * 
+     *
      * @return bool         True if appears to be a popfile path.
      */
     function IsPopPath(name)
@@ -55,7 +55,7 @@ __potato.NameFormatter <- {
      *
      * @return bool         True if the mission name has been modified.
      */
-    
+
     _FakeMissionName = null  // Mission name fake prop, internal use for this function.
     function IsNameModified() {
         if (IsSigmod) {
@@ -64,8 +64,8 @@ __potato.NameFormatter <- {
             //  Note that there is no $GetClientProp input in sigmod.
             popscript.AcceptInput("$ExecuteScript", @"
                 local objres = ents.FindByClass(""tf_objective_resource"")
-                objres:AcceptInput(""RunScriptCode"", 
-                    string.format(""__potato.NameFormatter._FakeMissionName = `%s`"", 
+                objres:AcceptInput(""RunScriptCode"",
+                    string.format(""::__potato.NameFormatter._FakeMissionName = `%s`"",
                      objres:GetFakeSendProp(""m_iszMvMPopfileName"")))
             ", null, null)
 
@@ -77,8 +77,8 @@ __potato.NameFormatter <- {
             }
         }
 
-        if (IsPopPath(NetProps.GetPropString(objres, "m_iszMvMPopfileName"))) {
-            CustomMissionName = NetProps.GetPropString(objres, "m_iszMvMPopfileName")
+        if (IsPopPath(NetProps.GetPropString(hObjRes, "m_iszMvMPopfileName"))) {
+            CustomMissionName = NetProps.GetPropString(hObjRes, "m_iszMvMPopfileName")
             return true
         }
 
@@ -95,10 +95,10 @@ __potato.NameFormatter <- {
     function SetMissionName(name) {
         if (name == null) return
         if (IsSigmod == true) {
-            objres.AcceptInput("$SetClientProp$m_iszMvMPopfileName", name, null, null)
+            hObjRes.AcceptInput("$SetClientProp$m_iszMvMPopfileName", name, null, null)
             return
         }
-        NetProps.SetPropString(objres, "m_iszMvMPopfileName", name)
+        NetProps.SetPropString(hObjRes, "m_iszMvMPopfileName", name)
     }
 
     /**
@@ -112,13 +112,13 @@ __potato.NameFormatter <- {
     function FormatMissionName(popname, end = false) {
         // Return null if we're on a 'normal' pop ("mvm_bigrock.pop"), as there
         //  is no mission name to format.
-        if (popname.slice(19 + len_mapname, 20 + len_mapname) != "_") return null
+        if (popname.slice(19 + MapName_len, 20 + MapName_len) != "_") return null
 
         // From filepath:
         //  "scripts/population/mvm_condemned_b3_adv_unholy_undead.pop"
         // Get phrases:
         //  ["adv", "unholy", "undead"]
-        local strings = split(popname.slice(20 + len_mapname, -4), "_")
+        local strings = split(popname.slice(20 + MapName_len, -4), "_")
 
         // Return null if we're probably on a Valve mission.
         if (strings.len() == 1 && ValvePops.find(strings[0]) != null) return null
@@ -164,11 +164,11 @@ __potato.NameFormatter <- {
 
             // We delay checking the mission display name so that mission makers may set their
             //  own as desired within this window.
-            EntFireByHandle(objres, "RunScriptCode", format(@"
-                if (!__potato.NameFormatter.IsNameModified())
-                    __potato.NameFormatter.SetMissionName(
-                        __potato.NameFormatter.FormatMissionName(`%s`))",
-              NetProps.GetPropString(objres, "m_iszMvMPopfileName")),
+            EntFireByHandle(hObjRes, "RunScriptCode", format(@"
+                if (!::__potato.NameFormatter.IsNameModified())
+                    ::__potato.NameFormatter.SetMissionName(
+                        ::__potato.NameFormatter.FormatMissionName(`%s`))",
+              NetProps.GetPropString(hObjRes, "m_iszMvMPopfileName")),
             InitialFormatDelay, null, null)
         }
 
@@ -179,12 +179,12 @@ __potato.NameFormatter <- {
             // Set the mission name without "(Difficulty)" before the loss summary panel shows.
             // We don't do this if the mission maker has used SetPropString since we will have
             //  no guaranteed way of knowing the original popfile name.
-            if (!IsPopPath(NetProps.GetPropString(objres, "m_iszMvMPopfileName"))) {
-                EntFireByHandle(objres, "RunScriptCode", format(@"
-                if (__potato.NameFormatter.InHumiliation)
-                    __potato.NameFormatter.SetMissionName(
-                        __potato.NameFormatter.FormatMissionName(`%s`, true))",
-                    NetProps.GetPropString(objres, "m_iszMvMPopfileName"), true),
+            if (!IsPopPath(NetProps.GetPropString(hObjRes, "m_iszMvMPopfileName"))) {
+                EntFireByHandle(hObjRes, "RunScriptCode", format(@"
+                if (::__potato.NameFormatter.InHumiliation)
+                    ::__potato.NameFormatter.SetMissionName(
+                        ::__potato.NameFormatter.FormatMissionName(`%s`, true))",
+                    NetProps.GetPropString(hObjRes, "m_iszMvMPopfileName"), true),
                 // Advance fire by 1s to account for client latency.
                 HumiliationTime - 1.0, null, null)
             }
@@ -200,32 +200,32 @@ __potato.NameFormatter <- {
             //  which makes the IsNameModified() test useless if it is ran after that block.
             if (IsNameModified())
                 // Set name back to mission maker's name once panel has been displayed
-                EntFireByHandle(objres, "RunScriptCode", format(@"
-                    if (__potato.NameFormatter.InVictory)
-                        __potato.NameFormatter.SetMissionName(`%s`)", CustomMissionName),
+                EntFireByHandle(hObjRes, "RunScriptCode", format(@"
+                    if (::__potato.NameFormatter.InVictory)
+                        ::__potato.NameFormatter.SetMissionName(`%s`)", CustomMissionName),
                 WinPanelDelay + 2.0, null, null)
             else
                 // Set name back to regular formatted name once victory panel has been displayed
-                EntFireByHandle(objres, "RunScriptCode", format(@"
-                    if (__potato.NameFormatter.InVictory)
-                        __potato.NameFormatter.SetMissionName(
-                            __potato.NameFormatter.FormatMissionName(`%s`))", params.mission),
+                EntFireByHandle(hObjRes, "RunScriptCode", format(@"
+                    if (::__potato.NameFormatter.InVictory)
+                        ::__potato.NameFormatter.SetMissionName(
+                            ::__potato.NameFormatter.FormatMissionName(`%s`))", params.mission),
                 WinPanelDelay + 2.0, null, null)
             // Give a 2s delay because if the client holds the scoreboard open, this may
             //  not apply for them; I'm tempted to not reset it at all for this reason.
 
             // Set mission name without difficulty before victory panel shows
-            objres.AcceptInput("RunScriptCode", format(@"
-                if (__potato.NameFormatter.InVictory)
-                    __potato.NameFormatter.SetMissionName(
-                        __potato.NameFormatter.FormatMissionName(`%s`, true))", params.mission),
+            hObjRes.AcceptInput("RunScriptCode", format(@"
+                if (::__potato.NameFormatter.InVictory)
+                    ::__potato.NameFormatter.SetMissionName(
+                        ::__potato.NameFormatter.FormatMissionName(`%s`, true))", params.mission),
             null, null)
             // Set name immediately to account for client latency.
 
             // Reset mission name before the popfile is reloaded by plugin
-            EntFireByHandle(objres, "RunScriptCode", format(@"
-                if (__potato.NameFormatter.InVictory)
-                    NetProps.SetPropString(__potato.NameFormatter.objres, `m_iszMvMPopfileName`, `%s`)
+            EntFireByHandle(hObjRes, "RunScriptCode", format(@"
+                if (::__potato.NameFormatter.InVictory)
+                    NetProps.SetPropString(::__potato.hObjRes, `m_iszMvMPopfileName`, `%s`)
                 ", params.mission),
             PluginReloadDelay - 0.015, null, null)
             // Only need to advance by SINGLE_TICK as this is for the server's benefit.
@@ -233,7 +233,7 @@ __potato.NameFormatter <- {
     }
 }
 
-__potato.NameFormatter.setdelegate(__potato)
-__potato.NameFormatter.Events.setdelegate(__potato.NameFormatter)
+::__potato.NameFormatter.setdelegate(::__potato)
+::__potato.NameFormatter.Events.setdelegate(::__potato.NameFormatter)
 
-__CollectGameEventCallbacks(__potato.NameFormatter.Events)
+__CollectGameEventCallbacks(::__potato.NameFormatter.Events)
