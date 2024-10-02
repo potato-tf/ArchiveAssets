@@ -2,14 +2,35 @@
 	// == GENERIC REUSABLE FIXES ==
 
 	/**
+	 * Makes a brush that blocks players filtered by team.
+	 * Used to patch up some holes in world geometry.
+	 */
+	function MakeForceField(origin, mins, maxs, team = Constants.ETFTeam.TEAM_SPECTATOR) {
+		local b = Entities.CreateByClassname("func_forcefield")
+
+		b.SetModel("models/empty.mdl")
+		b.SetAbsOrigin(origin)
+
+		NetProps.SetPropVector(b, "m_Collision.m_vecMinsPreScaled", mins)
+		NetProps.SetPropVector(b, "m_Collision.m_vecMaxsPreScaled", maxs)
+		b.SetSize(mins, maxs)
+
+		b.SetSolid(Constants.ESolidType.SOLID_BBOX)
+		b.SetTeam(team)
+		NetProps.SetPropInt(b, "m_nRenderMode", Constants.ERenderMode.kRenderNone)
+
+		return b
+	}
+
+	/**
 	 * Indiscriminately sets kRenderTransColor on all func_respawnroomvisualizers.
 	 *
 	 * This fixes the issue where sometimes the entity texture will incorrectly render
 	 * behind entities that are spatially behind it relative to the player.
 	 */
 	function FixAllVisualizers() {
-		for (local e; Entities.FindByClassname(e, "func_respawnroomvisualizer");)
-			NetProps.SetPropInt(e, "m_nRenderMode", Constants.ERenderMode.kRenderTransColor)
+		for (local vis; vis = Entities.FindByClassname(vis, "func_respawnroomvisualizer");)
+			NetProps.SetPropInt(vis, "m_nRenderMode", Constants.ERenderMode.kRenderTransColor)
 		RegisterFix("Added rendermode 1 to func_respawnroomvisualizer.")
 	}
 
