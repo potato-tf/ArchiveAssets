@@ -70,7 +70,7 @@
 	// == TESTING SERVER PRINT FUNCTIONS ==
 
 	/**
-	 * Function registers a map fix description for printing.
+	 * Registers a map fix description for printing.
 	 *
 	 * @param str desc      Array containing a string description of the map fix applied.
 	 *                      Will fail if it exceeds 255 chars in length.
@@ -81,24 +81,35 @@
 			Descriptions.push(desc)
 
 	/**
-	 * Function prints the map fixes applied on the map to player consoles on first mission
+	 * Prints the map fixes applied on the map to player consoles on first mission
 	 * load.
 	 */
-	Notified = false
 	function PrintMapFixes() {
-		if (!TestingServer || Notified) return
+		if (!TestingServer) return
+		if (Descriptions.len() == 0)
+			return
 
 		ClientPrint(null, Constants.EHudNotify.HUD_PRINTCONSOLE,
-			"\n== " + MapName + ": VScript map fixes have been applied. ==\nIf you are the map maker, you may wish to consider implementing these changes directly in your map:\n")
+			"\n\n== " + MapName + ": VScript map fixes have been applied. ==\nIf you are the map maker, you may wish to consider implementing these changes directly in your map:\n")
 
 		foreach (fix in Descriptions)
 			ClientPrint(null, Constants.EHudNotify.HUD_PRINTCONSOLE, " - " + fix + "\n")
 		ClientPrint(null, Constants.EHudNotify.HUD_PRINTCONSOLE, "\n")
-
-		Notified = true
+	}
+	// Call PrintMapFixes() once for every map on first mission load.
+	BaseEvents = {
+		function OnGameEvent_recalculate_holidays(_) {
+			if (GetRoundState() != Constants.ERoundState.GR_STATE_PREROUND) return
+			// Fire on a delay to avoid a code race.
+			EntFireByHandle(::__potato.hWorldspawn,
+				"RunScriptCode", "::__potato.MapFixes.PrintMapFixes()",
+			0.5, null, null)
+			delete ::__potato.MapFixes.BaseEvents
+		}
 	}
 }
 ::__potato.MapFixes.setdelegate(::__potato)
+__CollectGameEventCallbacks(::__potato.MapFixes.BaseEvents)
 
 // Map fixes are split in to separate files as "potato/map_fixes/<MapName>.nut"
 try

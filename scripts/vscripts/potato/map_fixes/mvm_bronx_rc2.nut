@@ -67,7 +67,5 @@ Events <- {
 		EntityOutputs.AddOutput(logic_auto,
 			"OnMapSpawn", "fwd_engiebot", "Enable"
 		null, -1, -1)
-
-		PrintMapFixes()
 	}
 }
