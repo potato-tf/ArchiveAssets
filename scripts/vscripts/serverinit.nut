@@ -47,6 +47,22 @@ function __potato::GetPreservedEnts() {
 	hPlyrMgr.ValidateScriptScope()
 }
 
+/**
+ * Deletes the ::__potato namespace.
+ * Can be used to reload the script.
+ */
+function __potato::Delete() {
+	function keys_recurse(container) {
+		foreach (v in container)
+			if (typeof v == "table" || typeof v == "array") {
+				keys_recurse(v)
+				if (typeof v == "table") v.setdelegate(null)
+			}
+	}
+	keys_recurse(::__potato)
+	delete ::__potato
+}
+
 // You can run script code after entities first spawn with this pattern.
 EntFireByHandle(::__potato.hWorldspawn,
 	"RunScriptCode", "::__potato.GetPreservedEnts()"
