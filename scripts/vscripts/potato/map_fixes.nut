@@ -68,6 +68,30 @@
 	}
 
 	/**
+	 * Marks navigation square(s) by ID as a spawnroom.
+	 *
+	 * @param int|array navs	Nav square(s) to mark as a spawnroom.
+	 * @param int team			Team to affilate nav square(s) with.
+	 */
+	function MarkAsSpawn(navs, team) {
+		if (team == Constants.ETFTeam.TF_TEAM_BLUE)
+			team = Constants.FTFNavAttributeType.TF_NAV_SPAWN_ROOM_BLUE
+		else
+			team = Constants.FTFNavAttributeType.TF_NAV_SPAWN_ROOM_RED
+		if (typeof navs == "array")
+			foreach (nav in navs) {
+				nav = NavMesh.GetNavAreaByID(nav)
+				nav.SetAttributeTF(team)
+				nav.ClearAttributeTF(team)
+			}
+		else {
+			navs = NavMesh.GetNavAreaByID(navs)
+			navs.SetAttributeTF(team)
+			navs.ClearAttributeTF(team)
+		}
+	}
+
+	/**
 	 * Creates a func_forcefield that blocks players filtered by team.
 	 * Will allow bullets and projectiles to pass.
 	 * Used to patch up some holes in world geometry.
@@ -75,10 +99,11 @@
 	 * @param Vector p1     One corner of the forcefield cuboid.
 	 * @param Vector p2     Opposite corner of the forcefield cuboid.
 	 * @param int team?     Team of the forcefield to allow passing (Default: SPEC).
-	 * @return handle       EHANDLE of the forcefield.
+	 * @return handle       EHANDLE of the func_forcefield.
 	 */
-	function MakeForceField(p1, p2, team = Constants.ETFTeam.TEAM_SPECTATOR) {
+	function MakeForcefield(p1, p2, team = Constants.ETFTeam.TEAM_SPECTATOR) {
 		local ent = Entities.CreateByClassname("func_forcefield")
+		SetupBoundingBrush(ent)
 		SetupAABBox(ent, p1, p2)
 		ent.SetTeam(team)
 		return ent
@@ -92,39 +117,76 @@
 	 * @param Vector p1     One corner of the nobuild cuboid.
 	 * @param Vector p2     Opposite corner of the nobuild cuboid.
 	 * @param bool resize?	Set to false to disable automatically extending the brush.
-	 * @return handle       EHANDLE of the nobuild.
+	 * @return handle       EHANDLE of the func_nobuild.
 	 */
 	function MakeNoBuild(p1, p2, resize = true) {
 		local ent = Entities.CreateByClassname("func_nobuild")
+		ent.DispatchSpawn()
 		SetupAABBox(ent, p1, p2)
 
-		if (!resize)
-			return ent
+		if (!resize) return ent
+
 		ent.SetSize(
 			Vector(-96, -96, -96),
 			ent.GetBoundingMaxs() + Vector(96, 96, 96)
 		)
-		ent.AddSolidFlags(Constants.FSolid.FSOLID_NOT_SOLID)
 		return ent
 	}
 
 	/**
-	 * Modifies a brush entity to become an axis-aligned bounding entity between two absolute
-	 * points.
-	 * If you need to DispatchSpawn() a brush, call it before this function.
+	 * Creates a no-damage trigger_hurt that blocks building placement.
+	 * Can be used to automatically collect cash if it can drop in an inaccessible location.
 	 *
-	 * @param Vector p1     One corner of the brush cuboid.
-	 * @param Vector p2     Opposite corner of the brush cuboid.
-	 * @return handle       EHANDLE of the brush.
+	 * @param Vector p1     One corner of the trigger_hurt cuboid.
+	 * @param Vector p2     Opposite corner of the trigger_hurt cuboid.
+	 * @return handle       EHANDLE of the trigger_hurt.
 	 */
-	function SetupAABBox(ent, p1, p2) {
+	function MakeTriggerHurt(p1, p2) {
+		local ent = Entities.CreateByClassname("trigger_hurt")
+		ent.DispatchSpawn()
+		SetupAABBox(ent, p1, p2)
+		return ent
+	}
+
+	/**
+	 * Creates a func_respawnroom.
+	 *
+	 * @param Vector p1     One corner of the respawnroom cuboid.
+	 * @param Vector p2     Opposite corner of the respawnroom cuboid.
+	 * @param int team      Team affiliation of the spawnroom.
+	 * @return handle       EHANDLE of the func_respawnroom.
+	 */
+	function MakeSpawnroom(p1, p2, team) {
+		local ent = Entities.CreateByClassname("func_respawnroom")
+		ent.SetTeam(team)
+		ent.DispatchSpawn()
+		SetupAABBox(ent, p1, p2)
+		return ent
+	}
+
+	/**
+	 * Modifies a brush entity to function as a bounding brush.
+	 *
+	 * @param handle ent    EHANDLE of the entity.
+	 */
+	function SetupBoundingBrush(ent) {
 		// Suppress ent console spam; without a brush model they cannot render anyway.
 		NetProps.SetPropInt(ent, "m_nRenderMode", Constants.ERenderMode.kRenderNone)
-
 		// Bounding brushes need a (non-brush) model or else collision with them will
 		//  result in client prediction errors.
 		ent.SetModel("models/empty.mdl")
+	}
 
+	/**
+	 * Modifies an entity to become an axis-aligned bounding entity between two absolute
+	 * points.
+	 * If you need to DispatchSpawn() an entity, call it before this function.
+	 *
+	 * @param handle ent    EHANDLE of the entity.
+	 * @param Vector p1     One corner of the entity cuboid.
+	 * @param Vector p2     Opposite corner of the entity cuboid.
+	 */
+	function SetupAABBox(ent, p1, p2) {
 		// Convert two spatial points to absolute origin and local maxs.
 		// Recall that maxs must be greater than the origin, or the server will crash.
 		local origin = Vector(
@@ -138,11 +200,9 @@
 			max(p1.z, p2.z) - origin.z
 		)
 		ent.SetAbsOrigin(origin)
-		NetProps.SetPropVector(ent, "m_Collision.m_vecMaxsPreScaled", maxs)
 		ent.SetSize(Vector(), maxs)
-		ent.SetSolid(Constants.ESolidType.SOLID_BBOX)
 
-		return ent
+		ent.SetSolid(Constants.ESolidType.SOLID_BBOX)
 	}
 
 	// == TESTING SERVER PRINT FUNCTIONS ==

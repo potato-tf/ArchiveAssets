@@ -8,7 +8,7 @@ Events <- {
 		RegisterFix("Block an out-of-bounds access spot.")
 		local oobA = Vector(-2026, -1041, 895)
 		local oobB = Vector(-1908, -854, 1510.91)
-		MakeForceField(oobA, oobB)
+		MakeForcefield(oobA, oobB)
 		MakeNoBuild(oobA, oobB)
 	}
 }

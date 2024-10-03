@@ -4,10 +4,6 @@ Events <- {
 		if (GetRoundState() != Constants.ERoundState.GR_STATE_PREROUND) return
 
 		RegisterFix("Fixed cash getting stuck in tank spawn.")
-		local tankcollect = SpawnEntityFromTable("trigger_hurt", {
-			origin = Vector(-5138, 3072, -370)
-		})
-		tankcollect.SetSize(Vector(), Vector(1426, 1001, 154))
-		tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
+		MakeTriggerHurt(Vector(-5138, 3072, -370), Vector(-3712, 4073, -216))
 	}
 }

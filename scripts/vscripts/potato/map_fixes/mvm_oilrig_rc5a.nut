@@ -39,22 +39,11 @@ Events <- {
 
 		RegisterFix("Added the missing centre spawn.")
 		// Properly mark the tank spawn nav square as an invaders' spawn room.
-		local tanknav = NavMesh.GetNavAreaByID(27)
-		tanknav.SetAttributeTF(Constants.FTFNavAttributeType.TF_NAV_SPAWN_ROOM_BLUE)
-		tanknav.ClearAttributeTF(Constants.FTFNavAttributeType.TF_NAV_BOMB_CAN_DROP_HERE)
+		MarkAsSpawn(27, Constants.ETFTeam.TF_TEAM_BLUE)
 		// Add missing BLU func_respawnroom.
-		local tankspawn = SpawnEntityFromTable("func_respawnroom", {
-			origin = Vector(-520, -5450, 1063)
-			TeamNum = Constants.ETFTeam.TF_TEAM_BLUE
-		})
-		tankspawn.SetSize(Vector(), Vector(400, 410, 200))
-		tankspawn.SetSolid(Constants.ESolidType.SOLID_BBOX)
+		MakeSpawnroom(Vector(-520, -5450, 1063), Vector(-120, -5040, 1263), Constants.ETFTeam.TF_TEAM_BLUE)
 
 		RegisterFix("Fixed cash getting stuck in the centre spawn.")
-		local tankcollect = SpawnEntityFromTable("trigger_hurt", {
-			origin = Vector(-520, -5450, 1063)
-		})
-		tankcollect.SetSize(Vector(), Vector(400, 410, 200))
-		tankcollect.SetSolid(Constants.ESolidType.SOLID_BBOX)
+		MakeTriggerHurt(Vector(-520, -5450, 1063), Vector(-120, -5040, 1263))
 	}
 }
