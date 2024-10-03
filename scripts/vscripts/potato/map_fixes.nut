@@ -2,22 +2,39 @@
 	// == GENERIC REUSABLE FIXES ==
 
 	/**
-	 * Makes a brush that blocks players filtered by team.
+	 * Makes an axis-aligned brush between two points that blocks players filtered by team.
 	 * Used to patch up some holes in world geometry.
+	 *
+	 * @param Vector p1     One corner of the forcefield cuboid.
+	 * @param Vector p2     Opposite corner of the forcefield cuboid.
+	 * @param int team?     Team of the forcefield (Default: SPEC).
+	 * @return handle		EHANDLE of the forcefield.
 	 */
-	function MakeForceField(origin, mins, maxs, team = Constants.ETFTeam.TEAM_SPECTATOR) {
+	function MakeForceField(p1, p2, team = Constants.ETFTeam.TEAM_SPECTATOR) {
 		local b = Entities.CreateByClassname("func_forcefield")
-
+		NetProps.SetPropInt(b, "m_nRenderMode", Constants.ERenderMode.kRenderNone)
+		// Bounding brushes need a (non-brush) model or collision with them will
+		//  result in client prediction errors.
 		b.SetModel("models/empty.mdl")
-		b.SetAbsOrigin(origin)
 
-		NetProps.SetPropVector(b, "m_Collision.m_vecMinsPreScaled", mins)
+		// Convert two spatial points to absolute origin and local maxs.
+		// Recall that maxs must be greater than the origin, or the server will crash.
+		local origin = Vector(
+			min(p1.x, p2.x),
+			min(p1.y, p2.y),
+			min(p1.z, p2.z)
+		)
+		local maxs = Vector(
+			max(p1.x, p2.x) - origin.x,
+			max(p1.y, p2.y) - origin.y,
+			max(p1.z, p2.z) - origin.z
+		)
+		b.SetAbsOrigin(origin)
 		NetProps.SetPropVector(b, "m_Collision.m_vecMaxsPreScaled", maxs)
-		b.SetSize(mins, maxs)
+		b.SetSize(Vector(), maxs)
 
 		b.SetSolid(Constants.ESolidType.SOLID_BBOX)
 		b.SetTeam(team)
-		NetProps.SetPropInt(b, "m_nRenderMode", Constants.ERenderMode.kRenderNone)
 
 		return b
 	}
@@ -128,6 +145,10 @@
 			delete ::__potato.MapFixes.BaseEvents
 		}
 	}
+
+	// == UTIL ==
+	function min(a, b) return a < b ? a : b
+	function max(a, b) return a > b ? a : b
 }
 ::__potato.MapFixes.setdelegate(::__potato)
 __CollectGameEventCallbacks(::__potato.MapFixes.BaseEvents)

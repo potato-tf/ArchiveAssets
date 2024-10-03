@@ -5,8 +5,7 @@ Events <- {
 
 		FixAllVisualizers()
 
-		RegisterFix("Blocked out-of-bounds access spot.")
-		MakeForceField(Vector(-1024, -1980, 2016),
-			Vector(-256, -68, -1056), Vector(256, 68, 1056))
+		RegisterFix("Blocked an out-of-bounds access spot.")
+		MakeForceField(Vector(-1280, -2048, 960), Vector(-768, -1912, 3072))
 	}
 }
