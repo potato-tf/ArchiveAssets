@@ -6,6 +6,9 @@ Events <- {
 		FixAllVisualizers()
 
 		RegisterFix("Block an out-of-bounds access spot.")
-		MakeForceField(Vector(-2026, -1041, 895), Vector(-1908 -854 1510.91))
+		local oobA = Vector(-2026, -1041, 895)
+		local oobB = Vector(-1908, -854, 1510.91)
+		MakeForceField(oobA, oobB)
+		MakeNoBuild(oobA, oobB)
 	}
 }

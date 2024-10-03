@@ -2,44 +2,6 @@
 	// == GENERIC REUSABLE FIXES ==
 
 	/**
-	 * Makes an axis-aligned brush between two points that blocks players filtered by team.
-	 * Used to patch up some holes in world geometry.
-	 *
-	 * @param Vector p1     One corner of the forcefield cuboid.
-	 * @param Vector p2     Opposite corner of the forcefield cuboid.
-	 * @param int team?     Team of the forcefield (Default: SPEC).
-	 * @return handle		EHANDLE of the forcefield.
-	 */
-	function MakeForceField(p1, p2, team = Constants.ETFTeam.TEAM_SPECTATOR) {
-		local b = Entities.CreateByClassname("func_forcefield")
-		NetProps.SetPropInt(b, "m_nRenderMode", Constants.ERenderMode.kRenderNone)
-		// Bounding brushes need a (non-brush) model or collision with them will
-		//  result in client prediction errors.
-		b.SetModel("models/empty.mdl")
-
-		// Convert two spatial points to absolute origin and local maxs.
-		// Recall that maxs must be greater than the origin, or the server will crash.
-		local origin = Vector(
-			min(p1.x, p2.x),
-			min(p1.y, p2.y),
-			min(p1.z, p2.z)
-		)
-		local maxs = Vector(
-			max(p1.x, p2.x) - origin.x,
-			max(p1.y, p2.y) - origin.y,
-			max(p1.z, p2.z) - origin.z
-		)
-		b.SetAbsOrigin(origin)
-		NetProps.SetPropVector(b, "m_Collision.m_vecMaxsPreScaled", maxs)
-		b.SetSize(Vector(), maxs)
-
-		b.SetSolid(Constants.ESolidType.SOLID_BBOX)
-		b.SetTeam(team)
-
-		return b
-	}
-
-	/**
 	 * Indiscriminately sets kRenderTransColor on all func_respawnroomvisualizers.
 	 *
 	 * This fixes the issue where sometimes the entity texture will incorrectly render
@@ -103,6 +65,84 @@
 		}
 
 		RegisterFix("Added uncapped rotation script to func_rotating.")
+	}
+
+	/**
+	 * Creates a func_forcefield that blocks players filtered by team.
+	 * Will allow bullets and projectiles to pass.
+	 * Used to patch up some holes in world geometry.
+	 *
+	 * @param Vector p1     One corner of the forcefield cuboid.
+	 * @param Vector p2     Opposite corner of the forcefield cuboid.
+	 * @param int team?     Team of the forcefield to allow passing (Default: SPEC).
+	 * @return handle       EHANDLE of the forcefield.
+	 */
+	function MakeForceField(p1, p2, team = Constants.ETFTeam.TEAM_SPECTATOR) {
+		local ent = Entities.CreateByClassname("func_forcefield")
+		SetupAABBox(ent, p1, p2)
+		ent.SetTeam(team)
+		return ent
+	}
+
+	/**
+	 * Creates a func_nobuild that blocks building placement.
+	 * Automatically extends the brush ±96 units on all sides of where you want to block
+	 * buildings, as nobuilds only block the centre of buildings when placing them.
+	 *
+	 * @param Vector p1     One corner of the nobuild cuboid.
+	 * @param Vector p2     Opposite corner of the nobuild cuboid.
+	 * @param bool resize?	Set to false to disable automatically extending the brush.
+	 * @return handle       EHANDLE of the nobuild.
+	 */
+	function MakeNoBuild(p1, p2, resize = true) {
+		local ent = Entities.CreateByClassname("func_nobuild")
+		SetupAABBox(ent, p1, p2)
+
+		if (!resize)
+			return ent
+		ent.SetSize(
+			Vector(-96, -96, -96),
+			ent.GetBoundingMaxs() + Vector(96, 96, 96)
+		)
+		ent.AddSolidFlags(Constants.FSolid.FSOLID_NOT_SOLID)
+		return ent
+	}
+
+	/**
+	 * Modifies a brush entity to become an axis-aligned bounding entity between two absolute
+	 * points.
+	 * If you need to DispatchSpawn() a brush, call it before this function.
+	 *
+	 * @param Vector p1     One corner of the brush cuboid.
+	 * @param Vector p2     Opposite corner of the brush cuboid.
+	 * @return handle       EHANDLE of the brush.
+	 */
+	function SetupAABBox(ent, p1, p2) {
+		// Suppress ent console spam; without a brush model they cannot render anyway.
+		NetProps.SetPropInt(ent, "m_nRenderMode", Constants.ERenderMode.kRenderNone)
+
+		// Bounding brushes need a (non-brush) model or else collision with them will
+		//  result in client prediction errors.
+		ent.SetModel("models/empty.mdl")
+
+		// Convert two spatial points to absolute origin and local maxs.
+		// Recall that maxs must be greater than the origin, or the server will crash.
+		local origin = Vector(
+			min(p1.x, p2.x),
+			min(p1.y, p2.y),
+			min(p1.z, p2.z)
+		)
+		local maxs = Vector(
+			max(p1.x, p2.x) - origin.x,
+			max(p1.y, p2.y) - origin.y,
+			max(p1.z, p2.z) - origin.z
+		)
+		ent.SetAbsOrigin(origin)
+		NetProps.SetPropVector(ent, "m_Collision.m_vecMaxsPreScaled", maxs)
+		ent.SetSize(Vector(), maxs)
+		ent.SetSolid(Constants.ESolidType.SOLID_BBOX)
+
+		return ent
 	}
 
 	// == TESTING SERVER PRINT FUNCTIONS ==
