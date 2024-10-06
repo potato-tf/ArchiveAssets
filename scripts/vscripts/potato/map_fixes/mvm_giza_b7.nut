@@ -9,6 +9,6 @@ Events <- {
 		local oobA = Vector(-1280, -2048, 960)
 		local oobB = Vector(-768, -1912, 3072)
 		MakeForcefield(oobA, oobB)
-		MakeNoBuild(oobA, oobB)
+		MakeNoBuild(oobA, oobB, NOBUILD_EXTENDALL)
 	}
 }

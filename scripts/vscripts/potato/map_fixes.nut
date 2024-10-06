@@ -111,25 +111,38 @@
 
 	/**
 	 * Creates a func_nobuild that blocks building placement.
-	 * Automatically extends the brush ±96 units on all sides of where you want to block
+	 * Can automatically extends the brush ±96 units on all sides of where you want to block
 	 * buildings, as nobuilds only block the centre of buildings when placing them.
 	 *
 	 * @param Vector p1     One corner of the nobuild cuboid.
 	 * @param Vector p2     Opposite corner of the nobuild cuboid.
-	 * @param bool resize?	Set to false to disable automatically extending the brush.
+	 * @param int resize?	Set to control automatic resizing behaviour (Default: Extend above and below.)
 	 * @return handle       EHANDLE of the func_nobuild.
 	 */
-	function MakeNoBuild(p1, p2, resize = true) {
+	NOBUILD_EXACT = 0
+	NOBUILD_EXTENDVERTICAL = 1
+	NOBUILD_EXTENDALL = 2
+	function MakeNoBuild(p1, p2, resize = 1) {
 		local ent = Entities.CreateByClassname("func_nobuild")
 		ent.DispatchSpawn()
 		SetupAABBox(ent, p1, p2)
 
-		if (!resize) return ent
-
-		ent.SetSize(
-			Vector(-96, -96, -96),
-			ent.GetBoundingMaxs() + Vector(96, 96, 96)
-		)
+		switch (resize) {
+			case NOBUILD_EXACT:
+				break
+			case NOBUILD_EXTENDVERTICAL:
+				ent.SetSize(
+					Vector(0, 0, -96),
+					ent.GetBoundingMaxs() + Vector(0, 0, 96)
+				)
+				break
+			case NOBUILD_EXTENDALL:
+				ent.SetSize(
+					Vector(-96, -96, -96),
+					ent.GetBoundingMaxs() + Vector(96, 96, 96)
+				)
+				break
+		}
 		return ent
 	}
 
