@@ -5,7 +5,6 @@ Events <- {
 
 		FixAllVisualizers()
 
-		printl(NOBUILD_EXTENDVERTICAL)
 		RegisterFix("Blocked a buster godspot.")
 		MakeNoBuild(
 			Vector(688, -3056, 112),
