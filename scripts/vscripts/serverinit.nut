@@ -12,14 +12,16 @@
 	MapName = GetMapName()
 	MapName_len = GetMapName().len()
 
-	ServerTags = split(Convars.GetStr("sv_tags"), ",")
-	TestingServer = false // TODO: Non-functional for now. Implement a method that checks sv_tags eventually.
+	ServerTags = null
+	TestingServer = false
 
 	// True if the sigsegv-mvm extension is active on the server.
 	IsSigmod = Convars.GetInt("sig_etc_misc") != null ? true : false
 
 	// Preserved entity handles; we only need to grab them once as they are not reset
 	//  between rounds.
+	// Entities besides worldspawn need to be grabbed on a delay as they do not exist
+	//  when this file is executed.
 	hGamerules = null // tf_gamerules
 	hObjRes    = null // tf_objective_resource
 	hPlyrMgr   = null // tf_player_manager
@@ -27,24 +29,29 @@
 }
 
 /**
- * Utility function to store preserved entity handles.
- * Must be ran on a delay as these ents do not exist when serverinit.nut is first executed
- * by the server.
+ * Utility function which is called after map entities are spawned.
  */
-function __potato::GetPreservedEnts() {
+function __potato::OnEntitiesSpawned() {
+
+	// == GET PRESERVED HANDLES ==
 	// Platform entities.
 	//hBigNet     = Entities.FindByClassname(null, "ai_network")
-
 	// TF2 entities.
 	hGamerules = Entities.FindByClassname(null, "tf_gamerules")
 	hPlyrMgr   = Entities.FindByClassname(null, "tf_player_manager")
-
 	// MvM Entities.
 	hObjRes    = Entities.FindByClassname(null, "tf_objective_resource")
 	//hMVMStats  = Entities.FindByClassname(null, "tf_mann_vs_machine_stats")
 	//hPopulator = Entities.FindByClassname(null, "info_populator")
+	// == END PRESERVED HANDLES ==
 
+	// Validate scopes for preserved entities here as it only needs to be done once.
 	hPlyrMgr.ValidateScriptScope()
+
+	// Set these variables after servercfgfile is executed.
+	ServerTags = split(Convars.GetStr("sv_tags"), ",")
+	if (ServerTags.find("testing") != null)
+		TestingServer = true
 }
 
 /**
@@ -64,9 +71,9 @@ function __potato::Delete() {
 }
 
 // You can run script code after entities first spawn with this pattern.
-EntFireByHandle(::__potato.hWorldspawn,
-	"RunScriptCode", "::__potato.GetPreservedEnts()"
-, -1, null, null)
+EntFireByHandle(::__potato.hWorldspawn, "RunScriptCode",
+	"::__potato.OnEntitiesSpawned()",
+-1, null, null)
 
 // The modules here can be found in the "vscripts/potato" folder.
 // They are not dependent on each other.
