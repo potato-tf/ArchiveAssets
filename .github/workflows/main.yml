@@ -92,7 +92,10 @@ jobs:
           {
             ssh -o StrictHostKeyChecking=no -p ${a[0]} ${a[1]} "touch /var/tf2server/tf/occupiedservers/wake; exit 0"
 
-            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --delete --update --exclude=".*" --exclude="*.bz2" --exclude="tf_mvm_missioncycle.res" --exclude="mapcycle.txt" . ${a[1]}:/var/tf2server/tf/archive/
+            # don't remove generated symbolic links, they are auto removed by server
+            ssh -p ${a[0]} -o StrictHostKeyChecking=no ${a[1]} "cd /var/tf2server/tf/archive; find . -type l" > ../links-${a[0]}-${a[1]}
+
+            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --delete --update --exclude=".*" --exclude="*.bz2" --exclude-from=../links-${a[0]}-${a[1]} --exclude="tf_mvm_missioncycle.res" --exclude="mapcycle.txt" . ${a[1]}:/var/tf2server/tf/archive/
             ssh -p ${a[0]} -o StrictHostKeyChecking=no ${a[1]} mkdir -p /var/www/html/gameassets/archive
             rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --delete --update --include="*/" --include="*.bz2" --exclude="*" . ${a[1]}:/var/www/html/gameassets/archive/
           
