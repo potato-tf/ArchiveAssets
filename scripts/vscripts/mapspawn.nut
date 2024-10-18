@@ -47,6 +47,11 @@ function __potato::OnEntitiesSpawned() {
 
 	// Validate scopes for preserved entities here as it only needs to be done once.
 	hPlyrMgr.ValidateScriptScope()
+	//hBigNet.ValidateScriptScope()
+	//hGamerules.ValidateScriptScope()
+	//hObjRes.ValidateScriptScope()
+	//hMVMStats.ValidateScriptScope()
+	//hPopulator.ValidateScriptScope()
 
 	// Set these variables after servercfgfile is executed.
 	ServerTags = split(Convars.GetStr("sv_tags"), ",")
@@ -84,6 +89,8 @@ IncludeScript("potato/map_fixes.nut")
 IncludeScript("potato/name_format.nut")
 // Disables respawn text on missions with no respawns.
 IncludeScript("potato/hide_respawntext.nut")
+// Fixes the readymode timer not aborting when the only readied player disconnects.
+IncludeScript("potato/dc_timer_fix.nut")
 
 // Stricter VScript rules used on the testing servers.
 //IncludeScript("potato/script_rules.nut")
