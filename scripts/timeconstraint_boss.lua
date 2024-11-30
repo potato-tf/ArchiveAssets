@@ -55,7 +55,6 @@ local DEATH_INSULTS = {
 		"Try running in circle harder, %s",
 		"Couldn't dead ring that one, %s? Unfortunate",
 	}
-
 }
 
 local timeconstraint_alive = false
@@ -66,8 +65,8 @@ local gamestateEnded = false
 
 local specialLinePlaying = false
 
-local PHASE3_SUBWAVES = 3
-local finishedSubwaves = 0
+-- local PHASE3_SUBWAVES = 3
+-- local finishedSubwaves = 0
 
 local function chatMessage(string)
 	local message = "{blue}"
@@ -134,17 +133,13 @@ local function storeRollback()
 end
 
 local function fade()
-	local fadeEnt = Entity("env_fade", true)
-	local properties = {
+	-- local fadeEnt = Entity("env_fade", true)
+	local fadeEnt = ents.CreateWithKeys("env_fade", {
 		holdtime = 1,
 		duration = 0.5,
-		rendercolor = "255, 255, 255",
+		rendercolor = ("255, 255, 255"),
 		renderamt = 255
-	}
-
-	for name, value in pairs(properties) do
-		fadeEnt:AcceptInput("$SetKey$"..name, value)
-	end
+	}, true, true)
 
 	fadeEnt.Fade(fadeEnt)
 
@@ -332,7 +327,7 @@ local function Holder(bot)
 		::continue::
 	end
 
-	
+
 	local callbacks = {}
 
 	storeRollback()
@@ -391,7 +386,7 @@ local function Holder(bot)
 
 	callbacks.died = bot:AddCallback(ON_DEATH, function()
 		timeconstraint_alive = false
-		
+
 		removeCallbacks(bot, callbacks)
 		removeTimers(timers)
 
@@ -468,18 +463,42 @@ local function Handle2(bot)
 	end)
 end
 
-function Phase3SubwaveDone()
-	finishedSubwaves = finishedSubwaves + 1
+-- function Phase3SubwaveDone()
+-- 	finishedSubwaves = finishedSubwaves + 1
 
-	if finishedSubwaves >= PHASE3_SUBWAVES then
-		if not cur_constraint then
-			return
+-- 	if finishedSubwaves >= PHASE3_SUBWAVES then
+-- 		if not cur_constraint then
+-- 			return
+-- 		end
+
+-- 		cur_constraint:Suicide()
+-- 	end
+-- end
+
+local SUBWAVE_3_BOTS_COUNT = 6
+local subwave3BotsDied = 0
+local function HandleSubwave3Bot(bot)
+	local callbacks = {}
+
+	callbacks.died = bot:AddCallback(ON_DEATH, function()
+		subwave3BotsDied = subwave3BotsDied + 1
+
+		print("SUBWAVE3 BOTS: " .. subwave3BotsDied .. "/" .. SUBWAVE_3_BOTS_COUNT)
+
+		if subwave3BotsDied >= SUBWAVE_3_BOTS_COUNT then
+			if cur_constraint then
+				cur_constraint:Suicide()
+			else
+				print("!!! NO TIME-CONSTRAINT FOUND !!!")
+			end
 		end
 
-		cur_constraint:Suicide()
-	end
+		removeCallbacks(bot, callbacks)
+	end)
+	callbacks.spawned = bot:AddCallback(ON_SPAWN, function()
+		removeCallbacks(bot, callbacks)
+	end)
 end
-
 
 local function Handle3(bot)
 	local callbacks = {}
@@ -530,7 +549,7 @@ local function Handle3(bot)
 
 				::continue::
 			end
-			
+
 		end)
 	end)
 
@@ -544,17 +563,17 @@ local function Handle3(bot)
 		-- 	if player.m_iTeamNum ~= 3 then
 		-- 		goto continue
 		-- 	end
-	
+
 		-- 	if not player:IsAlive() then
 		-- 		goto continue
 		-- 	end
-	
+
 		-- 	if player:GetPlayerName() ~= "Super Scout" then
 		-- 		goto continue
 		-- 	end
-	
+
 		-- 	player:Suicide()
-	
+
 		-- 	::continue::
 		-- end
 
@@ -884,6 +903,8 @@ local function HandleFinal(bot)
 	end)
 
 	callbacks.died = bot:AddCallback(ON_DEATH, function()
+		-- timeout
+		PvPBluWin()
 		removeCallbacks(bot, callbacks)
 	end)
 	callbacks.spawned = bot:AddCallback(ON_SPAWN, function()
@@ -894,30 +915,39 @@ end
 local function checkBot(bot, tags)
 	if hasTag(tags, "realcontraint") then
 		Holder(bot)
-		return
+		return false, false
 	end
 	if hasTag(tags, "timeconstraint1") then
 		Handle1(bot)
-		return true
+		return true, true
 	end
 	if hasTag(tags, "timeconstraint2") then
 		Handle2(bot)
-		return true
+		return true, true
 	end
 	if hasTag(tags, "timeconstraint3") then
 		Handle3(bot)
-		return true
+		return true, true
 	end
 	if hasTag(tags, "timeconstraintFinal") then
 		HandleFinal(bot)
+		return true, true
+	elseif hasTag(tags, "subwave3Bot") then
+		HandleSubwave3Bot(bot)
 		return true
 	end
 end
 
-function OnWaveSpawnBot(bot, _, tags)
-	local result = checkBot(bot, tags)
+function SlayTimeConstraintDebug()
+	if cur_constraint then
+		cur_constraint:Suicide()
+	end
+end
 
-	if result then
+function OnWaveSpawnBot(bot, _, tags)
+	local _result, isTimeConstrant = checkBot(bot, tags)
+
+	if isTimeConstrant then
 		cur_constraint = bot
 	end
 end
