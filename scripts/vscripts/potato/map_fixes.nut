@@ -266,9 +266,9 @@
 ::__potato.MapFixes.setdelegate(::__potato)
 __CollectGameEventCallbacks(::__potato.MapFixes.BaseEvents)
 
-// Map fixes are split in to separate files as "potato/map_fixes/<MapName>.nut"
+// Map fixes are split in to separate files, found in the format "potato/map_fixes/<MapName>.nut"
 try
-	DoIncludeScript("potato/map_fixes/" + ::__potato.MapName + ".nut", ::__potato.MapFixes)
+	::__potato.Include("map_fixes/" + ::__potato.MapName + ".nut", null, ::__potato.MapFixes)
 catch (e) {
 	if (e != "Failed to include script \"potato/map_fixes/" + ::__potato.MapName + ".nut\"")
 	throw e

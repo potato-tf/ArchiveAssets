@@ -13,10 +13,11 @@
 	MapName_len = GetMapName().len()
 
 	ServerTags = null
+	ScriptsBuffer = {}
 	TestingServer = false
 
 	// True if the sigsegv-mvm extension is active on the server.
-	IsSigmod = Convars.GetInt("sig_etc_misc") != null ? true : false
+	IsSigmod = Convars.GetInt("sig_etc_misc") != null
 
 	// Preserved entity handles; we only need to grab them once as they are not reset
 	//  between rounds.
@@ -26,7 +27,17 @@
 	hObjRes    = null // tf_objective_resource
 	hPlyrMgr   = null // tf_player_manager
 	hWorldspawn = Entities.FindByClassname(null, "worldspawn") // worldspawn
+
+	Events = {
+		// Update ServerTags whenever sv_tags changes.
+		function OnGameEvent_server_cvar(params) {
+			if (params.cvarname != "sv_tags") return
+			UpdateServerTags(params.cvarvalue)
+		}
+	}
 }
+::__potato.Events.setdelegate(::__potato)
+__CollectGameEventCallbacks(::__potato.Events)
 
 /**
  * Utility function which is called after map entities are spawned.
@@ -48,10 +59,91 @@ function __potato::OnEntitiesSpawned() {
 	// Validate scopes for preserved entities here as it only needs to be done once.
 	hPlyrMgr.ValidateScriptScope()
 
-	// Set these variables after servercfgfile is executed.
-	ServerTags = split(Convars.GetStr("sv_tags"), ",")
-	if (ServerTags.find("testing") != null)
-		TestingServer = true
+	// Set TestingServer to true if this is a Potato testing server.
+	UpdateServerTags()
+
+	// Include any buffered tag-dependent scripts now.
+	foreach (fp, include in ScriptsBuffer) {
+		local nobreak = true
+		foreach (tag in include[0]) {
+			if (ServerTags.find(tag) == null) {
+				nobreak = false
+				break
+			}
+		}
+		if (nobreak) {
+			try {
+				IncludeScript("potato/" + fp, include[1])
+			} catch (e) {
+				if (startswith(e, "Failed to include script \"potato/" + fp))
+					continue
+				throw e
+			}
+		}
+	}
+	delete ScriptsBuffer
+
+	// Suppress CVar change notifications for these which are always set by the game for MvM.
+	if (NetProps.GetPropBool(hGamerules, "m_bPlayingMannVsMachine")) {
+		Convars.SetValue("mp_tournament", 1)
+		Convars.SetValue("mp_tournament_stopwatch", 0)
+	}
+}
+
+/**
+ * Updates the ServerTags array, an array of strings containing tags from sv_tags.
+ * Also updates variables dependent on ServerTags.
+ *
+ * @param string tags?          Tag string override (Default: Refers to sv_tags value).
+ */
+function __potato::UpdateServerTags(tags = null) {
+	if (!tags)
+		tags = Convars.GetStr("sv_tags")
+	ServerTags = split(tags, ",")
+
+	// Set TestingServer to true if this is a Potato testing server.
+	TestingServer = ServerTags.find("testing") != null
+}
+
+/**
+ * Includes a script file relative to "scripts/vscripts/potato/".
+ * Does not throw an error if the inclusion failed.
+ * Allows testing against sv_tags to conditionally include scripts.
+ *
+ * @param string fp             File to include, ".nut" extension is optional.
+ * @param string|array tags?    Tag(s) to test against; all must be satisfied for inclusion to occur (Default: None).
+ * @param table scope?          Scope to include the script in (Default: ROOT).
+ */
+function __potato::Include(fp, tags = null, scope = null) {
+	if (typeof tags == "string")
+		tags = [tags]
+
+	if (fp.find(".nut") == null)
+		fp += ".nut"
+
+	// If server tags cannot be checked yet, store scripts to include later.
+	if (ServerTags == null && tags != null) {
+		ScriptsBuffer[fp] <- [tags, scope]
+		return
+	}
+
+	// Don't include scripts that we don't match the sv_tags for.
+	if (tags != null)
+		foreach (tag in tags)
+			if (ServerTags.find(tag) == null)
+				return
+
+	// Catch script include errors so that other scripts can execute.
+	try {
+		IncludeScript("potato/" + fp, scope)
+		return
+	} catch (e) {
+		// Must use startswith() here, sometimes an extra closing quote is added by the game.
+		if (startswith(e, "Failed to include script \"potato/" + fp))
+			return
+		// If any other error is thrown (how?), re-throw it.
+		throw e
+	}
 }
 
 /**
@@ -76,20 +168,26 @@ EntFireByHandle(::__potato.hWorldspawn, "RunScriptCode",
 -1, null, null)
 
 // These scripts are in the game-servers repo, not ArchiveAssets.
-IncludeScript("stringtofile.nut")
-IncludeScript("contracts.nut")
-
+// They should probably become more integrated with this script eventually.
+try IncludeScript("stringtofile.nut") catch (_) {}
+try IncludeScript("contracts.nut") catch (_) {}
+try IncludeScript("vpi/vpi.nut") catch (_) {}
 // The modules here can be found in the "vscripts/potato" folder.
 // They are not dependent on each other.
 
+// Temporary refund exploit fix.
+::__potato.Include("temp_refund_exploit_fix")
+
 // Map-specific bug fixes.
-IncludeScript("potato/map_fixes.nut")
+::__potato.Include("map_fixes")
 // Auto-formats the scoreboard mission name.
-IncludeScript("potato/name_format.nut")
+// Disabled locally for now as support for SetProp instead of SetClientProp, while existent,
+//  is poor.
+::__potato.Include("name_format", "potato")
 // Disables respawn text on missions with no respawns.
-IncludeScript("potato/hide_respawntext.nut")
+::__potato.Include("hide_respawntext")
 
 // Stricter VScript rules used on the testing servers.
-//IncludeScript("potato/script_rules.nut")
+::__potato.Include("script_rules", "testing")
 // Judging feedback tools used on the testing servers.
-//IncludeScript("potato/judge_feedback.nut")
+::__potato.Include("judge_feedback", "testing")

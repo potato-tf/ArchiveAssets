@@ -8,5 +8,8 @@ Events <- {
 
 		RegisterFix("Fixed cash getting stuck in tank spawn.")
 		MakeTriggerHurt(Vector(-1627, 2937, -274), Vector(-765, 3563, 217))
+
+		RegisterFix("Blocked an out-of-bounds access spot.")
+		MakeNoBuild(Vector(268, -260, 400), Vector(470, 80, 400), NOBUILD_EXTENDALL)
 	}
 }
