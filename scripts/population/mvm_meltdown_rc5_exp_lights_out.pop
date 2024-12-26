@@ -1,0 +1,2268 @@
+#base robot_standard.pop
+#base robot_giant.pop
+#base robot_scroob.pop
+#base custom_upgrades_scroob.pop
+
+WaveSchedule
+{
+StartingCurrency 1200
+RespawnWaveTime  3
+CanBotsAttackWhileInSpawnRoom no
+NoRomevisionCosmetics 1
+NoCritPumpkin 1
+AllowBotExtraSlots 1
+RobotLimit 45 //reconfigurer
+NoRedBotsRandomCrit 1	
+BotsUsePlayerTeleporters 0
+CustomNavFile mvm_meltdown_rc5_whurr //thank you whurr
+FixWavespawnReserveSlotsOnDisabledSpawnbot 1 // Fix wavespawn reserving slots even when spawnbot is disabled
+//StuckTimeMultiplier 3.5 	
+
+PrecacheSound "metal_popper_giant_mode_active_1.mp3"
+PrecacheSound "metal_popper_giant_mode_active_2.mp3"
+PrecacheSound "metal_popper_giant_mode_active_3.mp3"
+PrecacheSound "metal_popper_giant_mode_active_4.mp3"
+PrecacheSound "metal_popper_giant_mode_active_5.mp3"
+PrecacheSound "andrew_hulshult_deep_in_the_code.mp3"
+PrecacheSound "andrew_hulshult_deep_in_the_code_loop.mp3"
+PrecacheGeneric "scripts/lights_out.raw"
+PrecacheModel "models\bots\soldier_boss\bot_soldier_boss_gibby.mdl"
+PrecacheModel	"models/bots/boss_bot/combat_tank/combat_tank.mdl"
+PrecacheModel	"models/bots/boss_bot/combat_tank/combat_tank_minigun.mdl"
+PrecacheModel	"models/bots/boss_bot/combat_tank/combat_tank_rocketpod.mdl"
+PrecacheModel	"models/bots/boss_bot/combat_tank/combat_tank_rocket.mdl"
+PrecacheModel 	"models/bots/sniper_boss/bot_sniper_boss.mdl"
+
+Templates
+{
+	T_TFBot_Giant_Soldier_RocketShotgun_Chief
+	{
+		Class Soldier
+		Skill Expert
+		Attributes Miniboss
+		Health 60000
+		Name "Purple Heart"
+		ClassIcon soldier_blackbox_hyper
+		Action FetchFlag
+		Attributes UseBossHealthBar
+		UseMeleeThreatPrioritization 1
+		FireInput
+		{
+			Target w6_music
+			Action Trigger
+			Delay 0.01
+			Repeats 1
+		}
+		FireInput
+		{
+			Target player
+			Action $DisplayTextChat
+			Param "{BBFFBB}Now Playing: {FF0000}Deep In The Code, Doom OST, remixed by Andrew Hulshult{FF0000}"
+			Delay 0
+			Repeats 1
+			IfHealthBelow 100001
+		}		
+		
+		ChangeAttributes     //Periodically changes bot attributes, defined in EventChangeAttributes
+		{
+				Delay 0.01 //Time before the first bot attribute change (Default: 10)
+				Repeats 1 //How many times should bot change attributes in total (Default: 0 - Infinite)
+				IfHealthBelow 40001 //When set, the task activates only when the bot health is below specified value
+				Name "A" // Name of the bot attributes listed in EventChangeAttributes
+		}		
+		FireInput
+		{
+			Target purple_heart_danger_indicator
+			Action Enable
+			Delay 0.01
+			Repeats 1
+			IfHealthBelow 40001
+		}
+		FireInput
+		{
+			Target grenadelaunch_timer
+			Action Enable
+			Delay 0.01
+			Repeats 1
+			IfHealthBelow 40001
+		}
+		FireInput
+		{
+			Target grenadelaunch_timer
+			Action Disable
+			Delay 0.01
+			Repeats 1
+			IfHealthBelow 20001
+		}
+		FireInput
+		{
+			Target grenadelaunch_timer_giga
+			Action Enable
+			Delay 0.01
+			Repeats 1
+			IfHealthBelow 20001
+		}		
+		FireInput
+		{
+			Target player
+			Action $DisplayTextChat
+			Param "{99CCFF}Purple Heart{reset} : {fbeccf}Hello there, I am not going to die"
+			Delay 2
+			Repeats 1
+			IfHealthBelow 60001
+		}
+		FireInput
+		{
+			Target player
+			Action $DisplayTextChat
+			Param "{99CCFF}Purple Heart{reset} : {fbeccf}I hope your teammates {FFFF00}have functioning brains."
+			Delay 4
+			Repeats 1
+			IfHealthBelow 60001
+		}
+
+		FireInput
+		{
+			Target player
+			Action $DisplayTextChat
+			Param "{99CCFF}Purple Heart{reset} : {fbeccf}Go on, {FFFF00}come closer"
+			Delay 0.01
+			Repeats 1
+			IfHealthBelow 40001
+		}
+		FireInput
+		{
+			Target player
+			Action $DisplayTextChat
+			Param "{99CCFF}Purple Heart{reset} : {FFFF00}I will not perform an unlicensed crainiectomy on you."
+			Delay 2
+			Repeats 1
+			IfHealthBelow 40001
+		}
+		FireInput
+		{
+			Target player
+			Action $DisplayTextChat
+			Param "{99CCFF}Purple Heart{reset} : {fbeccf}Well this is less than ideal, isn't it?"
+			Delay 0.01
+			Repeats 1
+			IfHealthBelow 20001
+		}
+		FireInput
+		{
+			Target player
+			Action $DisplayTextChat
+			Param "{99CCFF}Purple Heart{reset} : {FFFF00}Dodge this."
+			Delay 2
+			Repeats 1
+			IfHealthBelow 20001
+		}		
+		ChangeAttributes     //Periodically changes bot attributes, defined in EventChangeAttributes
+		{
+				Delay 0.01 //Time before the first bot attribute change (Default: 10)
+				Repeats 1 //How many times should bot change attributes in total (Default: 0 - Infinite)
+				IfHealthBelow 20001 //When set, the task activates only when the bot health is below specified value
+				Name "B" // Name of the bot attributes listed in EventChangeAttributes
+		}		
+		FireInput   
+		{
+			Target "!activator"
+			Action "runscriptcode"
+			Param "DispatchParticleEffect(`ExplosionCore_MidAir`,self.GetOrigin(),Vector(0,0,0))"
+			Delay 0
+			Repeats 1
+			IfHealthBelow 40001
+		}		
+		FireInput   
+		{
+			Target "!activator"
+			Action "runscriptcode"
+			Param "DispatchParticleEffect(`ExplosionCore_MidAir`,self.GetOrigin(),Vector(0,0,0))"
+			Delay 0
+			Repeats 1
+			IfHealthBelow 20001
+		}
+		FireInput   
+		{
+			Target "!activator"
+			Action "SetHealth"
+			Param "40000"
+			Delay 0.02
+			Repeats 1
+			IfHealthBelow 40001
+		}		
+		FireInput   
+		{
+			Target "!activator"
+			Action "SetHealth"
+			Param "20000"
+			Delay 0.02
+			Repeats 1
+			IfHealthBelow 20001
+		}		
+		SpawnTemplate "purple_heart_pt"
+		EventChangeAttributes
+		{
+			Default
+			{
+				Item "The Black Box"
+				WeaponRestrictions PrimaryOnly
+				Attributes HoldFireUntilFullReload
+				Attributes MiniBoss
+				Attributes SpawnWithFullCharge
+				Item "The Concheror"
+				ItemAttributes
+				{
+					ItemName "The Black Box"
+					"damage bonus" 0.45 //blackbox
+					"heal on hit for rapidfire" 400
+					"clip size upgrade atomic" 1
+					"projectile spread angle penalty" 5
+					"mult projectile count" 3
+					"ignores other projectiles" 1
+					"dmg bonus vs buildings" 2 //engineer deletes this boss, this is here to make that not the case
+					
+				}				
+				CharacterAttributes
+				{
+					"move speed bonus"	0.5
+					"damage force reduction" 0.4
+					"airblast vulnerability multiplier" 0.4
+					"override footstep sound set" 3
+					"addcond immunity" 29 //cannot benefit from own buff
+					"increase buff duration" 9000	
+					"rocket jump damage reduction" 0.01
+					"cannot pick up intelligence" 1
+					"increase buff duration" 9000
+				}
+				Item "Armored Authority"				
+			}
+			
+			A
+			{
+				Item "The Black Box"
+				Item "The Half-Zatoichi"
+				Item "The Concheror"
+				WeaponRestrictions PrimaryOnly
+				Attributes HoldFireUntilFullReload
+				Attributes MiniBoss
+				ItemAttributes
+				{
+					ItemName "The Black Box"
+					"damage bonus" 0.6 //blackbox
+					"heal on hit for rapidfire" 400
+					"clip size upgrade atomic" 1
+					"projectile spread angle penalty" 5
+					"mult projectile count" 3
+					"ignores other projectiles" 1
+					"faster reload rate" 0.85
+					"dmg bonus vs buildings" 2 //engineer deletes this boss, this is here to make that not the case
+					"passive reload" 1
+				}			
+				WeaponSwitch
+				{
+					Type "Melee"
+					MaxTargetRange 200
+					MinTargetRange 0
+					Delay 0.1
+					Repeats 0
+					Cooldown 0
+					IfSeeTarget 1
+				}
+				WeaponSwitch
+				{
+					Type "Primary"
+					MaxTargetRange 9999
+					MinTargetRange 300
+					Delay 0.1
+					Repeats 0
+					Cooldown 0
+					IfSeeTarget 1
+				}				
+				ItemAttributes
+				{
+				ItemName "The Concheror"
+				"effect add attributes" "SET BONUS: health regen set bonus|10"
+				}
+				ItemAttributes
+				{
+				ItemName "The Half-Zatoichi"
+				"provide on active" 1
+				"damage bonus" 1.5
+				"honorbound" 0
+				"restore health on kill" 0
+				"heal on kill" 4000
+				"CARD: move speed bonus" 1.5
+				"damage blast push" 30
+				"dmg bonus vs buildings" 5 //engineer deletes this boss, this is here to make that not the case
+				"melee range multiplier" 1.35
+				"hand scale" 1.4
+				"switch from wep deploy time decreased" 0.5
+				"melee cleave attack" 1 //fuck you shield
+				}
+				CharacterAttributes
+				{
+					"move speed bonus"	0.5
+					"damage force reduction" 0.4
+					"airblast vulnerability multiplier" 0.4
+					"override footstep sound set" 3
+					"max health additive penalty" -20000
+					"increase buff duration" 9000
+					"rocket jump damage reduction" 0.01
+					"cannot pick up intelligence" 1
+				}
+				Item "Armored Authority"
+				Item "Beaten and Bruised"				
+			}
+			
+			B
+			{
+				UseCustomModel models/bots/soldier_boss/bot_soldier_boss_gibby.mdl
+				Item "The Black Box"
+				Item "The Half-Zatoichi"
+				Item "The Concheror"			
+				WeaponRestrictions PrimaryOnly
+				Attributes HoldFireUntilFullReload
+				Attributes MiniBoss
+				ItemAttributes
+				{
+					ItemName "The Black Box"
+					"heal on hit for rapidfire" 250
+					"clip size upgrade atomic" 26.0 //colonel
+					"faster reload rate" 0.19
+					"fire rate bonus" 0.2
+					"projectile spread angle penalty" 5
+					"Projectile speed increased" 0.4
+					"ignores other projectiles" 1
+					"dmg bonus vs buildings" 3 //engineer deletes this boss, this is here to make that not the case
+					"passive reload" 1
+				}	
+				WeaponSwitch
+				{
+					Type "Melee"
+					MaxTargetRange 200
+					MinTargetRange 0
+					Delay 0.1
+					Repeats 0
+					Cooldown 0
+					IfSeeTarget 1
+				}
+				WeaponSwitch
+				{
+					Type "Primary"
+					MaxTargetRange 9999
+					MinTargetRange 300
+					Delay 0.1
+					Repeats 0
+					Cooldown 0
+					IfSeeTarget 1
+				}
+				ItemAttributes
+				{
+				ItemName "The Concheror"
+				"effect add attributes" "SET BONUS: health regen set bonus|30"
+				}
+				ItemAttributes
+				{
+				ItemName "The Half-Zatoichi"
+				"provide on active" 1
+				"damage bonus" 1.5
+				"honorbound" 0
+				"restore health on kill" 0
+				"heal on kill" 8000
+				"CARD: move speed bonus" 1.65
+				"damage blast push" 30
+				"dmg bonus vs buildings" 10 //die
+				"melee range multiplier" 1.35
+				"hand scale" 1.4	
+				"switch from wep deploy time decreased" 0.5
+				"melee cleave attack" 1 //fuck you shield
+				}				
+				CharacterAttributes
+				{
+					"move speed bonus"	0.5
+					"damage force reduction" 0.4
+					"airblast vulnerability multiplier" 0.4
+					"override footstep sound set" 3
+					"max health additive penalty" -20000
+					"increase buff duration" 9000	
+					"rocket jump damage reduction" 0.01
+					"attach particle effect" 3130
+					"cannot pick up intelligence" 1
+				}
+				Item "Armored Authority"
+				Item "Beaten and Bruised"
+				Item "The Main Cast"
+				ItemAttributes
+				{
+				ItemName "Beaten and Bruised"
+				"item style override" 2
+				}				
+			}
+		}
+	}
+	T_TFBot_Giant_Soldier_RocketPush_Reserve_Boss
+	{
+		Class Soldier
+		Skill Expert
+		Item "The Liberty Launcher"
+		Item "The Reserve Shooter"
+		Item "Jumper's Jeepcap"
+		ClassIcon soldier_blast_combo_giant
+		Attributes MiniBoss
+		Attributes HoldFireUntilFullReload
+		Attributes UseBossHealthBar
+		Name "Chief Blast Combo Soldier"
+		Scale 1.9
+		AimAt Feet
+		AimLeadProjectileSpeed 1
+		Health 32000
+		FireInput
+		{
+			Target player
+			Action $DisplayTextChat
+			Param "{99CCFF}Chief Blast Combo Soldier{reset} : {fbeccf}Did you think you were done with me {FFFF33}back at the factory?"
+			Delay 0.01
+			Repeats 1
+			IfHealthBelow 100001
+		}
+		FireInput
+		{
+			Target player
+			Action $DisplayTextChat
+			Param "{99CCFF}Chief Blast Combo Soldier{reset} : {fbeccf}I've been brought around {ffdbbe}to a new way of thinking"
+			Delay 4
+			Repeats 1
+			IfHealthBelow 100001
+		}		
+		ItemAttributes
+		{
+			ItemName "The Liberty Launcher"
+			"damage blast push" 2.5
+			"fire rate bonus" 0.25
+			"clip size upgrade atomic" 3
+			"faster reload rate" 0.8
+			"Blast radius decreased" 1.2
+			"projectile spread angle penalty" 4
+			"dmg bonus vs buildings" 2 //engineer deletes this boss, this is here to make that not the case
+		}
+		ItemAttributes
+		{
+			ItemName "The Reserve Shooter"
+			"fire rate bonus" 0.9
+			"bullets per shot bonus" 10
+			"damage penalty" 0.6
+			"passive reload" 1
+			"faster reload rate" 0.01
+			"weapon spread bonus" 0.6
+		}
+		CharacterAttributes
+		{
+			"move speed bonus"	0.4
+			"override footstep sound set" 3
+			"damage force reduction" 0.4
+			"airblast vulnerability multiplier" 0.4
+			"airblast vertical vulnerability multiplier" 0.1
+			"deploy time increased" 0.5
+		}
+		SpawnTemplate
+		{
+		Name "ReserveCombo"
+		}				
+
+	}	
+}
+	CustomWeapon
+	{
+        "purple_heart_blast_launcher"
+        {
+			
+            OriginalItemName "tf_weapon_grenadelauncher"	
+			"Projectile speed increased" 0.65
+			"blast radius increased" 1.5
+			"damage bonus" 0.1
+			"projectile no deflect" 1
+			"damage blast push" 32
+			"projectile spread angle penalty" 30			
+			"fire rate bonus" 0.1 //shouldn't be necessary, but just in case
+			"clip size upgrade atomic" 7.0
+		}
+	}
+	ExtraSpawnPoint 
+    {
+        Name "spawnbot_gated"
+        TeamNum 5
+        X	"-1867.74"    
+        Y	"7509.46"                  
+        Z	"69.93"             
+    }
+	ExtraSpawnPoint 
+    {
+        Name "spawnbot_gated"
+        TeamNum 5
+        X	"-2546.67"    
+        Y	"7868.51"                  
+        Z	"69.93"             
+    }
+	ExtraSpawnPoint 
+    {
+        Name "spawnbot_gated_flank"
+        TeamNum 5
+        X	"-3321.79"    
+        Y	"6759.7"                  
+        Z	"281.92"             
+    }	
+	
+PointTemplates
+{
+		misc_logic
+		{
+			NoFixup 1				
+			//originally ripped from trespasser
+			env_fog_controller
+			{
+				"farz"          "-1"
+				"fogblend"      "1"
+				"fogcolor"      "24 25 36"
+				"fogcolor2"      "18 20 24"
+				"fogdir"        "1 0 0"
+				"fogenable"     "1"
+				"fogend"        "2200"
+				"foglerptime"   "2"
+				"fogmaxdensity" "0.91"
+				"fogstart"      "0"
+				"spawnflags" 	"1"
+				"targetname"    "mist"
+			}
+			sky_camera
+			{
+				"fogmaxdensity" "0.99"
+				"origin"        "2352.0 520 198"
+				"angles"        "0 0 0"
+				"fogcolor"      "0 0 0"
+				"fogcolor2"      "0 0 0"
+				"fogdir"        "1 0 0"
+				"fogenable"     "1"
+				"fogend"        "1"
+				"fogstart"      "1"
+				"scale"         "16"       
+				"targetname"    "mist_camera" 
+			}
+			trigger_multiple
+			{
+				"targetname"    "fog_system"
+				"origin"        "1847 -4007 71"
+				"mins"          "-9999 -9999 -9999"
+				"maxs"          "9999 9999 9999"
+				"StartDisabled" "0"
+				"spawnflags"    "1"
+				"OnStartTouch"  "!activator,SetFogController,mist,0.01,-1"
+			}
+			color_correction
+			{
+				"targetname" "dark_correction"
+				"filename" "scripts/lights_out.raw"
+				"maxfalloff" "-1"
+				"maxweight" "0.25"
+				"minfalloff" "-1"
+			}			
+			//resets fog, might be useful when the mission ends
+			logic_relay
+			{
+				"origin" "-1611.31 4748.55 169.35"
+				"targetname" "fog_old"
+				"ontrigger" "player,SetFogController,fog_controller,0.01,-1"
+				"ontrigger" "worldspawn,runscriptcode,SetSkyboxTexture(`sky_badlands_01`),0,-1"
+			}
+			logic_relay
+			{
+			"targetname" "misc_logic"
+			"onspawn" "worldspawn,runscriptcode,SetSkyboxTexture(`sky_nightfall_01`),0,-1"
+			"onspawn" "load_color_volume,Enable,,0,-1"
+			"onspawn" "spawnbot_gated*,Disable,,0,-1"
+			}
+			logic_relay
+			{
+			"targetname" "w4_relay"
+			"OnTrigger" "boss_path_54,AddOutput,OnPass !activator:SetSpeed:0:0:-1,0,-1"
+			"OnTrigger" "bombpath_right,Trigger,,0,-1"
+			}
+			ambient_generic
+			{
+				"targetname" "w6_music_player"
+				"message" "#andrew_hulshult_deep_in_the_code.mp3"
+				"health" "10"
+				"radius" "69420"
+				"spawnflags" "17"
+			}
+			ambient_generic
+			{
+				"targetname" "w6_music_player_Loop"
+				"message" "#andrew_hulshult_deep_in_the_code_loop.mp3"
+				"health" "10"
+				"radius" "69420"
+				"spawnflags" "17"
+			}			
+			logic_relay
+			{
+			    "targetname" "w6_music"
+				"OnTrigger" "w6_music_player,PlaySound,,0,-1"
+				"OnTrigger" "w6_music_player,StopSound,,133,-1"
+				"OnTrigger" "w6_music_loop,Trigger,,133,-1"
+			}
+			logic_relay
+			{
+			    "targetname" "w6_music_loop1"
+				"OnTrigger" "w6_music_player_Loop,PlaySound,,0,-1"
+				"OnTrigger" "w6_music_loop2,Trigger,133,-1"
+			}
+			logic_relay
+			{
+			    "targetname" "w6_music_loop2"
+				"OnTrigger" "w6_music_player_Loop,PlaySound,,0,-1"
+				"OnTrigger" "w6_music_loop1,Trigger,133,-1"
+			}			
+			logic_relay
+			{
+			    "targetname" "w6_music_end"
+				"OnTrigger" "w6_music_player,Volume,0.01,0,-1"
+				"OnTrigger" "w6_music_player_Loop,Volume,0.01,0,-1"
+				"OnTrigger" "w6_music_loop*,Kill,0.01,0,-1"
+			}			
+				prop_dynamic
+				{
+					"targetname" "no_pit"
+					origin "-1750.2 5360.42 0"
+					"angles" "0 90 0"
+					"model" "models\props_vehicles\train_flatcar_container.mdl"
+					"disableshadows" "1"
+					"modelscale" "1"
+					"SetBodyGroup" "0"
+					"skin" "0"
+					"solid" "6"
+					"spawnflags" "0"
+				}
+				prop_dynamic
+				{
+					"targetname" "no_pit"
+					origin "-1750.2 5360.42 150"
+					"angles" "0 90 0"
+					"model" "models\props_vehicles\train_flatcar_container.mdl"
+					"disableshadows" "1"
+					"modelscale" "1"
+					"SetBodyGroup" "0"
+					"skin" "0"
+					"solid" "6"
+					"spawnflags" "0"
+				}
+            trigger_push
+			{
+				"targetname" "ILoveCleaningUpAfterTheMapMakerSOFUCKINGMUCH"
+				"pushdir" "0 0 0"
+				"speed" 256
+				"spawnflags" "1"
+                "StartDisabled" "0"
+				"mins" "-200 -200 -20"
+				"maxs" "200 200 72"
+				"origin" "-1421.25 4206.89 441.63"		
+			}				
+			//unfucks the forward upgrade station
+			OnSpawnOutput
+			{
+				Target func_upgradestation
+				Action Enable
+			}			
+		}
+		purple_heart_pt
+		{
+			prop_dynamic
+			{
+				"model" "models/props_gameplay/cap_circle_320.mdl"
+				"disableshadows" 1
+				"startdisabled" 1
+				"modelscale" "0.625"
+				"targetname" purple_heart_danger_indicator
+				"skin" 2
+				"origin" "0 0 -0.2"
+			}
+			prop_dynamic
+			{
+				"model" "models/props_gameplay/cap_circle_320.mdl"
+				"disableshadows" 1
+				"startdisabled" 1
+				"modelscale" "0.625"
+				"targetname" purple_heart_danger_indicator
+				"skin" 2
+				"origin" "0 0 15"
+			}
+			info_target
+			{
+			"targetname" "CenterSpawnBeacon"
+			"origin" "0 0 0.2"
+			}
+			logic_timer
+			{
+				"targetname" "grenadelaunch_timer"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.06,-1" //matches gburst demo		
+				"OnTimer"	"grenadeLauncher,fireonce,,0.12,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.18,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.24,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.3,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.36,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.42,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.48,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.54,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.6,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.66,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.48,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.54,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.6,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.66,-1"				
+				"RefireTime" "7"
+				"StartDisabled" "1"
+			}
+			logic_timer
+			{
+				"targetname" "grenadelaunch_timer_giga"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.06,-1" //matches gburst demo		
+				"OnTimer"	"grenadeLauncher,fireonce,,0.12,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.18,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.24,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.3,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.36,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.42,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.48,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.54,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.6,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.66,-1"	
+				"OnTimer"	"grenadeLauncher,fireonce,,0.48,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.54,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.6,-1"
+				"OnTimer"	"grenadeLauncher,fireonce,,0.66,-1"					
+				"RefireTime" "4"
+				"StartDisabled" "1"
+			}			
+			 tf_point_weapon_mimic
+            {
+                "targetname" "grenadeLauncher"
+                "origin" "0 0 90"
+                "angles" "-35 -45 0"
+                "teamnum" "3"
+                "$weaponname" "purple_heart_blast_launcher"
+            }
+			 tf_point_weapon_mimic
+            {
+                "targetname" "grenadeLauncher"
+                "origin" "0 0 90"
+                "angles" "-35 45 0"
+                "teamnum" "3"
+                "$weaponname" "purple_heart_blast_launcher"
+            }			
+			OnSpawnOutput
+			{
+			Target "CenterSpawnBeacon"
+			Action "SetParent"
+			Param  "!activator"
+			Repeats 1
+			}
+			OnSpawnOutput
+			{
+				Target "grenadeLauncher"
+				Action $SetOwner
+				Param "@p@CenterSpawnBeacon"
+				Delay 0
+			}			
+		}
+}
+	Mission
+	{
+		Where spawnbot
+		Objective DestroySentries
+		BeginAtWave 1
+		RunForThisManyWaves 6
+		CooldownTime 40
+		DesiredCount 1
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+		}
+	}
+	Mission //Blue spies on wave 1
+	{
+		Where spawnbot
+		Objective Spy
+		InitialCooldown 10
+		CooldownTime 25
+		BeginAtWave 1
+		RunForThisManyWaves 1
+		DesiredCount 2
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Skill Normal
+		}
+	}	
+	Mission //Blue snipers on wave 2
+	{
+		Where spawnbot_flank
+		Objective Sniper
+		InitialCooldown 15
+		CooldownTime 20
+		BeginAtWave 2
+		RunForThisManyWaves 1
+		DesiredCount 2
+		TFBot
+		{
+			Template T_TFBot_Sniper
+			PreferClass Sniper
+		}
+	}	
+	Mission //Blue spies on wave 3
+	{
+		Where spawnbot
+		Objective Spy
+		InitialCooldown 10
+		CooldownTime 25
+		BeginAtWave 3
+		RunForThisManyWaves 1
+		DesiredCount 2
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Skill Normal
+		}
+	}
+	Mission //Blue snipers on wave 4
+	{
+		Where spawnbot_flank
+		Objective Sniper
+		InitialCooldown 15
+		CooldownTime 20
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		DesiredCount 2
+		TFBot
+		{
+			Template T_TFBot_Sniper
+			PreferClass Sniper
+		}
+	}
+	Mission //Blue spies on wave 5
+	{
+		Where spawnbot
+		Objective Spy
+		InitialCooldown 10
+		CooldownTime 25
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		DesiredCount 2
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Skill Normal
+		}
+	}
+	Mission //Blue snipers on wave 5
+	{
+		Where spawnbot_flank
+		Objective Sniper
+		InitialCooldown 15
+		CooldownTime 18
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		DesiredCount 4
+		TFBot
+		{
+			Template T_TFBot_Sniper
+			PreferClass Sniper
+		}
+	}	
+	SpawnTemplate "misc_logic"
+// WAVE 1 [$600]
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target bombpath_choose_relay
+			Action Trigger
+		}		
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave01a1"
+			Where spawnbot
+
+			TotalCount 3
+			MaxActive  3
+			SpawnCount 1
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  18
+
+			TFBot 
+			{ 
+			Template T_TFBot_Giant_Soldier_Spammer
+			}
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave01a"
+			Where spawnbot
+
+			TotalCount 20
+			MaxActive  6
+			SpawnCount 4
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  2.1
+
+			TFBot 
+			{ 
+			Template T_TFBot_Heavyweapons_Shotgun
+			PreferClass Sniper
+			}
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave01a"
+			Where spawnbot_flank
+
+			TotalCount 28
+			MaxActive  6
+			SpawnCount 4
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  1
+
+			TFBot 
+			{ 
+				Template T_TFBot_FlareGun_FastShot
+				PreferClass Sniper
+			}
+		}
+		
+// DUMMY
+				WaveSpawn
+		{
+			Name "wave01signaller"
+			TotalCount 0
+			SpawnCount 0
+
+			WaitBeforeStarting 0
+			WaitForAllDead     "wave01a1"
+		}
+				WaveSpawn
+		{
+			Name "wave01signaller"
+			TotalCount 0
+			SpawnCount 0
+
+			WaitBeforeStarting 0
+			WaitForAllSpawned     "wave01a"
+		}		
+		
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave01b1"
+			Where spawnbot
+
+			TotalCount 3
+			MaxActive  3
+			SpawnCount 1
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  18
+			WaitForAllDead "wave01a1"
+
+			TFBot 
+			{ 
+			Template T_TFBot_Giant_Heavy_Gauntlet_Pusher
+			}
+		}		
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave01b"
+			Where spawnbot_flank
+
+			TotalCount 32
+			MaxActive  6
+			SpawnCount 3
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  3.5
+			WaitForAllDead "wave01signaller"
+
+				TFBot 
+				{ 
+				Template T_TFBot_Scout_Cola
+				PreferClass Sniper
+				}
+		}
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave01b2"
+			Where spawnbot
+
+			TotalCount 18
+			MaxActive  6
+			SpawnCount 4
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  5
+			WaitForAllDead "wave01a1"
+
+			Squad
+			{
+				TFBot 
+				{ 
+					Class Soldier
+					Skill Expert
+				}
+				TFBot 
+				{ 
+					Template T_TFBot_Medic
+				}			
+			}
+		}
+
+		//  [$25]
+		WaveSpawn
+		{
+			Name  "wave01c1"
+			Where spawnbot
+
+			TotalCount 6
+			MaxActive  6
+			SpawnCount 2
+			TotalCurrency 25
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  14
+			WaitForAllDead "wave01b1"
+			
+			Squad
+			{
+				TFBot 
+				{ 
+				Template T_TFBot_Giant_Demoman
+				}
+				TFBot 
+				{ 
+					Template T_TFBot_Medic_Bigheal
+				}			
+			}	
+		}
+		//  [$25]
+		WaveSpawn
+		{
+			Name  "wave01c2"
+			Where spawnbot
+
+			TotalCount 6
+			MaxActive  6
+			SpawnCount 2
+			TotalCurrency 25
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  14
+			WaitForAllSpawned "wave01c1"
+			
+			Squad
+			{
+				TFBot 
+				{ 
+					Template T_TFBot_Giant_Soldier_RocketShotgun_Battered
+					ClassIcon soldier_blackbox_giant
+				}
+				TFBot 
+				{ 
+					Template T_TFBot_Medic_Bigheal
+				}			
+			}	
+		}		
+		//  [$100]
+		WaveSpawn
+		{
+			Where spawnbot_flank
+
+			TotalCount 24
+			MaxActive  6
+			SpawnCount 3
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  3.5
+			WaitForAllSpawned "wave01b"
+			Support 1
+
+			TFBot 
+			{ 
+			Template T_TFBot_Sniper_Carbine
+			PreferClass Sniper
+			}
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave01c"
+			Where spawnbot
+
+			TotalCount 14
+			MaxActive  5
+			SpawnCount 1
+			TotalCurrency 50
+
+			WaitBeforeStarting 6
+			WaitBetweenSpawns  4
+			WaitForAllSpawned "wave01b2"
+
+			TFBot 
+			{ 
+				Template T_TFBot_Pyro_DragonsFury_MiniGiant
+			}
+		}		
+
+		
+
+		
+	}
+// WAVE 2 [$600]
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target bombpath_right
+			Action Trigger
+		}
+		
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave02a1"
+			Where spawnbot
+
+			TotalCount 9
+			MaxActive  9
+			SpawnCount 3
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  16
+
+			Squad
+			{
+				TFBot 
+				{ 
+					Template T_TFBot_Giant_Scout_Armored
+				}
+				TFBot 
+				{ 
+					Template T_TFBot_Medic_Bigheal
+				}
+				TFBot 
+				{ 
+					Template T_TFBot_Medic_Bigheal
+				}			
+			}
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave02a"
+			Where spawnbot
+
+			TotalCount 28
+			MaxActive  7
+			SpawnCount 3
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  1
+
+			RandomChoice
+			{
+				TFBot 
+				{ 
+					Class Demoman
+					Skill Expert
+				}
+				TFBot 
+				{ 
+					Class Demoman
+					Skill Hard
+				}
+				TFBot 
+				{ 
+					Class Demoman
+					Skill Expert
+				}
+				TFBot 
+				{ 
+					Class Demoman
+					Skill Hard
+				}				
+				TFBot 
+				{ 
+					Class Demoman
+					Skill Normal
+				}				
+			}
+		}
+
+		//  [$50]
+		WaveSpawn
+		{
+			Where spawnbot_flank
+
+			TotalCount 32
+			MaxActive  5
+			SpawnCount 4
+			TotalCurrency 0
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  4
+			WaitForAllDead "wave02a1"
+			Support 1
+
+			TFBot 
+			{ 
+				Class Spy
+				Action FetchFlag
+				Skill Expert
+				Name "Active Camo Spy"
+				ClassIcon spy_revolver_lite
+				Item "Night Vision Gawkers"
+				Item "A Hat to Kill For"
+				PreferClass Sniper
+				AddCond
+				{
+						Index 66
+						Delay 0.3		
+				}
+				AddCond
+				{
+					Index 27
+					Delay 0.2
+				}				
+				CharacterAttributes
+				{
+				"cannot disguise" 1
+				"cannot pick up intelligence" 1
+				}
+			}				
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave02b"
+			Where spawnbot
+
+			TotalCount 18
+			MaxActive  7
+			SpawnCount 4
+			TotalCurrency 75
+
+			WaitBeforeStarting 6
+			WaitBetweenSpawns  2
+			WaitForAllDead "wave02a1"
+
+			TFBot 
+			{ 
+				Class Heavyweapons
+				Skill Normal
+				Name "Heavy"
+			}				
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave02b1"
+			Where spawnbot
+
+			TotalCount 4
+			MaxActive  4
+			SpawnCount 1
+			TotalCurrency 75
+
+			WaitBeforeStarting 6
+			WaitBetweenSpawns  16
+			WaitForAllDead "wave02a1"
+
+			TFBot 
+			{ 
+				Template T_TFBot_Giant_Soldier_Spammer_Reload
+			}				
+		}		
+		// Tank (25000 HP) [$50]
+		WaveSpawn
+		{
+			Name       "wave02b1"
+			TotalCount 1
+			MaxActive  1
+			SpawnCount 1
+			TotalCurrency 50
+
+			WaitBeforeStarting 6
+			WaitBetweenSpawns  0
+			WaitForAllDead     "wave02a1"
+			FirstSpawnMessage "{6666FF}Tank deployed with 25k (25000) HP!"
+
+			FirstSpawnOutput
+			{
+				Target boss_spawn_relay
+				Action Trigger
+			}
+			
+			Tank
+			{
+				Health	25000
+				Name	Tank
+				Speed	75
+				StartingPathTrackNode boss_path_1
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+		//thank you package
+		WaveSpawn
+        {
+            WaitBeforeStarting 26
+            WaitForAllSpawned wave02b1
+            FirstSpawnOutput
+            {
+                 Target wave_start_relay
+                Action RunScriptCode
+                Param "
+                    EntFire(`spawnbot_gated`, `Enable`)
+                "
+            }
+        }
+        WaveSpawn
+        {
+            WaitBeforeStarting 0
+            WaitForAllDead wave02b1
+            FirstSpawnOutput
+            {
+                 Target wave_start_relay
+                Action RunScriptCode
+                Param "
+                    EntFire(`spawnbot_gated*`, `Enable`)
+                "
+            }
+        }		
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave02c1"
+			Where spawnbot_gated
+
+			TotalCount 6
+			MaxActive  6
+			SpawnCount 2
+			TotalCurrency 150
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  20
+
+			Squad
+			{
+				TFBot 
+				{ 
+					Template T_TFBot_Giant_Heavyweapons
+				}
+				TFBot 
+				{ 
+					Template T_TFBot_Giant_Soldier_Spammer_Reload
+				}				
+			}			
+		}
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave02c1"
+			Where spawnbot_gated
+
+			TotalCount 18
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 150
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  3
+			Support 1
+
+			TFBot 
+			{ 
+				Template T_TFBot_Soldier_Extended_Concheror
+			}				
+		}		
+
+		
+	}
+// WAVE 3 [$600]
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target bombpath_choose_relay
+			Action Trigger
+		}		
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave03a1"
+			Where spawnbot
+
+			TotalCount 6
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  22
+			WaitForAllDead "wave02b1"
+
+			Squad
+			{
+				TFBot 
+				{ 
+					Template T_TFBot_Giant_Demo_Burst
+				}
+				TFBot 
+				{ 
+					Template T_TFBot_Giant_Medic_Kritz
+				}				
+			}			
+		}
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave03a"
+			Where spawnbot
+
+			TotalCount 9
+			MaxActive  4
+			SpawnCount 1
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  6.5
+			WaitForAllDead "wave02b1"
+
+				TFBot 
+				{ 
+					Template T_TFBot_Sniper_Huntsman_Spammer_Fat
+				}						
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave03a"
+			Where spawnbot_flank
+
+			TotalCount 42
+			MaxActive  6
+			SpawnCount 4
+			TotalCurrency 50
+
+			WaitBeforeStarting 0.2
+			WaitBetweenSpawns  2
+			TFBot
+			{
+				Class Scout
+				Skill Normal
+			}
+		}
+
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave03b"
+			Where spawnbot
+			Where spawnbot_flank
+
+			TotalCount 20
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  2.2
+			WaitForAllDead "wave03a1"
+			TFBot
+			{
+				Template T_TFBot_Soldier_Pale_Burst_Laser
+			}
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave03b"
+			Where spawnbot_flank
+			Where spawnbot
+
+			TotalCount 20
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  2.2
+			WaitForAllDead "wave03a1"
+			TFBot
+			{
+				Template T_TFBot_Sniper_Huntsman
+				Skill Expert
+			}
+		}		
+		//  [$25]
+		WaveSpawn
+		{
+			Name  "wave03b1"
+			Where spawnbot
+
+			TotalCount 12
+			MaxActive  12
+			SpawnCount 2
+			TotalCurrency 25
+
+			WaitBeforeStarting 5
+			WaitBetweenSpawns  11
+			WaitForAllDead "wave03a1"
+
+				Squad
+				{
+					TFBot
+					{
+						Template T_TFBot_Giant_Pyro_Fury_Spammer				
+					}
+					TFBot
+					{
+						Template T_TFBot_Medic				
+					}					
+				}				
+		}
+		//  [$25]
+		WaveSpawn
+		{
+			Name  "wave03b1"
+			Where spawnbot
+
+			TotalCount 12
+			MaxActive  12
+			SpawnCount 2
+			TotalCurrency 25
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  11
+			WaitForAllDead "wave03a1"
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_RapidFire				
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic				
+				}					
+			}					
+		}		
+
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave03c1"
+			Where spawnbot
+
+			TotalCount 1
+			MaxActive  1
+			SpawnCount 1
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  20
+			WaitForAllDead "wave03b1"
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_RocketPush_Reserve_Boss
+			}
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Where spawnbot
+
+			TotalCount 50
+			MaxActive  5
+			SpawnCount 3
+			TotalCurrency 50
+			Support 1
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  2.2
+			WaitForAllDead "wave03b1"
+			TFBot
+			{
+				Template T_TFBot_Soldier_Burst
+			}
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Where spawnbot_flank
+
+			TotalCount 50
+			MaxActive  5
+			SpawnCount 3
+			TotalCurrency 50
+			Support 1
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  2.2
+			WaitForAllDead "wave03b1"
+			TFBot
+			{
+				Template T_TFBot_Demo_Burst
+			}
+		}		
+
+		
+	}
+// WAVE 4 [$600]
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		InitWaveOutput
+		{
+			Target wave_start_relay
+			Action runscriptcode
+			Param "
+IncludeScript(`tankextensions_main`, getroottable())
+IncludeScript(`tankextensions/combattank`, getroottable())
+IncludeScript(`tankextensions/combattank_weapons/minigun`, getroottable())
+IncludeScript(`tankextensions/combattank_weapons/rocketpod`, getroottable())
+"		
+		}
+
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave04b1"
+			Where spawnbot
+
+			TotalCount 6
+			MaxActive  5
+			SpawnCount 1
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  12
+			TFBot
+			{
+				Template T_TFBot_Giant_Sniper_Huntsman_Spammer
+				UseCustomModel "models/bots/sniper_boss/bot_sniper_boss.mdl"
+			}
+		}
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave04b"
+			Where spawnbot
+
+			TotalCount 32
+			MaxActive  7
+			SpawnCount 3
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  2.2		
+			RandomChoice
+			{
+				TFBot
+				{
+					Class Soldier
+					Skill Expert
+				}
+				TFBot
+				{
+					Class Soldier
+					Skill Hard
+				}
+				TFBot
+				{
+					Class Soldier
+					Skill Hard
+					PreferClass Sniper
+				}				
+				TFBot
+				{
+					Class Soldier
+					Skill Expert
+					PreferClass Sniper
+				}
+				TFBot
+				{
+					Class Soldier
+					Skill Normal
+				}				
+			}
+		}
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave04b1"
+			Where spawnbot
+
+			TotalCount 20
+			MaxActive  20
+			SpawnCount 5
+			TotalCurrency 100
+
+			WaitBeforeStarting 3
+			WaitBetweenSpawns  18		
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Spammer_Reload_Buff_Banner
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic
+				}				
+				TFBot
+				{
+					Template T_TFBot_Medic
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic
+				}				
+			}
+		}
+		
+		
+		//  [$25]
+		WaveSpawn
+		{
+			Name  "wave04c1"
+			Where spawnbot
+
+			TotalCount 4
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 25
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  18.5
+			WaitForAllDead "wave04b1"
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons_Shotgun
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Regen
+				}			
+			}
+		}
+		//  [$25]
+		WaveSpawn
+		{
+			Name  "wave04c2"
+			Where spawnbot
+
+			TotalCount 4
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 25
+
+			WaitBeforeStarting 17
+			WaitBetweenSpawns  17
+			WaitForAllSpawned "wave04c1"
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Spammer
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Regen
+				}		
+			}
+		}
+		//  [$50]
+		WaveSpawn
+		{
+			Name  "wave04a"
+			Where spawnbot_flank
+
+			TotalCount 42
+			MaxActive  7
+			SpawnCount 3
+			TotalCurrency 25
+
+			WaitBeforeStarting 0.2
+			WaitBetweenSpawns  2
+			WaitForAllDead "wave04b1"
+			TFBot
+			{
+				Class Demoman
+				Skill Expert
+			}
+		}		
+
+		//  [$25]
+		WaveSpawn
+		{
+			Where spawnbot
+
+			TotalCount 64
+			MaxActive  5
+			SpawnCount 3
+			TotalCurrency 50
+
+			WaitBeforeStarting 6
+			WaitBetweenSpawns  2.7
+			WaitForAllSpawned "wave04a"
+			Support 1
+			
+
+			TFBot
+			{
+				Template T_TFBot_Demo_Persian
+			}
+		}
+		//  [$25]
+		WaveSpawn
+		{
+			Where spawnbot
+
+			TotalCount 64
+			MaxActive  5
+			SpawnCount 3
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  2.7
+			WaitForAllSpawned "wave04a"
+			Support 1
+			
+
+			TFBot
+			{
+				Class Scout
+				Skill Normal
+			}
+		}
+		//  [$100]
+		WaveSpawn
+		{
+			Name  "wave04a1"
+			Where spawnbot
+
+			TotalCount 3
+			MaxActive  3
+			SpawnCount 1
+			TotalCurrency 50
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  20
+			WaitForAllDead "wave04c2"
+			TFBot
+			{
+				Template T_TFBot_Heater_Heavy_Giant
+			}
+		}
+		// Tank (25000 HP) [$50]
+		WaveSpawn
+		{
+			Name       "wave04a1"
+			TotalCount 1
+			MaxActive  1
+			SpawnCount 1
+			TotalCurrency 25
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  0
+
+			FirstSpawnMessage "{6666FF}Combat Tank deployed with 25k (25000) HP!"
+			WaitForAllDead "wave04c2"
+			FirstSpawnOutput
+			{
+				Target	combattank_spawn_relay
+				Action	Trigger
+			}
+			Tank
+			{
+				Name	"combattank|rocketpod|rocketpod"
+				Health	25000
+				Speed	69
+				ClassIcon	tank_combat_rocket
+				StartingPathTrackNode	"boss_path_1"
+				OnBombDroppedOutput 
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+			
+		}		
+
+		
+	}
+// WAVE 5 [$600]
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name "wave06a1"
+			Where spawnbot
+
+			TotalCount 8
+			MaxActive  8
+			SpawnCount 2
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  21
+
+			Squad
+			{
+				TFBot 
+				{ 
+				Template T_TFBot_Giant_Soldier_Pale_Burst_Laser
+				}
+				TFBot 
+				{ 
+				Template T_TFBot_Giant_Soldier_Pale_Burst_Laser
+				}			
+			}
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name "wave06a"
+			Where spawnbot
+
+			TotalCount 32
+			MaxActive  6
+			SpawnCount 4
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  2.2
+
+
+				TFBot 
+				{ 
+				Class Heavy
+				Skill Normal
+				}				
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name "wave06a"
+			Where spawnbot
+
+			TotalCount 32
+			MaxActive  4
+			SpawnCount 2
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  1.4
+
+
+				TFBot 
+				{ 
+				Template T_TFBot_Demo_Burst_Loch
+				}				
+		}
+		
+		// DUMMY
+		WaveSpawn
+		{
+			Name "wave06aSignaller"
+			TotalCount 0
+			SpawnCount 0
+
+			WaitBeforeStarting 0
+			WaitForAllDead     "wave06a1"
+		}
+		// DUMMY
+		WaveSpawn
+		{
+			Name "wave06aSignaller"
+			TotalCount 0
+			SpawnCount 0
+
+			WaitBeforeStarting 0
+			WaitForAllSpawned     "wave06a"
+		}		
+		
+		
+		
+
+//  [$100]
+		WaveSpawn
+		{
+			Name "wave06b"
+			Where spawnbot_flank
+
+			TotalCount 54
+			MaxActive  12
+			SpawnCount 8
+			TotalCurrency 100
+
+			WaitBeforeStarting 6
+			WaitBetweenSpawns  3
+			WaitForAllSpawned "wave06aSignaller"
+
+
+				TFBot 
+				{ 
+				Template T_TFBot_Scout_Wingman
+				Attributes AlwaysCrit
+				PreferClass Sniper //fucking die
+				}				
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name "wave06b"
+			Where spawnbot_flank
+
+			TotalCount 16
+			MaxActive  4
+			SpawnCount 1
+			TotalCurrency 100
+
+			WaitBeforeStarting 6
+			WaitBetweenSpawns  2.5
+			WaitForAllSpawned "wave06aSignaller"
+
+
+				TFBot 
+				{ 
+				Template T_TFBot_Heavyweapons_Fist
+				}				
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Name "wave06b1"
+			Where spawnbot
+
+			TotalCount 10
+			MaxActive  10
+			SpawnCount 2
+			TotalCurrency 100
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  17
+			WaitForAllDead "wave06a1"
+
+				Squad
+				{
+					TFBot 
+					{ 
+						Template T_TFBot_Giant_Demo_SustainBarrage
+					}
+					TFBot
+					{
+						Template T_TFBot_Medic_Shield_Armored
+					}					
+				}
+		}
+		
+		
+//  [$0]
+		WaveSpawn
+		{
+			Where spawnbot
+
+			Name "wave06c1"
+			TotalCount 1
+			MaxActive  1
+			SpawnCount 1
+			TotalCurrency 0
+
+			WaitBeforeStarting 0
+			WaitBetweenSpawns  0
+			WaitForAllDead "wave06b1"
+
+			TFBot 
+			{ 
+			Template T_TFBot_Giant_Soldier_RocketShotgun_Chief
+			}
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Where spawnbot
+
+			TotalCount 100
+			MaxActive  6
+			SpawnCount 4
+			TotalCurrency 100
+
+			WaitBeforeStarting 3
+			WaitBetweenSpawns  1.4
+			WaitForAllSpawned "wave06b"
+			Support 1
+
+
+			TFBot 
+			{ 
+			Class Pyro
+			Skill Expert
+			Attributes AlwaysFireWeapon
+			}				
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Where spawnbot
+
+			TotalCount 100
+			MaxActive  6
+			SpawnCount 4
+			TotalCurrency 100
+
+			WaitBeforeStarting 3
+			WaitBetweenSpawns  1.4
+			WaitForAllSpawned "wave06b"
+			Support 1
+
+
+				TFBot 
+				{ 
+				Template T_TFBot_Demo_Burst
+				}				
+		}
+//  [$100]
+		WaveSpawn
+		{
+			Where spawnbot
+
+			TotalCount 50
+			MaxActive  3
+			SpawnCount 1
+			TotalCurrency 100
+
+			WaitBeforeStarting 3
+			WaitBetweenSpawns  3
+			WaitForAllSpawned "wave06b"
+			Support 1
+
+
+				TFBot 
+				{ 
+				Template T_TFBot_Engineer_Pomson_Armored_Drainer
+				PreferClass Medic
+				}				
+		}
+			WaveSpawn
+			{
+				Name  "wave06signaller"
+				Where spawnbot //lower
+
+				TotalCount 0
+				MaxActive  0
+				SpawnCount 0
+				TotalCurrency 0
+
+				WaitBeforeStarting 0
+				WaitBetweenSpawns  0
+				WaitForAllDead "wave06c1"
+				Support Limited
+				DoneOutput
+				{
+					Target w6_music_end
+					Action Trigger
+				}								
+			}		
+		
+	}
+}

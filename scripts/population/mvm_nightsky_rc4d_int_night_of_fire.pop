@@ -1,0 +1,1869 @@
+// "Night of Fire" for Nightsky, an intermediate mission by Lobotomy
+// Nightsky by Seelpit, Silentsky by PenolAkushari
+
+// This mission is pure VScript (PopExt dependent) only.
+
+// I like to give credit whenever I reasonably can. Thanks to:
+// NYS, Lite, Swordstone and others for icons,
+// Seelpit for helping in general mission making in Nightsky (she did make the map after all),
+// Royal for letting me steal his vscript code,
+// Whurr for the improved Nightsky nav,
+// and everyone who helped in any way.
+
+#base robot_standard.pop
+#base robot_giant.pop
+
+LobotomySchedule
+{
+	StartingCurrency 950
+	RespawnWaveTime 3
+	FixedRespawnWaveTime Yes
+	CanBotsAttackWhileInSpawnRoom No
+
+	FixHuntsmanDamageBonus 0 [$SIGSEGV] // Disables rafmod huntsman damage fix for non-potato servers compability
+
+	CustomNavFile "mvm_nightsky_rc4d_whurr" [$SIGSEGV] // seelpit please fix her, nav by Whurr
+
+	Templates
+	{
+		T_TFBot_Giant_Soldier_Fireball_Spammer
+		{
+			Class Soldier
+			Name "Giant Rapid Fire-Ball Soldier"
+			ClassIcon soldier_incendiary_spammer_giant
+			Health 3800
+			Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+			Item "Ghoul Gibbin' Gear"
+			Item "Hellhunter's Headpiece"
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Tag giant
+			Tag bombi_explosion
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+				"faster reload rate" -0.8
+				"fire rate bonus" 0.5
+				"projectile spread angle penalty" 3
+				"damage bonus" 0.5
+				"blast radius increased" 1.5
+				"attach particle effect" 2 // flying bits
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"Projectile speed increased" 0.65
+			}
+		}
+		T_TFBot_Medic_Bigheal_Armoured
+		{
+			Class Medic
+			Name "Armoured Bigheal Medic"
+			Skill Normal
+			Item "The Quick-Fix"
+			Item "The Exorcizor"
+			Health 650
+			Scale 1.4
+			ClassIcon medic_armored_lite
+			ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+				"ubercharge rate bonus" 0.1
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+			CharacterAttributes
+			{
+				"heal rate bonus" 20
+				"head scale" 0.7
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+			}
+		}
+		T_TFBot_Pyro_Spellbook_Fireball
+		{
+			Class Pyro
+			Skill Hard
+			WeaponRestrictions MeleeOnly
+			Attributes SuppressFire
+			Name "Fireball Spellbook Pyro"
+			ClassIcon pyro_dragon_fury_blue
+			Item "The Bat Outta Hell"
+			Item "TF_WEAPON_SPELLBOOK"
+			Item "Point and Shoot"
+			Tag "popext_spell{type = 0, cooldown = 7}"
+			ItemAttributes
+			{
+				ItemName "Point and Shoot"
+				"attach particle effect" 79 // darkblaze
+			}
+		}
+		T_TFBot_Pyro_Spellbook_Skeleton
+		{
+			Class Pyro
+			Skill Hard
+			WeaponRestrictions MeleeOnly
+			Attributes SuppressFire
+			Name "Skeleton Spellbook Pyro"
+			ClassIcon spell_skeletons_lite
+			Item "The Bat Outta Hell"
+			Item "TF_WEAPON_SPELLBOOK"
+			Item "Point and Shoot"
+			Tag "popext_spell{type = 11, cooldown = 9, charges = 1, repeats = 1}"
+			ItemAttributes
+			{
+				ItemName "Point and Shoot"
+				"attach particle effect" 44 // misty skull
+			}
+		}
+		T_TFBot_Pyro_Spellbook_Healing
+		{
+			Class Pyro
+			Skill Hard
+			WeaponRestrictions MeleeOnly
+			Attributes SuppressFire
+			Name "Healing Spellbook Pyro"
+			Health 650
+			Scale 1.4
+			ClassIcon spell_overheal_seel
+			Item "The Bat Outta Hell"
+			Item "TF_WEAPON_SPELLBOOK"
+			Item "Point and Shoot"
+			Tag "popext_spell{type = 2, cooldown = 4}"
+			ItemAttributes
+			{
+				ItemName "Point and Shoot"
+				"attach particle effect" 16 // vivid plasma
+			}
+			CharacterAttributes
+			{
+				"head scale" 0.7
+			}
+		}
+		T_TFBot_Pyro_Spellbook_PumpkinBomb
+		{
+			Class Pyro
+			Skill Hard
+			WeaponRestrictions MeleeOnly
+			Attributes SuppressFire
+			Name "Pumpkin Bombs Spellbook Pyro"
+			ClassIcon spell_pumpkin_lite
+			Item "The Bat Outta Hell"
+			Item "TF_WEAPON_SPELLBOOK"
+			Item "Point and Shoot"
+			Tag "popext_spell{type = 3, delay = 8, cooldown = 6}"
+			ItemAttributes
+			{
+				ItemName "Point and Shoot"
+				"attach particle effect" 163 // pumpkin party
+			}
+		}
+		T_TFBot_Pyro_Spellbook_Bats
+		{
+			Class Pyro
+			Skill Hard
+			WeaponRestrictions MeleeOnly
+			Attributes SuppressFire
+			Name "Bat Swarm Spellbook Pyro"
+			ClassIcon spell_swarm_of_bats
+			Item "The Bat Outta Hell"
+			Item "TF_WEAPON_SPELLBOOK"
+			Item "Point and Shoot"
+			Tag "popext_spell{type = 1, delay = 8, cooldown = 6}"
+			ItemAttributes
+			{
+				ItemName "Point and Shoot"
+				"attach particle effect" 76 // poisoned shadows
+			}
+		}
+		T_TFBot_Pyro_Spellbook_Leaping
+		{
+			Class Pyro
+			Skill Hard
+			WeaponRestrictions MeleeOnly
+			Attributes SuppressFire
+			Name "Leaping Spellbook Pyro"
+			ClassIcon spellbook_lite_teleport
+			Item "The Bat Outta Hell"
+			Item "TF_WEAPON_SPELLBOOK"
+			Item "Point and Shoot"
+			Tag "popext_spell{type = 6, cooldown = 4}"
+			ItemAttributes
+			{
+				ItemName "Point and Shoot"
+				"attach particle effect" 38 // cloudy moon
+			}
+		}
+		T_TFBot_Soldier_Fireball
+		{
+			Class Soldier
+			Name "Fireball Soldier"
+			ClassIcon soldier_incendiary
+			Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+			Item "Hellhunter's Headpiece"
+			Skill Normal
+			WeaponRestrictions PrimaryOnly
+			Tag bombi_explosion
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+				"damage bonus" 0.5
+				"blast radius increased" 1.5
+				"attach particle effect" 2 // flying bits
+			}
+		}
+		Ballistics_Trinity
+		{
+			Class Pyro
+			Skill Expert
+			WeaponRestrictions SecondaryOnly
+			Name "Ballistics Trinity"
+			ClassIcon shotgun_spammer_nys_giant
+			Health 13500
+			Scale 1.9
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Item "Dead Heat"
+			Tag giant
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SHOTGUN_PYRO"
+				"bullets per shot bonus" 10 // shoots 20 pellets per shot
+				"damage penalty" 0.25
+				"faster reload rate" 0.1
+				"attach particle effect" 701 // hot
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.3
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale" 0.1
+				"attack projectiles" 1
+			}
+		}
+		Hellfire_Trinity
+		{
+			Class Pyro
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Name "Hellfire Trinity"
+			ClassIcon pyro_spellbook
+			Health 13500
+			Scale 1.9
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Attributes AlwaysCrit
+			Item "The Seared Sorcerer"
+			Tag "popext_spell{type = 9, delay = 16, cooldown = 10}"
+			Tag giant
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_FLAMETHROWER"
+				"airblast pushback scale" 2.0
+				"lunchbox adds minicrits" 2 // use alternate flamethrower particles
+			}
+			ItemAttributes
+			{
+				ItemName "The Seared Sorcerer"
+				"attach particle effect" 78 // hellfire
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.3
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale" 0.1
+			}
+		}
+		Bastion_Trinity
+		{
+			Class Pyro
+			Skill Expert
+			WeaponRestrictions MeleeOnly
+			Name "Bastion Trinity"
+			ClassIcon pyro_jug_axtinguisher_heal
+			Health 13500
+			Scale 1.9
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Item "The Axtinguisher"
+			Item "The Wraith Wrap"
+			Tag "popext_spell{type = 2, delay = 12, cooldown = 10}"
+			Tag giant
+			CharacterAttributes
+			{
+				"move speed bonus" 0.3
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale" 0.1
+				"attach particle effect" 3094 // aurelian seal
+			}
+		}
+	}
+
+	// Early waves (w1-4) buster
+	Mission
+	{
+		Objective DestroySentries
+		Where spawnbot_mission_sentrybuster
+		DesiredCount 1
+		BeginAtWave 1
+		RunForThisManyWaves 4
+		InitialCooldown 45
+		CooldownTime 60
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Attributes IgnoreEnemies
+			Attributes DisableDodge
+			Item "Ghostly Gibus"
+			Name "Shorter Sentry Buster"
+			CharacterAttributes
+			{
+				"head scale" 3.5
+				"torso scale" -0.5
+			}
+		}
+	}
+	// Wave 5 onwards buster
+	Mission
+	{
+		Objective DestroySentries
+		Where spawnbot_mission_sentrybuster
+		DesiredCount 1
+		BeginAtWave 5
+		RunForThisManyWaves 2
+		InitialCooldown 25
+		CooldownTime 40
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Attributes IgnoreEnemies
+			Attributes DisableDodge
+			Item "Ghostly Gibus"
+			Name "Shorter Sentry Buster"
+			CharacterAttributes
+			{
+				"head scale" 3.5
+				"torso scale" -0.5
+			}
+		}
+	}
+	// Wave 2 spies
+	Mission
+	{
+		Objective Spy
+		Where spawnbot_mission_spy
+		DesiredCount 3
+		BeginAtWave 2
+		RunForThisManyWaves 1
+		InitialCooldown 16
+		CooldownTime 40
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Item "The Executioner"
+		}
+	}
+	// Wave 3 spies
+	Mission
+	{
+		Objective Spy
+		Where spawnbot_mission_spy
+		DesiredCount 2
+		BeginAtWave 3
+		RunForThisManyWaves 1
+		InitialCooldown 25
+		CooldownTime 40
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Item "The Executioner"
+		}
+	}
+	// Wave 5 & 6 spies
+	Mission
+	{
+		Objective Spy
+		Where spawnbot_mission_spy
+		DesiredCount 2
+		BeginAtWave 5
+		RunForThisManyWaves 2
+		InitialCooldown 25
+		CooldownTime 35
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Item "The Executioner"
+		}
+	}
+	// Wave 4 snipers
+	Mission
+	{
+		Objective Sniper
+		Where spawnbot_mission_sniper
+		DesiredCount 2
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		InitialCooldown 15
+		CooldownTime 40
+		TFBot
+		{
+			Template T_TFBot_Sniper
+			Item "Headhunter's Brim"
+		}
+	}
+	// Wave 6 snipers
+	Mission
+	{
+		Objective Sniper
+		Where spawnbot_mission_sniper
+		DesiredCount 2
+		BeginAtWave 6
+		RunForThisManyWaves 1
+		InitialCooldown 40
+		CooldownTime 35
+		TFBot
+		{
+			Template T_TFBot_Sniper
+			Item "Headhunter's Brim"
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////
+
+	// Wave 1
+	Wave
+	{
+		// Include PopExtPlus
+		InitWaveOutput
+		{
+			Target bignet
+			Action RunScriptCode
+			Param "IncludeScript(`night_of_fire_lobotomy.nut`, getroottable())"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaveSpawn
+		{
+			Name "wave1a"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 7
+			TotalCurrency 200
+			TFBot
+			{
+				Class Pyro
+				Name "Giant Flare Gun Pyro"
+				ClassIcon pyro_flare_giant
+				Skill Expert
+				Health 3000
+				Item "The Flare Gun"
+				Item "The Last Breath"
+				Item "The Coffin Kit"
+				WeaponRestrictions SecondaryOnly
+				Attributes MiniBoss
+				Tag giant
+				ItemAttributes
+				{
+					ItemName "The Flare Gun"
+					"fire rate bonus" 0.3
+				}
+				CharacterAttributes
+				{
+					"move speed bonus" 0.5
+					"damage force reduction" 0.6
+					"airblast vulnerability multiplier" 0.6
+					"override footstep sound set" 6
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1a"
+			Where spawnbot
+			TotalCount 34
+			MaxActive 8
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 3
+			TotalCurrency 100
+			Squad
+			{
+				TFBot
+				{
+					Class Pyro
+					Skill Easy
+					Item "Fallen Angel"
+					Item "Tail From the Crypt"
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_FLAMETHROWER"
+						"damage bonus" 0.7
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix
+					Item "The Exorcizor"
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1b"
+			Where spawnbot
+			WaitForAllSpawned "wave1a"
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 13
+			WaitBetweenSpawns 21
+			TotalCurrency 200
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier
+				Item "Ghoul Gibbin' Gear"
+				Item "Hellhunter's Headpiece"
+				Tag giant
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1bc"
+			Where spawnbot
+			WaitForAllSpawned "wave1a"
+			TotalCount 30
+			MaxActive 12
+			SpawnCount 3
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 5
+			TotalCurrency 150
+			Squad
+			{
+				TFBot
+				{
+					Class Demoman
+					Name "Quickiebomb Demonman"
+					Skill Easy
+					WeaponRestrictions SecondaryOnly
+					Item "The Quickiebomb Launcher"
+					Item "The Bonedolier"
+					ClassIcon demo_quickie_pda
+					// I stole this animation fix from Mince's steam guide
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_GRENADELAUNCHER"
+						"is_passive_weapon" 1
+						"override projectile type" 27
+						"fire rate penalty" 99
+					}
+					ItemAttributes
+					{
+						ItemName "The Quickiebomb Launcher"
+						"stickybomb charge rate" 0.001
+						"max pipebombs decreased" -7
+						"projectile range increased" 0.35
+						"damage bonus" 0.5
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1s"
+			Where spawnbot_side
+			TotalCount 25
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 16
+			TotalCurrency 75
+			Support 1
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Scout_Melee
+					Name "Unarmed Scout"
+					Item "Wrap Battler"
+					Item "B-ankh!"
+					Item "Futankhamun"
+					Item "Unarmed Combat"
+					ClassIcon scout_bat_nys
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_Melee
+					Name "Unarmed Scout"
+					Item "Wrap Battler"
+					Item "B-ankh!"
+					Item "Futankhamun"
+					Item "Unarmed Combat"
+					ClassIcon scout_bat_nys
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_Melee
+					Name "Unarmed Scout"
+					Item "Wrap Battler"
+					Item "B-ankh!"
+					Item "Futankhamun"
+					Item "Unarmed Combat"
+					ClassIcon scout_bat_nys
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_Melee
+					Name "Unarmed Scout"
+					Item "Wrap Battler"
+					Item "B-ankh!"
+					Item "Futankhamun"
+					Item "Unarmed Combat"
+					ClassIcon scout_bat_nys
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1s"
+			Where spawnbot
+			TotalCount 6
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 15
+			TotalCurrency 25
+			Support 1
+			TFBot
+			{
+				Template T_TFBot_Pyro_Spellbook_Leaping
+			}
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////
+
+	// Wave 2
+	Wave
+	{
+		// Include PopExtPlus
+		InitWaveOutput
+		{
+			Target bignet
+			Action RunScriptCode
+			Param "IncludeScript(`night_of_fire_lobotomy.nut`, getroottable())"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaveSpawn
+		{
+			Name "wave2a"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			TotalCurrency 50
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Fireball_Spammer
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b"
+			Where spawnbot
+			WaitForAllDead "wave2a"
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 17
+			TotalCurrency 200
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Fireball_Spammer
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c"
+			Where spawnbot
+			WaitForAllSpawned "wave2b"
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 17
+			WaitBetweenSpawns 15
+			TotalCurrency 200
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Heater // this template is giant
+				Name "Giant Heater Heavy"
+				ClassIcon heavy_heater_nys_giant
+				Tag giant
+				Item "Minsk Beef"
+				Item "Bull Locks"
+				Item "Bone-Cut Belt"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2s"
+			Where spawnbot
+			WaitForAllDead "wave2a"
+			TotalCount 75
+			MaxActive 12
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 4
+			TotalCurrency 125
+			Support 1
+			RandomChoice
+			{
+				TFBot
+				{
+					Class Demoman
+					Name "Loch-n-Load Demonman"
+					Skill Normal
+					WeaponRestrictions PrimaryOnly
+					Item "The Loch-n-Load"
+					Item "The Bonedolier"
+					ClassIcon demo_loch_nys
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Name "Detonator Pyro"
+					Item "The Detonator"
+					Item "Fallen Angel"
+					Item "Tail From the Crypt"
+					ClassIcon pyro_detonator
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_SunStick
+					Name "Sun-on-a-Stick Scout"
+					Item "Wrap Battler"
+					Item "B-ankh!"
+					Item "Futankhamun"
+					ClassIcon scout_sunstick_swordstone
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2s"
+			Where spawnbot
+			TotalCount 6
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 17
+			TotalCurrency 25
+			Support 1
+			TFBot
+			{
+				Template T_TFBot_Pyro_Spellbook_Fireball
+			}
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////
+
+	// Wave 3
+	Wave
+	{
+		// Include PopExtPlus
+		InitWaveOutput
+		{
+			Target bignet
+			Action RunScriptCode
+			Param
+			"
+				IncludeScript(`night_of_fire_lobotomy.nut`, getroottable())
+
+				SendGlobalGameEvent(`show_annotation`, {
+					worldPosX = -5226
+					worldPosY = -2974
+					worldPosZ = 100
+					id = 1
+					text = `The parachuting tank will land here!`
+					lifetime = -1
+				})
+
+				ClientPrint(null, 3, `\x0799CCFFThis wave features a \x07FFFF66parachuting tank\x0799CCFF! The annotation on screen shows where it will land.`)
+			"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaveSpawn
+		{
+			Name "wave3a"
+			Where spawnbot
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 22
+			TotalCurrency 200
+			Squad
+			{
+				TFBot
+				{
+					Class Sniper
+					Name "Giant Bowman"
+					Item "The Huntsman"
+					Item "Headhunter's Brim"
+					Item "Hunting Cloak"
+					ClassIcon sniper_bow
+					Skill Hard
+					Health 3000
+					WeaponRestrictions PrimaryOnly
+					Attributes MiniBoss
+					Tag giant
+					CharacterAttributes
+					{
+						"move speed bonus" 0.5
+						"damage force reduction" 0.5
+						"airblast vulnerability multiplier" 0.5
+						"override footstep sound set" 6
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Name "Bigheal Medic"
+					Item "The Exorcizor"
+					CharacterAttributes
+					{
+						"heal rate bonus" 20
+					}
+				}
+			}
+			FirstSpawnOutput
+			{
+				Target bignet
+				Action RunScriptCode
+				Param
+				"
+					SendGlobalGameEvent(`hide_annotation`, {id = 1})
+				"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a"
+			Where spawnbot
+			TotalCount 16
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 8
+			TotalCurrency 100
+			TFBot
+			{
+				Class Soldier
+				Skill Hard
+				Item "Hellhunter's Headpiece"
+			}
+		}
+		WaveSpawn
+		{
+			StartWaveOutput
+			{
+				Target drop_bomb0_relay
+				Action trigger
+			}
+			Name "wave3a-paratank"
+			TotalCount 1
+			WaitBeforeStarting 10
+			TotalCurrency 100
+			Tank
+			{
+				Name "droptank0"
+				ClassIcon tank2_para [$SIGSEGV]
+				Health 12000
+				Speed 75
+				StartingPathTrackNode "tank_path_drop0_a"
+				OnKilledOutput
+				{
+					Target droptank0_killed_relay
+					Action Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+			FirstSpawnOutput
+			{
+				Target bignet
+				Action RunScriptCode
+				Param
+				"
+					ClientPrint(null, 3, `\x0799CCFFA tank with 12000 health is parachuting in! Watch out!`)
+				"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b"
+			Where spawnbot
+			WaitForAllSpawned "wave3a"
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 18
+			TotalCurrency 150
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Crit
+					Item "Ghoul Gibbin' Gear"
+					Item "Hellhunter's Headpiece"
+					Tag giant
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_SlowRecharge
+					Item "The Exorcizor"
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b"
+			Where spawnbot
+			WaitForAllSpawned "wave3a"
+			TotalCount 22
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 18
+			WaitBetweenSpawns 4
+			TotalCurrency 75
+			TFBot
+			{
+				Class Scout
+				Skill Easy
+				Item "Wrap Battler"
+				Item "B-ankh!"
+				Item "Futankhamun"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b"
+			Where spawnbot
+			WaitForAllSpawned "wave3a"
+			TotalCount 22
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 18
+			WaitBetweenSpawns 4
+			TotalCurrency 75
+			TFBot
+			{
+				Class Scout
+				Skill Normal
+				Item "Wrap Battler"
+				Item "B-ankh!"
+				Item "Futankhamun"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3s"
+			Where spawnbot_side
+			TotalCount 25
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 19
+			TotalCurrency 25
+			Support 1
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Heavyweight_Champ
+				Item "Der Maschinensoldaten-Helm"
+				Skill Normal
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3s"
+			Where spawnbot
+			TotalCount 5
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 17
+			TotalCurrency 25
+			Support 1
+			TFBot
+			{
+				Template T_TFBot_Pyro_Spellbook_Bats
+			}
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////
+
+	// Wave 4
+	Wave
+	{
+		// Include PopExtPlus
+		InitWaveOutput
+		{
+			Target bignet
+			Action RunScriptCode
+			Param "IncludeScript(`night_of_fire_lobotomy.nut`, getroottable())"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaveSpawn
+		{
+			Name "wave4a"
+			Where spawnbot
+			TotalCount 21
+			MaxActive 9
+			SpawnCount 3
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 4
+			TotalCurrency 60
+			TFBot
+			{
+				Template T_TFBot_Sniper_Huntsman
+				Name "Ignite Bowman"
+				Item "Headhunter's Brim"
+				ClassIcon sniper_bow_ignite
+				Tag arrow_ignite
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a"
+			Where spawnbot
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 15
+			TotalCurrency 75
+			TFBot
+			{
+				Class Scout
+				Name "Giant Armoured Sunstick Scout"
+				Skill Expert
+				Attributes MiniBoss
+				ClassIcon scout_sunstick_swordstone_armored
+				Health 3000
+				WeaponRestrictions MeleeOnly
+				Item "Sun-on-a-Stick"
+				Item "The Masked Fiend"
+				Tag giant
+				CharacterAttributes
+				{
+					"damage force reduction" 0.7
+					"airblast vulnerability multiplier" 0.7
+					"override footstep sound set" 5
+					"move speed penalty" 0.75
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b"
+			Where spawnbot
+			WaitForAllSpawned "wave4a"
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 20
+			TotalCurrency 200
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demoman
+					ClassIcon demo_rapid_giant
+					Tag giant
+					Name "Giant Rapid Fire Demonman"
+					Item "Forgotten King's Restless Head"
+					Item "Forgotten King's Pauldrons"
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Regen
+					Name "Giant Regen Medic"
+					Tag giant
+					Item "The Exorcizor"
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b"
+			Where spawnbot
+			WaitForAllSpawned "wave4a"
+			TotalCount 10
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 9
+			TotalCurrency 75
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Fist
+				Item "Der Maschinensoldaten-Helm"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4c"
+			Where spawnbot
+			WaitForAllSpawned "wave4b"
+			TotalCount 5
+			MaxActive 3
+			SpawnCount 1
+			WaitBeforeStarting 24
+			WaitBetweenSpawns 11
+			TotalCurrency 200
+			TFBot
+			{
+				Class Pyro
+				Name "Giant Conch Furry Pyro"
+				Item "The Dragon's Fury"
+				Item "The Concheror"
+				Item "The Head Prize"
+				ClassIcon pyro_dragon_fury_conch_v2_giant
+				Skill Expert
+				Health 3000
+				WeaponRestrictions PrimaryOnly
+				Attributes MiniBoss
+				Attributes SpawnWithFullCharge
+				Tag giant
+				MaxVisionRange 800
+				ItemAttributes
+				{
+					ItemName "The Dragon's Fury"
+					"damage bonus" 1.5
+				}
+				CharacterAttributes
+				{
+					"move speed bonus"	0.5
+					"damage force reduction" 0.6
+					"airblast vulnerability multiplier" 0.6
+					"override footstep sound set" 6
+					"increase buff duration" 999
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4c"
+			Where spawnbot
+			WaitForAllSpawned "wave4b"
+			TotalCount 24
+			MaxActive 12
+			SpawnCount 3
+			WaitBeforeStarting 20
+			WaitBetweenSpawns 6
+			TotalCurrency 100
+			TFBot
+			{
+				Template T_TFBot_Soldier_Fireball
+				Skill Easy
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4s"
+			Where spawnbot
+			TotalCount 18
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 17
+			TotalCurrency 90
+			Support 1
+			TFBot
+			{
+				Template T_TFBot_Pyro_Spellbook_PumpkinBomb
+			}
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////
+
+	// Wave 5
+	Wave
+	{
+		// Include PopExtPlus
+		InitWaveOutput
+		{
+			Target bignet
+			Action RunScriptCode
+			Param "IncludeScript(`night_of_fire_lobotomy.nut`, getroottable())"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaveSpawn
+		{
+			Name "wave5a"
+			Where spawnbot
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 20
+			TotalCurrency 150
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Fast
+				Item "The Masked Fiend"
+				Tag giant
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a"
+			Where spawnbot
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 9
+			TotalCurrency 50
+			TFBot
+			{
+				Template T_TFBot_Scout_FAN
+				Item "Wrap Battler"
+				Item "B-ankh!"
+				Item "Futankhamun"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a"
+			Where spawnbot
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 9
+			TotalCurrency 50
+			TFBot
+			{
+				Class Demoman
+				Skill Easy
+				Item "The Bonedolier"
+				Name "Demonman"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a"
+			Where spawnbot
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 19
+			TotalCurrency 150
+			Squad
+			{
+				TFBot
+				{
+					Class Heavyweapons
+					Name "Super Lightweight Champ"
+					ClassIcon heavy_gru_giant
+					Skill Expert
+					Health 5000
+					Item "Gloves of Running Urgently MvM"
+					Item "Horror Shawl"
+					WeaponRestrictions MeleeOnly
+					Attributes MiniBoss
+					Attributes AlwaysCrit
+					Tag giant
+					ItemAttributes
+					{
+						ItemName "Gloves of Running Urgently MvM"
+						"fire rate bonus" 0.6
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.5
+						"damage force reduction" 0.3
+						"airblast vulnerability multiplier" 0.3
+						"override footstep sound set" 2
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix
+					Item "The Exorcizor"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix
+					Item "The Exorcizor"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix
+					Item "The Exorcizor"
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b"
+			Where spawnbot
+			WaitForAllSpawned "wave5a"
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 15
+			TotalCurrency 150
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Spammer
+				Item "Ghoul Gibbin' Gear"
+				Item "Hellhunter's Headpiece"
+				Tag giant
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b"
+			Where spawnbot
+			WaitForAllSpawned "wave5a"
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 15
+			TotalCurrency 150
+			TFBot
+			{
+				Template T_TFBot_Giant_Demo_Burst
+				Tag giant
+				Item "Forgotten King's Restless Head"
+				Item "Forgotten King's Pauldrons"
+				Name "Giant Burst Fire Demonman"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5c"
+			Where spawnbot
+			WaitForAllSpawned "wave5b"
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 15
+			TotalCurrency 200
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons
+					Tag giant
+					Skill Hard
+					Item "Minsk Beef"
+					Item "Bull Locks"
+					Item "Bone-Cut Belt"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_Bigheal_Armoured
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5d"
+			Where spawnbot
+			WaitForAllSpawned "wave5c"
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			WaitBeforeStarting 22
+			WaitBetweenSpawns 0
+			TotalCurrency 200
+			Squad
+			{
+				TFBot
+				{
+					Class Soldier
+					Name "Colonel Sanders"
+					ClassIcon soldier_barrage_incendiary_nys
+					Health 4000
+					Tag bot_giant
+					Tag giant
+					Tag bombi_explosion
+					Skill Expert
+					WeaponRestrictions PrimaryOnly
+					Attributes MiniBoss
+					Attributes HoldFireUntilFullReload
+					Attributes AlwaysCrit
+					Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+					Item "The Infernal Impaler"
+					// Item "Warlock's Warcloak"
+					ItemAttributes
+					{
+						ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+						"clip size upgrade atomic" 26.0
+						"faster reload rate" 0.22
+						"fire rate bonus" 0.2
+						"projectile spread angle penalty" 5
+						"damage bonus" 0.5
+						"blast radius increased" 1.6
+						"attach particle effect" 2 // flying bits
+					}
+					CharacterAttributes
+					{
+						"health regen" 40
+						"move speed bonus" 0.5
+						"damage bonus" 1.25
+						"damage force reduction" 0.4
+						"airblast vulnerability multiplier" 0.4
+						"override footstep sound set" 3
+						"airblast vertical vulnerability multiplier" 0.1
+						"Projectile speed increased" 0.4
+					}
+				}
+				TFBot
+				{
+					Class Medic
+					Name "Armoured Shield Bigheal Medic"
+					Skill Expert
+					Attributes ProjectileShield
+					Attributes IgnoreEnemies
+					WeaponRestrictions SecondaryOnly
+					Health 950
+					Scale 1.5
+					ClassIcon medic_shield_armored_lite
+					Item "Herzensbrecher"
+					Item "Kriegsmaschine-9000"
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_MEDIGUN"
+						"generate rage on heal" 2
+						"increase buff duration" 10
+						"uber duration bonus" -8
+						"ubercharge rate bonus" 0
+					}
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+						"damage penalty" 0.1
+					}
+					CharacterAttributes
+					{
+						"heal rate bonus" 20
+						"head scale" 0.7
+						"damage force reduction" 0.6
+						"airblast vulnerability multiplier" 0.6
+						"bot medic uber deploy delay duration" 9999
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5s"
+			Where spawnbot
+			TotalCount 10
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 18
+			TotalCurrency 50
+			Support 1
+			TFBot
+			{
+				Template T_TFBot_Pyro_Spellbook_Skeleton
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5s"
+			Where spawnbot
+			WaitForAllDead "wave5a"
+			TotalCount 50
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 4
+			WaitBetweenSpawns 15
+			TotalCurrency 50
+			Support 1
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Soldier_RocketShotgun
+					Item "Hellhunter's Headpiece"
+				}
+				TFBot
+				{
+					Template T_TFBot_Soldier_RocketShotgun
+					Item "Hellhunter's Headpiece"
+				}
+				TFBot
+				{
+					Template T_TFBot_Soldier_RocketShotgun
+					Item "Hellhunter's Headpiece"
+				}
+			}
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////
+
+	// Wave 6
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target bignet
+			Action RunScriptCode
+			Param
+			"
+				IncludeScript(`night_of_fire_lobotomy.nut`, getroottable())
+				EntFire(`tf_zombie`, `Kill`)
+			"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaveSpawn
+		{
+			Name "wave6b" // is in fact a wave6ab, name chosen for pacing
+			Where spawnbot
+			TotalCount 32
+			MaxActive 12
+			SpawnCount 4
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 9
+			TotalCurrency 50
+			TFBot
+			{
+				Class Soldier
+				Skill Hard
+				WeaponRestrictions SecondaryOnly
+				ClassIcon soldier_bison_b
+				Name "Bison Soldier"
+				Item "The Righteous Bison"
+				Item "Lord Cockswain's Pith Helmet"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a"
+			Where spawnbot
+			TotalCount 15
+			MaxActive 9
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 9
+			TotalCurrency 50
+			TFBot
+			{
+				Class Pyro
+				Skill Expert
+				Item "Fallen Angel"
+				Item "Tail From the Crypt"
+				ItemAttributes
+				{
+					ItemName "TF_WEAPON_FLAMETHROWER"
+					"airblast disabled" 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6b" // is in fact a wave6a-tank, name chosen for pacing
+			TotalCount 1
+			WaitBeforeStarting 16
+			TotalCurrency 50
+			Tank
+			{
+				Health 25000
+				Name "tank"
+				Speed 75
+				Skin 1
+				StartingPathTrackNode "tank_path_b"
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+			FirstSpawnOutput
+			{
+				Target bignet
+				Action RunScriptCode
+				Param
+				"
+					ClientPrint(null, 3, `\x0799CCFFA tank with 25000 health has been deployed!`)
+				"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6b"
+			Where spawnbot
+			WaitForAllSpawned "wave6a"
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 12
+			TotalCurrency 110
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Fireball_Spammer
+				}
+				TFBot
+				{
+					Class Pyro
+					Name "Giant Flare Rain Pyro"
+					ClassIcon pyro_flare_rain_nys_giant
+					Skill Expert
+					Health 3000
+					Item "The Detonator"
+					Item "The Last Breath"
+					Item "The Coffin Kit"
+					WeaponRestrictions SecondaryOnly
+					Attributes MiniBoss
+					Tag giant
+					ItemAttributes
+					{
+						ItemName "The Detonator"
+						"fire rate bonus" 0.15
+						"projectile spread angle penalty" 10
+					}
+					CharacterAttributes
+					{
+						"move speed bonus" 0.5
+						"damage force reduction" 0.6
+						"airblast vulnerability multiplier" 0.6
+						"override footstep sound set" 6
+					}
+				}
+				TFBot
+				{
+					Class Pyro
+					Name "Giant Flare Rain Pyro"
+					ClassIcon pyro_flare_rain_nys_giant
+					Skill Expert
+					Health 3000
+					Item "The Detonator"
+					Item "The Last Breath"
+					Item "The Coffin Kit"
+					WeaponRestrictions SecondaryOnly
+					Attributes MiniBoss
+					Tag giant
+					ItemAttributes
+					{
+						ItemName "The Detonator"
+						"fire rate bonus" 0.15
+						"projectile spread angle penalty" 10
+					}
+					CharacterAttributes
+					{
+						"move speed bonus" 0.5
+						"damage force reduction" 0.6
+						"airblast vulnerability multiplier" 0.6
+						"override footstep sound set" 6
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6s"
+			Where spawnbot
+			TotalCount 6
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 10
+			TotalCurrency 40
+			Support Limited
+			TFBot
+			{
+				Template T_TFBot_Pyro_Spellbook_Healing
+			}
+		}
+
+		////////////////////////////////////////
+
+		// Boss announcement
+		WaveSpawn
+		{
+			Name "wave6-announcement"
+			WaitForAllDead "wave6b"
+
+			FirstSpawnOutput
+			{
+				Target bignet
+				Action RunScriptCode
+				Param
+				"
+					ClientPrint(null, 3, `\x07FF3F3FThe Trinity is approaching!`)
+				"
+			}
+		}
+		// Shotgun boss
+		WaveSpawn
+		{
+			Name "wave6-boss1"
+			Where spawnbot
+			WaitForAllDead "wave6-announcement"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 0
+			TotalCurrency 35
+			TFBot
+			{
+				Template Ballistics_Trinity
+			}
+		}
+		// Flamethrower & meteor shower boss
+		WaveSpawn
+		{
+			Name "wave6-boss2"
+			Where spawnbot
+			WaitForAllDead "wave6-announcement"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 0
+			TotalCurrency 35
+			TFBot
+			{
+				Template Hellfire_Trinity
+			}
+		}
+		// Axtinguisher & healing boss
+		WaveSpawn
+		{
+			Name "wave6-boss3"
+			Where spawnbot
+			WaitForAllDead "wave6-announcement"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 0
+			TotalCurrency 35
+			TFBot
+			{
+				Template Bastion_Trinity
+			}
+		}
+		// Boss support
+		WaveSpawn
+		{
+			Name "wave6-boss-support"
+			Where spawnbot
+			WaitForAllDead "wave6-announcement"
+			TotalCount 15
+			MaxActive 12
+			SpawnCount 3
+			WaitBeforeStarting 18
+			WaitBetweenSpawns 11
+			TotalCurrency 15
+			Support 1
+			TFBot
+			{
+				Name "Furry Pyro"
+				Class Pyro
+				Skill Hard
+				ClassIcon pyro_dragon_fury_swordstone
+				Item "The Dragon's Fury"
+				Item "The Head Prize"
+				MaxVisionRange 800
+			}
+		}
+	}
+}

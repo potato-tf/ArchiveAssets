@@ -1,0 +1,2975 @@
+//	Mission designer: Lyney
+//  Map Designer: RC_Polygons
+
+#base robot_giant.pop
+#base robot_standard.pop
+#base butcher_meat_grinder_weapon.pop
+//#base judge_restricts.pop
+
+// WAVE 1 Current Money: 1200$
+// WAVE 2 Current Money: 1200$ + 1600$ + 100$ Bonus = 2900$ (No Bonus: 2800$)
+// WAVE 3 Current Money: 2900$ + 1600$ + 100$ Bonus = 4600$ (No Bonus: 4400$)
+// Total Possible Money: 4600$ + 1400$ = 6000$ (No Bonus: 5800$)
+
+WaveSchedule
+{
+
+	StartingCurrency 1200
+	RespawnWaveTime 3
+	CanBotsAttackWhileInSpawnRoom no
+	CustomNavFile mvm_butcher_rc1b_cleaner
+	
+	Mission // sentry buster
+	{
+		Objective DestroySentries
+
+		InitialCooldown 5
+		Where spawnbot_mission_sentry_buster
+		BeginAtWave 1
+		RunForThisManyWaves 9
+
+		CooldownTime 45
+
+        TFBot
+		{
+			Template T_TFBot_SentryBuster
+        }
+	}
+	
+	Mission
+	{
+		Objective Sniper
+
+		InitialCooldown 45
+		Where spawnbot_mission_sniper_left
+		BeginAtWave 2
+		RunForThisManyWaves 1
+		CooldownTime 60
+		DesiredCount 2
+		
+		TFBot
+		{
+			Class Sniper
+			Skill Hard
+		}
+	}
+	
+	Mission
+	{
+		Objective Spy
+
+		InitialCooldown 30
+		Where spawnbot_mission_spy
+		BeginAtWave 3
+		RunForThisManyWaves 2
+		CooldownTime 52
+		DesiredCount 3
+		
+		TFBot
+		{
+			Class Spy
+			Skill Hard
+		}
+	}
+	
+	PointTemplates    [$SIGSEGV]    //    this piece of code is to remove the powerup from the game if its dropped, hence making it only be used by the designated class
+	{
+		powerup_fix
+		{
+			logic_timer
+			{
+                "targetname"    "powerup_kill"
+                "RefireTime"    "0.1"
+                "OnTimer"        "item_powerup_rune,kill,,0,-1"
+            }
+        }
+    }
+	
+    SpawnTemplate powerup_fix    [$SIGSEGV]
+
+	Templates
+	{
+		T_TFBot_Scout_Soda_Popper
+		{
+			Class Scout
+			Name "Soda Popper Scout"
+			ClassIcon scout_popper2
+			Skill Easy
+			Item "The Soda Popper"
+			Item "Bonk Boy"
+			WeaponRestrictions PrimaryOnly
+		}
+		
+		T_TFBot_Scout_Pistol
+		{
+			Class Scout
+			ClassIcon scout_pistol_nys
+			Name "Pistol Scout"
+			WeaponRestrictions SecondaryOnly
+		}
+		
+		T_TFBot_Scout_Melee_FixIcons
+		{
+			Template T_TFBot_Scout_Melee
+			ClassIcon scout_bat_nys
+		}
+		
+		T_TFBot_Scout_SunOnAStick
+		{
+			Class Scout
+			Name "Sun-on-a-Stick Scout"
+			Skill Hard
+			ClassIcon scout_sunstick_swordstone
+			WeaponRestrictions MeleeOnly
+			Item "Sun-on-a-Stick"
+			Item "Fallen Angel"
+			Item "Tail From the Crypt"
+			Item "Blazing Bull"
+		}
+		
+		T_TFBot_Soldier_Extended_Buff_Banner_Bugfixed
+		{
+			Template T_TFBot_Soldier_Extended_Buff_Banner
+			ItemAttributes
+			{
+				ItemName "The Buff Banner"
+				"single wep holster time increased" 0.35
+				"single wep deploy time increased" 0.35
+			}
+			CharacterAttributes
+			{
+				"increase buff duration" 99
+				"blast dmg to self increased" 0
+			}
+		}
+		
+		T_TFBot_Soldier_Extended_Concheror_BugFixed
+		{
+			Template T_TFBot_Soldier_Extended_Concheror
+			ItemAttributes
+			{
+				ItemName "The Concheror"
+				"single wep holster time increased" 0.35
+				"single wep deploy time increased" 0.35
+			}
+			CharacterAttributes
+			{
+				"increase buff duration" 99
+				"blast dmg to self increased" 0
+			}
+		}
+		
+		T_TFBot_Soldier_DirectHit
+		{
+			Class Soldier
+			Name "Direct Hit Soldier"
+			ClassIcon soldier_directhit_lite
+			Skill Hard
+			Item "The Direct Hit"
+			Item "The Team Captain"
+			WeaponRestrictions PrimaryOnly
+			CharacterAttributes
+			{
+				"cancel falling damage" 1
+			}
+		}
+		
+		T_TFBot_Soldier_Bison
+		{
+			Class Soldier
+			ClassIcon soldier_bison_b
+			Name "Bison Soldier"
+			Skill Expert
+			WeaponRestrictions SecondaryOnly
+			Item "The Righteous Bison"
+			Item "Lord Cockswain's Pith Helmet"
+			ItemAttributes
+			{
+				ItemName "The Righteous Bison"
+				"dmg bonus vs buildings" 5
+			}
+		}
+		
+		T_TFBot_Soldier_Equalizer
+		{
+			Class Soldier
+			Name "Equalizer Soldier"
+			ClassIcon soldier_equalizer
+			Skill Expert
+			WeaponRestrictions MeleeOnly
+			Item "The Equalizer"
+		}
+		
+		T_TFBot_Soldier_Escape_Conch
+		{
+			Class Soldier
+			Name "Escape Conch Soldier"
+			ClassIcon soldier_escape_conch
+			Skill Expert
+			Item "The Escape Plan"
+			Item "Soldier's Stash"
+			Item "The Concheror"
+			WeaponRestrictions MeleeOnly
+			Attributes SpawnWithFullCharge
+			ItemAttributes
+			{
+				ItemName "The Escape Plan"
+			}
+			ItemAttributes
+			{
+				ItemName "The Concheror"
+				"single wep holster time increased" 0.35
+				"single wep deploy time increased" 0.35
+			}
+			CharacterAttributes
+			{
+				"increase buff duration" 99
+				"cancel falling damage" 1
+				"blast dmg to self increased" 0
+			}
+		}
+		
+		T_TFBot_Soldier_Armored
+		{
+			Class Soldier
+			Name "Armored Soldier"
+			Skill Normal
+			ClassIcon soldier_armored
+			Health 800 // 200*4 = 800
+			Scale 1.4
+			Tag bot_giant
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.7
+				"damage force reduction" 0.7
+				"cancel falling damage" 1
+				"blast dmg to self increased" 0
+			}
+		}
+		
+		T_TFBot_Soldier_Crit_Armored
+		{
+			Template T_TFBot_Soldier_Armored
+			Name "Armored Charged Soldier"
+			Skill Normal
+			ClassIcon soldier_crit_armored
+			Item "The Original"
+			WeaponRestrictions PrimaryOnly
+			Attributes AlwaysCrit
+			Attributes HoldFireUntilFullReload
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "The Original"
+				"faster reload rate" 0.2
+				"fire rate bonus" 2
+				"Projectile speed increased" 0.5
+			}
+		}
+		
+		T_TFBot_Giant_Soldier_Spammer_Reload_DirectHit
+		{
+			Class Soldier
+			Name "Giant Burst Direct Hit Soldier"
+			ClassIcon soldier_directhit_spammer_giant
+			Health 3800
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Item "The Direct Hit"
+			ItemAttributes
+			{
+				ItemName "The Direct Hit"
+				"faster reload rate" 0.4
+				"fire rate bonus" 0.2
+				"clip size upgrade atomic" 5.0
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"cancel falling damage" 1
+				"blast dmg to self increased" 0
+				"Projectile speed increased" 0.9
+			}
+		}
+		
+		T_TFBot_Giga_Soldier_BigrockBurst
+		{
+			Class Soldier
+			Name "Giga Burst Fire Soldier"
+			ClassIcon soldier_burstfire_hyper_lite
+			Health 4200
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"damage bonus" 2.0
+				"faster reload rate" 0.4
+				"fire rate bonus" 0.2
+				"clip size upgrade atomic" 5.0
+				"Projectile speed increased" 0.9
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"cancel falling damage" 1
+				"blast dmg to self increased" 0
+			}
+		}
+		
+		T_TFBot_Giant_Soldier_Bison_Spammer
+		{
+			Class Soldier
+			ClassIcon soldier_bison_spammer_giant
+			Name "Giant Rapid Bison Soldier"
+			Health 3800
+			Skill Expert
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			Item "The Righteous Bison"
+			Item "Lord Cockswain's Pith Helmet"
+			ItemAttributes
+			{
+				ItemName "The Righteous Bison"
+				"faster reload rate" -0.8
+				"fire rate bonus" 0.5
+				"dmg bonus vs buildings" 5
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"cancel falling damage" 1
+			}
+		}
+		
+		T_TFBot_Pyro_Airblast
+		{
+			Class Pyro
+			Name "Airblast Pyro"
+			ClassIcon pyro_reflect_daan
+			Skill Expert
+			Health 175
+			WeaponRestrictions PrimaryOnly
+			Item "TF_WEAPON_FLAMETHROWER"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_FLAMETHROWER"
+				"mult airblast refire time" 0.1
+				"weapon burn dmg increased" 0.1
+			}
+			Item "Traffic Cone"
+			CharacterAttributes
+			{
+				"damage bonus" 0.1
+			}
+		}
+		
+		T_TFBot_Pyro_DF
+		{
+			Class Pyro
+			ClassIcon pyro_dragon_fury_swordstone
+			Name "Dragon Fury Pyro"
+			Skill Normal
+			Item "The Dragon's Fury"
+			Item "Burny's Boney Bonnet"
+			Item "The Cauterizer's Caudal Appendage"
+			Item "The Monster's Stompers"
+			Item "Fallen Angel"
+			MaxVisionRange 750
+		}
+		
+		T_TFBot_Pyro_Shotgun
+		{
+			Class Pyro
+			ClassIcon heavy_shotgun
+			Name "Shotgun Pyro"
+			Skill Normal
+			WeaponRestrictions SecondaryOnly
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SHOTGUN_HWG"
+				"faster reload rate" 0.1
+				"fire rate bonus" 2.5
+				"bullets per shot bonus" 3
+				"damage bonus" 0.33
+			}
+		}
+		
+		T_TFBot_Giant_Pyro_No_Airblast_AlwaysFireWeapons
+		{
+			Template T_TFBot_Giant_Pyro
+			Attributes AlwaysFireWeapon
+			Tag bot_giant
+			CharacterAttributes
+			{
+				"cancel falling damage" 1
+			}
+		}
+		
+		T_TFBot_Giant_Pyro_Dragon_Fury
+		{
+			Class Pyro
+			ClassIcon pyro_dragon_fury_swordstone_giant
+			Name "Giant Dragon's Fury Pyro"
+			Health 3000
+			Skill Expert
+			Attributes MiniBoss
+			Tag bot_giant
+			MaxVisionRange 1000
+			Item "The Dragon's Fury"
+			Item "Burny's Boney Bonnet"
+			Item "The Cauterizer's Caudal Appendage"
+			Item "The Monster's Stompers"
+			Item "Fallen Angel"
+			ItemAttributes
+			{
+				ItemName "The Dragon's Fury"
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 6
+				"cancel falling damage" 1
+			}
+		}
+		
+		T_TFBot_Giant_Pyro_Flare_Rain
+		{
+		    Class Pyro
+			ClassIcon pyro_flare_rain_nys
+			Name "Giant Flare Rain Pyro"
+			Health 3000
+			Skill Expert
+			Attributes MiniBoss
+			Tag bot_giant
+			WeaponRestrictions SecondaryOnly
+			Item "The Flare Gun"
+			ItemAttributes
+			{
+			    ItemName "The Flare Gun"
+				"projectile spread angle penalty" 4
+				"Projectile speed decreased" 0.5
+				"clip size upgrade atomic" 30
+				"fire rate bonus" 0.08
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+				"cancel falling damage" 1
+			}
+		}
+		
+		T_TFBot_Demoman_LochNLoad
+		{
+			Class Demoman
+			ClassIcon demo_loch_nys
+			Name "Loch n' Load Demoman"
+			Skill Normal
+			Item "The Loch-n-Load"
+		}
+		
+		T_TFBot_Demoman_Iron
+		{
+			Class Demoman
+			Name "Iron Bomber Demoman"
+			Skill Normal
+			Item "The Iron Bomber"
+		}
+		
+		T_TFBot_Demoman_ClusterBomb
+        {
+            Class Demoman
+            ClassIcon demo_clusterbomb
+            Name "Cluster Fire Demoman"
+            Skill Hard
+            Item "The Iron Bomber"
+            ItemAttributes
+            {
+                ItemName "The Iron Bomber"
+                "faster reload rate" 1.25
+				"fire rate bonus" 0.15
+				"clip size penalty" 0.75
+            }
+        }
+		
+		T_TFBot_Demoman_Armored
+		{
+			Class Demoman
+			Name "Armored Demoman"
+			Skill Normal
+			ClassIcon demo_armoured
+			Health 700 // 175*4 = 700
+			Scale 1.4
+			Tag bot_giant
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.7
+				"damage force reduction" 0.7
+				"cancel falling damage" 1
+				"blast dmg to self increased" 0
+			}
+		}
+		
+		T_TFBot_Demoman_Spammer_Armored
+		{
+			Template T_TFBot_Demoman_Armored
+			Name "Armored Rapid Fire Demo"
+			Skill Normal
+			ClassIcon demo_spammer_armored
+			WeaponRestrictions PrimaryOnly
+			Attributes HoldFireUntilFullReload
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"faster reload rate" -0.4
+				"fire rate bonus" 0.75
+			}
+		}
+		
+		T_TFBot_Giant_Demoman_No_RapidFire
+		{
+			Class Demoman
+			Name "Giant Demoman"
+			ClassIcon demo_giant
+			Skill Expert
+			Health 3000
+			WeaponRestrictions PrimaryOnly
+			Attributes HoldFireUntilFullReload
+			Attributes MiniBoss
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4
+				"cancel falling damage" 1
+				"blast dmg to self increased" 0
+			}
+		}
+		
+		T_TFBot_Giant_Demo_RapidFire_FixIcons
+		{
+			Class Demoman
+			Name "Giant Rapid Fire Demoman"
+			ClassIcon demo_spammer
+			Skill Expert
+			Health 3000
+			WeaponRestrictions PrimaryOnly
+			Attributes HoldFireUntilFullReload
+			Attributes MiniBoss
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"faster reload rate" -0.4
+				"fire rate bonus" 0.75
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4
+				"cancel falling damage" 1
+				"blast dmg to self increased" 0
+			}
+		}
+		
+		T_TFBot_Giant_Demo_Loch_Burst
+		{
+			Class Demoman
+			Name "Giant Burst Loch Demo"
+			ClassIcon demo_burst_giant
+			Health 3300
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Item "The Loch-N-Load"
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "The Loch-N-Load"
+				"faster reload rate" 0.65 //35% faster reload
+				"fire rate bonus" 0.1
+				"clip size upgrade atomic" 7
+				"projectile spread angle penalty" 5
+			}
+
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 4
+				"cancel falling damage" 1
+				"blast dmg to self increased" 0
+			}
+		}
+		
+		T_TFBot_Giant_Demo_MineLayer
+		{
+			Class Demoman
+			ClassIcon demo_clusterbomb_blast //demo_clusterbomb_giant
+			Name "Giant Mine Layer Demoman"
+			Health 3300
+			Skill Expert
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Tag bot_giant
+			Item "The Iron Bomber"
+			Item "Steel Shako"
+			ItemAttributes
+			{
+				ItemName "The Iron Bomber"
+				"projectile spread angle penalty" 3.0
+				"faster reload rate" 0.45
+				"fire rate bonus" 0.05
+				"clip size bonus" 1.75
+				"fuse bonus" 2.2
+			}
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4.0
+				"damage force reduction" 0.5
+				"move speed bonus" 0.5
+				"cancel falling damage" 1
+				"blast dmg to self increased" 0
+			}
+		}
+		
+		T_TFBot_Giant_Demo_BigrockBurst
+		{
+			Class Demoman
+			Name "Giga Burst Fire Demo"
+			ClassIcon demo_burst_hyper_lite
+			Health 3300
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"faster reload rate" 0.5 //50% faster reload
+				"fire rate bonus" 0.2
+				"clip size upgrade atomic" 7.0
+				"projectile spread angle penalty" 5
+				"Projectile speed increased" 0.9
+				"damage bonus"	2
+			}
+
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 4
+				"cancel falling damage" 1
+				"blast dmg to self increased" 0
+			}
+		}
+		
+		T_TFBot_Heavyweapons_Family_Business
+		{
+			Class Heavyweapons
+			ClassIcon heavy_family_business_lite
+			Name "Family Business Heavy"
+			Skill Normal
+			WeaponRestrictions SecondaryOnly
+			Item "The Family Business"
+			ItemAttributes
+			{
+				ItemName "The Family Business"
+			}
+		}
+		
+		T_TFBot_Heavyweapons_Armored
+		{
+			Class Heavyweapons
+			ClassIcon heavy_armored
+			Name "Armored Heavy"
+			Skill Easy
+			Health 1200 // 300*4 = 1200
+			Scale 1.4
+			Tag bot_giant
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.7
+				"damage force reduction" 0.7
+				"cancel falling damage" 1
+			}
+		}
+		
+		T_TFBot_Heavyweapons_Shotgun_Armored
+		{
+			Template T_TFBot_Heavyweapons_Armored
+			ClassIcon heavy_armored_shotgun
+			Name "Armored Shotgun Heavy"
+			Skill Hard
+			WeaponRestrictions SecondaryOnly
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SHOTGUN_HWG"
+				"faster reload rate" 0.1
+				"fire rate bonus" 2.5
+				"bullets per shot bonus" 3
+				"damage bonus" 0.33
+			}
+		}
+		
+		T_TFBot_Giant_Heavyweapons_BrassBeast
+		{
+			Class Heavyweapons
+			Name "Giant Brass Beast Heavy"
+			ClassIcon heavy_brass_nys_giant
+			Skill Expert
+			Health 5000
+			WeaponRestrictions PrimaryOnly
+			MaxVisionRange 1200
+			Attributes MiniBoss
+			Item "The Brass Beast"
+			ItemAttributes
+			{
+				ItemName "The Brass Beast"
+				"damage bonus" 1.7
+			}
+			CharacterAttributes
+			{
+				"damage bonus"	1.5
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+				"cancel falling damage" 1
+			}
+		}
+		
+		T_TFBot_Medic_Popping_BigHeal
+		{
+			Class Medic
+			Name "Popping Big-Heal Medic"
+			ClassIcon medic_pop
+			Skill Normal
+			Attributes SpawnWithFullCharge
+			Item "The Quick-Fix"
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+			CharacterAttributes
+			{
+				"heal rate bonus" 10
+				"cancel falling damage" 1
+			}
+		}
+		
+		T_TFBot_Medic_Kritzkrieg
+		{
+			Class Medic
+			Name "Kritzkrieg Medic"
+			ClassIcon medic_kritz
+			Skill Normal
+			Health 150
+			Attributes SpawnWithFullCharge
+			Item "The Kritzkrieg"
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "The Kritzkrieg"
+				"ubercharge rate bonus" 9999
+				"uber duration bonus" 9999
+			}
+			CharacterAttributes
+			{
+				"bot medic uber health threshold" 9999
+				"cancel falling damage" 1
+			}
+		}
+		
+		T_TFBot_Medic_Shield
+		{
+			Class Medic
+			ClassIcon medic_shield_lite
+			Name "Shield Medic"
+			Skill Expert
+			Attributes IgnoreEnemies
+			Attributes SpawnWithFullCharge
+			Attributes ProjectileShield
+			WeaponRestrictions SecondaryOnly
+			Tag bot_giant
+			Item "The Physician's Protector"
+			Item "tf_weapon_medigun"
+			ItemAttributes
+			{
+				ItemName "tf_weapon_medigun"
+				"generate rage on heal" 2
+				"increase buff duration" 99
+				"ubercharge rate bonus" -1
+				"uber duration bonus" -8
+				"heal rate bonus" 200
+			}
+			CharacterAttributes
+			{
+				"bot medic uber deploy delay duration" 9999
+				"cancel falling damage" 1
+			}
+		}
+		
+		T_TFBot_Medic_Bullet_VAC
+		{
+			Name "Bullet VAC Medic"
+			Health 150
+			Class Medic
+			Skill Expert
+			ClassIcon medic_bullet
+			WeaponRestrictions SecondaryOnly
+			Attributes SpawnWithFullCharge
+			Attributes VaccinatorBullets
+			Attributes IgnoreEnemies
+			Item "TF_WEAPON_MEDIGUN"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_MEDIGUN"
+				"lunchbox adds minicrits" 3
+				"heal rate bonus" 10
+				"medigun bullet resist deployed" 0.75
+				"medigun bullet resist passive" 0.75
+				"medigun charge is resists" 3
+			}
+			CharacterAttributes
+			{
+				"bot medic uber health threshold" 9999
+				"ubercharge rate bonus" 999
+			}
+		}
+		
+		T_TFBot_Medic_Blast_VAC
+		{
+			Name "Blast VAC Medic"
+			Health 150
+			Class Medic
+			Skill Expert
+			ClassIcon medic_blast
+			WeaponRestrictions SecondaryOnly
+			Attributes SpawnWithFullCharge
+			Attributes VaccinatorBlast
+			Attributes IgnoreEnemies
+			Item "TF_WEAPON_MEDIGUN"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_MEDIGUN"
+				"lunchbox adds minicrits" 3
+				"heal rate bonus" 10
+				"medigun blast resist deployed" 0.75
+				"medigun blast resist passive" 0.75
+				"medigun charge is resists" 4
+			}
+			CharacterAttributes
+			{
+				"bot medic uber health threshold" 9999
+				"ubercharge rate bonus" 999
+			}
+		}
+		
+		T_TFBot_Medic_Armored
+		{
+			Class Medic
+			ClassIcon medic_armored
+			Name "Armored Medic"
+			Skill Normal
+			Health 600 // 150*4 = 600
+			Scale 1.4
+			Tag bot_giant
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.7
+				"damage force reduction" 0.7
+				"cancel falling damage" 1
+			}
+		}
+		
+		T_TFBot_Medic_Kritzkrieg_Armored
+		{
+			Template T_TFBot_Medic_Armored
+			Name "Armored Kritzkrieg Medic"
+			ClassIcon medic_kritz_armored_lite
+			Skill Normal
+			Attributes SpawnWithFullCharge
+			Item "The Kritzkrieg"
+			ItemAttributes
+			{
+				ItemName "The Kritzkrieg"
+				"ubercharge rate bonus" 9999
+				"uber duration bonus" 9999
+			}
+			CharacterAttributes
+			{
+				"bot medic uber health threshold" 9999
+				"heal rate bonus" 999
+			}
+		}
+		
+		T_TFBot_Medic_Shield_Armored
+		{
+			Template T_TFBot_Medic_Armored
+			ClassIcon medic_shield_armored_lite
+			Name "Armored Shield Medic"
+			Skill Expert
+			Attributes IgnoreEnemies
+			Attributes SpawnWithFullCharge
+			Attributes ProjectileShield
+			WeaponRestrictions SecondaryOnly
+			Item "The Physician's Protector"
+			Item "tf_weapon_medigun"
+			ItemAttributes
+			{
+				ItemName "tf_weapon_medigun"
+				"generate rage on heal" 2
+				"increase buff duration" 99
+				"ubercharge rate bonus" -1
+				"uber duration bonus" -8
+				"heal rate bonus" 999
+			}
+			CharacterAttributes
+			{
+				"bot medic uber deploy delay duration" 9999
+			}
+		}
+		
+		T_TFBot_Giant_Uber_Medic_GuaranteePop
+		{
+			Class Medic
+			Name "Giant Uber Medic"
+			ClassIcon medic_uber_giant
+			Skill Expert
+			Health 4500
+			Attributes MiniBoss
+			Attributes IgnoreEnemies
+			Attributes SpawnWithFullCharge
+			Item "Medi Gun"
+			WeaponRestrictions SecondaryOnly
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "tf_weapon_medigun"
+				"bot medic uber health threshold" 2250
+				"heal rate bonus" 999
+				//"bot medic uber deploy delay duration" 1.5
+				"ubercharge rate bonus" 0.001 // Disable Second Pop
+				"uber duration bonus" -3
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"cancel falling damage" 1
+			}
+		}
+		
+		T_TFBot_Giant_Medic_Kritzkrieg
+		{
+			Class Medic
+			ClassIcon medic_kritz_giant
+			Name "Giant KritzKrieg Medic"
+			Health 4500
+			Skill Expert
+			Attributes MiniBoss
+			Attributes AlwaysCrit
+			Attributes IgnoreEnemies
+			Attributes SpawnWithFullCharge
+			Tag bot_giant
+			WeaponRestrictions SecondaryOnly
+			Item "The KritzKrieg"
+			Item "The Virus Doctor"
+			ItemAttributes
+			{
+				ItemName "The KritzKrieg"
+				"uber duration bonus" 9999
+				"ubercharge rate bonus" 9999
+				"bot medic uber health threshold" 9999
+				"heal rate bonus" 999
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"health from healers increased" 0.005
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"cancel falling damage" 1
+			}
+		}
+	}
+	
+	//WAVE 1 (1600$)
+	Wave
+    {
+		WaitWhenDone	65
+		Checkpoint	Yes
+        StartWaveOutput
+        {
+            Target wave_start_relay_ironman
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+		InitWaveOutput
+		{
+			Target wave_start_relay_ironman
+			Action RunScriptCode
+			Param
+			"
+				IncludeScript(`popextensions_main`, getroottable())
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_right_relay`, `Trigger`)
+				EntFire(`bombpath_left_upper_relay`, `TurnOff`)
+				EntFire(`Ironman_Mode_Intel`, `SetReturnTime`, `60`)
+				IncludeScript(`disablesquad`)
+				ClientPrint(null,3,`\x0800FF00FFThe bomb will stop resetting when the last subwave!`)
+				IncludeScript(`butcher_extrahealthammokit`)
+				SpawnTemplate(`HealthAmmoKit`)
+				MissionAttrs
+				(
+					{
+						`NoRome`: 2
+						`NoCrumpkins`: 1
+						`NoThrillerTaunt`: 1
+					}
+				)
+			"
+		}
+		
+		WaveSpawn
+		{
+			Name 1a-support
+
+			Where spawnbot_right
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 45
+			TotalCurrency 0
+			
+			Support Limited
+			
+			Squad
+			{
+				Squad
+				{
+					TFBot
+					{
+						Template T_TFBot_Scout_Melee_FixIcons
+						Name "Bomb Carrying Service"
+					}
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1a
+
+			Where spawnbot_right
+			TotalCount 32
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 6
+			TotalCurrency 200
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Shotgun
+					Skill Normal
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Class Soldier
+					Skill Normal
+					Tag disband_squad
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1a
+
+			Where spawnbot_right
+			TotalCount 12
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 20
+			TotalCurrency 120
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_DemoMan_PrinceTavish
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1b
+			WaitForAllSpawned 1a
+
+			Where spawnbot_left
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 20
+			TotalCurrency 60
+			
+			//Squad
+			//{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier
+					CharacterAttributes
+					{
+						"cancel falling damage" 1
+						"blast dmg to self increased" 0
+					}
+				}
+				//TFBot
+				//{
+					//Template T_TFBot_Medic_QuickUber
+					//Attributes IgnoreEnemies
+					//Name "Quick-Uber Medic"
+				//}
+			//}
+		}
+		
+		WaveSpawn
+		{
+			Name 1b
+			WaitForAllSpawned 1a
+
+			Where spawnbot_left
+			TotalCount 20
+			MaxActive 8
+			SpawnCount 1
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 1.5
+			TotalCurrency 120
+			
+			TFBot
+			{
+				Template T_TFBot_Sniper_Huntsman
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1b
+			WaitForAllSpawned 1a
+
+			Where spawnbot_left
+			TotalCount 21
+			MaxActive 7
+			SpawnCount 7
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 13
+			TotalCurrency 100
+			
+			TFBot
+			{
+				Template T_TFBot_Soldier_DirectHit
+				Skill Normal
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1c
+			WaitForAllSpawned 1b
+
+			Where spawnbot_left
+			TotalCount 56
+			MaxActive 8
+			SpawnCount 2
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 2
+			TotalCurrency 120
+			
+			TFBot
+			{
+				Class Scout
+				Skill Easy
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1c
+			WaitForAllSpawned 1b
+
+			Where spawnbot_right
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 20
+			TotalCurrency 300
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demoman_No_RapidFire
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1d-Support
+			WaitForAllSpawned 1c
+
+			Where spawnbot_top
+			TotalCount 80
+			MaxActive 4
+			SpawnCount 1
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 1
+			TotalCurrency 80
+			
+			Support 1
+			
+			TFBot
+			{
+				Template T_TFBot_Scout_Pistol
+				Skill Easy
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1d-Support
+			WaitForAllSpawned 1c
+
+			Where spawnbot_left
+			TotalCount 100
+			MaxActive 8
+			SpawnCount 5
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 6
+			TotalCurrency 200
+			
+			FirstSpawnWarningSound ui\chat_display_text.wav
+			
+			Support 1
+			
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					EntFire(`Ironman_Mode_Intel`, `SetReturnTime`, `999999`)
+					ClientPrint(null,3,`\x0800FF00FFThe bomb has now stopped resetting!`)
+				"
+			}
+			
+			Squad
+			{
+				TFBot
+				{
+					Class Pyro
+					Skill Easy
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Class Pyro
+					Skill Easy
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Flaregun
+					Tag disband_squad
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1d
+			WaitForAllSpawned 1c
+
+			Where spawnbot_chief
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 15
+			TotalCurrency 150
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Pyro_Dragon_Fury
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Name "Big-Heal Medic"
+					Attributes IgnoreEnemies
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Name "Big-Heal Medic"
+					Attributes IgnoreEnemies
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 1e
+			WaitForAllSpawned 1d
+
+			Where spawnbot_chief
+			TotalCount 9
+			MaxActive 9
+			SpawnCount 3
+			WaitBeforeStarting 20
+			WaitBetweenSpawns 25
+			TotalCurrency 150
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Heavyweapons_Heater
+					Name "Giant Heater Heavy"
+					CharacterAttributes
+					{
+						"cancel falling damage" 1
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Name "Big-Heal Medic"
+					Attributes IgnoreEnemies
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Name "Big-Heal Medic"
+					Attributes IgnoreEnemies
+				}
+			}
+		}
+	}
+	
+	//WAVE 2 (1600$)
+	Wave
+    {
+		WaitWhenDone	65
+		Checkpoint	Yes
+        StartWaveOutput
+        {
+            Target wave_start_relay_ironman
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+		InitWaveOutput
+		{
+			Target wave_start_relay_ironman
+			Action RunScriptCode
+			Param
+			"
+				IncludeScript(`popextensions_main`, getroottable())
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_right_relay`, `TurnOff`)
+				EntFire(`bombpath_left_upper_relay`, `Trigger`)
+				EntFire(`Ironman_Mode_Intel`, `SetReturnTime`, `60`)
+				//ClientPrint(null,3,`\x0800FF00FFThe bomb will stop resetting when the last subwave!`)
+				//IncludeScript(`disablesquad`)
+				IncludeScript(`butcher_extrahealthammokit`)
+				SpawnTemplate(`HealthAmmoKit`)
+				MissionAttrs
+				(
+					{
+						`NoRome`: 2
+						`NoCrumpkins`: 1
+						`NoThrillerTaunt`: 1
+					}
+				)
+			"
+		}
+		
+		WaveSpawn
+		{
+			Name 2a
+
+			Where spawnbot_chief
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 15
+			TotalCurrency 120
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Pyro_No_Airblast_AlwaysFireWeapons
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2a
+		
+			TotalCount 1
+            WaitBeforeStarting 5
+			TotalCurrency 120
+			FirstSpawnWarningSound	"mvm\mvm_tank_start.wav"
+			
+			FirstSpawnOutPut
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param 
+				"
+					ClientPrint(null,3,`\x0799CCFFTank deployed with 22000 HP!`)
+				"
+			}
+
+			Tank
+			{
+				Health 22000
+				Speed 75
+				Name "tank_boss"
+				StartingPathTrackNode "tank_path_b_1"
+
+				OnKilledOutput                                  
+				{
+					Target boss_dead_relay
+					Action Trigger                         
+				}
+				
+				OnBombDroppedOutput                             
+				{
+					Target boss_deploy_relay
+					Action Trigger                         
+				}
+			}		
+		}
+		
+		WaveSpawn
+		{
+			Name 2a
+
+			Where spawnbot_top
+			TotalCount 40
+			MaxActive 7
+			SpawnCount 5
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 5
+			TotalCurrency 160
+			
+			TFBot
+			{
+				Template T_TFBot_Scout_SunOnAStick
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2a
+
+			Where spawnbot_top
+			TotalCount 20
+			MaxActive 6
+			SpawnCount 4
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 9
+			TotalCurrency 80
+			
+			TFBot
+			{
+				Class Soldier
+				Skill Normal
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2b
+			WaitForAllSpawned 2a
+
+			Where spawnbot_top
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 21
+			TotalCurrency 90
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Baseball
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2b
+			WaitForAllSpawned 2a
+
+			Where spawnbot_top
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 4
+			TotalCurrency 160
+
+			TFBot
+			{
+				Template T_TFBot_Demoman_Knight
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2b
+			WaitForAllSpawned 2a
+
+			Where spawnbot_top
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 8.5
+			TotalCurrency 120
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Soldier_Crit_Armored
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal
+					Attributes IgnoreEnemies
+					Name "Big-Heal Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2c
+			WaitForAllSpawned 2b
+
+			Where spawnbot_top
+			TotalCount 15
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 19
+			TotalCurrency 150
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Spammer_Reload_DirectHit
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2c
+			WaitForAllSpawned 2b
+
+			Where spawnbot_left
+			Where spawnbot_right
+			TotalCount 33
+			MaxActive 9
+			SpawnCount 3
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 3
+			TotalCurrency 100
+			
+			TFBot
+			{
+				//Template T_TFBot_Pyro_DF
+				Template T_TFBot_Demoman_LochNLoad
+				Skill Normal
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2d
+			WaitForAllSpawned 2c
+
+			Where spawnbot_right
+			TotalCount 26
+			MaxActive 8
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 1
+			TotalCurrency 100
+			
+			TFBot
+			{
+				Template T_TFBot_Soldier_Bison
+				Skill Normal
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2d
+			WaitForAllSpawned 2c
+
+			Where spawnbot_left
+			TotalCount 10
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 21
+			TotalCurrency 100
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons_Deflector
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+			}
+		}
+		
+		//WaveSpawn
+		//{
+			//Name 2d-dummy
+			//WaitForAllDead 2d-giant
+		//}
+		//WaveSpawn
+		//{
+			//Name 2d-dummy
+			//WaitForAllSpawned 2d
+		//}
+		
+		WaveSpawn
+		{
+			Name 2e-support
+			WaitForAllSpawned 2d
+
+			Where spawnbot_left
+			TotalCount 200
+			MaxActive 8
+			SpawnCount 2
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 3
+			TotalCurrency 200
+			
+			FirstSpawnWarningSound ui\chat_display_text.wav
+			
+			Support 1
+			
+			TFBot
+			{
+				Class Soldier
+				Skill Normal
+			}
+			
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					EntFire(`Ironman_Mode_Intel`, `SetReturnTime`, `999999`)
+					ClientPrint(null,3,`\x0800FF00FFThe bomb has now stopped resetting!`)
+				"
+			}
+		}
+		
+		//WaveSpawn
+		//{
+			//Name 2e-support
+			//WaitForAllSpawned 2d
+
+			//Where spawnbot_left
+			//TotalCount 80
+			//MaxActive 4
+			//SpawnCount 1
+			//WaitBeforeStarting 5
+			//WaitBetweenSpawns 0.5
+			//TotalCurrency 80
+			
+			//Support 1
+			
+			//TFBot
+			//{
+				//Template T_TFBot_Pyro_DF
+			//}
+		//}
+		
+		//WaveSpawn
+		//{
+			//Name 2e
+			//WaitForAllDead 2d
+
+			//Where spawnbot_top
+			//TotalCount 4
+			//MaxActive 4
+			//SpawnCount 1
+			//WaitBeforeStarting 26
+			//WaitBetweenSpawns 16
+			//TotalCurrency 100
+			
+			//TFBot
+			//{
+				//Template T_TFBot_Giant_Scout_Baseball
+			//}
+		//}
+		
+		WaveSpawn
+		{
+			Name 2e
+			WaitForAllSpawned 2d
+
+			Where spawnbot_left
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 22
+			WaitBetweenSpawns 25
+			TotalCurrency 60
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_MineLayer
+				}
+				//TFBot
+				//{
+					//Template T_TFBot_Medic_QuickUber
+					//Attributes IgnoreEnemies
+					//Name "Quick-Uber Medic"
+				//}
+				//TFBot
+				//{
+					//Template T_TFBot_Medic_QuickUber
+					//Attributes IgnoreEnemies
+					//Name "Quick-Uber Medic"
+				//}
+				TFBot
+				{
+					Template T_TFBot_Medic_Shield_Armored
+					Attributes IgnoreEnemies
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2e-another-giant
+			WaitForAllSpawned 2d
+
+			Where spawnbot_left
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			WaitBeforeStarting 30
+			WaitBetweenSpawns 30
+			TotalCurrency 20
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Bison_Spammer
+				Attributes AlwaysCrit
+				CharacterAttributes
+				{
+					"cancel falling damage" 1
+					"blast dmg to self increased" 0
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 2f
+			WaitForAllSpawned 2e
+
+			Where spawnbot_left
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 22
+			WaitBetweenSpawns 22
+			TotalCurrency 20
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_Loch_Burst
+					CharacterAttributes
+					{
+						"cancel falling damage" 1
+						"blast dmg to self increased" 0
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_Shield_Armored
+					Attributes IgnoreEnemies
+				}
+			}
+		}
+	}
+	
+	//WAVE 3 (900$)
+	Wave
+    {
+		WaitWhenDone	65
+		Checkpoint	Yes
+        StartWaveOutput
+        {
+            Target wave_start_relay_ironman
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+		InitWaveOutput
+		{
+			Target wave_start_relay_ironman
+			Action RunScriptCode
+			Param
+			"
+				IncludeScript(`popextensions_main`, getroottable())
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_right_relay`, `TurnOff`)
+				EntFire(`bombpath_left_upper_relay`, `Trigger`)
+				EntFire(`Ironman_Mode_Intel`, `SetReturnTime`, `60`)
+				IncludeScript(`disablesquad`)
+				ClientPrint(null,3,`\x08FF54F1FFThe bomb path will be changed while the wave is active.`)
+				ClientPrint(null,3,`\x08FF54F1FFAfter the bomb path has changed, Another bomb will enter the area!`)
+				ClientPrint(null,3,`\x08FF54F1FFA warning sound will be warned to everyone with a 25-second break`)
+				//ClientPrint(null,3,`\x0800FF00FFThe bomb will stop resetting when the last subwave!`)
+				IncludeScript(`butcher_extrahealthammokit`)
+				SpawnTemplate(`HealthAmmoKit`)
+				MissionAttrs
+				(
+					{
+						`NoRome`: 2
+						`NoCrumpkins`: 1
+						`NoThrillerTaunt`: 1
+					}
+				)
+			"
+		}
+		
+		WaveSpawn
+		{
+			Name 3a-support
+
+			Where spawnbot_top
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 0
+			
+			Support Limited
+			
+			Squad
+			{
+				Squad
+				{
+					TFBot
+					{
+						Template T_TFBot_Scout_Melee_FixIcons
+						Name "Bomb Carrying Service"
+						ClassIcon agentbomb
+					}
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3a
+
+			Where spawnbot_top
+			TotalCount 42
+			MaxActive 8
+			SpawnCount 1
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 1
+			TotalCurrency 100
+			
+			TFBot
+			{
+				Template T_TFBot_Scout_Soda_Popper
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3a
+
+			Where spawnbot_top
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 22
+			TotalCurrency 200
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_Burst
+					CharacterAttributes
+					{
+						"cancel falling damage" 1
+						"blast dmg to self increased" 0
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Kritzkrieg
+					Attributes IgnoreEnemies
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3b
+			WaitForAllSpawned 3a
+
+			Where spawnbot_top
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 24
+			TotalCurrency 20
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_SlowBarrage
+					CharacterAttributes
+					{
+						"cancel falling damage" 1
+						"blast dmg to self increased" 0
+						"health regen" 0
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3b
+			WaitForAllSpawned 3a
+
+			Where spawnbot_left
+			TotalCount 28
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 3
+			TotalCurrency 40
+			
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Family_Business
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3b
+			WaitForAllSpawned 3a
+
+			Where spawnbot_right
+			TotalCount 30
+			MaxActive 6
+			SpawnCount 1
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 1
+			TotalCurrency 60
+			
+			TFBot
+			{
+				Class Pyro
+				Skill Easy
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3b
+			WaitForAllSpawned 3a
+
+			Where spawnbot_chief
+			TotalCount 5
+			MaxActive 3
+			SpawnCount 1
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 8
+			TotalCurrency 100
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Pyro_Dragon_Fury
+				CharacterAttributes
+				{
+					"cancel falling damage" 1
+					"blast dmg to self increased" 0
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c
+			WaitForAllSpawned 3b
+		
+			TotalCount 1
+            WaitBeforeStarting 0
+			TotalCurrency 200
+			FirstSpawnWarningSound	"mvm\mvm_tank_start.wav"
+			
+			FirstSpawnOutPut
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param 
+				"
+					ClientPrint(null,3,`\x0799CCFFTank deployed with 32000 HP!`)
+				"
+			}
+
+			Tank
+			{
+				Health 32000
+				Speed 75
+				Name "tank_boss"
+				StartingPathTrackNode "tank_path_b_1"
+
+				OnKilledOutput                                  
+				{
+					Target boss_dead_relay
+					Action Trigger                         
+				}
+				
+				OnBombDroppedOutput                             
+				{
+					Target boss_deploy_relay
+					Action Trigger                         
+				}
+			}		
+		}
+		
+		WaveSpawn
+		{
+			Name 3c
+			WaitForAllSpawned 3b
+
+			Where spawnbot_top
+			TotalCount 8
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 19
+			TotalCurrency 80
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Demo_RapidFire_FixIcons
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c
+			WaitForAllSpawned 3b
+
+			Where spawnbot_left
+			TotalCount 36
+			MaxActive 12
+			SpawnCount 6
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 10
+			TotalCurrency 100
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Soldier_Extended_Buff_Banner_Bugfixed
+					Tag disband_squad
+				}
+				TFBot
+				{
+					Template T_TFBot_Soldier_Extended_Concheror_BugFixed
+					Tag disband_squad
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c-changepath
+			WaitForAllDead 3c
+			FirstSpawnWarningSound mvm\mvm_cpoint_klaxon.wav
+			WaitBeforeStarting 0
+			
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					EntFire(`bombpath_choose_relay`, `Kill`)
+					EntFire(`bombpath_clearall_relay`, `Trigger`)
+					EntFire(`bombpath_right_relay`, `TurnOff`)
+					EntFire(`bombpath_left_upper_relay`, `TurnOff`)
+					EntFire(`Ironman_Mode_Intel`,`ForceResetSilent`)
+					EntFire(`Ironman_Mode_Intel`, `Disable`)
+					EntFire(`upgrade_forward_door`, `Open`)
+					EntFire(`FrontUpgradeStationL`, `Enable`)
+					EntFire(`buring_fire_1_timer`, `Disable`)
+					ClientPrint(null,3,`\x08FF54F1FFThe bomb path has changed.`)
+					ClientPrint(null,3,`\x08FF54F1FFAnother bomb will enter the area!`)
+					if(Entities.FindByName(null, `pathchange`) == null)
+					{
+						SpawnEntityFromTable(`training_annotation`, {
+							targetname = `pathchange`
+							origin = `2421 3436 128` // 3339 2615 256
+							angles = `0 0 0`
+							lifetime = `26`
+							display_text = `The bomb path has changed.`
+						})
+					}
+					EntFire(`pathchange`,`show`)
+				"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c-changepath-2
+			WaitForAllDead 3c-changepath
+			WaitBeforeStarting 3
+			FirstSpawnWarningSound mvm\mvm_cpoint_klaxon.wav
+			
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					EntFire(`Ironman_Mode_Intel`, `Enable`)
+					EntFire(`Ironman_Mode_Intel`, `SetReturnTime`, `45`)
+					EntFire(`Ironman_Mode_Intel_45_sec`, `Enable`)
+					EntFire(`bombpath_right_relay`, `Trigger`)
+					EntFire(`bombpath_left_upper_relay`, `TurnOff`)
+				"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c-changepath-2
+			WaitForAllDead 3c-changepath
+			WaitBeforeStarting 4.5
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					if(Entities.FindByName(null, `botspawning`) == null)
+					{
+						SpawnEntityFromTable(`training_annotation`, {
+							targetname = `botspawning`
+							origin = `3062 1502 512`
+							angles = `0 0 0`
+							lifetime = `21.5`
+							display_text = `The next robot subwave will spawn in this area!`
+						})
+					}
+					EntFire(`botspawning`,`show`)
+				"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c-changepath-2
+			WaitForAllDead 3c-changepath
+			FirstSpawnWarningSound vo/announcer_begins_20sec.mp3
+			WaitBeforeStarting 6
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					ClientPrint(null,3,`\x08FFFF00FFThe Mission begins in 20 seconds!`)
+				"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c-changepath-2
+			WaitForAllDead 3c-changepath
+			FirstSpawnWarningSound vo/announcer_begins_10sec.mp3
+			WaitBeforeStarting 16
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					ClientPrint(null,3,`\x08FFFF00FFThe Mission begins in 10 seconds`)
+				"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c-changepath-2
+			WaitForAllDead 3c-changepath
+			FirstSpawnWarningSound Announcer.CompGameBegins05Seconds
+			WaitBeforeStarting 21
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					ClientPrint(null,3,`\x08FFFF00FF5...`)
+				"
+			}
+		}
+		WaveSpawn
+		{
+			Name 3c-changepath-2
+			WaitForAllDead 3c-changepath
+			FirstSpawnWarningSound Announcer.CompGameBegins04Seconds
+			WaitBeforeStarting 22
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					ClientPrint(null,3,`\x08FFFF00FF4...`)
+				"
+			}
+		}
+		WaveSpawn
+		{
+			Name 3c-changepath-2
+			WaitForAllDead 3c-changepath
+			FirstSpawnWarningSound Announcer.CompGameBegins03Seconds
+			WaitBeforeStarting 23
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					ClientPrint(null,3,`\x08FFFF00FF3...`)
+				"
+			}
+		}
+		WaveSpawn
+		{
+			Name 3c-changepath-2
+			WaitForAllDead 3c-changepath
+			FirstSpawnWarningSound Announcer.CompGameBegins02Seconds
+			WaitBeforeStarting 24
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					ClientPrint(null,3,`\x08FFFF00FF2...`)
+				"
+			}
+		}
+		WaveSpawn
+		{
+			Name 3c-changepath-2
+			WaitForAllDead 3c-changepath
+			FirstSpawnWarningSound Announcer.CompGameBegins01Seconds
+			WaitBeforeStarting 25
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					ClientPrint(null,3,`\x08FFFF00FF1...`)
+				"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3c-changepath-2
+			WaitForAllDead 3c-changepath
+			FirstSpawnWarningSound "mvm\extra_bomb.wav"
+			WaitBeforeStarting 26
+		}
+		
+		//WaveSpawn
+		//{
+			//Name 3c-changepath-2
+			//WaitForAllDead 3c-changepath
+			//FirstSpawnWarningSound "mvm\mvm_warning.wav"
+			//WaitBeforeStarting 28
+		//}
+		
+		WaveSpawn
+		{
+			Name relay
+			WaitForAllDead 3c-changepath-2
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 0
+		}
+		
+		WaveSpawn
+		{
+			Name closed-upgradestation
+			WaitForAllDead relay
+
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 0
+			
+			StartWaveOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					EntFire(`upgrade_forward_door`, `Close`)
+					EntFire(`FrontUpgradeStationL`, `Disable`)
+				"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3d
+			WaitForAllDead 3c-changepath-2
+
+			Where spawnbot_top
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 22
+			TotalCurrency 100
+			
+			FirstSpawnWarningSound "mvm\mvm_warning.wav"
+			
+			StartWaveOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					EntFire(`pathchange`,`Kill`)
+					EntFire(`bombpath_arrows_clear_relay`,`Trigger`)
+					EntFire(`Ironman_Mode_Intel_45_sec`, `Enable`)
+					EntFire(`Ironman_Mode_Intel`, `Enable`)
+					EntFire(`Ironman_Mode_Intel`, `SetReturnTime`, `45`)
+					//EntFire(`upgrade_forward_door`, `Close`)
+					//EntFire(`FrontUpgradeStationL`, `Disable`)
+					EntFire(`buring_fire_1_timer`, `Enable`)
+					if(Entities.FindByName(null, `twinbomb`) == null)
+					{
+						SpawnEntityFromTable(`training_annotation`, {
+							targetname = `twinbomb`
+							origin = `3062 1502 512`
+							angles = `0 0 0`
+							lifetime = `8`
+							display_text = `Another bomb will enter the area!`
+						})
+					}
+					EntFire(`twinbomb`,`show`)
+				"
+			}
+			
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout
+				//Skill Normal
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3d
+			WaitForAllDead 3c-changepath-2
+
+			Where spawnbot_top
+			TotalCount 40
+			MaxActive 13
+			SpawnCount 5
+			WaitBeforeStarting 4
+			WaitBetweenSpawns 4
+			TotalCurrency 40
+			
+			TFBot
+			{
+				Class Soldier
+				Skill Normal
+				Attributes AlwaysCrit
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3e
+			WaitForAllSpawned 3d
+
+			Where spawnbot_left
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 18
+			TotalCurrency 60
+			
+			FirstSpawnWarningSound ui\chat_display_text.wav
+			
+			FirstSpawnOutput
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param
+				"
+					EntFire(`Ironman_Mode_Intel`, `SetReturnTime`, `999999`)
+					EntFire(`Ironman_Mode_Intel_45_sec`, `SetReturnTime`, `999999`)
+					ClientPrint(null,3,`\x0800FF00FFThe bomb has now stopped resetting!`)
+				"
+			}
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Heavyweapons
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Uber_Medic_GuaranteePop
+					Attributes IgnoreEnemies
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3e-support
+			WaitForAllSpawned 3d
+
+			Where spawnbot_left
+			TotalCount 100
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 12
+			TotalCurrency 100
+			
+			Support 1
+			
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Shotgun_Armored
+				Skill Hard
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3e-support
+			WaitForAllSpawned 3d
+
+			Where spawnbot_top
+			TotalCount 99
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 6
+			TotalCurrency 100
+			
+			Support 1
+			
+			TFBot
+			{
+				Template T_TFBot_Demoman_Iron
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3e
+			WaitForAllSpawned 3d
+
+			Where spawnbot_top
+			TotalCount 12
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 40
+			WaitBetweenSpawns 25
+			TotalCurrency 50
+			
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giga_Soldier_BigrockBurst
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickUber
+					Attributes IgnoreEnemies
+					Name "Quick-Uber Medic"
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name 3e-tank
+			WaitForAllSpawned 3d
+		
+			TotalCount 1
+            WaitBeforeStarting 60
+			TotalCurrency 50
+			FirstSpawnWarningSound	"mvm\mvm_tank_start.wav"
+			
+			FirstSpawnOutPut
+			{
+				Target wave_start_relay_ironman
+				Action RunScriptCode
+				Param 
+				"
+					ClientPrint(null,3,`\x0799CCFFTank deployed with 34666 HP!`)
+				"
+			}
+
+			Tank
+			{
+				Health 34666
+				Skin 1
+				Speed 75
+				Name "tank_boss"
+				StartingPathTrackNode "tank_path_b_1"
+
+				OnKilledOutput                                  
+				{
+					Target boss_dead_relay
+					Action Trigger                         
+				}
+				
+				OnBombDroppedOutput                             
+				{
+					Target boss_deploy_relay
+					Action Trigger                         
+				}
+			}		
+		}
+	}
+	
+	//WAVE 4 (0$)
+	//Wave
+    //{
+		//WaitWhenDone	65
+		//Checkpoint	Yes
+        //StartWaveOutput
+        //{
+			//Target wave_start_relay_ironman
+			//Action Trigger
+		//}
+		//DoneOutput
+        //{
+            //Target wave_finished_relay
+			//Action Trigger
+        //}
+		//InitWaveOutput
+		//{
+			//Target wave_start_relay_ironman
+			//Action RunScriptCode
+			//Param
+			//"
+				//IncludeScript(`popextensions_main`, getroottable())
+				//EntFire(`bombpath_choose_relay`, `Kill`)
+				//EntFire(`bombpath_clearall_relay`, `Trigger`)
+				//EntFire(`bombpath_right_relay`, `Trigger`)
+				//EntFire(`bombpath_left_upper_relay`, `TurnOff`)
+				//EntFire(`Ironman_Mode_Intel`, `Enable`)
+				//EntFire(`Ironman_Mode_Intel`, `SetReturnTime`, `60`)
+				//ClientPrint(null,3,`\x08FF54F1FFAfter bomb path has changed, Another bomb will entered the area on this wave!`)
+				//MissionAttrs
+				//(
+					//{
+						//`NoRome`: 2
+						//`NoCrumpkins`: 1
+						//`NoThrillerTaunt`: 1
+					//}
+				//)
+				//if(Entities.FindByName(null, `pathchange`) == null)
+				//{
+					//SpawnEntityFromTable(`training_annotation`, {
+						//targetname = `pathchange`
+						//origin = `3120 1439 512`
+						//angles = `0 0 0`
+						//lifetime = `9999`
+						//display_text = `Another bomb will entered the area on this wave!`
+					//})
+				//}
+				//EntFire(`pathchange`,`Show`)
+			//"
+		//}
+	//}
+}
+
+// Change Log
+// Reduce Start Money from 1400$ to 1200$
+
+// Change Log
+// Wave 2
+// Change Heavy to FAN Scout Easy AI
+// add conch on soldier escape plan
+
+// Change Log
+// Change Iron Bomber Demo Icon to demo_clusterbomb_single
+// Bomb Change Timer from 30 sec to 60 sec
+
+// Wave 3
+// on the 2 Bomb Change Timer from 30 sec to 60 sec, 15 sec to 45 sec
+// Change Giga Burst Demo to Soldier Counterpart
+// Add 34666 HP Tank on the last wave (32000+34666 = 66666 HP)
+
+// Change Log
+// Wave 3 Change Break Time from 15 sec to 8 sec
+
+// Change Log
+// Wave 1
+// Support are change from limited to Support 1
+
+// Wave 2
+// Change Force-A-Nature Scout Easy AI MaxActive from 3 to 7, SpawnCount from 2 to 4
+
+// Wave 3
+// Super Scout WaitBetweenSpawns Change from 15 sec to 12 sec
+// Crit Huntsman Change WaitBetweenSpawns from 5 sec to 4 sec, MaxActive from 10 to 13
+
+// Change Log
+// Wave 1 
+// Change Giant Rapid Fire Demo to Standard Giant Demoman with no stat
+// Change Kritz Medic to VAC Bullet and Blast Medic
+
+// Change Log
+// Wave 2
+// Change Fan Scout to Soldier Normal AI
+
+// Wave 3
+// Change Crit Bowman to Crit Soldier Normal AI
+
+// Change Log
+// Wave 1
+// Uber Medic on Demoknight increase from 1 to 3
+// Change Shotgun Pyro to Shotgun Heavy
+// Remove Airblast Pyro
+// The Pyro Support That SpawnCount 5 have 2 Pyro Easy AI and 3 Flare Pyro with unsquaded
+
+// Wave 2
+// -
+
+// Wave 3
+// Path break Change from 10 second to 25 second
+// Giant Quick Uber Medic Change "ubercharge rate bonus" from 5 to 0.001 to disable second pop (they can't pop second time now, this rename to "Giant Uber Medic")
+// Change Super Scout to Giant Scattergun Scout Valve Template
+
+// Change Log
+// Wave 1
+// Subwave 1b Change Pyro to Direct Hit Soldier Normal AI and Remove Uber Medic on Giant Soldier
+// and Switch Huntsman and Direct Hit Soldier
+// Change Duo Vac Medic to Big-Heal Medic
+// Scout TotalCount from 60 to 56
+// Giant Fury Pyro Change WaitBeforeStarting from 5 to 0, WaitBetweenSpawns from 22 to 10
+
+// Wave 2
+// Reduce Scout SOAS MaxActive from 10 to 7
+// Reduce Soldier MaxActive from 8 to 6
+// Remove Bison from Demoknight+Bison Squad and MaxActive from 10 to 8
+// Armored Charge Soldier + Medic MaxActive from 5 to 4
+// Change DF Pyro to Loch Demo Normal AI
+// Bison on Subwave 2d are Support Limited
+// Remove Subwave 2e
+
+// Bomb will stop resetting every Last Subwave
+
+// Change Log
+// Wave 2
+// Reduce Giant Pyro from 8 to 6
+
+// Wave 3
+// Reduce Giant Scout TotalCount 10 to 6, MaxActive 6 to 4, WaitBetweenSpawns 12 to 25
+// Lower Giant Scout Skill AI to Normal (Valve Template is Expert)
+
+// Change Log
+// Wave 1 and Wave 2 add more subwave to get near similar lengths to Wave 3
+// Wave 1
+// Added 1e subwave: 3 Giant Heater Heavy with Big Heal medic
+
+// Wave 2
+// Added 2e subwave: 3 Giant Mine Layer Demo with Armored Shield Medic
+// Added 2f subwave: 2 Giant Burst Loch Demo with Armored Shield Medic
+
+// Added CustomNavFile
+
+// Change Log
+// Wave 1
+// Change a Half of Shotgun Heavy to Soldier
+
+// Wave 2
+// Change Soldier to Conch Soldier and Remove Escape Conch Soldier
+// MaxActive from 6 to 8, WaitBetweenSpawns from 5 to 3, SpawnCount from 4 to 2
+
+// Change Log
+// Wave 3
+// Change Giant Scout WaitBetweenSpawns from 25 to 22
+
+// Change Log
+// Wave 2
+// Added 22k Tank on begining WaitBeforeStarting 5 Seconds
+
+// Wave 3
+// Change Giant Flare Rain Pyro to Colonel Barrage
+
+// Updated Nav
+
+// Change Log
+// Wave 1
+// Fixed Name to Giant Heater Heavy
+
+// Wave 2
+// Add Giant Crit Rapid Bison on last subwave (to come with Giant Demoman)
+// WaitBeforeStarting 30, WaitBetweenSpawns 30, TotalCount 4, MaxActive 4, SpawnCount 1
+
+// Wave 3
+// Added 2nd Barrage with WaitBetweenSpawns 24
+// Giant Heavy + Giant Uber Medic has 2 pairs now with WaitBetweenSpawns 18
+// Giga Burst Soldier WaitBeforeStarting from 28 to 40
+// Last Tank WaitBeforeStarting from 48 to 60 due to Giant Stacking
+
+// Change Log
+// Wave 3
+// Change Giant Rapid Fire Soldier to Giant Fury Pyro
+// Change Loch Demo to Family Business Heavy, TotalCount from 32 to 28

@@ -1,0 +1,6912 @@
+//Accursed Aggrievocation, by Seelpit
+//Advanced difficulty
+
+//Additional credits!
+//Terrorlict by Sntr originally, then revamped by me 
+//With lots of mapping help from Damno!!
+//Bot inspiration from Hellblade :3
+//Bot inspiration & PTs from rafradek (Axtinguisher tossers are a natural evolution from Eyelander shooters!)
+
+//lite - Created bot spawnpoint model
+//ficool - Scripting help for Buddha mode
+
+//Athazar - Weapon pack added bc it's in Sergeant Table's mission.
+//DrCactus - Overclocks added bc they're in Sergeant Table's mission.
+
+//A scary advanced that utilizes a little bit of rafmod for some funky bots and waves!
+//And features VScript, too!
+
+//spawnbot names:
+//spawnbot_invasion (drop right), spawnbot_tunnel (tunnel left), spawnbot (middle),
+//spawnbot_scattered (all), spawnbot_mission_sniper (shack), spawnbot_mission_spy
+
+//spawnbot_limited_a, spawnbot_limited_b, spawnbot_limited_c, spawnbot_limited_d
+//spawnbot_invasion_limited_a, spawnbot_invasion_limited_b, spawnbot_invasion_limited_c, spawnbot_invasion_limited_d
+//spawnbot_tunnel_limited_a, spawnbot_tunnel_limited_b, spawnbot_tunnel_limited_c, spawnbot_tunnel_limited_d
+
+//spawnbot_airdrop_0
+
+//spawnbot relays:
+//limited_spawns_enable_a_relay, limited_spawns_enable_b_relay, limited_spawns_enable_c_relay, limited_spawns_enable_d_relay
+//limited_spawns_disable_a_relay, limited_spawns_disable_b_relay, limited_spawns_disable_c_relay, limited_spawns_disable_d_relay
+
+//Tank stuff:
+//boss_spawn_relay, boss_deploy_relay, boss_dead_relay
+//tank_path_1, tank_path_alt_1
+
+//Flank tags:
+//flank_frontright, flank_frontleft
+//flank_upperright, flank_upperleft
+
+//InitWaveOutput path choices:
+//bombpath_centerleft_relay, bombpath_centerright_relay
+//bombpath_upperleft_relay, bombpath_upperright_relay
+
+//Themes, because I love using those!
+//Main theme: a cult raises a bunch of stuff from the dead, or elsewhere.
+//Might also involve eldritch gods.
+
+//Payout:		(Bonuses incl.)
+//		Start	Paid	End
+//W1	950		850		1800
+//W2	1800	950		2850
+//W3	2850	850		3800
+//W4	3800	1000	4900
+//W5	4900	1400	6400
+//W6	6400	850		7350
+
+//Wave 1 - Afterlife Atrocities		THEME: general "reanimated" bots, zombies, and disease.
+//Wave 2 - Cultist Calamity			THEME: fevered followers of the Monocultus.
+//Wave 3 - Terrorized Tomb			THEME: Sun God's worshipers. Ends with duo boss (wow multiple multi bosses in a row; maybe swap..?)
+//Wave 4 - Forlorn Flameborn		THEME: DS3 references (and thus, fire damage once more).
+//Wave 5 - Warzone Wreaking			THEME: War-themed bots and such.
+//Wave 7 - Universal Uncertainty: Entropy
+
+//Wave ? - Pumpkinton Patricide		THEME: kill the entire Sir Pumpkinton family tree.
+
+
+// Universal Collapse - trigger_push stuff, maybe? Reverse airblast?
+// Check if push works with negative value!
+// Falling Star: maybe falling tank, like Radahn attack!
+// Meteor Rain (duh)
+// Supernova (note: stuns SUCK to fight!!)
+// Final Entropy:
+
+//Division of boss/non-boss waves PER THEME:
+//Afterlife Atrocities		No boss (early wave)
+//Cultist Calamity			MiniBoss (only ~2x health, but still UseBossHealthBar)
+//Terrorized Tomb			2x boss
+//Forlorn Flameborn			0x boss
+//Warzone Wreaking			1x or 2x MiniBoss
+//Universal Uncertainty		1x superboss
+
+//Pumpkinton Patricide		3x boss
+
+//Testing notes!
+
+//W1
+//- 
+
+//W2
+//- 
+
+//W3
+//- Torturer Demos...does their gimmick need to be? Rethink their ROLE in the subwave!
+//- Subwave 2 kind of splits around due to more roamy bots, less "cohesion"...
+//	Is it POSSIBLE to tweak that?
+
+//W4
+//- 
+
+//W5
+//- 
+
+//W6
+//- 
+
+//Judge demo notes
+//W1
+//- 
+
+//W2
+//- Add MONOCULUS prop to the buster head :3
+
+//W3
+//- Homing on DoDusk is a bit iffy, since unindicated --> not properly intro'd like in DemDom!
+
+//W4
+//- 
+//	
+
+//W5
+//- 
+
+//W6
+//- 
+
+
+//Changelog
+//W1
+//- 
+
+//W2
+//- 
+
+//W3
+//- 
+
+//W4
+//- 
+
+//W5
+//- 
+
+//W6
+//- 
+
+#base robot_standard.pop
+#base robot_giant.pop
+
+#base athazar_weapon_pack_red.pop
+#base overclock_cactus_general.pop
+
+popuwashyon
+{
+	StartingCurrency 950 //A safe and solid amount that allows comfy upgrades...and lets me use stronger subwaves >:3
+	RespawnWaveTime 3
+	FixedRespawnWaveTime 1 //Feels better...probably
+	CanBotsAttackWhileInSpawnRoom No //Absolutely not.
+	
+	RobotLimit 25 //Delicious extra slots.
+	
+	TextPrintTime 0
+	ForceHoliday 2 //Enforces Halloween mode, but does not enable wave 666 and zombie bots
+	BotsUsePlayerTeleporters 0 //just walk lmao
+	NoThrillerTaunt 1 //disabled! You can tauntkill to your heart's content.
+	NoCritPumpkin 1
+	
+	PrecacheModel "models/props_mvm/robot_hologram_color.mdl"
+	PrecacheModel "models/props_mvm/mvm_revive_tombstone_blu.mdl"
+	PrecacheModel "models/props_mvm/robot_spawnpoint.mdl"
+	PrecacheModel "models/props_moonbase/moon_rock_small001.mdl"
+	
+	
+	//Athazar's weapon pack
+	PrecacheModel	"models/ctf2w/weapons/c_models/c_payoff/c_payoff.mdl"
+	PrecacheModel	"models/workshop/weapons/c_models/c_nailgun/c_nailgun.mdl"
+
+	PrecacheModel	"models/ctf2w/weapons/c_models/c_spitfire_rocketlauncher/c_spitfire_rocketlauncher.mdl"
+	PrecacheModel	"models/ctf2w/weapons/c_models/c_spitfire_rocketlauncher/w_rocket_spitfire.mdl"
+	
+	PrecacheModel	"models/weapons/c_models/c_solar_carbonizer/c_solar_carbonizer.mdl"
+	PrecacheModel	"models/weapons/c_models/c_calefactor/c_calefactor.mdl"
+
+
+	PrecacheModel	"models/ctf2w/weapons/c_models/c_techlauncher/c_techlauncher.mdl"
+	PrecacheModel	"models/ctf2w/weapons/c_models/c_techlauncher/shellprojectile.mdl"
+
+	PrecacheModel	"models/weapons/c_models/c_canned_ration/c_canned_ration.mdl"
+	PrecacheModel	"models/weapons/c_models/c_canned_ration/c_ration_plate.mdl"
+
+	PrecacheModel	"models/weapons/c_models/c_gamma_gazer/c_gamma_gazer_1.mdl"
+	PrecacheModel	"models/ctf2w/weapons/w_models/w_mini_pda.mdl"
+
+	PrecacheModel	"models/weapons/w_models/w_pill.mdl"
+	PrecacheModel	"models/weapons/c_models/c_hypodermic_injector/c_hypodermic_injector.mdl"
+
+	PrecacheModel	"models/ctf2w/weapons/c_models/c_atgun/c_atgun.mdl"
+	PrecacheModel	"models/weapons/c_models/c_laserbow/c_laserbow_nocull.mdl"
+	PrecacheModel	"models/weapons/c_models/c_brick/c_brick.mdl"
+
+	PrecacheModel	"models/weapons/c_models/c_tranquilizer/c_revolver.mdl"
+	PrecacheModel	"models/weapons/c_models/c_timely_demise/c_timely_demise.mdl"
+	PrecacheModel	"models/weapons/v_models/v_timebomb/v_timebomb.mdl"
+	PrecacheModel	"models/weapons/w_models/w_rocketbullet.mdl"
+
+	PrecacheModel	"models/buildables/mini_dispenser_faithful.mdl"
+	PrecacheModel	"models/buildables/mini_dispenser_faithful_light.mdl"
+	
+	PointTemplates
+	{
+		/////////////////////////////////////////////////
+		//	Afterlife Atrocities
+		/////////////////////////////////////////////////
+		
+		PT_CaberToss
+		{
+			OnSpawnOutput
+			{
+				Target "cabertoss_mimic"
+				Action $SetOwner
+				Param !activator //as it turns out, !parent does not exist in I/O???
+				Delay 0.02
+			}
+			OnSpawnOutput
+			{
+				Target "cabertoss_mimic"
+				Action FireOnce
+				Delay 0.05
+			}
+			OnSpawnOutput
+			{
+				Target "cabertoss_mimic"
+				Action Kill
+				Delay 0.08
+			}
+			tf_point_weapon_mimic
+			{
+				"targetname" "cabertoss_mimic"
+				"origin" "0 0 0"
+				"angles" "0 -90 0"
+				"teamnum" "3" //blue
+				"$weaponname" "Caber Toss"
+			}
+		}
+		
+		/////////////////////////////////////////////////
+		//	Cultist Calamity
+		/////////////////////////////////////////////////
+		
+		PT_JarateJarProjectile
+		{
+			tf_projectile_jar
+			{
+				"origin" "40 0 0"
+				"teamnum" "3" // 2 - Red team, 3 - Blu team
+			}
+		}
+		PT_FilterChief
+		{
+			filter_tf_bot_has_tag
+			{
+				"targetname" "filter_chief"
+				"tags" "cultchief"
+				"require_all_tags" "1"
+			}
+		}
+		
+		/////////////////////////////////////////////////
+		//	Terrorized Tomb
+		/////////////////////////////////////////////////
+		
+		PT_RotatingAxe
+		{
+            OnSpawnOutput
+            {
+                Target "!activator"
+                Action "AddOutput"
+                Param "rendermode 10"
+                Delay 0.01
+            }
+            prop_dynamic
+            {
+                "targetname" "axe1"
+                "parentname" "rot"
+                "model" "models/weapons/c_models/c_axtinguisher/c_axtinguisher_pyro.mdl"
+                "angles" "0 0 0"
+            }
+            func_rotating
+            {
+                "targetname" "rot"
+                "spawnflags" 73 //not solid, spin on Y, start active
+                "fanfriction" 100
+                "maxspeed" 400
+            }
+		}
+		PT_Deity_Titles
+		{
+			//Title cards I stole from royal with permission.
+			//In that sense, it's no longer stealing!
+			game_text
+			{
+				"origin" "1984 1984 99999"
+				"targetname" "upper_text"
+				"message" "SOLAR TWINS"
+				"x" "-1"
+				"y" "0.4"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "2"
+				"color" "255 245 210"
+				"fxtime" "0.2"
+				"fadeout" "1"
+				//"fadein" "0"
+				"holdtime" "5"
+			}
+			game_text
+			{
+				"origin" "1984 1984 99999"
+				"targetname" "middle_text"
+				"message" "DEITY OF DAWN"
+				"x" "-1"
+				"y" "0.45"
+				"channel" "4"
+				"spawnflags" "1"
+				"color" "255 225 130"
+				"fadein" "0.2"
+				"fadeout" "1"
+				"holdtime" "4.6"
+			}
+			game_text
+			{
+				"origin" "1984 1984 99999"
+				"targetname" "lower_text"
+				"message" "DEITY OF DUSK"
+				"x" "-1"
+				"y" "0.5"
+				"channel" "1"
+				"spawnflags" "1"
+				"color" "255 190 100"
+				"fadein" "0.2"
+				"fadeout" "1"
+				"holdtime" "4.2"
+			}
+			logic_relay
+			{
+				"targetname" "deity_text_relay"
+				"OnTrigger" "upper_text,Display,,0,-1"
+				"OnTrigger" "middle_text,Display,,0.4,-1"
+				"OnTrigger" "lower_text,Display,,0.8,-1"
+			}
+		}
+		PT_Deity_Dawn_dest
+		{
+			KeepAlive 1
+			NoFixup 1
+			OnParentKilledOutput
+			{
+				Target prop_dawn
+				Action Enable
+				Delay 0
+			}
+			OnParentKilledOutput
+			{
+				Target particle_dawn*
+				Action Start
+				Delay 0
+			}
+			OnParentKilledOutput
+			{
+				Target prop_dawn
+				Action Kill
+				Delay 2
+			}
+			OnParentKilledOutput
+			{
+				Target nobuild_dawn
+				Action Kill
+				Delay 2.1
+			}
+			OnParentKilledOutput
+			{
+				Target particle_dawn*
+				Action Stop
+				Delay 2
+			}
+			OnParentKilledOutput
+			{
+				Target particle_dawn*
+				Action Kill
+				Delay 2.1
+			}
+			info_target //Will serve as the destination
+			{
+				"targetname" "destination_dawn"
+				"origin" "0 0 20" //Slightly higher than origin; may prevent stucking in ground
+			}
+			func_nobuild //Will serve as the destination
+			{
+				"targetname" "nobuild_dawn"
+				"origin" "0 0 0"
+				"mins" "45 45 0"
+				"maxs" "45 45 96"
+				"AllowSentry" 0
+				"AllowDispenser" 0
+				"AllowTeleporters" 0
+				"teamnum" 2 //RED
+			}
+			prop_dynamic
+			{
+				"targetname" "prop_dawn"
+				"model" "models/props_mvm/mvm_revive_tombstone_blu.mdl"
+				"solid" 0
+				"DisableBoneFollowers" 1
+				"defaultanim" "idle"
+				"StartDisabled" 1
+			}
+			info_particle_system
+			{
+				"targetname" "particle_dawn"
+				"start_active" 0
+				"effect_name" "utaunt_arcane_yellow_parent"
+			}
+			info_particle_system
+			{
+				"targetname" "particle_dawn"
+				"start_active" 0
+				"effect_name" "utaunt_spotlight_parent"
+			}
+		}
+		
+		/////////////////////////////////////////////////
+		//	Forlorn Flameborn
+		/////////////////////////////////////////////////
+		
+		PT_SpellHealLogic
+		{
+			logic_relay
+			{
+				"targetname" "postheal_relay"
+				"OnTrigger" "!activator,$ChangeAttributes,Heal,0,-1"
+				"OnTrigger" "!activator,$ChangeAttributes,PostHeal,0.2,-1"
+			}
+		}
+		
+		/////////////////////////////////////////////////
+		//Warzone Wreaking
+		/////////////////////////////////////////////////
+		
+		//Special thanks to lite for providing these + the base for texts!
+		//Includes both the props, nobuild, and relays.
+		PT_SpawnPoint
+		{
+			NoFixup 1
+			prop_dynamic
+			{
+				"targetname" "spawnpointprops"
+				"model" "models/props_mvm/robot_spawnpoint.mdl"
+				"defaultanim" "idle"
+				"disableshadows" "1" // prevents shadow from nothing while disabled
+				"skin" "3" // Skin 0 for Red, Skin 1 for Blue, Skin 2 for Gray, and Skin 3 to disable the hologram
+			}
+			//Preventing any trollage with sentries or teleporters
+			func_nobuild
+			{
+                "targetname" "spawnpoint_nobuild"
+                "origin" "3650 430 -17"
+                "mins" "-36 -36 -10"
+                "maxs" "36 36 98" //min 96 to not build on top, here's 2 free units of caution
+                "TeamNum" "2"
+			}
+			logic_relay
+			{
+				"targetname" "spawnpoint_relay_r"
+				"OnTrigger" "spawnpointprops,skin,0,0,-1" // When triggered, changes all "spawnpointprops" to use the Red skin (0)
+			}
+			logic_relay
+			{
+				"targetname" "spawnpoint_relay"
+				"OnTrigger" "spawnpointprops,skin,3,0,-1" // When triggered, changes all "spawnpointprops" to use the Disabled skin (3)
+			}
+		}
+		
+		PT_AirdropText
+		{
+			NoFixUp 1
+			training_annotation
+			{
+			  "targetname" "airtext_1"
+			  "display_text" "Airdrop! Watch the sky!"
+			  "lifetime" "4"
+			  "origin" "-120 40 1080"
+			}
+			training_annotation
+			{
+			  "targetname" "airtext_1"
+			  "display_text" "Another airdrop! Look up!"
+			  "lifetime" "4"
+			  "origin" "-120 40 1080"
+			}
+		}
+		
+		PT_RocketTurret
+		{
+			// NoFixup 1
+			OnSpawnOutput
+			{
+				Target "aimrocket_mimic"
+				Action $SetOwner
+				Param @e@m_hOwnerEntity@!activator
+				Delay 0.05
+			}
+			OnSpawnOutput
+			{
+				Target "aimrocket_mimic"
+				Action SetParent
+				Param !activator
+				Delay 0.05
+			}
+			logic_relay
+			{
+				"spawnflags" "2"
+				"targetname" "aimrocket_firer"
+				"OnSpawn" "aimrocket_firer,Trigger,,0.2,-1"
+				"OnTrigger" "aimrocket_mimic,FireOnce,,0.2,-1"
+				"OnTrigger" "aimrocket_mimic,FireOnce,,0.4,-1"
+				"OnTrigger" "aimrocket_mimic,FireOnce,,0.6,-1"
+				"OnTrigger" "aimrocket_mimic,FireOnce,,0.8,-1"
+				"OnTrigger" "aimrocket_firer,Trigger,,1.8,-1"
+			}
+			tf_point_weapon_mimic
+			{
+				"targetname" "aimrocket_mimic"
+				"origin" "0 0 0"
+				"angles" "0 0 0"
+				"teamnum" "3" //blue
+				"$firetime" "1.6"
+				"$preventshootparent" 1
+				"$weaponname" "Back Rocket"
+			}
+		}
+		PT_BlimpBotTeleDest_A
+		{
+			OnSpawnOutput
+			{
+                Target "!activator"
+                Action "color"
+                Param  "77 114 52"
+            }
+			OnParentKilledOutput
+			{
+				Target "destination_air"
+				Action Kill
+				Delay 1
+			}
+            KeepAlive 1
+            info_target
+            {
+                "targetname" "destination_air"
+            }
+		}
+		PT_BlimpBotTeleDest_B
+		{
+			OnSpawnOutput
+			{
+                Target "!activator"
+                Action "color"
+                Param  "77 114 52"
+            }
+			OnParentKilledOutput
+			{
+				Target "destination_strike"
+				Action Kill
+				Delay 1
+			}
+            KeepAlive 1
+            info_target
+            {
+                "targetname" "destination_strike"
+            }
+		}
+		
+		/////////////////////////////////////////////////
+		// Universal Uncertainty
+		/////////////////////////////////////////////////
+		
+		PT_Chief_Phase3Ent
+		{
+			//Dummy entity used to bar bots from spawning til phase swap.
+			info_teleport_destination
+			{
+				"targetname" "chief_phase3_ent"
+			}
+		}
+		PT_Chief_Phase4Ent
+		{
+			//Dummy entity used to bar bots from spawning til phase swap.
+			info_teleport_destination
+			{
+				"targetname" "chief_phase4_ent"
+			}
+		}
+		
+		//Title for Entropy
+		PT_Chief_Title
+		{
+			OnSpawnOutput
+			{
+				Target "upper_text"
+				Action "Display"
+				Delay 0
+			}
+			OnSpawnOutput
+			{
+				Target "middle_text"
+				Action "Display"
+				Delay 0.4
+			}
+			//Title cards I stole from royal with permission.
+			//In that sense, it's no longer stealing!
+			game_text
+			{
+				"origin" "1984 1984 99999"
+				"targetname" "upper_text"
+				"message" "SCOURGE OF STARS AND PLANETS, UNIVERSAL CERTAINTY"
+				"x" "-1"
+				"y" "0.4"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "2"
+				"color" "230 99 170"
+				"fxtime" "0.2"
+				"fadeout" "1"
+				//"fadein" "0"
+				"holdtime" "5"
+			}
+			game_text
+			{
+				"origin" "1984 1984 99999"
+				"targetname" "middle_text"
+				"message" "ENTROPY"
+				"x" "-1"
+				"y" "0.5"
+				"channel" "4"
+				"spawnflags" "1"
+				"color" "255 128 78"
+				"fadein" "0.4"
+				"fadeout" "1"
+				"holdtime" "4.6"
+			}
+		}
+		
+		PT_TeleportSpot
+		{
+			NoFixup 1
+			info_particle_system
+			{
+				"targetname" "$Particlename$"
+				"effect_name" "eyeboss_tp_vortex"
+				"start_active" "0"
+			}
+			info_teleport_destination
+			{
+				"targetname" "$Targetname$"
+			}
+		}
+		PT_Chief_FinalAttack
+		{
+			OnSpawnOutput
+			{
+				Target "mimic_chief*"
+				Action "$SetOwner"
+				Param "!activator"
+				Delay 0.016
+			}
+			OnSpawnOutput
+			{
+				Target "chief_prop*"
+				Action "Disable"
+				Delay 0
+			}
+			logic_relay
+			{
+				"targetname" "finalattack_relay"
+				//Particle.
+				"OnTrigger" "particle_chief_finalattack,Start,,0,-1"
+				
+				//Enable wider spam, turn weapon into stronger / weaker version.
+				"OnTrigger" "!activator,$GiveItem,Desperation of Miquella,0,-1"
+				"OnTrigger" "!activator,$GiveItem,Miquella's Forgiveness,4,-1"
+				
+				"OnTrigger" "particle_chief_finalattack,Stop,,2.5,-1"
+				"OnTrigger" "particle_chief_finalattack,Kill,,2.52,-1"
+			}
+			info_particle_system
+			{
+				"targetname" "particle_chief_finalattack"
+				"effect_name" "powerup_supernova_explode_blue"
+				"start_active" 0
+			}
+            tf_point_weapon_mimic
+            {
+                "targetname" "mimic_chief_bison"
+                "origin" "0 0 120"
+                "angles" "0 0 0"
+                "teamnum" "3" //blue
+                "$weaponname" "Miquella's Piercer"
+                "$firetime" "0.07"
+            }
+            tf_point_weapon_mimic
+            {
+                "targetname" "mimic_chief_nuke"
+                "origin" "0 0 120"
+                "angles" "-60 0 0"
+                "teamnum" "3" //blue
+                "$weaponname" "True Light of Miquella"
+                "$firetime" "3"
+            }
+			
+			// Death logic
+			
+			logic_relay
+			{
+				"targetname" "death_relay"
+				"OnTrigger" "bomb*,ForceResetSilent,,0,-1"
+				"OnTrigger" "mimic_chief*,$StopFiring,,0,-1" //edge case prevention
+				"OnTrigger" "@f@filter_bluteam@player,$TakeDamage,9999,0,-1"
+				"OnTrigger" "!activator,$AddCond,64 5,0.02,-1"
+				"OnTrigger" "!activator,$AddCond,87 5,0.02,-1"
+				"OnTrigger" "@f@filter_redteam@player,$PlaySoundToSelf,weapons/rescue_ranger_teleport_send_01.wav,0.02,-1"
+				
+				"OnTrigger" "chief_prop,AddThinkToEnt,,0,-1"
+				"OnTrigger" "chief_prop*,Enable,,0.02,-1"
+				"OnTrigger" "chief_prop,SetAnimation,taunt_drg_melee,0.02,-1"
+				"OnTrigger" "chief_prop,SetPlayBackRate,0.5,0.033,-1"
+				"OnTrigger" "chief_deathparticle,Start,,0.2,-1"
+				
+				"OnTrigger" "!activator,$SetLocalOrigin,2500 1400 0,2.44,-1"
+				"OnTrigger" "!activator,RunScriptCode,RemoveBuddha(),2.47,-1"
+				"OnTrigger" "!activator,$TakeDamage,40000,2.5,-1"
+				"OnTrigger" "!activator,$TakeDamage,40000,3.5,-1"
+				"OnTrigger" "!activator,$TakeDamage,40000,4.5,-1" //DIE ALREADY
+				"OnTrigger" "!activator,$TakeDamage,40000,5.5,-1"
+				"OnTrigger" "chief_deathparticle,Stop,,2.5,-1"
+			}
+			info_particle_system
+			{
+				"targetname" "chief_deathparticle"
+				"start_active" "0"
+				"effect_name" "eyeboss_tp_vortex"
+				"origin" "0 0 170"
+			}
+			prop_dynamic
+			{
+				"targetname"	"chief_prop"
+				"origin" 		"0 0 0"
+				"model"			"models/player/engineer.mdl"
+				"skin" 			1
+				"modelscale" 	1.75
+				"defaultanim"	"ref" //"taunt_drg_melee"
+				"solid" 		0
+				"rendermode" 	0
+				"renderfx" 		0
+				"renderamt" 	255
+			}
+			prop_dynamic_ornament
+			{
+				"targetname"			"chief_prop_ornaments"
+				"InitialOwner"			"chief_prop"
+				"model"					"models/workshop/player/items/engineer/hwn2015_iron_lung/hwn2015_iron_lung.mdl"
+				"skin"					1
+				"spawnflags"			256
+				"DisableBoneFollowers"	1
+				"disableshadows"		1
+				"solid"					0
+				"rendermode"			0
+				"renderfx"				0
+				"renderamt"				255
+			}
+			prop_dynamic_ornament
+			{
+				"targetname"			"chief_prop_ornaments"
+				"InitialOwner"			"chief_prop"
+				"model"					"models/workshop/player/items/engineer/hwn2015_roboot/hwn2015_roboot.mdl"
+				"skin"					1
+				"spawnflags"			256
+				"DisableBoneFollowers"	1
+				"disableshadows"		1
+				"solid"					0
+				"rendermode"			0
+				"renderfx"				0
+				"renderamt"				255
+			}
+			prop_dynamic_ornament
+			{
+				"targetname"			"chief_prop_ornaments"
+				"InitialOwner"			"chief_prop"
+				"model"					"models/workshop/player/items/soldier/hw2013_galactic_gauntlets/hw2013_galactic_gauntlets.mdl"
+				"skin"					1
+				"spawnflags"			256
+				"DisableBoneFollowers"	1
+				"disableshadows"		1
+				"solid"					0
+				"rendermode"			0
+				"renderfx"				0
+				"renderamt"				255
+			}
+			prop_dynamic_ornament
+			{
+				"targetname"			"chief_prop_ornaments"
+				"InitialOwner"			"chief_prop"
+				"model"					"models/workshop/player/items/soldier/hw2013_jupiter_jumpers/hw2013_jupiter_jumpers.mdl"
+				"skin"					1
+				"spawnflags"			256
+				"DisableBoneFollowers"	1
+				"disableshadows"		1
+				"solid"					0
+				"rendermode"			0
+				"renderfx"				0
+				"renderamt"				255
+			}
+			prop_dynamic_ornament
+			{
+				"targetname"			"chief_prop_ornaments"
+				"InitialOwner"			"chief_prop"
+				"model"					"models/player/items/pyro/bio_fireman.mdl"
+				"skin"					1
+				"spawnflags"			256
+				"DisableBoneFollowers"	1
+				"disableshadows"		1
+				"solid"					0
+				"rendermode"			0
+				"renderfx"				0
+				"renderamt"				255
+			}
+		}
+	}
+	
+	ExtraSpawnPoint
+    {
+        Name	"spawnbot_reprogrammed"	// Spawns just outside of RED's right-side exit
+        TeamNum	3
+        X		3650
+        Y		430
+        Z		24 //really idk how high it NEEDS to be off the ground. This is like, 41 units higher.
+    }
+	
+	ExtraTankPath // Blimp spawn
+	{
+		Name	"tank_path_blimp_a"
+		Node	"-1700 -1650 -40"
+		Node	"-1700 -1200 240"
+		Node	"-1700 -900 240"
+		Node	"-1020 -750 240"
+		Node	"800 -750 240"
+		Node	"1200 -250 240"
+		Node	"1750 -250 220"
+		Node	"2750 -250 220"
+		Node	"2975 -360 220"
+	}
+	ExtraTankPath // Blimp spawn
+	{
+		Name	"tank_path_blimp_b"
+		Node	"-2300 1100 -160"
+		Node	"-1550 850 240"
+		Node	"-550 450 300"
+		Node	"1000 450 300"
+		Node	"1600 420 300"
+		Node	"2435 420 260"
+		Node	"3000 -115 220"
+	}
+	
+	Templates
+	{
+		Zombie_Scout
+		{
+			Item "Zombie Scout"
+			// UseCustomModel "models/player/scout.mdl" [$SIGSEGV]
+			UseHumanModel 2
+			NoIdleSound 1
+		}
+		Zombie_Soldier
+		{
+			Item "Zombie Soldier"
+			// UseCustomModel "models/player/soldier.mdl" [$SIGSEGV]
+			UseHumanModel 2
+			NoIdleSound 1
+		}
+		Zombie_Pyro
+		{
+			Item "Zombie Pyro"
+			// UseCustomModel "models/player/pyro.mdl" [$SIGSEGV]
+			UseHumanModel 2
+			NoIdleSound 1
+		}
+		Zombie_Demo
+		{
+			Item "Zombie Demo"
+			// UseCustomModel "models/player/demo.mdl" [$SIGSEGV]
+			UseHumanModel 2
+			NoIdleSound 1
+		}
+		Zombie_Heavy
+		{
+			Item "Zombie Heavy"
+			// UseCustomModel "models/player/heavy.mdl" [$SIGSEGV]
+			UseHumanModel 2
+			NoIdleSound 1
+		}
+		Zombie_Engineer
+		{
+			Item "Zombie Engineer"
+			// UseCustomModel "models/player/engineer.mdl" [$SIGSEGV]
+			UseHumanModel 2
+			NoIdleSound 1
+		}
+		Zombie_Medic
+		{
+			Item "Zombie Medic"
+			// UseCustomModel "models/player/medic.mdl" [$SIGSEGV]
+			UseHumanModel 2
+			NoIdleSound 1
+		}
+		Zombie_Sniper
+		{
+			Item "Zombie Sniper"
+			// UseCustomModel "models/player/sniper.mdl" [$SIGSEGV]
+			UseHumanModel 2
+			NoIdleSound 1
+		}
+		Zombie_Spy
+		{
+			Item "Zombie Spy"
+			// UseCustomModel "models/player/spy.mdl" [$SIGSEGV]
+			UseHumanModel 2
+			NoIdleSound 1
+		}
+		
+		//Turns bots red; goes to bomb.
+		RedBot_Bomb
+		{
+			Action EscortFlag //ignore escort limit!
+			AddCond [$SIGSEGV]
+			{
+				Name "TF_COND_REPROGRAMMED"
+			}
+			CharacterAttributes
+			{
+				"cannot pick up intelligence" 1
+			}
+		}
+		//Turns bots red; goes to bomb; fix for giant disp heavy.
+		RedBot_Bomb_Fetch
+		{
+			Action FetchFlag
+			AddCond [$SIGSEGV]
+			{
+				Name "TF_COND_REPROGRAMMED"
+			}
+			CharacterAttributes
+			{
+				"cannot pick up intelligence" 1
+			}
+		}
+		//Turns bots red + adds Mobber behavior.
+		RedBot_Hunt
+		{
+			Attributes DisableDodge
+			Action Mobber [$SIGSEGV]
+			AddCond [$SIGSEGV]
+			{
+				Name "TF_COND_REPROGRAMMED"
+			}
+		}
+		
+		
+		////////////////////////////////////////////////////////////////////////////
+		///////////////////////			Red bots			////////////////////////
+		////////////////////////////////////////////////////////////////////////////
+		
+		Red_Soldier_Buff
+		{
+			Class Soldier
+			Name "Buff Direct Hit Soldier"
+			Skill Expert
+			ClassIcon soldier_buff
+			Item "The Direct Hit"
+			Item "The Buff Banner"
+			Attributes SpawnWithFullCharge
+			Attributes HoldFireUntilFullReload
+			AimLeadProjectileSpeed 2000
+			ItemAttributes
+			{
+				ItemName "The Direct Hit"
+				"reload time decreased while healed" 0.25
+				"faster reload rate" 0.4
+				"heal on kill" 50
+			}
+			CharacterAttributes
+			{
+				"increase buff duration" 5
+				"deploy time decreased" 0.5
+				"move speed bonus" 1.3
+				"health regen" 4
+				"dmg taken from bullets reduced" 0.5
+				"dmg taken from blast reduced" 0.5
+				"dmg taken from fire reduced" 0.5
+				"dmg taken from crit reduced" 0.1
+			}
+			Template RedBot_Hunt
+		}
+
+		////////////////////////////////////////////////////////////////////////////
+		///////////////////////			After bots			////////////////////////
+		////////////////////////////////////////////////////////////////////////////
+		//Scout with an arm. He's armed.
+		After_Scout_Melee
+		{
+			Class Scout
+			Name "Armed Scout"
+			Item "Unarmed Combat"
+			Item "The Tomb Wrapper"
+			Item "A Handsome Handy Thing"
+			ClassIcon scout_bat_nys
+			WeaponRestrictions MeleeOnly
+			Attributes DisableDodge
+			Template Zombie_Scout
+			CharacterAttributes
+			{
+				"mult flag carrier move speed" 1.2 //too fast when fully canceled, and too fast with 1.34 still.
+			}
+		}
+		//A mini-giant soldier variant of the Giant Bazooka Backup Soldier.
+		//Allows for blast damage to be more effective thanks to the health being spread over more targets,
+		//while being more threatening with more rockets being shot!
+		After_Soldier_Bazooka_Backup
+		{
+			Class Soldier
+			Skill Normal
+			Health 650
+			Scale 1.3
+			ClassIcon soldier_bazooka_backup
+			Name "Bumbling Backup Soldier"
+			Item "The Beggar's Bazooka"
+			Item "The Battalion's Backup"
+			Item "Helmet without a Home"
+			Item "The Captain's Cocktails"
+			Item "Lieutenant Bites the Dust"
+			Attributes SpawnWithFullCharge
+			Attributes HoldFireUntilFullReload //PLEASE just obey this
+			ItemAttributes
+			{
+				ItemName "The Beggar's Bazooka"
+				"can overload" 0
+				"auto fires full clip" 0
+				"reload time increased hidden" 1
+			}
+			ItemAttributes
+			{
+				ItemName "The Battalion's Backup"
+				"increase buff duration" 2 //longer but not super long
+				"max health additive bonus" 0
+				"deploy time increased" 0.5
+				"gesture speed increase" 0.66
+				
+				//EXPERIMENTAL: regular backup effect, not overridden.
+				// "effect cond override" 42 //bomb buff: not crit immune
+			}
+			AddTemplate Zombie_Soldier
+		}
+		//Demo that throws Cabers without any passive-weapon jank.
+		After_Demoman_CaberToss_PT
+		{
+			Class Demoman
+			Skill Expert
+			Health 650
+			Scale 1.4
+			Name "Caber-Throwing Demo"
+			Item "The Ullapool Caber"
+			ClassIcon demo_caber_nys
+			WeaponRestrictions MeleeOnly
+			ItemAttributes
+			{
+				ItemName "The Ullapool Caber"
+				"regenerate stickbomb" 1
+				"fire rate penalty" 1.5 //1.2
+			}
+			ShootTemplate
+			{
+				Name "PT_CaberToss"
+				Speed 0
+				Origin "0 0 94"
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.75
+				"health regen" 1
+				"mult flag carrier move speed" 1.34
+			}
+			AddTemplate Zombie_Demo
+		}
+		//Demo that throws Cabers, but with passive-weapon jank.
+		After_Demoman_CaberToss
+		{
+			Class Demoman
+			Skill Expert
+			Health 650
+			Scale 1.4
+			Name "Caber-Tossing Demo"
+			Item "The Ullapool Caber"
+			Item "Head Banger"
+			Item "Mad Lad"
+			ClassIcon demo_caber_nys
+			WeaponRestrictions PrimaryOnly
+			ItemAttributes
+			{
+				ItemName "The Ullapool Caber"
+				"is_passive_weapon" 1
+				"regenerate stickbomb" 1
+				"fire rate penalty" 1.25 //1
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"custom item model" "models/workshop/weapons/c_models/c_caber/c_caber.mdl"
+				"custom projectile model" "models/workshop/weapons/c_models/c_caber/c_caber.mdl"
+				"grenade no bounce" 1
+				"damage penalty" 0.85 //They're still quite strong without a reload!
+				"fire rate penalty" 1.65 //0.99
+				"faster reload rate" 0
+				"custom kill icon" "ullapool_caber_explosion"
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.9
+				"health regen" 1
+				"mult flag carrier move speed" 1.34
+			}
+			AddTemplate Zombie_Demo
+		}
+		//Punchy Heavy! An oldie goldie.
+		//Does not target the bomb.
+		After_Heavy_Fist
+		{
+			Class Heavyweapons
+			Name "Fist Heavy"
+			Item "Ghastly Gibus 2010" //ghastlier!
+			ClassIcon heavy_zombie_lite
+			WeaponRestrictions MeleeOnly
+			Attributes DisableDodge
+			Action Mobber
+			Template Zombie_Heavy
+			ItemAttributes
+			{
+				ItemName "Ghastly Gibus 2010"
+				"item style override" 1
+			}
+			CharacterAttributes
+			{
+				"mult flag carrier move speed" 1.34
+			}
+		}
+		//An engineer on the offense with a shotgun!
+		//No health increase, just clunky firepower.
+		After_Engineer_Shotgun
+		{
+			Class Engineer
+			Skill Normal
+			Name "Shambling Shotgun Engie"
+			Action FetchFlag
+			ClassIcon heavy_shotgun
+			Item "Bedouin Bandana"
+			Item "The Bruiser's Bandanna"
+			WeaponRestrictions PrimaryOnly
+			ItemAttributes
+			{
+				ItemName "The Bruiser's Bandanna"
+				"item style override" 1
+			}
+			AddTemplate Zombie_Engineer
+		}
+		//A crossbow medic that can penetrate allies and enemies alike!
+		After_Medic_Infpop
+		{
+			Class Medic
+			Name "Death-Defying Medic"
+			Skill Hard
+			Item "The Quick-Fix"
+			Item "Das Ubersternman"
+			Item "Herzensbrecher"
+			Item "Medi-Mask"
+			Item "The Second Opinion"
+			Attributes SpawnWithFullCharge
+			ClassIcon medic_infpop
+			ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+				"heal rate bonus" 4.17 //Base 300 HP/sec heals
+				"overheal penalty" 0.001
+				"health from healers reduced" 0.5 //150 HP/sec selfheal
+				"uber duration bonus" -9 //Infinite uber duration
+			}
+			CharacterAttributes
+			{
+				"bot medic uber health threshold" 160
+			}
+			Template Zombie_Medic
+		}
+		//A crossbow medic that can penetrate allies and enemies alike!
+		After_Medic_Xbow
+		{
+			Class Medic
+			Name "Infestinger Medic"
+			// Health 350
+			// Scale 1.2
+			Skill Normal
+			MaxVisionRange 1300
+			Item "The Crusader's Crossbow"
+			Item "Berliner's Bucket Helm"
+			ClassIcon medic_crossbow_penetration
+			WeaponRestrictions PrimaryOnly
+			Action FetchFlag
+			AimAt Head
+			ItemAttributes
+			{
+				ItemName "The Crusader's Crossbow"
+				"projectile penetration" 1
+				"projectile speed decreased" 0.45 //1080 HU/s
+				"damage penalty" 0.8 //Also decreases health given
+				// "health drain medic" -1 //this is to show their health!
+			}
+			Template Zombie_Medic
+		}
+		
+		//A giant soldier using the Beggar's Bazooka. Pretty standard.
+		After_Giant_Soldier_Bazooka
+		{
+			Template T_TFBot_Giant_Soldier
+			ClassIcon soldier_bazooka
+			Name "Giant Unstable Soldier"
+			Item "The Beggar's Bazooka"
+			Item "Helmet without a Home"
+			Item "The Captain's Cocktails"
+			Attributes HoldFireUntilFullReload //PLEASE just obey this
+			ItemAttributes
+			{
+				ItemName "The Beggar's Bazooka"
+				"can overload" 0
+				"auto fires full clip" 0
+				"reload time increased hidden" 1
+				"faster reload rate" 0.6
+				"clip size upgrade atomic" 5
+				"projectile speed decreased" 0.65
+			}
+			AddTemplate Zombie_Soldier
+		}
+		//A giant burst backup soldier, using the Beggar's Bazooka. Pretty standard, though bulky.
+		After_Giant_Soldier_Bazooka_Backup
+		{
+			Template T_TFBot_Giant_Soldier
+			ClassIcon soldier_bazooka_backup
+			Name "Giant Unstable Backup Soldier"
+			Item "The Beggar's Bazooka"
+			Item "The Battalion's Backup"
+			Item "Helmet without a Home"
+			Item "The Captain's Cocktails"
+			Attributes SpawnWithFullCharge
+			Attributes HoldFireUntilFullReload //PLEASE just obey this
+			ItemAttributes
+			{
+				ItemName "The Beggar's Bazooka"
+				"can overload" 0
+				"auto fires full clip" 0
+				"reload time increased hidden" 1
+				"faster reload rate" 0.6
+				"clip size upgrade atomic" 5
+				"projectile speed decreased" 0.65
+			}
+			ItemAttributes
+			{
+				ItemName "The Battalion's Backup"
+				"increase buff duration" 3.5 //longer but not super long
+				"effect cond override" 42 //bomb buff: not crit immune
+				"max health additive bonus" 0
+				"deploy time increased" 0.5
+				"gesture speed increase" 0.66
+			}
+			AddTemplate Zombie_Soldier
+		}
+		
+		//A Giant Short Circuit engineer, occassionally alt-firing!
+		After_Giant_Engineer_ShortCircuit
+		{
+			Class Engineer
+			Skill Expert
+			Name "Giant Electro-charged Engineer"
+			Health 3000
+			ClassIcon engineer_shortcircuit_lite
+			Action FetchFlag [$SIGSEGV]
+			MaxVisionRange 750
+			UseMeleeThreatPrioritization 1 [$SIGSEGV]
+			WeaponRestrictions SecondaryOnly
+			Item "The Short Circuit"
+			//Old set
+			// Item "Life Support System"
+			// Item "Iron Lung"
+			// Item "Defragmenting Hard Hat 17%"
+			//New set
+			Item "Tin-1000"
+			Item "Roboot"
+			Item "Iron Fist"
+			Item "Arsonist Apparatus"
+			Item "Iron Lung"
+			
+			Attributes MiniBoss
+			FireWeapon
+			{
+				Type Secondary
+				Cooldown 8.7
+				Duration 0.7 //2 orbs
+				Delay 10
+				Repeats 0
+				IfSeeTarget 1
+			}
+			VoiceCommand
+			{
+				Type "Battle Cry"
+				Cooldown 8.7
+				Delay 8.5
+				Repeats 0
+				IfSeeTarget 1
+			}
+			ItemAttributes
+			{
+				ItemName "The Short Circuit"
+				"dmg penalty vs players" 2.5 //25 on normal hit, 37.5 on orb
+				"disable buildings on hit" 1 //electricity could overcharge them, right?
+				"damage blast push" 1.5
+				
+				//Although this works and can increase range, it isn't intuitive to fight,
+				//and can leave players wondering what's knocking them back.
+				// "max bullet range" 175
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+			}
+			
+			Template Zombie_Engineer
+		}
+		//A Giant Short Circuit engineer that moves extra fast, but is less bulky!
+		After_Giant_Engineer_ShortCircuit_Fast
+		{
+			Class Engineer
+			Skill Expert
+			Name "Giant Undead Android Engie"
+			Health 1250 //Eat your heart out, Super Scout.
+			ClassIcon engineer_shortcircuit_lite //_fast? _blast?
+			Action FetchFlag [$SIGSEGV]
+			MaxVisionRange 750
+			UseMeleeThreatPrioritization 1 [$SIGSEGV]
+			WeaponRestrictions SecondaryOnly
+			Item "The Short Circuit"
+			Item "Tin-1000"
+			Item "Roboot"
+			Item "Iron Fist"
+			Item "Arsonist Apparatus"
+			Item "Iron Lung"
+			
+			Attributes MiniBoss
+			VoiceCommand
+			{
+				Type "Battle Cry"
+				Cooldown 8.7
+				Delay 3
+				Repeats 0
+				IfSeeTarget 1
+			}
+			ItemAttributes
+			{
+				ItemName "The Short Circuit"
+				"dmg penalty vs players" 3.5	//35 per normal hit
+				"dmg bonus vs buildings" 35 	//equal damage to buildings
+				"fire rate penalty" 4			//0.4s between hits
+				"disable buildings on hit" 1	//electricity could overcharge them, right?
+				"damage blast push" 1.5
+				
+				//Although this works and can increase range, it isn't intuitive to fight,
+				//and can leave players wondering what's knocking them back.
+				// "max bullet range" 175
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 1.15		//Test out some different values.
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"voice pitch scale" 0 //Stop screaming, for goodness' sake.
+			}
+			
+			Template Zombie_Engineer
+		}
+		
+		////////////////////////////////////////////////////////////////////////////
+		///////////////////////			Cult bots			////////////////////////
+		////////////////////////////////////////////////////////////////////////////
+		
+		
+		//A soldier. Very simple, but this one shoots eyeballs.
+		Cult_Soldier
+		{
+			Name "Monocultus Soldier"
+			Class Soldier
+			Attributes HoldFireUntilFullReload
+			Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+			Item "MONOCULUS!"
+			RocketCustomModel "models/props_halloween/eyeball_projectile.mdl"
+			UseHumanModel 2
+			//add item zombie soldier to some
+		}
+		//A Direct Hit Soldier. That also shoots eyeballs. Yup.
+		Cult_Soldier_DH
+		{
+			Name "Monocultus Direct Soldier"
+			Class Soldier
+			Attributes HoldFireUntilFullReload
+			Item "The Direct Hit"
+			Item "MONOCULUS!"
+			RocketCustomModel "models/props_halloween/eyeball_projectile.mdl"
+			UseHumanModel 2
+			//add item zombie soldier to some
+		}
+		//A regular ol' pyro! No longer slows speed, because that's mean.
+		Cult_Pyro
+		{
+			Name "Monocultus Pyro"
+			Class Pyro
+			Skill Normal
+			Attributes AlwaysFireWeapon
+			Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+			Item "The Seared Sorcerer"
+			Item "dec2014 Pyromancer's Raiments"
+			UseHumanModel 2
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_FLAMETHROWER"
+				"paintkit_proto_def_index" 269 //Spider Season
+				"set_item_texture_wear" 0.2
+			}
+		}
+		//Bigger punchy packin' a punch!
+		//Does not suffer bomb slowdown.
+		Cult_Heavy_Fist
+		{
+			Class Heavyweapons
+			Name "Resurrected Flesh Gauntlet"
+			Health 900
+			Scale 1.5
+			ClassIcon heavy_zombie_arm2_lite
+			WeaponRestrictions MeleeOnly
+			Attributes DisableDodge
+			Item "Immobile Suit"
+			Item "Life Support System"
+			Item "Steel-Toed Stompers"
+			Item "Soviet Stitch-Up"
+			Template Zombie_Heavy
+			CharacterAttributes
+			{
+				"mult flag carrier move speed" 1.34
+			}
+		}
+		//A human Kritz BigHeal Medic!
+		//The high heal rate makes them well-suited for giants.
+		Cult_Medic_Kritz
+		{
+			Class Medic
+			Name "Monocultus Enrager Medic"
+			ClassIcon medic_kritz
+			Skill Expert
+			Attributes SpawnWithFullCharge
+			Item "The Kritzkrieg"
+			Item "Prussian Pickelhaube"
+			Item "Smock Surgeon"
+			Item "BINOCULUS!"
+			ItemAttributes
+			{
+				ItemName "The Kritzkrieg"
+				"bot medic uber health threshold" 160
+				"heal rate bonus" 10
+				"uber duration bonus" -9 //Infinite uber duration
+			}
+			ItemAttributes
+			{
+				ItemName "BINOCULUS!"
+				"set item tint rgb" 12073019 //Team Spirit, RED
+			}
+			UseHumanModel 2
+		}
+		//A human Superheal Medic!
+		Cult_Medic_Superheal
+		{
+			Class Medic
+			Name "Necrotic Summoner Medic"
+			Item "Templar's Spirit"
+			Item "The Quick-Fix"
+			Attributes SpawnWithFullCharge
+			ClassIcon medic_infpop
+			ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+				"heal rate bonus" 4.17 //Base 300 HP/sec heals
+				"overheal penalty" 0.001
+				"health from healers reduced" 0.5 //150 HP/sec selfheal
+				"uber duration bonus" -9 //Infinite uber duration
+			}
+			CharacterAttributes
+			{
+				"bot medic uber health threshold" 160
+			}
+			UseHumanModel 2
+		}
+		//A Sn-eye-per, firing regular ol' arrows.
+		Cult_Sniper_Bow
+		{
+			Template T_TFBot_Sniper_Huntsman
+			Name "Monocultus Bowman"
+			Item "MONOCULUS!"
+			ItemAttributes
+			{
+				ItemName "The Huntsman"
+				"damage bonus" 1
+				"damage penalty" 0.5
+			}
+			UseCustomModel "models/player/sniper.mdl"
+			//add item zombie sniper to some
+		}
+		//A Sn-eye-per, firing arrows and tossin' Jarate.
+		Cult_Sniper_Bow_Jarate
+		{
+			Template T_TFBot_Sniper_Huntsman
+			Name "Monocultus Sneyeper"
+			Item "Jarmaments"
+			Item "MONOCULUS!"
+			Item "Jarate"
+			WeaponRestrictions SecondaryOnly
+			// ClassIcon sniper_jarate_bow //weirder naming convention cause sniper_bow_jarate is already taken.
+			ItemAttributes
+			{
+				ItemName "The Huntsman"
+				"damage bonus" 1
+				"damage penalty" 0.5
+			}
+			ItemAttributes
+			{
+				ItemName "Jarate"
+				"effect bar recharge time increased" 0.3
+			}
+			FireInput
+			{
+				Target "!self"
+				Action "CallScriptFunction"
+				Param "ShouldTossJarate"
+				IfSeeTarget 1 //The whole reason I'm doing this with rafmod.
+				MaxTargetRange 1600
+				Delay 2
+				Cooldown 0.25
+			}
+			UseCustomModel "models/player/sniper.mdl"
+			//add item zombie sniper to some
+		}
+		//A Sn-eye-per, firing jarate-coated arrows.
+		Cult_Sniper_Bow_Wet
+		{
+			Template T_TFBot_Sniper_Huntsman
+			Name "Monocultus Sneyeper"
+			Item "Jarmaments"
+			Item "MONOCULUS!"
+			ClassIcon sniper_bow_jarate
+			ItemAttributes
+			{
+				ItemName "The Huntsman"
+				"damage bonus" 1
+				"damage penalty" 0.5
+				"add cond on hit" 24
+				"add cond on hit duration" 5
+			}
+			UseCustomModel "models/player/sniper.mdl"
+			//add item zombie sniper to some
+		}
+		//A Sn-eye-per, firing arrows...with Jarate attached to it, instead of being coated.
+		//Yes, actual Jarate, which impacts.
+		//...doesn't work properly though so scrapping that for now.
+		Cult_Sniper_Bow_JarateArrow
+		{
+			Template T_TFBot_Sniper_Huntsman
+			Name "Monocultus Sneyeper"
+			Item "Jarmaments"
+			Item "MONOCULUS!"
+			ClassIcon sniper_bow_jar
+			ItemAttributes
+			{
+				ItemName "The Huntsman"
+				"damage bonus" 1
+				"damage penalty" 0.5
+				"ignores other projectiles" 1
+			}
+            ShootTemplate
+            {
+                Name PT_JarateJarProjectile
+                AttachToProjectile 1
+            }
+			UseCustomModel "models/player/sniper.mdl"
+			//add item zombie sniper to some
+		}
+		
+		Cult_Giant_Soldier_Trirocket
+		{
+			Template T_TFBot_Giant_Soldier
+			Name "Giant Third Eye Soldier"
+			Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+			Item "Spooky Head-Bouncers"
+			Item "Veteran's Attire"
+			Item "Warhood"
+			MaxVisionRange 1500 //They get a little insane w/o it...
+			ClassIcon soldier_rocketshotgun_lite
+			RocketCustomModel "models/props_halloween/eyeball_projectile.mdl"
+			// RocketCustomParticle "eyeboss_projectile"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+				"paintkit_proto_def_index" 265 //Eyestalker
+				"set_item_texture_wear" 0.2
+				"fire rate bonus" 0.15
+				"clip size penalty" 0.75
+				"reload time increased" 1.2
+				"projectile speed decreased" 0.65
+				"projectile spread angle penalty" 0.5
+			}
+			AddTemplate Zombie_Soldier
+		}
+		Cult_Giant_Soldier_Trirocket_Direct
+		{
+			Template T_TFBot_Giant_Soldier
+			Name "Giant Fourth Eye Soldier"
+			Item "The Direct Hit"
+			Item "Spooky Head-Bouncers"
+			Item "Veteran's Attire"
+			Item "BINOCULUS!"
+			Item "War Pig"
+			MaxVisionRange 1500 //They get a little insane w/o it...
+			ClassIcon soldier_rocketshotgun_dh_lite
+			RocketCustomModel "models/props_halloween/eyeball_projectile.mdl"
+			// RocketCustomParticle "eyeboss_projectile"
+			ItemAttributes
+			{
+				ItemName "The Direct Hit"
+				"fire rate bonus" 0.15
+				"clip size penalty" 0.75
+				"projectile spread angle penalty" 0.5
+			}
+			ItemAttributes
+			{
+				ItemName "War Pig"
+				"item style override" 1
+				"set item tint rgb" 6901050 //Radigan Conagher Brown
+			}
+			AddTemplate Zombie_Soldier
+		}
+		Cult_Giant_Demoman
+		{
+			Template T_TFBot_Giant_Demoman
+			Name "Giant Revived Ravager Demo"
+			Health 3300
+			Item "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+			Item "Ethereal Hood"
+			Item "The Hurt Locher"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+				"paintkit_proto_def_index" 297 //Necromanced
+				"set_item_texture_wear" 0.2
+				"faster reload rate" 0.5
+				"fire rate bonus" 0.5
+			}
+			AddTemplate Zombie_Demo
+		}
+		Cult_Giant_Demoman_Loch
+		{
+			Template T_TFBot_Giant_Demoman
+			Name "Giant Third Eye Demo"
+			Health 3300
+			Item "The Loch-n-Load"
+			Item "Spooky Head-Bouncers"
+			Item "Dead of Night"
+			Item "The Dread Hiding Hood"
+			Item "Pocket Halloween Boss"
+			ClassIcon demo_loch_nys
+			ItemAttributes
+			{
+				ItemName "The Loch-n-Load"
+				"paintkit_proto_def_index" 265 //Eyestalker
+				"set_item_texture_wear" 0.2
+				
+				"projectile speed increased" 0.95 //Never forget to undo overaim!
+				"faster reload rate" 0.5
+				"fire rate bonus" 0.5
+				"grenade no bounce" 1
+				"sticky air burst mode" 0
+			}
+			ItemAttributes
+			{
+				ItemName "Pocket Halloween Boss"
+				"item style override" 2 //Monoculus - duh.
+			}
+			AddTemplate Zombie_Demo
+		}
+		Cult_Giant_Demoman_Sticky
+		{
+			Template T_TFBot_Giant_Demoman
+			Name "Giant Monocultus Demo"
+			Health 3300
+			MaxVisionRange 1800
+			Item "harvest_stickybomblauncher_pumpkinpatch"
+			Item "MONOCULUS!"
+			Item "Dead of Night" //Dark, hide grenades
+			Item "Pocket Halloween Boss"
+			ExtAttr AlwaysFireWeaponAlt
+			ClassIcon pumpkin_lord2
+			ItemAttributes
+			{
+				ItemName "harvest_stickybomblauncher_pumpkinpatch"
+				"max pipebombs decreased" -7 //Monocultus so just 1!
+				"sticky arm time bonus" -0.3 //additive value
+				"projectile range decreased" 0.34
+				"stickybomb charge rate" 0.001
+				"faster reload rate" 0.2
+				//technically could use SR here but meh
+			}
+			ItemAttributes
+			{
+				ItemName "Pocket Halloween Boss"
+				"item style override" 2 //Monoculus - duh.
+			}
+			CharacterAttributes
+			{
+				"SPELL: Halloween pumpkin explosions" 1
+			}
+			AddTemplate Zombie_Demo
+		}
+		Cult_Giant_Demoknight
+		{
+			Template T_TFBot_Giant_Demoman
+			Name "Giant Summoned Headtaker Demo"
+			Health 3000
+			ClassIcon demoknight_headtaker_nys
+			WeaponRestrictions MeleeOnly
+			Item "The Horseless Headless Horseman's Headtaker"
+			Item "Ethereal Hood"
+			Attributes DisableDodge
+			ItemAttributes
+			{
+				ItemName "The Headless Horseless Horsemann's Headtaker"
+				"critboost on kill" 5
+				"max health additive penalty" 0
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.62 //approx as fast as a gdemoknight with 3 heads
+			}
+			AddTemplate Zombie_Demo
+		}
+		
+		//A giant heavy that has a permanent MONOCULUS spell attached to him!
+		//...well, it's more a passive rocket launcher at that point...
+		Cult_Chief_Heavy_Spell
+		{
+			Template T_TFBot_Giant_Heavyweapons
+			Name "Monocultus Menace"
+			Health 12500
+			ClassIcon heavy_monoculus
+			Skill Normal //holy shit it's overtuned with good aim.
+			Attributes UseBossHealthBar
+			Tag "cultchief"
+			Item "Upgradeable TF_WEAPON_MINIGUN"
+			Item "MONOCULUS!"
+			Item "Moccasin Machinery"
+			Item "Purity Fist"
+			Item "Bone-Cut Belt"
+			Item "Pocket Halloween Boss"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_MINIGUN"
+				"paintkit_proto_def_index" 265 //Eyestalker
+				"set_item_texture_wear" 0.2
+				"damage bonus" 1.2
+			}
+			ItemAttributes
+			{
+				ItemName "Pocket Halloween Boss"
+				"item style override" 2 //Monoculus - duh.
+			}
+			
+			AddTemplate Zombie_Heavy
+		}
+		
+		////////////////////////////////////////////////////////////////////////////
+		/////////////////////			Pumpkin bots				////////////////
+		////////////////////////////////////////////////////////////////////////////
+		
+		//A Widowmaker engie. Plain and simple.
+		//Kind of a "rapid fire" shotgun, if you think about it?
+		Pumpkin_Engineer
+		{
+			Class Engineer
+			Name "Pumpkinton's Engie"
+			Action FetchFlag
+			Item "The Widowmaker"
+			Item "Hollowed Helm"
+			Item "Gourd Grin"
+			Item "The Gunslinger" //slightly more health to compensate for having more cash.
+			ClassIcon engineer_widowmaker_nys
+			ItemAttributes
+			{
+				ItemName "The Widowmaker"
+				"fire rate penalty" 1.3 //reduces overall spam, kinda like Shotgun Heavies!
+			}
+			Template Zombie_Engineer
+		}
+		//A human Quick-Fix Medic! Can pop a charge, too.
+		//Similar stats to regular Uber Medic.
+		Pumpkin_Medic
+		{
+			Class Medic
+			Name "Pumpkinton's Patch-Up Medic"
+			Skill Normal
+			Item "Towering Patch of Pumpkins"
+			Item "Gourd Grin"
+			Item "The Quick-Fix"
+			Attributes SpawnWithFullCharge
+			ClassIcon medic_quickfix_seel2
+			ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+				"heal rate bonus" 5
+				"ubercharge rate bonus" 2 //don't leave 'em living!
+			}
+			CharacterAttributes
+			{
+				"bot medic uber health threshold" 51
+			}
+			Template Zombie_Medic
+		}
+		Pumpkin_Spy
+		{
+			Class Spy
+			Name "Pumpkinton Py"
+			Skill Expert
+			Item "Showstopper"
+			Item "Big Topper"
+			Item "Gruesome Gourd"
+			ItemAttributes
+			{
+				ItemName "Gruesome Gourd"
+				"set item tint rgb" 8289918
+			}
+			Template Zombie_Spy
+		}
+		
+		//TEST: does this work better if pumpkin explosion is instead done with ShootTemplate?
+		//Pair with "projectile detonate time" instead of m2!
+		Pumpkin_Chief_I
+		{
+			Name "Sir Pumpkinton I"
+			Template T_TFBot_Giant_Demoman
+			Health 3300
+			MaxVisionRange 1800
+			Item "Sir Pumpkinton"
+			Item "The Whiskey Bib"
+			Item "harvest_stickybomblauncher_pumpkinpatch"
+			Item "Secret Diary"
+			StripItemSlot 0 //Spell use requires them to be able to swap weapons
+			StripItemSlot 2 //And for some reason they switch to their melee???
+			ExtAttr AlwaysFireWeaponAlt
+			ClassIcon pumpkin_lord2
+			ItemAttributes
+			{
+				ItemName "harvest_stickybomblauncher_pumpkinpatch"
+				"fire rate penalty" 1.25
+				"max pipebombs decreased" -6 //two!
+				"sticky arm time penalty" 0.8 //additive value
+				"projectile range decreased" 0.34
+				"stickybomb charge rate" 0.001
+				"faster reload rate" 0.2
+				//technically could use SR here but meh
+			}
+			CharacterAttributes
+			{
+				"SPELL: Halloween pumpkin explosions" 1
+			}
+			FireWeapon
+			{
+				Type "Action"
+				Delay 3
+				Cooldown 4
+				IfSeeTarget 1
+				Duration 0.4
+			}
+			Spell [$SIGSEGV] //Gives specified spell to bots.
+			{
+				Delay 3
+				Cooldown 6
+				IfSeeTarget 1
+				Charges 1 //spells to give
+				Limit 1 //spells the bot can store
+				Type "Pumpkin MIRV"
+			}
+			AddTemplate Zombie_Demo
+		}
+		
+		////////////////////////////////////////////////////////////////////////////
+		///////////////////////			Tomb bots				/////////////////////
+		////////////////////////////////////////////////////////////////////////////
+		
+		Tomb_Scout_Sun
+		{
+			Name "Scorching Scout"
+			Class Scout
+			Skill Expert
+			Health 350
+			Scale 1.2
+			Item "Wrap Battler"
+			Item "B-ankh!"
+			Item "Futankhamun"
+			Item "Sharpened Volcano Fragment"
+			WeaponRestrictions MeleeOnly
+			Attributes DisableDodge
+			ClassIcon pyro_volcano
+			CharacterAttributes
+			{
+				"mult flag carrier move speed" 1.2 //Same as W1 Scouts
+			}
+			Template Zombie_Scout
+		}
+		Tomb_Pyro_Torch
+		{
+			Name "Torch-Tossing Pyro"
+			Class Pyro
+			Skill Normal
+			Item "The Macabre Mask"
+			Item "The Maniac's Manacles"
+			Item "The Manmelter"
+			WeaponRestrictions SecondaryOnly
+			ClassIcon pyro_manmelter_spammer
+			ItemAttributes
+			{
+				ItemName "The Manmelter"
+				"fire rate bonus" 0.2
+				"projectile speed increased" 1
+			}
+			Template Zombie_Pyro
+		}
+		Tomb_Demo_Sticky
+		{
+			Class Demoman
+			Skill Hard
+			Name "Tomb-Trashing Demo"
+			Item "The Pithy Professional"
+			ClassIcon demo_sticky_daan
+			WeaponRestrictions SecondaryOnly
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_PIPEBOMBLAUNCHER"
+				"paintkit_proto_def_index" 268 //mummified mimic
+				"set_item_texture_wear" 0.2
+				"projectile range increased" 0.35
+				"stickybomb charge rate" 0.001
+				"max pipebombs decreased" -7
+				"faster reload rate" 0.1 //0.109
+			}
+			Template Zombie_Demo
+		}
+		Tomb_Demo_Quickie
+		{
+			Class Demoman
+			Skill Hard
+			Name "Torturer Demo"
+			Health 650
+			Scale 1.4
+			Item "The Quickiebomb Launcher"
+			Item "Dark Age Defender"
+			Item "The Headtaker's Hood"
+			ClassIcon demo_quickie_pda
+			WeaponRestrictions SecondaryOnly
+			AimAt Body
+			AimOffset "0 0 -5"
+			ItemAttributes
+			{
+				ItemName "The Quickiebomb Launcher"
+				"projectile range increased" 0.4
+				"stickybomb charge rate" 0.001
+				"max pipebombs decreased" -7
+				"faster reload rate" 0
+				"fire rate penalty"	1.5 //0.9s
+				"stickybomb stick to enemies" 1
+				"damage penalty" 0.75
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.9
+				"health regen" 1
+			}
+			Template Zombie_Demo
+		}
+		Tomb_Sniper_Croc
+		{
+			Class Sniper
+			Name "Ferocious Nile Crocodile"
+			Health 650
+			Scale 1.4
+			Item "Crocodile Mun-dee"
+			Item "Scopers Scales"
+			WeaponRestrictions MeleeOnly
+			Attributes DisableDodge
+			ClassIcon sniper_kukri_lite
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_CLUB"
+				"custom kill icon" "crocodile"
+				"bleeding duration" 3
+				"is invisible" 1
+			}
+			CharacterAttributes
+			{
+				"health regen" 1
+				"mult flag carrier move speed" 1.34
+			}
+			Template Zombie_Sniper
+		}
+		Tomb_Spy_Mummy
+		{
+			Class Spy
+			Name "Mummy Masquerade Spy"
+			Skill Hard
+			Item "Under Cover"
+			Item "Your Eternal Reward"
+			Attributes IgnoreFlag
+			Template Zombie_Spy
+		}
+		
+		Tomb_Giant_Pyro_Douse
+		{
+			Template T_TFBot_Giant_Pyro
+			Name "Giant Daylight Douser Pyro"
+			WeaponRestrictions PrimaryOnly
+			ClassIcon pyro_jug_axtinguisher_bright
+			Item "Deity's Dress"
+			Item "Feathered Fiend"
+			Item "Axtinguisher Tosser"
+			Item "The Axtinguisher"
+			Attributes SuppressFire
+			ItemAttributes
+			{
+				ItemName "The Axtinguisher"
+				"is_passive_weapon" 1
+				"fire rate bonus" 0.6 //0.48
+			}
+            ShootTemplate
+            {
+                Name PT_RotatingAxe
+                AttachToProjectile 1
+            }
+			FireWeapon
+			{
+				Type "Primary"
+				Cooldown 0.5
+				Duration 0.1
+				Delay 4
+				IfSeeTarget 1
+			}
+			AddTemplate Zombie_Pyro
+		}
+		//A giant Family Business Heavy, firing fast bursts of bullets.
+		//At range, swaps to the Fists of Steel to keep itself safe.
+		Tomb_Giant_Heavy_Business
+		{
+			Template T_TFBot_Giant_Heavyweapons
+			Name "Giant Pharaoh Heavy"
+			AimTrackingInterval 0.2
+			Class Heavyweapons
+			ClassIcon heavy_familybusiness_fist
+			StripItemSlot 0
+			Item "The Crown of the Old Kingdom"
+			Item "Kapitan's Kaftan"
+			Item "The Family Business"
+			Item "Fists of Steel"
+			ItemAttributes
+			{
+				ItemName "The Family Business"
+				"paintkit_proto_def_index" 268 //mummified mimic
+				"set_item_texture_wear" 0.2
+				"damage penalty" 1 //haha yes
+				"faster reload rate" 0.5
+				"fire rate bonus" 0.7
+				"hold fire until full reload" 1 //Thank you rafmod :3
+			}
+			ItemAttributes
+			{
+				ItemName "The Fists of Steel"
+				"provide on active" 1
+				"move speed penalty" 0.75 //0.525x speed
+				
+				"item color rgb" 15185211 //Australium Gold. TEMP - may be removed if confusing.
+			}
+			WeaponSwitch
+			{
+				Type "Melee"
+				Delay 0
+				Repeats 1
+			}
+			WeaponSwitch
+			{
+				Type "Melee"
+				IfSeeTarget 1
+				MinTargetRange 400
+				Cooldown 1.5
+			}
+			WeaponSwitch
+			{
+				Type "Secondary"
+				IfSeeTarget 1
+				MaxTargetRange 450
+				Cooldown 1.5
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.7
+			}
+			AddTemplate Zombie_Heavy
+		}
+		//A giant Blutsauger medic, with excellent aim!
+		//Can be quite deadly...don't move predictably!
+		Tomb_Giant_Medic_Sun
+		{
+			Name "Giant Solar Scholar Medic"
+			Class Medic
+			Health 4000
+			Skill Hard
+			ClassIcon medic_blutsauger_lite
+			Action FetchFlag
+			Attributes MiniBoss
+			WeaponRestrictions PrimaryOnly
+			Item "The Blutsauger"
+			Item "Teutonkahmun"
+			Item "Ramses' Regalia"
+			AimAt Head
+			AimOffset "0 0 5"
+			AimLeadProjectileSpeed 1100
+			ItemAttributes
+			{
+				ItemName "The Blutsauger"
+				"fire rate bonus" 0.6
+				"damage bonus" 2		//24 dmg point blank!
+				"clip size penalty" 0.4 //16 shots
+				"heal on hit for rapidfire" 200 //Total max HP restored: 3200
+				"item style override" 1
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+			}
+			Template Zombie_Medic
+		}
+		
+		//Deity of Dawn, a Scout that "respawns" itself, like a new dawn!
+		Tomb_Chief_Scout
+		{
+			Class Scout
+			Name "Deity of Dawn"
+			Health 6500
+			Item "Olympic Leapers"
+			Item "Athenian Attire"
+			Item "Sun-on-a-Stick"
+			Item "Jungle Wreath"
+			WeaponRestrictions MeleeOnly
+			ClassIcon scout_sunstick_swordstone_giant
+			Attributes DisableDodge
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			NoIdleSound 1
+			ItemAttributes
+			{
+				ItemName "Sun-on-a-Stick"
+				"damage penalty" 1
+				"fire rate penalty" 1.2
+				"dmg taken from fire reduced on active" 1
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.6 //240 hu/s, soldier speed
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.3
+			}
+			UseHumanModel 2
+		}
+		//Deity of Dusk, a Heavy that "persists" for a bit longer, like dusk staying longer at the poles!
+		//Alternatively, night = death.
+		Tomb_Chief_Heavy
+		{
+			Template T_TFBot_Giant_Heavyweapons
+			Name "Deity of Dusk"
+			Health 15000
+			Item "The Unshaved Bear"
+			Item "Kapitan's Kaftan"
+			Item "Sun Shooter"
+			Item "The Freedom Staff"
+			Item "Bedouin Bandana"
+			Attributes UseBossHealthBar
+			Attributes DisableDodge
+			ClassIcon soldier_incendiary_nys
+			WeaponRestrictions SecondaryOnly
+			NoIdleSound 1
+			ItemAttributes
+			{
+				ItemName "The Freedom Staff"
+				"damage blast push" 4 //get OFF of me, feeble peasant!
+			}
+			ItemAttributes
+			{
+				ItemName "Bedouin Bandana"
+				"attach particle effect" 90 //Death at Dusk
+			}
+			FireInput
+			{
+				Target player
+				Action $PlaySoundToSelf
+				Param "=35|mvm/mvm_used_powerup.wav"
+				Delay 0
+				Repeats 1
+				IfHealthBelow 5001
+			}
+			Message
+			{
+				Name "{blue}Deity of Dusk {FBECCB}has used their {FFBE64}FINAL DUSK {FBECCB}Power Up Canteen!"
+				Delay 0
+				Repeats 1
+				IfHealthBelow 5001
+			}
+			AddAttribute
+			{
+				Item "Active"
+				Name "fire rate bonus HIDDEN"
+				Value 0.1
+				Repeats 1
+				Cooldown 1
+				Delay 0.05
+				IfHealthBelow 5001
+			}
+			AddAttribute
+			{
+				Item "Active"
+				Name "fire rate bonus HIDDEN"
+				Value 0.85
+				Repeats 1
+				Cooldown 1
+				Delay 0.95
+				IfHealthBelow 5001
+			}
+			AddCond
+			{
+				Index 42 //bomb buff effect
+				Duration 999
+				IfHealthBelow 5001
+			}
+			UseHumanModel 2
+		}
+		
+		
+		////////////////////////////////////////////////////////////////////////////
+		///////////////////////			Flameborn bots			////////////////////
+		////////////////////////////////////////////////////////////////////////////
+		
+		//A Scout. Simple.
+		Flameborn_Scout
+		{
+			Class Scout
+			Skill Normal
+			Name "Dogged Hound"
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			Item "The Hound's Hood"
+			Item "The Terrier Trousers"
+			Item "Claws And Infect"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"paintkit_proto_def_index" 291 //Broken Bones
+				"set_item_texture_wear" 0.4
+			}
+			UseHumanModel 2
+		}
+		
+		//A clever range-based weapon-swapping soldier!
+		//Rocket Launcher at long to mid range, Shotgun at close range to prevent self-damage. Quite standard.
+		Flameborn_Soldier_Swapper
+		{
+			Class Soldier
+			Health 650
+			Scale 1.4
+			Skill Hard
+			Name "Black Knight"
+			Item "Dark Falkirk Helm"
+			Item "Dark Age Defender"
+			Item "Forgotten King's Pauldrons"
+			Item "The Sole Saviors"
+			Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+			ClassIcon soldier_shotgun_spammer
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+				"faster reload rate" 0
+				"fire rate bonus" 0.75
+				"projectile speed decreased" 0.8
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SHOTGUN_SOLDIER"
+				"faster reload rate" 0
+				"fire rate bonus" 0.75
+			}
+			WeaponSwitch
+			{
+				Type "Primary"
+				IfSeeTarget 1
+				MinTargetRange 300
+				Cooldown 1.5
+			}
+			WeaponSwitch
+			{
+				Type "Secondary"
+				IfSeeTarget 1
+				MaxTargetRange 350
+				Cooldown 1.5
+			}
+			Template Zombie_Soldier
+		}
+		
+		//A Direct Hit soldier! Fairly standard fellow.
+		Flameborn_Soldier_DH
+		{
+			Class Soldier
+			Skill Normal
+			Name "Hollow Knight"
+			Item "Crit Cloak"
+			Item "The Sole Saviors"
+			Item "The Caped Crusader"
+			Item "The Direct Hit"
+			ClassIcon soldier_directhit_lite
+			Attributes HoldFireUntilFullReload
+			Template Zombie_Soldier
+		}
+		//A minigiant Direct Hit soldier with two charges of a healing spell!
+		Flameborn_Soldier_DH_HealSpell
+		{
+			Class Soldier
+			Health 650
+			Scale 1.4
+			Skill Hard
+			Name "Hollow Cleric"
+			Item "The Direct Hit"
+			Item "TF_WEAPON_SPELLBOOK"
+			Item "Mighty Mitre"
+			Item "Warlock's Warcloak"
+			Item "The Exorcizor"
+			Attributes HoldFireUntilFullReload
+			ClassIcon soldier_directhit_heal_spell
+			Spell
+			{
+				Delay 8
+				Type "Healing Aura"
+				Repeats 1
+				IfSeeTarget 0
+			}
+			Spell
+			{
+				IfHealthBelow 500
+				Type "Healing Aura"
+				Repeats 1
+			}
+			Template Zombie_Soldier
+		}
+		
+		//A classy pyro. Its airblast deflects, but it can refire a little slower.
+		Flameborn_Pyro
+		{
+			Name "Kindling Hollow"
+			Class Pyro
+			Skill Normal
+			Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+			Item "The Hollowhead"
+			Item "The Maniac's Manacles"
+			// ClassIcon pyro_heal
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_FLAMETHROWER"
+				"paintkit_proto_def_index" 406 //health n hell
+				"set_item_texture_wear" 0.2
+				"airblast_destroy_projectile" 1
+				"mult airblast primary refire time" 1.25 //airblast pauses their flames for a longer while
+				// "damage penalty" 0.9
+				// "flame_speed" 1960 //decreased range
+				// "heal on hit for rapidfire" 6 //6/0.075 = 80 hp/s
+			}
+			UseHumanModel 2
+		}
+		//A melee pyro. Can be scary with its crits!
+		Flameborn_Pyro_TDegree
+		{
+			Class Pyro
+			Name "Ragged Hollow"
+			Skill Normal
+			Item "The Hollowhead"
+			Item "The Maniac's Manacles"
+			Item "The Abhorrent Appendages"
+			Item "The Third Degree"
+			Skin 5
+			ClassIcon pyro_thirddegree_blu
+			Attributes AlwaysCrit
+			WeaponRestrictions MeleeOnly
+			CharacterAttributes
+			{
+				"mult flag carrier move speed" 1.34
+			}
+			Template Zombie_Pyro
+		}
+		//A demoknight that sets you on fire! Uses the Splendid Screen. No HP penalty makes it bulkier anyway!
+		Flameborn_Demo_Knight_Fire
+		{
+			Class Demoman
+			Name "Rekindled Knight"
+			ClassIcon demoknight_fire
+			Item "Dark Falkirk Helm"
+			Item "Dark Age Defender"
+			Item "The Splendid Screen"
+			Item "The Eyelander"
+			WeaponRestrictions MeleeOnly
+			Attributes DisableDodge
+			ItemAttributes
+			{
+				ItemName "The Eyelander"
+				"attach particle effect" 2
+				"set damagetype ignite" 1
+				"fire rate penalty" 1.2
+				"max health additive penalty" 0
+			}
+			Template Zombie_Demo
+		}
+		//A Heater Heavy. Wears slops. Quite rugged.
+		Flameborn_Heavy
+		{
+			Class Heavy
+			Skill Normal
+			Name "Rugged Hollow"
+			Item "The Huo Long Heatmaker"
+			Item "The Rat Stompers"
+			Item "Ghastly Gibus"
+			ClassIcon heavy_heater
+			AddTemplate Zombie_Heavy
+		}
+		
+		//A spy that heals on kill, through the kunai!
+		Flameborn_Spy_Kunai
+		{
+			Class Spy
+			Skill Expert
+			Name "Black Knife Assassin"
+			Item "The Diamondback"
+			Item "Conniver's Kunai"
+			Item "Bedouin Bandana"
+			Attributes IgnoreFlag
+			ClassIcon spy_heal
+			ItemAttributes
+			{
+				ItemName "The Diamondback"
+				"auto fires when full" 1
+			}
+			ItemAttributes
+			{
+				ItemName "Conniver's Kunai"
+				"max health additive penalty" 0
+			}
+			ItemAttributes
+			{
+				ItemName "Bedouin Bandana"
+				"set item tint rgb" 8626083 //Balaclavas Are Forever
+			}
+			UseHumanModel 2
+		}
+		
+		
+		//A Pyro that swaps between their flamer and flare gun based on target range.
+		//Also overheals their allies and heals themselves when below half health!
+		Flameborn_Giant_Pyro_Combo_HealSpell
+		{
+			Class Pyro
+			Skill Expert
+			Name "Lord of Cinder"
+			Health 3000
+			Attributes MiniBoss
+			ClassIcon pyro_combo_heal_spell
+			Item "TF_WEAPON_SPELLBOOK"
+			Item "dec2014 Pyromancer's Raiments"
+			Item "Hard-Headed Hardware"
+			Item "The Manneater"
+			SpawnTemplate PT_SpellHealLogic
+			ItemAttributes
+			{
+				ItemName "The Manneater"
+				"set item tint rgb" 13595446
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SPELLBOOK"
+				"deploy time decreased" 0.01
+			}
+			CharacterAttributes
+			{
+				"max health additive bonus" 3000
+				"health from healers increased" 20
+				"move speed penalty" 0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 6
+			}
+			UseHumanModel 2
+			
+			FireInput
+			{
+				Target "postheal_relay"
+				Action Trigger
+				Delay 0
+				Repeats 1
+				IfHealthBelow 1500
+			}
+			EventChangeAttributes
+			{
+				Default
+				{
+					Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+					ItemAttributes
+					{
+						ItemName "Upgradeable TF_WEAPON_FLAMETHROWER"
+						"paintkit_proto_def_index" 102 //Wrapped Reviver
+						"set_item_texture_wear" 0.2
+						"damage bonus" 1.25
+						"mult airblast refire time" 1.5
+					}
+					Spell
+					{
+						Delay 10
+						Type "Healing Aura"
+						Repeats 1
+					}
+				}
+				Heal
+				{
+					Spell
+					{
+						Delay 0
+						IfHealthBelow 1500
+						Type "Healing Aura"
+						Repeats 1
+					}
+				}
+				PostHeal
+				{
+					WeaponRestrictions SecondaryOnly
+					Item "The Flare Gun"
+					AimAt Head
+					ItemAttributes
+					{
+						ItemName "The Flare Gun"
+						"fire rate bonus" 0.1
+						"projectile spread angle penalty" 1
+						"projectile speed decreased" 0.4 //600 HU/s
+						"projectile gravity" 50 //less gravity to compensate slower speed.
+					}
+				}
+			}
+		}
+		//A giant demoman that fires igniting grenades. Watch your step!
+		Flameborn_Giant_Demoman_Cinder
+		{
+			Class Demoman
+			Health 3300
+			Skill Expert
+			Attributes MiniBoss
+			Name "Heir of Fire"
+			ClassIcon demo_spammer_fire
+			Item "The Iron Bomber"
+			Item "The Splendid Screen"
+			Item "Forgotten King's Restless Head"
+			Item "Forgotten King's Pauldrons"
+			ItemAttributes
+			{
+				ItemName "The Iron Bomber"
+				"paintkit_proto_def_index" 293 //Searing Souls
+				"set_item_texture_wear" 0.2
+				"fire rate bonus" 0.75
+				"faster reload rate" 0
+				"set damagetype ignite" 1
+				"no self effect" 1
+				"projectile trail particle" "rocketpack_exhaust_fire"
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4
+			}
+			AddTemplate Zombie_Demo
+		}
+		
+		Flameborn_Giant_Engineer_Ranger_Burst
+		{
+			Name "Giant Dark Hail Engie"
+			Class Engineer
+			Skill Expert
+			Health 3000
+			ClassIcon engineer_ranger_nys_spammer
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Action FetchFlag
+			Item "The Rescue Ranger"
+			Item "Underminer's Overcoat"
+			Item "Demonic Dome"
+			Item "The Cryptic Keepsake"
+			AimAt Head
+			ItemAttributes
+			{
+				ItemName "The Rescue Ranger"
+				"paintkit_proto_def_index" 412 //Secretly Serviced
+				"set_item_texture_wear" 0
+				
+				"mult projectile count" 4
+				"fire rate penalty" 1.4
+				"projectile spread angle penalty" 4
+				"projectile speed decreased" 0.4
+				
+				"mod max primary clip override" -1
+			}
+			ItemAttributes
+			{
+				ItemName "Underminer's Overcoat"
+				"item style override" 2
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"voice pitch scale" 0.2
+			}
+			UseHumanModel 2
+		}
+		
+		//A giant crossbow medic that fires in bursts! And it penetrates, too, allowing it to heal at the same time!
+		Flameborn_Giant_Medic_Crossbow_Burst
+		{
+			Name "Giant Repeating Crossbow Knight"
+			Class Medic
+			Skill Hard
+			Health 4500
+			ClassIcon medic_crossbow_burst_penetration
+			Item "The Crusader's Crossbow"
+			Item "Bushi-dou"
+			Item "The War on Smissmas Battle Hood"
+			Item "The Ruffled Ruprecht"
+			Item "The Foul Cowl"
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Action FetchFlag
+			AimAt Head
+			ItemAttributes
+			{
+				ItemName "The Crusader's Crossbow"
+				"paintkit_proto_def_index" 297 //Necromanced
+				"set_item_texture_wear" 0.4
+				
+				"clip size upgrade atomic" 9
+				"projectile spread angle penalty" 2
+				"faster reload rate" 1.5
+				"reload full clip at once" 1
+				"projectile penetration" 1
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+			}
+			UseHumanModel 2
+		}
+		
+		////////////////////////////////////////////////////////////////////////////
+		///////////////////////			Warzone bots			////////////////////
+		////////////////////////////////////////////////////////////////////////////
+		
+		War_Scout
+		{
+			Class Scout
+			Name "Infantry Scout"
+			Skill Normal
+			Item "Fortunate Son"
+			Item "Flak Jack" //look. it's just a REALLY solid combo. It just works.
+			Item "craftsmann_scattergun_backcountryblaster"
+			AddTemplate Zombie_Scout
+		}
+		War_Pyro_Combo
+		{
+			Name "Trench Clearer Pyro"
+			Class Pyro
+			ClassIcon pyro_degreaser_panic
+			Skill Expert
+			Item "The Degreaser"
+			Item "Panic Attack Shotgun"
+			Item "Full Metal Helmet"
+			Item "Torcher's Trench Coat"
+			MaxVisionRange 1200
+			WeaponSwitch
+			{
+				Type "Primary"
+				IfSeeTarget 1
+				MaxTargetRange 350
+				Delay 2
+				Cooldown 4
+			}
+			WeaponSwitch
+			{
+				Type "Secondary"
+				Delay 0
+				Cooldown 4
+			}
+			ItemAttributes
+			{
+				ItemName "The Degreaser"
+				"paintkit_proto_def_index" 217
+				"set_item_texture_wear" 0.4
+			}
+			ItemAttributes
+			{
+				ItemName "Panic Attack Shotgun"
+				"paintkit_proto_def_index" 217
+				"set_item_texture_wear" 0.4
+				"passive reload" 1
+				"faster reload rate" 0
+			}
+			Template Zombie_Pyro
+		}
+		War_Demo_Mine
+		{
+			Name "Rapid Mine Layer Demoman"
+			Class Demoman
+			Item "The Iron Bomber"
+			Item "The Frag Proof Fragger"
+			ClassIcon demo_spammer
+			ItemAttributes
+			{
+				ItemName "The Iron Bomber"
+				"paintkit_proto_def_index" 217
+				"set_item_texture_wear" 0.2
+				"faster reload rate" 0
+				"fire rate bonus" 0.8
+				"grenade damage reduction on world contact" 1.75 //105 base
+			}
+			Template Zombie_Demo
+		}
+		
+		War_Engineer_Frontline
+		{
+			
+			Class Engineer
+			Skill Expert
+			Name "Frontline Engineer"
+			Health 250 //Eat your heart out, Super Scout.
+			Scale 1.2
+			ClassIcon engineer_shortcircuit_lite //_fast? _blast?
+			Action FetchFlag [$SIGSEGV]
+			MaxVisionRange 750
+			UseMeleeThreatPrioritization 1 [$SIGSEGV]
+			WeaponRestrictions SecondaryOnly
+			Item "The Short Circuit"
+			Item "Dogfighter"
+			Item "Head of Defense"
+			ItemAttributes
+			{
+				ItemName "The Short Circuit"
+				"dmg penalty vs players" 3.5	//35 per normal hit
+				"dmg bonus vs buildings" 35 	//equal damage to buildings
+				"fire rate penalty" 3			//0.3s between hits
+				"disable buildings on hit" 1	//electricity could overcharge them, right?
+				"damage blast push" 1.5
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 1.3
+				"damage force reduction" 0.8
+				"airblast vulnerability multiplier" 0.8
+			}
+			
+			Template Zombie_Engineer
+		}
+		
+		War_Engineer_Widowmaker_Sentry
+		{
+			Class Engineer
+			Action FetchFlag
+			Name "Frontline Engineer"
+			Tag engineer_frontline
+			Health 350
+			Scale 1.2
+			Skill Hard
+			Item "The Widowmaker"
+			Item "The Gunslinger"
+			Item "Dogfighter"
+			Item "Head of Defense"
+			ClassIcon engineer_widowmaker_nys
+			
+			ClientCommand
+			{
+				Name "build 2"
+				Delay 15
+				Cooldown 10
+				IfSeeTarget 1
+			}
+			AddAttribute
+			{
+				Item "TF_WEAPON_BUILDER"
+				Name "disable weapon switch"
+				Value 1
+				Delay 15
+				Cooldown 10
+				IfSeeTarget 1
+			}
+			AddAttribute
+			{
+				Item "TF_WEAPON_BUILDER"
+				Name "disable weapon switch"
+				Value 0
+				Delay 15.5
+				Cooldown 1
+				IfSeeTarget 1
+			}
+			ClientCommand
+			{
+				Name "destroy 2"
+				Delay 25
+				Cooldown 10
+				IfSeeTarget 1
+			}
+			
+			// FireInput
+            // {
+                // Target "switch_to_sentry_mode"
+                // Action "Trigger"
+                // Delay 3
+                // Cooldown 4
+                // IfSeeTarget 0
+            // }
+            // FireInput
+            // {
+                // Target "switch_to_shotgun_mode"
+                // Action "Trigger"
+                // Delay 0
+                // Cooldown 3
+                // IfSeeTarget 1
+            // }
+			CharacterAttributes
+			{
+				"deploy time decreased" 0.1
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_BUILDER"
+				"provide on active" 1
+			}
+			ItemAttributes
+			{
+				ItemName "Head of Defense"
+				"item style override" 1
+			}
+			Template Zombie_Engineer
+		}
+		War_Engineer
+		{
+			Class Engineer
+			Health 500
+			Name "Backline Engineer"
+			Item "Trash Toter"
+			Item "Tools of the Trade"
+			Item "Winter Backup"
+			Attributes IgnoreFlag
+			Attributes TeleportToHint
+			ExtAttr BuildDispenserAsTeleporter
+			TeleportWhere spawnbot
+			CharacterAttributes
+			{
+				"engy dispenser radius increased" 4
+				"health from healers reduced" 0.25
+				"mult dispenser rate" 4
+			}
+			Template Zombie_Engineer
+		}
+		War_Medic_UberBigHeal
+		{
+			Template T_TFBot_Medic
+			Name "Armored Combat Medic"
+			Health 300
+			Scale 1.2
+			Item "Berlin Brain Bowl"
+			Item "Bunnyhopper's Ballistics Vest"
+			// Item "The Surgical Survivalist"
+			// Item "Battery Canteens"
+			ClassIcon medic_uber_armored_lite
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_MEDIGUN"
+				"heal rate bonus" 2 //stacks with character attributes' heal rate bonus of 5x
+				"uber duration bonus" -3 //I mean come on they have everything else already
+			}
+			// ItemAttributes
+			// {
+				// ItemName "Battery Canteens"
+				// "attachment name" "zombie_body"
+				// "custom item model" "models/player/items/medic/medic_zombie.mdl"
+				// "player skin override" 1
+				// "zombiezombiezombiezombie" 1
+			// }
+			// UseHumanModel 2
+			AddTemplate Zombie_Medic
+		}
+		War_Sniper
+		{
+			Class Sniper
+			Name "Spec Ops Sniper"
+			Skill Expert
+			Item "Cozy Camper"
+			Item "The AWPer Hand"
+			Item "The Triggerman's Tacticals"
+			Item "Rifleman's Regalia"
+			ClassIcon sniper_heal
+			Template Zombie_Sniper
+		}
+		War_Spy
+		{
+			Class Spy
+			Name "Infiltration Spy"
+			Skill Expert
+			AimTrackingInterval 0.2
+			Item "Lurking Legionnaire"
+			Item "A Hat To Kill For"
+			Item "Upgradeable TF_WEAPON_REVOLVER"
+			Item "Upgradeable TF_WEAPON_KNIFE"
+			Attributes IgnoreFlag
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_REVOLVER"
+				"paintkit_proto_def_index" 412
+				"set_item_texture_wear" 0.4
+				"auto fires when full" 1
+			}
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_KNIFE"
+				"paintkit_proto_def_index" 412
+				"set_item_texture_wear" 0.4
+			}
+			Template Zombie_Spy
+		}
+		
+		War_Giant_Scout
+		{
+			Class Scout
+			Name "Super Infantry Scout"
+			Skill Hard
+			Health 1600
+			Attributes MiniBoss
+			ClassIcon scout_spammer
+			Item "Fortunate Son"
+			Item "Flak Jack" //look. it's just a REALLY solid combo. It just works.
+			Item "craftsmann_scattergun_backcountryblaster"
+			ItemAttributes
+			{
+				ItemName "craftsmann_scattergun_backcountryblaster"
+				"fire rate bonus" 0.8
+				"faster reload rate" 0
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.65
+				"airblast vulnerability multiplier" 0.65
+				"cancel falling damage" 1
+			}
+			AddTemplate Zombie_Scout
+		}
+		War_Giant_Soldier_BBox_Ubercan
+		{
+			Template T_TFBot_Giant_Soldier
+			Name "Colonel Desperation"
+			Health 4000
+			Item "The Diplomat"
+			Item "The Patriot Peak"
+			Item "The Black Box"
+			Item "Battery Canteens"
+			ClassIcon soldier_blackbox_ubercan
+			ExtAttr SuppressCanteenUse
+			ItemAttributes
+			{
+				ItemName "The Black Box"
+				"damage bonus" 0.45
+				"fire rate bonus" 0.05
+				"faster reload rate" 1.5
+				"Projectile speed increased" 0.8
+				"projectile spread angle penalty" 4
+				"heal on hit for rapidfire" 1000
+			}
+			ItemAttributes
+			{
+				ItemName "Battery Canteens"
+				"ubercharge" 1
+				"powerup charges" 1
+				"powerup duration" 5
+			}
+			FireWeapon
+			{
+				Type "Action"
+				Repeats 1
+				IfHealthBelow 2000
+				IfSeeTarget 1
+				Delay 0.03
+				Cooldown 1
+			}
+			AddTemplate Zombie_Soldier
+		}
+		//An infinite barrage soldier! Comes with less health regen, but faster rockets and no reload time!
+		War_Giant_Soldier_Barrage
+		{
+			Template T_TFBot_Giant_Soldier
+			Name "Colonel Cataclysm"
+			Health 4000
+			Item "The Diplomat"
+			Item "Stout Shako"
+			Item "gentlemanne_rocketlauncher_coffinnail"
+			ClassIcon soldier_barrage_infinite
+			ItemAttributes
+			{
+				ItemName "gentlemanne_rocketlauncher_coffinnail"
+				"faster reload rate" 0
+				"fire rate bonus" 0.2
+				"projectile speed decreased" 0.45
+				"projectile spread angle penalty" 5
+				"damage bonus" 1.5
+			}
+			CharacterAttributes
+			{
+				"health regen" 20 //Lesser, to make them not as much of a pain
+			}
+			AddTemplate Zombie_Soldier
+		}
+		//A powerful Giant Heavy that fires homing rockets continually!
+		War_Giant_Heavy_Rocket
+		{
+			Template T_TFBot_Giant_Heavyweapons
+			Name "Marshal Misha"
+			ClassIcon heavy_rocket_homing_nys
+			Item "gentlemanne_minigun_topshelf"
+			Item "The Team Captain"
+			Item "Commissar's Coat"
+			Item "The Fortune Hunter"
+			ItemAttributes
+			{
+				ItemName "gentlemanne_minigun_topshelf"
+				"damage bonus" 1.5
+			}
+			ItemAttributes
+			{
+				ItemName "The Fortune Hunter"
+				"custom item model" "models/weapons/c_models/c_rocketlauncher/c_rocketlauncher.mdl"
+				"attachment name" "head"
+				"attachment angles" "-100 5 25"
+				"attachment offset" "-23 0 -40"
+				"attachment scale" "2.25"
+			}
+			SpawnTemplate
+			{
+				Name PT_RocketTurret
+				Origin "-50 50 100"
+				Angles "-70 0 0"
+			}
+			AddTemplate Zombie_Heavy
+		}
+		
+		War_Giant_Medic_Shield
+		{
+			Class Medic
+			Name "Giant Riot Shield Medic"
+			Skill Expert
+			Health 4500
+			ClassIcon medic_shield_lite
+			Item "TF_WEAPON_MEDIGUN"
+			Item "Flatliner"
+			Item "dec2014 Surgeon's Shako"
+			Item "The Colonel's Coat"
+			Attributes SpawnWithFullCharge
+			Attributes ProjectileShield
+			Attributes IgnoreEnemies
+			Attributes MiniBoss
+			CharacterAttributes
+			{
+				"increase buff duration" 19
+				"bot medic uber deploy delay duration" 900
+				"move speed penalty" 0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_MEDIGUN"
+				"heal rate bonus" 200
+			}
+			Template Zombie_Medic
+		}
+		
+		////////////////////////////////////////////////////////////////////////////
+		///////////////////////			Universe bots			////////////////////
+		////////////////////////////////////////////////////////////////////////////
+		
+		//A speedy Scout with a Bat Saber.
+		Universe_Scout
+		{
+			Class Scout
+			Skill Expert
+			Name "Voyage Scout"
+			ClassIcon scout_bat_nys
+			Attributes DisableDodge
+			WeaponRestrictions MeleeOnly
+			Item "Batsaber"
+			Item "Cadet Visor"
+			Item "Speedster's Spandex"
+			UseHumanModel 2
+			CharacterAttributes
+			{
+				"mult flag carrier move speed" 1.34
+			}
+		}
+		//A VERY fast-firing Fury pyro. Dangerous up close with crits!
+		Universe_Pyro_Fury_Spammer
+		{
+			Class Pyro
+			Skill Expert
+			Name "Comet Pyro"
+			ClassIcon pyro_dragon_fury_swordstone_spammer
+			Item "The Dragon's Fury"
+			Item "The Spectralnaut"
+			Item "The Space Diver"
+			MaxVisionRange 750
+			ItemAttributes
+			{
+				ItemName "The Dragon's Fury"
+				"item_meter_charge_rate" 0.64 //20% faster
+			}
+			UseHumanModel 2
+		}
+		//A mini-giant version of the Axtinguisher-tossing Pyro from Wave 3!
+		//That's right, we're reprising old bots now >:3
+		Universe_Pyro_Douse
+		{
+			Class Pyro
+			Name "Starkiller Pyro"
+			Scale 1.3
+			Health 650
+			WeaponRestrictions SecondaryOnly
+			ClassIcon pyro_jug_axtinguisher_bright
+			Item "Axtinguisher Tosser"
+			Item "The Axtinguisher"
+			Item "The Space Diver"
+			Item "The HazMat Headcase"
+			Attributes SuppressFire
+			AimAt Head
+			ItemAttributes
+			{
+				ItemName "The Axtinguisher"
+				"is_passive_weapon" 1
+				"fire rate bonus" 0.6 //0.48
+			}
+            ShootTemplate
+            {
+                Name PT_RotatingAxe
+                AttachToProjectile 1
+            }
+			FireWeapon
+			{
+				Type "Primary"
+				Cooldown 0.8
+				Duration 0.2
+				Delay 4
+				IfSeeTarget 1
+			}
+			ItemAttributes
+			{
+				ItemName "The HazMat Headcase"
+				"item style override" 1 //Reinforced
+			}
+			CharacterAttributes
+			{
+				"health regen" 0
+				"cancel falling damage" 1
+			}
+			AddTemplate Zombie_Pyro
+		}
+		//A mini-giant Demoman that shoots igniting iron bombs!
+		//Yup, more reprisal!
+		Universe_Demoman_Spammer_Fire
+		{
+			Class Demoman
+			Name "Comet Demo"
+			Health 650
+			Scale 1.3
+			ClassIcon demo_spammer_fire
+			Item "The Iron Bomber"
+			Item "The Sub Zero Suit"
+			Item "The MK 50"
+			ItemAttributes
+			{
+				ItemName "The Iron Bomber"
+				"paintkit_proto_def_index" 232 //Alien Tech
+				"set_item_texture_wear" 0.2
+				"fire rate bonus" 0.85 //Slightly slower than giant version.
+				"faster reload rate" 0
+				"set damagetype ignite" 1
+				"no self effect" 1
+				"projectile trail particle" "rocketpack_exhaust_fire"
+			}
+			CharacterAttributes
+			{
+				"health regen" 0
+				"cancel falling damage" 1
+			}
+			AddTemplate Zombie_Demo
+		}
+		//A mini-giant version of the Short Circuit Engie from wave 1!
+		//Also deals WAY more damage.
+		Universe_Engineer_ShortCircuit
+		{
+			Class Engineer
+			Skill Expert
+			Name "Electron Emitting Engie"
+			Health 650
+			Scale 1.3
+			ClassIcon engineer_shortcircuit_lite //_fast? _blast?
+			MaxVisionRange 750
+			Action FetchFlag [$SIGSEGV]
+			UseMeleeThreatPrioritization 1 [$SIGSEGV]
+			WeaponRestrictions SecondaryOnly
+			Item "The Short Circuit"
+			Item "Phononaut"
+			Item "Life Support System"
+			Item "Rocket Operator"
+			Item "Roboot"
+			ItemAttributes
+			{
+				ItemName "The Short Circuit"
+				"dmg penalty vs players" 10	 	//100 | 75 | 50 | 25
+				"dmg bonus vs buildings" 10 	//now it deals base damage.
+				"fire rate penalty" 3			//0.3s between hits
+				"disable buildings on hit" 2	//electricity could overcharge them, right?
+				"damage blast push" 1.5
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 1.15
+				"damage force reduction" 0.8
+				"airblast vulnerability multiplier" 0.8
+			}
+			UseHumanModel 2
+		}
+		
+		Universe_Giant_Scout
+		{
+			Class Scout
+			Skill Expert
+			Name "Lightspeed Scout"
+			Health 1200
+			ClassIcon scout_giant_fast
+			Attributes MiniBoss
+			Attributes DisableDodge
+			WeaponRestrictions MeleeOnly
+			Item "Batsaber"
+			Item "Cadet Visor"
+			Item "Speedster's Spandex"
+			Item "Fuel Injector"
+			UseHumanModel 2
+			CharacterAttributes
+			{
+				"cancel falling damage" 1
+			}
+		}
+		Universe_Giant_Scout_Ubercan
+		{
+			Class Scout
+			Skill Expert
+			Name "Beyond Lightspeed"
+			Health 1200
+			ClassIcon scout_fast_ubercan
+			Attributes MiniBoss
+			Attributes DisableDodge
+			WeaponRestrictions MeleeOnly
+			Item "Batsaber"
+			Item "Cadet Visor"
+			Item "Speedster's Spandex"
+			Item "Fuel Injector"
+			Item "Battery Canteens"
+			ExtAttr SuppressCanteenUse
+			ItemAttributes
+			{
+				ItemName "Battery Canteens"
+				"ubercharge" 1
+				"powerup charges" 2
+				"powerup duration" 2.5
+			}
+			FireWeapon
+			{
+				Type "Action"
+				Repeats 1
+				IfHealthBelow 1190
+				Delay 0.03
+				Cooldown 1
+			}
+			FireWeapon
+			{
+				Type "Action"
+				IfHealthBelow 600
+				IfSeeTarget 1
+				Delay 0.03
+				Cooldown 0.5 //SPAM that shit
+			}
+			CharacterAttributes
+			{
+				"cancel falling damage" 1
+				"move speed penalty" 0.9
+			}
+			UseHumanModel 2
+		}
+		//A giant meteorshowering soldier!
+		//Highly dangerous even with resistances.
+		Universe_Giant_Soldier_Meteor
+		{
+			Template T_TFBot_Giant_Soldier
+			Name "Giant Starfall Soldier"
+			Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+			Attributes AlwaysCrit //Visual only.
+			Item "Attack Packs"
+			Item "Veteran's Attire"
+			Item "Shortness of Breath"
+			Item "Universal Translator"
+			ClassIcon spell_meteor_swordstonehel //Hellblade <3
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+				"paintkit_proto_def_index" 293
+				"set_item_texture_wear" 0
+				
+				"faster reload rate" 3.5
+				"clip size upgrade atomic" -3
+				"override projectile type extra" "spellmeteorshower"
+			}
+			ItemAttributes
+			{
+				ItemName "Universal Translator"
+				"set item tint rgb" 4345659 //Zepheniah's Greed
+				"attach particle effect" 78
+			}
+			CharacterAttributes
+			{
+				"cancel falling damage" 1
+			}
+			UseHumanModel 2
+		}
+		//A giant demoman with grenades that float in midair past a certain range!
+		Universe_Giant_Demoman_Gravity
+		{
+			Template T_TFBot_Giant_Demo_Burst
+			Name "Beyond Gravity"
+			Item "Blast Defense"
+			Item "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_GRENADELAUNCHER"
+				"fire rate bonus" 0.1
+				"faster reload rate" 0.5
+				"projectile spread angle penalty" 5
+				"clip size upgrade atomic" 7
+				
+				"paintkit_proto_def_index" 225 //cosmic calamity
+				"set_item_texture_wear" 0.2
+				
+				"projectile gravity" -20
+				"projectile acceleration" -900
+				"projectile speed decreased" 0.75 //912
+				"projectile acceleration time" 1
+				"projectile acceleration start time" 0.2
+				"blast radius increased" 1.2 //haha yes
+			}
+			AddTemplate Zombie_Demo
+		}
+		
+		
+		Chief_Resists
+		{
+			//Attributes: highly specific vulnerability values, courtesy of Bazooks.
+			//Increases average damage taken by approximately 1.7x
+			WeaponResist   //Multiplies damage received from weapons listed below
+			{
+				"TF_WEAPON_SCATTERGUN" 1.449
+				"tf_weapon_soda_popper" 1.412
+				"tf_weapon_handgun_scout_primary" 1.63
+				"tf_weapon_pep_brawler_blaster" 1.875
+				"TF_WEAPON_ROCKETLAUNCHER" 1.7
+				"tf_weapon_particle_cannon" 1.7
+				"tf_weapon_flamethrower" 1.5
+				"TF_WEAPON_GRENADELAUNCHER" 1.616
+				"tf_weapon_cannon" 1.54
+				"TF_WEAPON_PIPEBOMBLAUNCHER" 1.5767
+				"tf_weapon_sword" 2
+				"tf_weapon_knife" 1.25
+				// "TF_WEAPON_MINIGUN" 0.85
+				"TF_WEAPON_SHOTGUN_PYRO" 2.5
+				"TF_WEAPON_SHOTGUN_HWG" 2.5
+				"TF_WEAPON_SHOTGUN_SOLDIER" 2.5
+				"TF_WEAPON_SHOTGUN_PRIMARY" 2.5
+				"tf_weapon_sentry_revenge" 2.5
+				"TF_WEAPON_SNIPERRIFLE" 2
+				"tf_weapon_compound_bow" 2
+			}
+		}
+		
+		Universe_Chief_Phase1
+		{
+			Class Soldier
+			Name "Entropy"
+			Skill Expert
+			Health 22000 //Actual health is a lil under 13k; do this * 1.7 = Health keyvalue
+			SpawnTemplate PT_Chief_Title
+			AddTemplate Chief_Resists
+			Tag "unichief"
+			
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Attributes HoldFireUntilFullReload
+			
+			ClassIcon spellbook_lite_chief
+			Item "The Person in the Iron Mask"
+			Item "The Jupiter Jumpers"
+			Item "The Space Bracers"
+			Item "Roboot"
+			Item "Iron Lung"
+			Item "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+			StripItemSlot 1
+			StripItemSlot 2
+			
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+				"paintkit_proto_def_index" 232 //Alien Tech
+				"set_item_texture_wear" 0
+				"faster reload rate" 0
+				"fire rate bonus" 0.5
+				"projectile speed decreased" 0.65
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SPELLBOOK"
+				"single wep deploy time decreased" 0.1
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.2
+				"airblast vulnerability multiplier" 0.2
+				"rage giving scale" 0.15
+				"move speed penalty" 0.5
+				"rocket jump damage reduction" -0.01
+			}
+			FireInput
+			{
+				Target "!self"
+				Action RunScriptCode
+				Param "BossAttack_JumpLaser(self);
+				SINS.ChangeClassIcon(self,`soldier_spammer`)"
+				Delay 1
+				Repeats 1
+			}
+		}
+		Universe_Chief_Phase2
+		{
+			Class Pyro
+			Name "Entropy"
+			Skill Expert
+			Health 22000 //Actual health is a lil under 13k; do this * 1.7 = Health keyvalue
+			SpawnTemplate
+			{
+				Name "PT_TeleportSpot"
+				Origin "0 0 170"
+				Params
+				{
+					"Particlename" "particle_phase2"
+					"Targetname" "dest_phase2"
+				}
+			}
+			AddTemplate Chief_Resists
+			Tag "unichief"
+			
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Attributes HoldFireUntilFullReload
+			
+			DeathSound "ui/halloween_boss_player_becomes_it.wav"
+			
+			ClassIcon spellbook_lite_chief
+			Item "The Person in the Iron Mask"
+			Item "The Jupiter Jumpers"
+			Item "The Space Bracers"
+			Item "Roboot"
+			Item "Iron Lung"
+			Item "TF_WEAPON_SPELLBOOK"
+			AimAt Head
+			
+			CharacterAttributes
+			{
+				"damage force reduction" 0.2
+				"airblast vulnerability multiplier" 0.2
+				"rage giving scale" 0.15
+				"move speed penalty" 0.4
+			}
+			//Causes spawning of bots from wave6_phase3
+			FireInput
+			{
+				Target "chief_phase3_ent"
+				Action Kill
+				Delay 0
+				Repeats 1
+				IfHealthBelow 12000
+			}
+			FireInput
+			{
+				Target "particle_phase2"
+				Action Start
+				Delay 0
+				Repeats 1
+				IfHealthBelow 12000
+			}
+			
+			ChangeAttributes
+			{
+				Name "Flare"
+				Cooldown 10
+				Delay 0
+			}
+			ChangeAttributes
+			{
+				Name "Sting"
+				Cooldown 10
+				Delay 5
+			}
+			EventChangeAttributes
+			{
+				Flare
+				{
+					WeaponRestrictions SecondaryOnly
+					Item "The Flare Gun"
+					Item "The Axtinguisher"
+					MaxVisionRange 1200
+					AddCond
+					{
+						Index 36 //hype!
+						Duration 5
+					}
+					ItemAttributes
+					{
+						ItemName "The Flare Gun"
+						"fire rate bonus" 0.05
+						"projectile spread angle penalty" 5
+						"projectile speed increased" 1
+						"projectile speed decreased" 0.3
+						
+						"mod projectile heat seek power" 25
+						"mod projectile heat aim error" 120
+						"mod projectile heat aim time" 2
+					}
+					FireInput
+					{
+						Target "!self"
+						Action RunScriptCode
+						Param "SINS.ChangeClassIcon(self,`pyro_flare_rain_homing_nys`)"
+						Delay 0.1
+						Repeats 1
+					}
+				}
+				Sting
+				{
+					WeaponRestrictions PrimaryOnly
+					Item "Axtinguisher Tosser"
+					Item "The Axtinguisher"
+					Attributes SuppressFire
+					ItemAttributes
+					{
+						ItemName "Axtinguisher Tosser"
+						"projectile speed decreased" 0.3 //from 0.4
+						"projectile spread angle penalty" 5
+						"mult projectile count" 4
+					}
+					ItemAttributes
+					{
+						ItemName "The Axtinguisher"
+						"is_passive_weapon" 1
+						"fire rate bonus" 0.6 //0.48
+					}
+					ShootTemplate
+					{
+						Name PT_RotatingAxe
+						AttachToProjectile 1
+					}
+					FireWeapon
+					{
+						Type "Primary"
+						Cooldown 0.7
+						Duration 0.1
+						Delay 0.75
+						IfSeeTarget 1
+					}
+					FireInput
+					{
+						Target "!self"
+						Action RunScriptCode
+						Param "SINS.ChangeClassIcon(self,`pyro_jug_axtinguisher_bright`)"
+						Delay 0.1
+						Repeats 1
+					}
+				}
+			}
+		}
+		Universe_Chief_Phase3
+		{
+			Class Engineer
+			Name "Entropy"
+			Skill Expert
+			Health 30000 //Actual health is ~17.6k; do this * 1.7 = Health keyvalue
+			SpawnTemplate
+			{
+				Name "PT_TeleportSpot"
+				Origin "0 0 170"
+				Params
+				{
+					"Particlename" "particle_phase3"
+					"Targetname" "dest_phase3"
+				}
+			}
+			AddTemplate Chief_Resists
+			Tag "unichief_final"
+			
+			Action FetchFlag
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Attributes HoldFireUntilFullReload
+			
+			ClassIcon spellbook_lite_chief
+			Item "The Person in the Iron Mask"
+			Item "The Jupiter Jumpers"
+			Item "The Space Bracers"
+			Item "Roboot"
+			Item "Iron Lung"
+			Item "Light of Miquella"
+			Item "TF_WEAPON_SPELLBOOK"
+			
+			DeathSound "misc/halloween/spell_spawn_boss_disappear.wav"
+			SpawnTemplate PT_Chief_FinalAttack
+			
+			ItemAttributes
+			{
+				ItemName "Light of Miquella"
+				"fire rate bonus" 0.1
+				"faster reload rate" 0
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.2
+				"airblast vulnerability multiplier" 0.2
+				"rage giving scale" 0.15
+				"move speed penalty" 0.4
+				"health from healers increased" 6 //50+(6*274) at max rate, 50+(6*91.3) at base rate
+			}
+			
+			Spell
+			{
+				Delay 6
+				Cooldown 15
+				Type "Healing Aura"
+				IfHealthAbove 8000 //Forgiveness and anti-edge case scenario where he can heal through the final damage taken.
+			}
+			
+			//Causes spawning of bots from wave6_phase3
+			FireInput
+			{
+				Target "chief_phase4_ent"
+				Action Kill
+				Delay 0
+				Repeats 1
+				IfHealthBelow 18000
+			}
+			FireInput
+			{
+				Target "particle_phase3"
+				Action Start
+				Delay 0
+				Repeats 1
+				IfHealthBelow 18000
+			}
+			FireInput
+			{
+				Target "finalattack_relay"
+				Action Trigger
+				Delay 0.1
+				Repeats 1
+				IfHealthBelow 10000
+			}
+			FireInput
+			{
+				Target "death_relay"
+				Action Trigger
+				Repeats 1
+				Delay 0
+				IfHealthBelow 10
+			}
+		}
+	}
+	
+	CustomWeapon
+	{
+		"Caber Toss"
+		{
+			OriginalItemName "TF_WEAPON_GRENADELAUNCHER"
+			"custom projectile model" "models/workshop/weapons/c_models/c_caber/c_caber.mdl"
+			"projectile speed decreased" 0.9
+			"grenade explode on impact" 1
+			"damage penalty" 0.75
+			"custom kill icon" "ullapool_caber_explosion"
+			"custom weapon fire sound" "weapons/shovel_swing.wav"
+		}
+		"Axtinguisher Tosser"
+		{
+			OriginalItemName "The Rescue Ranger"
+			"projectile gravity" -1
+			"projectile speed decreased" 0.4
+			
+			"penetrate teammates" 1
+			"projectile penetration" 1
+			"arrow hit kill time" 0.1
+			// "projectile lifetime" 10
+			// "grenade bounce speed" 0.3
+			
+			"no damage falloff" 1
+			"damage bonus" 1.1 //44
+			"minicrit vs burning player" 1
+			"damage bonus vs burning" 1.5 //66 base damage
+			"fire input on hit" "!self^ExtinguishPlayer^" //extinguish the player
+			
+			"fire rate bonus" 0.6 //0.375
+			"faster reload rate" 0
+			
+			"custom projectile model" "models/weapons/w_models/w_drg_ball.mdl"
+			"custom item model" "models/weapons/c_models/c_axtinguisher/c_axtinguisher_pyro.mdl"
+			"custom weapon fire sound" "common/null.wav"
+			"custom kill icon" "axtinguisher"
+		}
+		"Sun Shooter"
+		{
+			OriginalItemName "The Family Business"
+			"paintkit_proto_def_index" 293
+			"set_item_texture_wear" 0
+			
+			"override projectile type" 2
+			"projectile speed increased" 0.5
+			"mod projectile heat seek power" 40
+			"mod projectile heat aim time" 3
+			"mod projectile heat aim error" 360
+			"mod projectile heat no predict target speed" 1
+			
+			"damage bonus" 15 //90 base damage
+			"damage penalty" 1
+			"faster reload rate" 0
+			"fire rate bonus" 1
+			"projectile spread angle penalty" 6
+			
+			"set damagetype ignite" 1
+			"no self effect" 1
+			
+			//ty Hellblade <3
+			"projectile trail particle"	"spell_fireball_small_blue"
+			"custom projectile model" "models/weapons/w_models/w_drg_ball.mdl"
+			// "explosion particle" "spell_fireball_tendril_parent_blue"
+			"custom impact sound" "=30|misc/halloween/spell_fireball_impact.wav"
+			"custom kill icon" "spellbook_fireball"
+		}
+		//Rocket that homes in briefly, deccelerates after being launched.
+		"Back Rocket"
+		{
+			OriginalItemName "TF_WEAPON_ROCKETLAUNCHER"
+			// "projectile gravity" 400
+			"projectile trail particle"	"eyeboss_projectile"
+			"projectile speed decreased" 0.6
+			"blast dmg to self increased" 0
+			"penetrate teammates" 1
+			"projectile acceleration" -440
+			"projectile acceleration time" 0.5
+			"projectile acceleration start time" 0.5
+			"mod projectile heat seek power" 75
+			"mod projectile heat aim error" 360
+			"mod projectile heat aim time" 3
+			"mod projectile heat no predict target speed" 1
+			// "custom weapon fire sound" "=20|mvm/giant_soldier/giant_soldier_rocket_shoot.wav"
+		}
+		//Flare Gun that shoots slower, gravityless swords.
+		"Fire Sword"
+		{
+			OriginalItemName "The Flare Gun"
+			"projectile gravity" -1
+			"projectile speed decreased" 0.6
+			"penetrate teammates" 1
+			"custom projectile model" "models/weapons/c_models/c_claymore/c_claymore.mdl"
+		}
+		//Grenades with almost no gravity, no speed, a larger blast radius, and some homing.
+		"Grenade Generator"
+		{
+			OriginalItemName "The Iron Bomber"
+			"mod projectile heat seek power" 60
+			"projectile gravity" 5
+			"projectile speed increased" 0.02
+			"blast radius increased" 1.2 //haha yes
+		}
+		//Rocket Launcher used as intro by final boss. Fires meteors (disguised rockets)
+		"Meteor Shooter"
+		{
+			OriginalItemName "TF_WEAPON_ROCKETLAUNCHER"
+			"custom projectile model" "models/props_moonbase/moon_rock_small001.mdl"
+			"custom kill icon" "spellbook_meteor"
+			"projectile trail particle" "peejar_trail_blu"
+			"projectile spread angle penalty" 4
+		}
+		"Microcosm Launcher"
+		{
+			OriginalItemName "The Cow Mangler 5000"
+			"projectile no deflect" 1 //Mangler projectiles 
+			"projectile speed decreased" 0.6
+			"blast dmg to self increased" 0
+			"penetrate teammates" 1
+		}
+		
+		//W6 boss
+		"Light of Miquella"
+		{
+			OriginalItemName "The Pomson 6000"
+			"set item tint rgb" 15132390
+			"projectile trail particle" "rockettrail_airstrike_line"
+			"projectile speed decreased" 0.6
+			"penetrate teammates" 1
+			"dmg bonus vs buildings" 5
+			"dmg penalty vs players" 1.5
+		}
+		"Desperation of Miquella"
+        {
+            OriginalItemName "The Pomson 6000"
+            "set item tint rgb" 15132390
+            "projectile trail particle" "rockettrail_airstrike_line"
+			"fire rate bonus" 0.01
+			"faster reload rate" 0
+            "projectile speed decreased" 0.4
+			"projectile spread angle penalty" 15
+			"penetrate teammates" 1
+			"dmg bonus vs buildings" 5
+			"dmg penalty vs players" 1.5
+        }
+        "Miquella's Piercer"
+        {
+            OriginalItemName "The Pomson 6000"
+            "set item tint rgb" 15132390
+            "projectile trail particle" "rockettrail_airstrike_line"
+			"energy weapon penetration" 1
+			"fire rate bonus" 0.01
+			"faster reload rate" 0
+			"projectile spread angle penalty" 25
+            "projectile speed decreased" 0.4
+            "mod projectile heat seek power" 30
+            "mod projectile heat aim time" 4
+            "mod projectile heat aim error" 360
+			"mod projectile heat no predict target speed" 1
+			"dmg penalty vs players" 1.5
+			"dmg bonus vs buildings" 10
+        }
+        "Miquella's Forgiveness"
+        {
+            OriginalItemName "The Pomson 6000"
+            "set item tint rgb" 15132390
+            "projectile trail particle" "rockettrail_airstrike_line"
+			"fire rate bonus" 1
+			"faster reload rate" 0
+            "projectile speed decreased" 0.4
+			"penetrate teammates" 1
+			"dmg bonus vs buildings" 5
+			"dmg penalty vs players" 1.5
+			"move speed penalty" 0.5
+        }
+        "True Light of Miquella"
+        {
+            OriginalItemName "TF_WEAPON_ROCKETLAUNCHER"
+            "mult projectile scale" 1.75
+            "projectile speed decreased" 0.3
+			"projectile no deflect" 1
+            "mod projectile heat seek power" 60
+            "mod projectile heat aim time" 10
+            "mod projectile heat aim error" 360
+			"mod projectile heat no predict target speed" 1
+            "damage bonus" 3
+            "explosion particle" "fireSmokeExplosion3" //big explosion
+            "blast radius increased" 2
+        }
+	}
+	
+	//W1: afterlife busters
+	Mission
+	{
+		Objective DestroySentries
+		Where spawnbot
+		CooldownTime 45
+		InitialCooldown 6
+		DesiredCount 1
+		BeginAtWave 1
+		RunForThisManyWaves 1
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Class Pyro
+			Attributes IgnoreEnemies
+			Attributes DisableDodge
+			Name "Resurrected Buster"
+			Item "The Coffin Kit"
+			Item "The Ullapool Caber"
+			ItemAttributes
+			{
+				ItemName "The Ullapool Caber"
+				"use original class weapon animations" 1
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0
+			}
+		}
+	}
+	//W2: cult busters
+	Mission
+	{
+		Objective DestroySentries
+		Where spawnbot_scattered
+		CooldownTime 60
+		InitialCooldown 30
+		DesiredCount 1
+		BeginAtWave 2
+		RunForThisManyWaves 1
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Attributes IgnoreEnemies
+			Attributes DisableDodge
+			Name "Monocultuster"
+			CharacterAttributes
+			{
+				"damage force reduction" 0
+				"mod weapon blocks healing" 1
+			}
+		}
+	}
+	//W3: tomb busters
+	Mission
+	{
+		Objective DestroySentries
+		Where spawnbot_scattered
+		CooldownTime 60
+		InitialCooldown 30
+		DesiredCount 1
+		BeginAtWave 3
+		RunForThisManyWaves 1
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Attributes IgnoreEnemies
+			Attributes DisableDodge
+			Name "Sentry-Swallowing Sand Burst"
+			CharacterAttributes
+			{
+				"damage force reduction" 0
+				"mod weapon blocks healing" 1
+			}
+		}
+	}
+	//W4: eldritch busters
+	Mission
+	{
+		Objective DestroySentries
+		Where spawnbot_tunnel
+		Where spawnbot_invasion
+		CooldownTime 50
+		InitialCooldown 20
+		DesiredCount 1
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Attributes IgnoreEnemies
+			Attributes DisableDodge
+			Name "Demon Burster"
+			CharacterAttributes
+			{
+				"damage force reduction" 0
+				"mod weapon blocks healing" 1
+			}
+		}
+	}
+	//W5: war busters
+	Mission
+	{
+		Objective DestroySentries
+		Where spawnbot_tunnel
+		Where spawnbot_invasion
+		CooldownTime 60
+		InitialCooldown 30
+		DesiredCount 1
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Attributes IgnoreEnemies
+			Attributes DisableDodge
+			Name "Trench Clearer"
+			CharacterAttributes
+			{
+				"damage force reduction" 0
+				"mod weapon blocks healing" 1
+			}
+		}
+	}
+	//W6+7: space busters
+	Mission
+	{
+		Objective DestroySentries
+		Where spawnbot_tunnel
+		Where spawnbot_invasion
+		CooldownTime 50
+		InitialCooldown 20
+		DesiredCount 1
+		BeginAtWave 6
+		RunForThisManyWaves 2
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Attributes IgnoreEnemies
+			Attributes DisableDodge
+			Name "Inverted Black Hole Buster"
+			CharacterAttributes
+			{
+				"damage force reduction" 0
+				"mod weapon blocks healing" 1
+			}
+		}
+	}
+	
+	//W3: spy
+	Mission
+	{
+		Objective Spy
+		Where spawnbot_mission_spy
+		CooldownTime 60
+		InitialCooldown 35
+		DesiredCount 2
+		BeginAtWave 3
+		RunForThisManyWaves 1
+		TFBot
+		{
+			Template Tomb_Spy_Mummy
+		}
+	}
+	//W4: spy
+	Mission
+	{
+		Objective Spy
+		Where spawnbot_mission_spy
+		CooldownTime 55
+		InitialCooldown 15
+		DesiredCount 2
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		TFBot
+		{
+			Template Flameborn_Spy_Kunai
+		}
+	}
+	
+	//W5: war sniper, spy
+	Mission
+	{
+		Objective Sniper
+		Where spawnbot_mission_sniper
+		CooldownTime 50
+		InitialCooldown 15
+		DesiredCount 1
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		TFBot
+		{
+			Template War_Sniper
+		}
+	}
+	
+	SpawnTemplate
+	{
+		Name "PT_SpawnPoint"
+		"origin" "3650 430 -17"
+	}
+
+	
+	// PROPOSED CHANGES:
+	
+	//- Remove Plague Medic entirely. Lovely as their concept is, they are just a tad too weird and clunky!
+	//- SC Engies: Primary fire range already reduced, see if it feels fair as Pyro --Needs testing
+	
+	// Wave 1 - Intro to map - Afterlife Atrocities
+	// Payout: $850
+	// Theme: zombieeees. brrr. shoot them.
+	// How Red Will Win: slight crowds that greatly encourage spread damage. Some key targets to take down in first and last subwave.
+	// Firepower is generally concentrated on single bots and not crowds, but can still threaten damage if not dealt with.
+	// Middle subwave will have a slight DPS / bodyblock check with a faster, bulkier target, but less firepower.
+	
+	
+	// Notable counters: sentries (!!!), AoE (!!), ranged in general (!!).
+	// Fist Heavy (yay), Armed Scout (arm), Caber-Tossing Demo (shoottemplate with custom weapon; shorter-range grenade demo),
+	// Stinger-Spewing Medic (crossbow)
+	// Giant Backup Soldier (weaker ver.)
+	// Giant Short Circuits? --> Doesn't work as well due to low range and slow speed; kb is slightly annoying...
+	// ...but what if we make it akin to a Giant Scout that can deal knockback at melee range?
+	// Using unique SC func of orb is tempting, but nerfs projectile classes unnecessarily --> primary fire only
+	
+	// Final subwave: showoff for custom FireWeapon functionality?
+
+	// Subwave 1 - Crowds and key targets
+	// - Backup Bazooka Soldier (minigiant)
+	// - Armed Scout (fast support, good health-bags)
+	
+	// Subwave 2 - Bulk and speed (but not much damage)
+	// - Giant Undead Android Engineer (faster Short Circuit engie, akin to gscout; deals light knockback on hit)
+	// - Stinger-Spewing Medic (good ranged attackers)
+	// - Caber-Tossing Demo (low range but higher damage attackers)
+	
+	//Bleeds over into sub 3
+	// Subwave 3 - Hardest part! Bulk, damage, and key target.
+	// High spam and bulk but slow speed!
+	// - Giant Bazooka Soldier + Death-Defying Medic (infpop qfix)
+	// Support: Fist Heavy (after subwave 1 dies, then after subwave 2, intensify), Armed Scout (when subwave 3's giant spawns)
+	
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target bignet
+			Action RunScriptCode
+			Param "EntFire(`hologram_color_purple_relay`,`Trigger`)
+				IncludeScript(`seel_terror.nut`,getroottable())"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		
+		WaveSpawn
+		{
+			Name "wave1a1"
+			WaitBeforeStarting 20
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 30
+			TFBot
+			{
+				Template After_Giant_Engineer_ShortCircuit_Fast
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1a"
+			Where spawnbot
+			Where spawnbot_invasion
+			Where spawnbot_tunnel
+			RandomSpawn 1
+			WaitBetweenSpawns 5
+			TotalCount 40
+			MaxActive 15
+			SpawnCount 5
+			TotalCurrency 100
+			Squad
+			{
+				NoFormation 1
+				TFBot
+				{
+					Template After_Soldier_Bazooka_Backup
+				}
+				NextSpawnerClone 4
+				TFBot
+				{
+					Template After_Scout_Melee
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1a2"
+			Where spawnbot
+			WaitBeforeStarting 7.5
+			WaitBetweenSpawns 3 //10 spawns, 30 sec
+			TotalCount 30
+			MaxActive 6
+			SpawnCount 3
+			TotalCurrency 60
+			RandomChoice
+			{
+				TFBot
+				{
+					Template After_Scout_Melee
+				}
+				TFBot
+				{
+					Template After_Scout_Melee
+				}
+				TFBot
+				{
+					Template After_Scout_Melee
+				}
+				TFBot
+				{
+					Template After_Scout_Melee
+					Name "Unarmed Scout"
+					Item "TF_WEAPON_FISTS"
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_FISTS"
+						"melee attack rate bonus" 0.625 //5/8th, 0.5s
+						"damage penalty" 0.54 //7/13th, 35 dmg
+					}
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave1b"
+			WaitForAllSpawned "wave1a2"
+			Where spawnbot_tunnel
+			WaitBetweenSpawnsAfterDeath 20
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 60
+			TFBot
+			{
+				Template After_Giant_Engineer_ShortCircuit_Fast
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1b3"
+			WaitForAllDead "wave1a1"
+			WaitForAllSpawned "wave1a"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 140
+			FirstSpawnOutput
+			{
+				Target boss_spawn_relay
+				Action Trigger
+			}
+			DoneOutput
+			{
+				Target limited_spawns_enable_a_relay
+				Action Trigger
+			}
+			Tank
+			{
+				Health 13000
+				Speed 75
+				Name "tankboss"
+				StartingPathTrackNode "tank_path_1"
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1b2"
+			WaitForAllDead "wave1a"
+			WaitBetweenSpawns 3
+			Where spawnbot_invasion
+			TotalCount 15
+			MaxActive 5
+			SpawnCount 3
+			TotalCurrency 105
+			FirstSpawnOutput
+			{
+				Target limited_spawns_disable_a_relay
+				Action Trigger
+			}
+			LastSpawnOutput
+			{
+				Target limited_spawns_enable_a_relay
+				Action Trigger
+			}
+			Squad
+			{
+				NoFormation 1 //Unfortunately squadding them does not work out.
+				TFBot
+				{
+					Template After_Demoman_CaberToss
+				}
+				TFBot
+				{
+					Template After_Medic_Xbow
+				}
+				TFBot
+				{
+					Template After_Medic_Xbow
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1b4"
+			WaitForAllDead "wave1a"
+			WaitBetweenSpawns 3
+			Where spawnbot_tunnel
+			TotalCount 15
+			MaxActive 5
+			SpawnCount 3
+			TotalCurrency 105
+			LastSpawnOutput
+			{
+				Target limited_spawns_enable_a_relay
+				Action Trigger
+			}
+			Squad
+			{
+				NoFormation 1 //Unfortunately squadding them does not work out.
+				TFBot
+				{
+					Template After_Demoman_CaberToss
+				}
+				TFBot
+				{
+					Template After_Medic_Xbow
+				}
+				TFBot
+				{
+					Template After_Medic_Xbow
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1c"
+			WaitForAllDead "wave1a"
+			WaitBeforeStarting 20
+			Where spawnbot_invasion_limited_a //Spawn cond: WaitForAllSpawned Demo/Medic OR WaitForAllDead Tank
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			TotalCurrency 130
+			Squad
+			{
+				TFBot
+				{
+					Template After_Giant_Soldier_Bazooka
+				}
+				TFBot
+				{
+					Template After_Medic_Infpop
+				}
+				TFBot
+				{
+					Template After_Giant_Engineer_ShortCircuit_Fast
+					Tag leave_squad
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1c2"
+			WaitForAllSpawned "wave1c"
+			WaitBeforeStarting 15
+			Where spawnbot_tunnel
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			TotalCurrency 100
+			Squad
+			{
+				TFBot
+				{
+					Template After_Giant_Soldier_Bazooka
+				}
+				TFBot
+				{
+					Template After_Medic_Infpop
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "Support"
+			WaitBeforeStarting 20
+			Where spawnbot_tunnel
+			Where spawnbot_invasion
+			WaitBetweenSpawns 15
+			TotalCount 20
+			MaxActive 2
+			SpawnCount 1
+			Support Limited
+			TotalCurrency 20
+			RandomChoice
+			{
+				TFBot
+				{
+					Template After_Heavy_Fist
+				}
+				TFBot
+				{
+					Template After_Heavy_Fist
+				}
+				TFBot
+				{
+					Template After_Heavy_Fist
+				}
+				TFBot
+				{
+					Template After_Heavy_Fist
+					ItemAttributes
+					{
+						ItemName "Ghastly Gibus 2010"
+						"item style override" 0
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave1b2"
+			Where spawnbot_scattered
+			WaitBetweenSpawns 8
+			TotalCount 30
+			MaxActive 3
+			SpawnCount 2
+			Support Limited
+			RandomChoice
+			{
+				TFBot
+				{
+					Template After_Heavy_Fist
+				}
+				TFBot
+				{
+					Template After_Heavy_Fist
+				}
+				TFBot
+				{
+					Template After_Heavy_Fist
+				}
+				TFBot
+				{
+					Template After_Heavy_Fist
+					ItemAttributes
+					{
+						ItemName "Ghastly Gibus 2010"
+						"item style override" 2
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave1a"
+			Where spawnbot_limited_a //real spawn cond: WaitForAllSpawned wave1b2 or wave1b4 
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 6
+			TotalCount 30
+			MaxActive 5
+			SpawnCount 2
+			Support Limited
+			RandomChoice
+			{
+				TFBot
+				{
+					Template After_Engineer_Shotgun
+				}
+				TFBot
+				{
+					Template After_Engineer_Shotgun
+				}
+				TFBot
+				{
+					Template After_Engineer_Shotgun
+				}
+				TFBot
+				{
+					Template After_Engineer_Shotgun
+					Item "dec2014 engineer_seal"
+				}
+			}
+		}
+	}
+	
+	// Wave 2 - More advanced bots - Cultist Calamity: fevered followers of the Monocultus
+	// Payout: $900
+	// Still basic bots but with a cultish theme, for MONOCULUS! Use humans!
+	// Flesh Gauntlet (zombie), Necrotic Summoner Medic (qfix),
+	// Spell-casting Medic (heal spell), 
+	// Monocultus Soldier (burst fire? slower burst fire? charged?)
+	// Giant Summonoculus Demoman (uses Monoculus spell), Giant Monocultus Soldier
+	
+	// Throughout, per subwave: 1-2 high-priority targets with slight bomb pressure.
+	// - Flesh Gauntlet + Necromancer Medic (superheal)
+	
+	// Subwave 1: mid-range effectiveness, and immediately set the tone.
+	// - Giant Monocultus Demo (loch, 0.5x fire and reload rate)
+	// - Monocultus Bowman (1/4 jarate huntsman, slower projspeed, attach Jarate prop to arrow!)
+	
+	// Subwave 2: longer range; time to strafe nicely!
+	// - Giant Tri-Burst Soldier
+	// - Giant Direct Tri-Burst Soldier + Kritz Medic
+	// - Monocultus Pyro (attempts to flank)
+	
+	// Subwave 3: single target with healers; a trickier giant heavy!
+	//- Monocultus Leader (gheavy with "permanent" Monoculus spell up)
+	//	Monocultus Medic  (regular ol' qfix medics. no weirdness, keep it snappy.)
+	
+	// - Support: Monocultus Follower (soldier)
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target bignet
+			Action RunScriptCode
+			Param "
+			EntFire(`bombpath_centerleft_relay`,`Trigger`)
+			EntFire(`hologram_color_purple_relay`,`Trigger`)
+			IncludeScript(`seel_terror.nut`,getroottable())"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		//Used to filter out any other bots except the chief for flag 2.
+		SpawnTemplate PT_FilterChief
+		
+		WaveSpawn
+		{
+			Name "wave2a1"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 50
+			TFBot
+			{
+				Template Cult_Giant_Demoman_Loch
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave2a"
+			WaitBeforeStarting 12
+			Where spawnbot_invasion
+			TotalCount 1 
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 50
+			TFBot
+			{
+				Template Cult_Giant_Demoman_Loch
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a3"
+			WaitBeforeStarting 24
+			Where spawnbot_tunnel
+			TotalCount 1 
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 50
+			TFBot
+			{
+				Template Cult_Giant_Demoman_Loch
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a2"
+			Where spawnbot
+			Where spawnbot_invasion
+			RandomSpawn 1 //Evenly spread
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 5
+			TotalCount 30
+			MaxActive 12
+			SpawnCount 5
+			TotalCurrency 120
+			Squad
+			{
+				NoFormation 1 //easier than LeaveSquad'ing them tbh
+				NextSpawnerClone 4 //instead of ctrl+D'ing!
+				TFBot
+				{
+					Template Cult_Sniper_Bow
+				}
+				TFBot
+				{
+					Template Cult_Sniper_Bow_Jarate
+					Tag flank_frontleft
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "Support_a"
+			Where spawnbot_tunnel
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 8
+			TotalCount 4
+			MaxActive 3
+			SpawnCount 2
+			TotalCurrency 60
+			Support Limited
+			Squad
+			{
+				TFBot
+				{
+					Template Cult_Heavy_Fist
+				}
+				TFBot
+				{
+					Template Cult_Medic_Superheal
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a_giants"
+			WaitForAllDead "wave2a1"
+		}
+		WaveSpawn
+		{
+			Name "wave2a_giants"
+			WaitForAllDead "wave2a"
+		}
+		WaveSpawn
+		{
+			Name "wave2a_giants"
+			WaitForAllDead "wave2a3"
+		}
+		WaveSpawn
+		{
+			Name "wave2a_giants_and_support"
+			WaitForAllDead "Support_a"
+		}
+		WaveSpawn
+		{
+			Name "wave2a_giants_and_support"
+			WaitForAllDead "wave2a_giants"
+		}
+		
+		WaveSpawn
+		{
+			Name "wave2b1"
+			WaitForAllDead "wave2a"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 40
+			TFBot
+			{
+				Template Cult_Giant_Soldier_Trirocket_Direct
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b"
+			WaitForAllDead "wave2a3"
+			Where spawnbot_invasion
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 40
+			FirstSpawnOutput
+			{
+				Target limited_spawns_disable_a_relay
+				Action Trigger
+			}
+			TFBot
+			{
+				Template Cult_Giant_Soldier_Trirocket_Direct
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b3"
+			WaitForAllDead "wave2b1"
+			Where spawnbot_invasion
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			TotalCurrency 120
+			Squad
+			{
+				TFBot
+				{
+					Template Cult_Giant_Soldier_Trirocket_Direct
+				}
+				TFBot
+				{
+					Template Cult_Medic_Kritz
+				}
+				TFBot
+				{
+					Template Cult_Medic_Kritz
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b3"
+			WaitForAllDead "wave2b"
+			Where spawnbot
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			TotalCurrency 120
+			Squad
+			{
+				TFBot
+				{
+					Template Cult_Giant_Soldier_Trirocket_Direct
+				}
+				TFBot
+				{
+					Template Cult_Medic_Kritz
+				}
+				TFBot
+				{
+					Template Cult_Medic_Kritz
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b_dummy"
+			WaitForAllSpawned "wave2b3"
+			WaitBeforeStarting 45
+			FirstSpawnOutput
+			{
+				Target limited_spawns_enable_a_relay
+				Action Trigger
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b_dummy"
+			WaitForAllDead "wave2b3"
+			FirstSpawnOutput
+			{
+				Target limited_spawns_enable_a_relay
+				Action Trigger
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b2"
+			WaitForAllDead "wave2a2"
+			Where spawnbot_tunnel
+			WaitBetweenSpawns 0.5
+			TotalCount 24
+			MaxActive 9
+			SpawnCount 3
+			TotalCurrency 120
+			Squad
+			{
+				NoFormation 1
+				TFBot
+				{
+					Template Cult_Pyro
+				}
+				TFBot
+				{
+					Template Cult_Pyro
+					Tag flank_frontleft
+				}
+				TFBot
+				{
+					Template Cult_Pyro
+					Tag flank_frontleft
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "Support_b"
+			WaitForAllDead "wave2a_giants_and_support"
+			Where spawnbot_tunnel
+			WaitBetweenSpawns 8
+			TotalCount 4
+			MaxActive 3
+			SpawnCount 2
+			TotalCurrency 50
+			Support Limited
+			Squad
+			{
+				TFBot
+				{
+					Template Cult_Heavy_Fist
+				}
+				TFBot
+				{
+					Template Cult_Medic_Superheal
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c"
+			WaitForAllSpawned "wave2b3"
+			WaitBeforeStarting 10
+			Where spawnbot_limited_a
+			TotalCount 1
+			MaxActive 1
+			TotalCount 1
+			StartWaveOutput
+			{
+				Target "bomb_2"
+				Action "AddOutput"
+				Param "$filter filter_chief"
+			}
+			FirstSpawnOutput
+			{
+				Target "bomb_2"
+				Action Enable
+			}
+			TFBot
+			{
+				Template Cult_Chief_Heavy_Spell
+				FireInput
+				{
+					Target "player"
+					Action $PlaySoundToSelf
+					Param "vo/mvm_another_bomb04.mp3"
+					Delay 0.1
+					Repeats 1
+				}
+				EventChangeAttributes
+				{
+					Default
+					{
+						VoiceCommand [$SIGSEGV]  //Periodacally uses voice commands
+						{
+							Delay 3
+							Cooldown 8
+							Repeats 2
+							Type "Battle cry"
+						}
+						InterruptAction [$SIGSEGV] 
+						{
+							Target "-2120 -100 -180"
+							Delay 1 
+							Repeats 1
+							Duration 0.1
+							WaitUntilDone 1
+							OnDoneChangeAttributes "Taunting"
+						}
+					}
+					Taunting
+					{
+						Taunt
+						{
+							Name "Taunt: Second Rate Sorcery"
+							Delay 0
+							Repeats 1
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b_giants_and_support"
+			WaitForAllDead "wave2b"
+		}
+		WaveSpawn
+		{
+			Name "Support_c"
+			WaitForAllDead "wave2b_giants_and_support"
+			Where spawnbot_tunnel
+			WaitBetweenSpawns 8
+			TotalCount 4
+			MaxActive 3
+			SpawnCount 2
+			TotalCurrency 50
+			Support Limited
+			Squad
+			{
+				TFBot
+				{
+					Template Cult_Heavy_Fist
+				}
+				TFBot
+				{
+					Template Cult_Medic_Superheal
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			Where spawnbot_invasion
+			WaitForAllDead "wave2b2"
+			WaitBetweenSpawns 12
+			TotalCount 10
+			MaxActive 4
+			SpawnCount 2
+			Support 1
+			RandomChoice
+			{
+				TFBot
+				{
+					Template Cult_Soldier_DH
+				}
+				TFBot
+				{
+					Template Cult_Soldier_DH
+				}
+				TFBot
+				{
+					Template Cult_Soldier_DH
+				}
+				TFBot
+				{
+					Template Cult_Soldier_DH
+					Item "Zombie Soldier"
+				}
+				// TFBot
+				// {
+					// Template Cult_Soldier
+				// }
+				// TFBot
+				// {
+					// Template Cult_Soldier
+					// Item "Zombie Soldier"
+				// }
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			Where spawnbot_invasion
+			WaitForAllSpawned "wave2c"
+			WaitBetweenSpawns 6
+			TotalCount 10
+			MaxActive 3
+			SpawnCount 2
+			Support 1
+			TotalCurrency 80
+			RandomChoice
+			{
+				TFBot
+				{
+					Template Cult_Pyro
+				}
+				TFBot
+				{
+					Template Cult_Pyro
+				}
+				TFBot
+				{
+					Template Cult_Pyro
+				}
+				TFBot
+				{
+					Template Cult_Pyro
+					Item "Zombie Pyro"
+				}
+			}
+		}
+	}
+	
+	// Wave 3 - Pumpkinton Patricide - a boss rush where we kill the Pumpkinton family line
+	// Payout: $800
+	
+	// Subwave 1: Sir Pumpkinton I
+	// - Chief Demo: Uses stickybomb launcher + pumpkin bomb spell.
+	
+	// Subwave 2: Sir Pumpkinton II
+	// - Chief Demo: Rapid Fire Demo, shoots out larger pumpkin bombs alongside pipes. (Use tf_generic_bomb?)
+	//	 + Pumpkinton's Patch-Up Medic
+	
+	// Subwave 3: Sir Pumpkinton III (& his forefathers)
+	// - Chief Demo: Sometimes tosses axe. Very brutish.
+	//	 + Support:
+	
+	// - Supporting bots, mainwave: Pumpkinton Widow Engie, Pumpkinton Py (Spy)
+
+	// Wave 4 - Fancy fiery bots - Terrorized Tomb
+	// Payout: $900
+	// Based on Egypt's hieroglyphs, because we love obscure references!
+	// Heavy with his Minigun, a Sapper, two small Sticky Bombs, a large Sticky Bomb, a level one Sentry Gun,
+	// the Backstab symbol, a simplified Demoman face, a crocodile, an Ubersaw, a Soldier (sitting down),
+	// the Team Fortress logo, a hamburger and what could be construed as a Pyro 
+	// Heavy, Spy, Sticky Demo, Engineer, Ubersaw Medic, Soldier, Pyro
+	
+	// Giant Pharaoh Heavy (FamBus), Tomb Torcher Pyro (flare with torch projectiles),
+	// Tomb Trasher Demo (sticky), Tomb Terror Scout (sun on a stick!),
+	// Giant Solar Scholar Medic (syringe), (Sandstorm Tank (lingering damage)?)
+	// Ferocious Nile Crocodile (sniper w/ bleed?), Mummy Masquerade Spy (YER)
+	
+	// Subwave 1: combo of syringe + shotgun, with spamminess as support
+	// - Giant Solar Scholar Medic (Blutsauger)
+	// - Giant Pharaoh Heavy (Family Business / Fists of Steel)
+	// - Tomb Trasher Demo
+	// - Tomb Torturer Demo (minigiant quickiebomb?) 
+	
+	// Subwave 2: weaker version of Lord of Cinder
+	// Commons act as duo together, giant functions as long-range support
+	// - Giant Daylight Douser Pyro -- axtinguisher tosser! minicrits vs burning, and removes flaming effect
+	// - Tomb Torcher Pyro -- spammer Manmelter
+	// - Tomb Terror Scout
+	
+	// Subwave 3
+	// - Deity of Dawn - Scout: functions as initial push in two steps, letting heavy cover more ground
+	// - Deity of Dusk - Heavy: spawns at the same time, can be chipped away at while scout rushes
+	// Support is not too intense to allow more focus on the bosses themselves
+	
+	// Support: Ferocious Nile Crocodile, Mummy Masquerade Spy
+	Wave
+	{
+		SpawnTemplate PT_Deity_Titles
+		InitWaveOutput
+		{
+			Target "hologram_color_purple_relay"
+			Action Trigger
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaveSpawn
+		{
+			Name "wave3a"
+			Where spawnbot
+			WaitBetweenSpawns 25 //only spawn next pair if one dies AFTER this time
+			TotalCount 4
+			MaxActive 3
+			SpawnCount 2
+			TotalCurrency 200
+			FirstSpawnOutput
+			{
+				Target limited_spawns_disable_a_relay
+				Action Trigger
+			}
+			LastSpawnOutput
+			{
+				Target limited_spawns_enable_a_relay
+				Action Trigger
+				Delay 40
+			}
+			DoneOutput
+			{
+				Target limited_spawns_enable_a_relay
+				Action Trigger
+			}
+			Squad
+			{
+				NoFormation 1
+				TFBot
+				{
+					Template Tomb_Giant_Medic_Sun
+				}
+				TFBot
+				{
+					Template Tomb_Giant_Heavy_Business
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a2"
+			Where spawnbot_invasion
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 5
+			TotalCount 15 //5 pairs
+			MaxActive 6
+			SpawnCount 3
+			TotalCurrency 90
+			Squad
+			{
+				NoWaitForFormation 1
+				TFBot
+				{
+					Template Tomb_Demo_Quickie
+				}
+				TFBot
+				{
+					Template Tomb_Demo_Sticky
+				}
+				TFBot
+				{
+					Template Tomb_Demo_Sticky
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a3"
+			Where spawnbot
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 4
+			TotalCount 20 //5 spawns
+			MaxActive 8
+			SpawnCount 4
+			TotalCurrency 80
+			TFBot
+			{
+				Template Tomb_Demo_Sticky
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b"
+			WaitForAllSpawned "wave3a"
+			Where spawnbot_limited_a
+			WaitBetweenSpawns 10
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 120
+			TFBot
+			{
+				Template Tomb_Giant_Pyro_Douse
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b2"
+			WaitForAllDead "wave3a2"
+			Where spawnbot
+			Where spawnbot_tunnel
+			WaitBetweenSpawns 2.5
+			TotalCount 20	//15:5
+			MaxActive 6
+			SpawnCount 4	//3:1 pyro:scout
+			TotalCurrency 80
+			Squad
+			{
+				NoFormation 1
+				TFBot
+				{
+					Template Tomb_Scout_Sun
+				}
+				TFBot
+				{
+					Template Tomb_Pyro_Torch
+				}
+				TFBot
+				{
+					Template Tomb_Pyro_Torch
+				}
+				TFBot
+				{
+					Template Tomb_Pyro_Torch
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b2"
+			WaitForAllDead "wave3a3"
+			Where spawnbot
+			Where spawnbot_tunnel
+			WaitBetweenSpawns 2.5
+			TotalCount 20	//15:5
+			MaxActive 6
+			SpawnCount 4	//3:1 pyro:scout
+			TotalCurrency 80
+			Squad
+			{
+				NoFormation 1
+				TFBot
+				{
+					Template Tomb_Scout_Sun
+				}
+				TFBot
+				{
+					Template Tomb_Pyro_Torch
+				}
+				TFBot
+				{
+					Template Tomb_Pyro_Torch
+				}
+				TFBot
+				{
+					Template Tomb_Pyro_Torch
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3c1"
+			WaitForAllDead "wave3b"
+			Where spawnbot_invasion
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 0
+			FirstSpawnOutput
+			{
+				Target deity_text_relay
+				Action Trigger
+			}
+			TFBot
+			{
+				Template Tomb_Chief_Scout
+				SpawnTemplate PT_Deity_Dawn_dest
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3c"
+			WaitForAllDead "wave3c1"
+			Where spawnbot_invasion
+			WaitBeforeStarting 2
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 100
+			TFBot
+			{
+				Template Tomb_Chief_Scout
+				Health 1600
+				Scale 1.6
+				FireInput
+				{
+					Target !activator
+					Action $TeleportToEntity
+					Param "destination_dawn"
+					Delay 0
+					Repeats 1
+				}
+				ItemAttributes
+				{
+					ItemName "Jungle Wreath"
+					"attach particle effect" 89 //morning glory
+				}
+				CharacterAttributes
+				{
+					"move speed penalty" 0.75 //300 HU/s
+				}
+				AddAttribute
+				{
+					Item "Player"
+					Name "move speed penalty"
+					Value 0.2 //60 HU/s
+					Repeats 1
+					Cooldown 1
+					Delay 0.05
+				}
+				AddAttribute
+				{
+					Item "Player"
+					Name "move speed penalty"
+					Value 0.75 //300 HU/s
+					Repeats 1
+					Cooldown 1
+					Delay 2
+				}
+				AddCond
+				{
+					Delay 0
+					Index 52
+					Duration 2
+				}
+				FireInput
+				{
+					Target player
+					Action $PlaySoundToSelf
+					Param "=35|mvm/mvm_used_powerup.wav"
+					Delay 0
+					Repeats 1
+				}
+				Message
+				{
+					Name "{blue}Deity of Dawn {FBECCB}has been {FFE182}REVIVED{FBECCB}, using their {FFE182}NEW DAWN {FBECCB}Power Up Canteen!"
+					Delay 0
+					Repeats 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3c"
+			WaitForAllDead "wave3b"
+			Where spawnbot_tunnel
+			WaitBeforeStarting 0.2
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 100
+			TFBot
+			{
+				Template Tomb_Chief_Heavy
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave3b2"
+			Where spawnbot_scattered
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 10
+			TotalCount 10
+			MaxActive 4
+			SpawnCount 1
+			Support 1
+			TFBot
+			{
+				Template Tomb_Sniper_Croc
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllSpawned "wave3c1"
+			Where spawnbot_scattered
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 7
+			TotalCount 10
+			MaxActive 3
+			SpawnCount 1
+			Support 1
+			TFBot
+			{
+				Template Tomb_Sniper_Croc
+			}
+		}
+	}
+	
+	
+	// Wave 4 - Forlorn Flameborn - A massive Dark Souls 3 (and Elden Ring (and DS2)) reference!
+	// Payout: $900
+	// Bot ideas: greater focus on giants / commons, moreso swarms and groups for a bit.
+	
+	//Giants: mild threats, but primarily bulky.
+	// "Magus & Congregation":
+		//Giant Dark Hail Engie		Rescue Ranger with mult proj count and spread.
+		//Cleric					Minigiant DH Soldier with Healing Spell, for blast damage
+		//Congregation				Melee Pyros (crits), bulkier than Crocodile Snipers!
+	// Giant Flaming Demoknight: can fire flares. (duh! mix of close-range and longer-range effectiveness)
+	// Giant Repeating Crossbow Medic: decent threat, repeats a bit from wave 1, too!
+	
+	//Commons: higher threat, but not as bulky!
+	
+	// Black Knight (rocket launcher/shotgun: good vs sentries, won't blow self up)
+	//Support:
+	// Kindling Hollow - Pyros, for a bit of bonus pressure and general compatability.
+	// Black Knife Assassin (Kunai Spy :3 : disruptive, good to keep players on toes against easier giants)
+	
+	//UNUSED
+	// Defensive Deacon (uber medic or shield medic! both can work)
+	// Hollow Knight (dh soldier)
+	
+	// Subwave 1: Dark Souls 2 reference! A decent squad, can be kinda scary. Sub1b spawns in some time after the full squad spawns.
+	// Heal spell use: buff up commons.
+	// "Magus & Congregation":
+		//Giant Dark Hail Engie		Rescue Ranger with mult proj count and spread.
+		//Cleric					Minigiant DH Soldier with Healing Spell, for blast damage
+		//Congregation				TDegree Pyros (crits) & Pyros, bulkier than Crocodile Snipers!
+		
+	//Cleric + Congregation (Heavies)
+	
+	// + Tank in between Subwave 1 and 2!
+	//	 Regular tank due to general gimmickiness of wave,
+	//	 and because additional spam might run out of hand ;P
+	//	 shhhh it's not because of scope issues
+	
+	// Subwave 2: Mid-range Giants with suppressive fire!
+	// - Heir of Fire (flame grenade)
+	// - Rugged Hollow (heater heavy)
+	
+	// Subwave 3: Long range, close range. All ranges welcome! The Hounds welcome you!
+	// - Giant Repeating Crossbow Medic (totally not Gael)
+	// - Dogged Hound (Scout, primary)
+	
+	// Subwave 4: Spammier giants for long range, close-range support!
+	// Heal spell use: self-heal, group heal, invuln.
+	// - Lord of Cinder (Swapping Flare Pyro)
+	// - Black Knight (minigiant Swapping Soldier, no spell)
+	
+	// Support: Rekindled Knight (flaming eyelander, no projectile), Kindling Hollow, Black Knife Assassin
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target bignet
+			Action RunScriptCode
+			Param "EntFire(`hologram_color_purple_relay`,`Trigger`)
+			IncludeScript(`seel_terror.nut`,getroottable())"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaveSpawn
+		{
+			Name "wave4a"
+			Where spawnbot
+			TotalCount 10
+			MaxActive 10
+			SpawnCount 10
+			TotalCurrency 100
+			Squad
+			{
+				NoWaitForFormation 1
+				FormationSize 175
+				TFBot
+				{
+					Template Flameborn_Giant_Engineer_Ranger_Burst
+					CharacterAttributes
+					{
+						"max health additive bonus" 3000
+						"health from healers increased" 10
+					}
+				}
+				TFBot
+				{
+					Template Flameborn_Soldier_DH_HealSpell
+				}
+				TFBot
+				{
+					Template Flameborn_Soldier_DH_HealSpell
+				}
+				NextSpawnerClone 7
+				TFBot
+				{
+					Template Flameborn_Pyro_TDegree
+					Tag leave_squad_delay
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a_wait"
+			WaitForAllSpawned "wave4a"
+			FirstSpawnOutput
+			{
+				Target bignet
+				Action RunScriptCode
+				Param "EntFire(`limited_spawns_disable_a_relay`,`Trigger`)
+				EntFire(`limited_spawns_enable_a_relay`,`Trigger`,``,25)"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a_wait"
+			WaitForAllDead "wave4a"
+			DoneOutput
+			{
+				Target limited_spawns_enable_a_relay
+				Action Trigger
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a2"
+			Where spawnbot_invasion
+			WaitBeforeStarting 10
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 40
+			Squad
+			{
+				NoWaitForFormation 1
+				FormationSize 175
+				TFBot
+				{
+					Template Flameborn_Soldier_DH_HealSpell
+				}
+				NextSpawnerClone 3
+				TFBot
+				{
+					Template Flameborn_Heavy
+					Tag leave_squad_delay_short
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a2"
+			Where spawnbot_tunnel
+			WaitBeforeStarting 10
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 40
+			FirstSpawnOutput
+			{
+				Target limited_spawns_disable_c_relay
+				Action Trigger
+			}
+			Squad
+			{
+				NoWaitForFormation 1
+				FormationSize 175
+				TFBot
+				{
+					Template Flameborn_Soldier_DH_HealSpell
+				}
+				NextSpawnerClone 3
+				TFBot
+				{
+					Template Flameborn_Heavy
+					Tag leave_squad_delay_short
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave4a3"
+			WaitBeforeStarting 20
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 60
+			FirstSpawnOutput
+			{
+				Target boss_spawn_relay
+				Action Trigger
+			}
+			Tank
+			{
+				Health 20000
+				Speed 75
+				Name "tankboss"
+				StartingPathTrackNode "tank_path_alt_1"
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave4b"
+			WaitForAllSpawned "wave4a"
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 12
+			Where spawnbot_limited_a
+			Where spawnbot_tunnel_limited_a
+			Where spawnbot_invasion_limited_a
+			RandomSpawn 1
+			TotalCount 12
+			MaxActive 7
+			SpawnCount 3
+			TotalCurrency 180
+			
+			FirstSpawnOutput
+			{
+				Target limited_spawns_disable_b_relay
+				Action Trigger
+			}
+			LastSpawnOutput
+			{
+				Target limited_spawns_enable_b_relay
+				Action Trigger
+				Delay 35
+			}
+			DoneOutput
+			{
+				Target limited_spawns_enable_b_relay
+				Action Trigger
+			}
+			Squad
+			{
+				NoWaitForFormation 1
+				TFBot
+				{
+					Template Flameborn_Giant_Demoman_Cinder
+					CharacterAttributes
+					{
+						"max health additive bonus" 3000
+						"health from healers increased" 10
+					}
+				}
+				TFBot
+				{
+					Template Flameborn_Soldier_DH_HealSpell
+				}
+				TFBot
+				{
+					Template Flameborn_Soldier_DH_HealSpell
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b2"
+			WaitForAllDead "wave4a2"
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 2
+			Where spawnbot
+			TotalCount 18
+			MaxActive 6
+			SpawnCount 2
+			TotalCurrency 60
+			TFBot
+			{
+				Template Flameborn_Heavy
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave4c1"
+			WaitForAllSpawned "wave4b"
+			WaitBeforeStarting 10
+			Where spawnbot_tunnel_limited_b
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 50
+			TFBot
+			{
+				Template Flameborn_Giant_Medic_Crossbow_Burst
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4c"
+			WaitForAllSpawned "wave4b"
+			WaitBeforeStarting 10
+			Where spawnbot_invasion_limited_b
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 50
+			TFBot
+			{
+				Template Flameborn_Giant_Medic_Crossbow_Burst
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4c_wait"
+			WaitForAllSpawned "wave4c"
+			FirstSpawnOutput
+			{
+				Target limited_spawns_enable_c_relay
+				Action Trigger
+				Delay 35
+			}
+			DoneOutput
+			{
+				Target limited_spawns_enable_c_relay
+				Action Trigger
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4c2"
+			WaitForAllSpawned "wave4b2"
+			Where spawnbot_limited_b
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 1.5
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 2
+			TotalCurrency 120
+			TFBot
+			{
+				Template Flameborn_Scout
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4d"
+			WaitForAllDead "wave4a"
+			WaitForAllSpawned "wave4c"
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 15
+			Where spawnbot_limited_c
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 100
+			Squad
+			{
+				NoFormation 1
+				TFBot
+				{
+					Template Flameborn_Giant_Pyro_Combo_HealSpell
+				}
+				TFBot
+				{
+					Template Flameborn_Soldier_Swapper
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4d2"
+			WaitForAllSpawned "wave4c2"
+			Where spawnbot_tunnel_limited_c
+			WaitBetweenSpawns 5
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 200
+			TFBot
+			{
+				Template Flameborn_Soldier_Swapper
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave4a"
+			Where spawnbot
+			WaitBetweenSpawnsAfterDeath 10
+			TotalCount 10
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			TFBot
+			{
+				Template Flameborn_Demo_Knight_Fire
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave4b"
+			Where spawnbot
+			WaitBetweenSpawnsAfterDeath 10
+			TotalCount 10
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			TFBot
+			{
+				Template Flameborn_Demo_Knight_Fire
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave4c"
+			Where spawnbot
+			WaitBetweenSpawnsAfterDeath 10
+			TotalCount 10
+			MaxActive 1
+			SpawnCount 1
+			Support 1
+			TFBot
+			{
+				Template Flameborn_Demo_Knight_Fire
+			}
+		}
+	}
+	
+	// Wave 5 - RED bots comin' in hot - Warzone Wreaking - Payout: $1400
+	
+	//REWORK definitively included bots:
+	//- Marshal Misha (heavy with homing rockets)
+	//- Blimp(s) with RED Buff Banner DH Soldiers
+	//- Canteen bots?
+	//	- Uber Canteen BBox Soldier? :3c
+	//- Uber BigHeal Medics
+	
+	//REWORK layout:
+	// Subwave 1
+	// - 2x Blimp
+	  // - On Death: spawns Super Infantry Scout
+	// - Giant Uber Box Soldier | Colonel Desperation
+	// - Infiltrator Spy
+	//RED Support: Buff Banner DH Soldiers
+
+	// Subwave 2
+	// - Giant Infinite Barrage Soldier | Colonel Cataclysm + Armored Uber Medic
+	// - AIRDROP: Giant Infinite Barrage Soldier
+	// - Combo Pyro (degreaser/panic attack)
+	// - Kritz Banner Soldier (lim support)
+
+	// Subwave 3
+	// - Marshal Misha, w/ giant medic
+	// - Marshal Misha, w/ giant kritz medic
+
+	// SUPPORT:
+	// - Infantry Scout
+	// - Backline Engineer (tele-in)
+	// - Frontline Engineer (Fast Short Circuit mini-giant | Widowmaker/Gunslinger, builds Mini-Sentries)
+	
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target bignet
+			Action RunScriptCode
+			Param "EntFire(`hologram_color_purple_relay`,`Trigger`)
+			EntFire(`spawnpoint_relay_r`,`Trigger`)
+			IncludeScript(`seel_ins.nut`,getroottable())"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		SpawnTemplate PT_AirdropText
+		
+		WaveSpawn
+		{
+			Name "wave5a"
+			Where spawnbot
+			WaitBetweenSpawns 15
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			TotalCurrency 150
+			FirstSpawnOutput
+			{
+				Target limited_spawns_disable_a_relay
+				Action Trigger
+			}
+			LastSpawnOutput
+			{
+				Target limited_spawns_enable_a_relay
+				Action Trigger
+				Delay 35
+			}
+			DoneOutput
+			{
+				Target limited_spawns_enable_a_relay
+				Action Trigger
+			}
+			TFBot
+			{
+				Template War_Giant_Soldier_BBox_Ubercan
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave5a1a"
+			WaitBeforeStarting 2
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 105
+			Tank
+			{
+				SpawnTemplate "PT_BlimpBotTeleDest_A" //destination_air
+				
+                Health 10000
+				Speed 65
+				DisableSmokestack 1
+                ClassIcon blimp2_lite
+				Skin 2 //grey aka colorable
+                MaxTurnRate 50
+                Model "models/bots/boss_bot/boss_blimp.mdl"
+                Gravity 0 //prevents it from yeeting itself down
+				RotatePitch 0 //prevents it from turning upwards
+                DisableTracks 1 //prevents its ghooooost tracks from making noise
+                DisableChildModels 1 //HOPEFULLY prevents the bomb from sticking out
+				EngineLoopSound "npc\combine_gunship\dropship_engine_distant_loop1.wav"
+                PingSound "npc\combine_gunship\ping_search.wav"
+                Name "tank"
+                StartingPathTrackNode "tank_path_blimp_a_1"
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+				OnKilledOutput
+				{
+					Target bomb_2
+					Action Enable
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a1b"
+			WaitBeforeStarting 10
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 105
+			Tank
+			{
+				SpawnTemplate "PT_BlimpBotTeleDest_B" //destination_strike
+				
+                Health 10000
+				Speed 65
+				DisableSmokestack 1
+                ClassIcon blimp2_lite
+				Skin 2 //grey aka colorable
+                MaxTurnRate 50
+                Model "models/bots/boss_bot/boss_blimp.mdl"
+                Gravity 0 //prevents it from yeeting itself down
+				RotatePitch 0 //prevents it from turning upwards
+                DisableTracks 1 //prevents its ghooooost tracks from making noise
+                DisableChildModels 1 //HOPEFULLY prevents the bomb from sticking out
+				EngineLoopSound "npc\combine_gunship\dropship_engine_distant_loop1.wav"
+                PingSound "npc\combine_gunship\ping_search.wav"
+                Name "tank"
+                StartingPathTrackNode "tank_path_blimp_b_1"
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+				OnKilledOutput
+				{
+					Target bomb_2
+					Action Enable
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a_blimps"
+			WaitForAllDead "wave5a1a"
+		}
+		WaveSpawn
+		{
+			Name "wave5a_blimps"
+			WaitForAllDead "wave5a1b"
+		}
+		WaveSpawn
+		{
+			Name "wave5a3"
+			WaitForAllDead "wave5a1a"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 50
+			TFBot
+			{
+				Template War_Giant_Scout
+				FireInput
+				{
+					Target !activator
+					Action $TeleportToEntity
+					Param "destination_air"
+					Delay 0.1
+					Repeats 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a3"
+			WaitForAllDead "wave5a1b"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 50
+			TFBot
+			{
+				Template War_Giant_Scout
+				FireInput
+				{
+					Target !activator
+					Action $TeleportToEntity
+					Param "destination_strike"
+					Delay 0.1
+					Repeats 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b1"
+			WaitForAllSpawned "wave5a"
+			Where spawnbot_limited_a
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			TotalCurrency 150
+			Squad
+			{
+				TFBot
+				{
+					Template War_Giant_Soldier_Barrage
+				}
+				TFBot
+				{
+					Template War_Medic_UberBigHeal
+				}
+				TFBot
+				{
+					Template War_Medic_UberBigHeal
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b"
+			WaitForAllSpawned "wave5b1"
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 25
+			Where spawnbot_airdrop_0
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 100
+			StartWaveOutput
+			{
+				Target "airtext_1"
+				Action Show
+				Delay 8
+			}
+			LastSpawnOutput
+			{
+				Target "airtext_2"
+				Action Show
+			}
+			TFBot
+			{
+				Template War_Giant_Soldier_Barrage
+				Item "The B.A.S.E. Jumper"
+				CharacterAttributes
+				{
+					"cancel falling damage" 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b"
+			WaitForAllSpawned "wave5b1"
+			WaitBeforeStarting 20
+			Where spawnbot_invasion
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			TotalCurrency 150
+			Squad
+			{
+				TFBot
+				{
+					Template War_Giant_Soldier_Barrage
+				}
+				TFBot
+				{
+					Template War_Medic_UberBigHeal
+				}
+				TFBot
+				{
+					Template War_Medic_UberBigHeal
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b3"
+			WaitForAllDead "wave5b1"
+			Where spawnbot_tunnel
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			TotalCurrency 150
+			Squad
+			{
+				TFBot
+				{
+					Template War_Giant_Soldier_Barrage
+				}
+				TFBot
+				{
+					Template War_Medic_UberBigHeal
+				}
+				TFBot
+				{
+					Template War_Medic_UberBigHeal
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b2"
+			WaitForAllSpawned "wave5a"
+			Where spawnbot_invasion_limited_a
+			Where spawnbot_tunnel_limited_a
+			WaitBetweenSpawns 3
+			TotalCount 32
+			MaxActive 8
+			SpawnCount 3
+			TotalCurrency 160
+			TFBot
+			{
+				Template War_Pyro_Combo
+				Attributes AlwaysCrit
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave5b_wait"
+			WaitForAllSpawned "wave5b3"
+			
+			FirstSpawnOutput
+			{
+				Target bignet
+				Action RunScriptCode
+				Param "EntFire(`limited_spawns_disable_b_relay`,`Trigger`)
+				EntFire(`limited_spawns_enable_b_relay`,`Trigger`,``,40)"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b_wait"
+			WaitForAllDead "wave5b"
+			DoneOutput
+			{
+				Target limited_spawns_enable_b_relay
+				Action Trigger
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b_wait"
+			WaitForAllDead "wave5b3"
+			DoneOutput
+			{
+				Target limited_spawns_enable_b_relay
+				Action Trigger
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave5c"
+			WaitForAllSpawned "wave5b3"
+			WaitBeforeStarting 18
+			Where spawnbot_tunnel_limited_b
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			TotalCurrency 200
+			Squad
+			{
+				TFBot
+				{
+					Template War_Giant_Heavy_Rocket
+				}
+				TFBot
+				{
+					Template War_Giant_Medic_Shield
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "RED Support"
+			Support 1
+			TFBot
+			{
+				Class Pyro
+				ClassIcon red2_lite
+			}
+		}
+		WaveSpawn
+		{
+			Name "RED Support"
+			WaitBeforeStarting 16
+			Where spawnbot_reprogrammed
+			WaitBetweenSpawnsAfterDeath 30
+			TotalCount 5
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 0
+			Support Limited
+			TFBot
+			{
+				Template Red_Soldier_Buff
+				InterruptAction
+				{
+					Target "destination_air"
+					AimTarget "destination_air"
+					KillAimTarget 1
+					Delay 5
+					Duration 0.1
+					WaitWhenDone 1
+				}
+				AddCond
+				{
+					Delay 0
+					Index 52
+					Duration 2.5
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "RED Support"
+			WaitBeforeStarting 20
+			Where spawnbot_reprogrammed
+			WaitBetweenSpawnsAfterDeath 30
+			TotalCount 5
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 0
+			Support Limited
+			TFBot
+			{
+				Template Red_Soldier_Buff
+				InterruptAction
+				{
+					Target "destination_strike"
+					AimTarget "destination_strike"
+					KillAimTarget 1
+					Delay 5
+					Duration 0.1
+					WaitWhenDone 1
+				}
+				AddCond
+				{
+					Delay 0
+					Index 52
+					Duration 2.5
+				}
+			}
+		}
+		// WaveSpawn
+		// {
+			// Name "RED Support"
+			// WaitBeforeStarting 4
+			// Where spawnbot_reprogrammed
+			// WaitBetweenSpawns 15
+			// TotalCount 3
+			// MaxActive 3
+			// SpawnCount 1
+			// TotalCurrency 0
+			// Support 1
+			// TFBot
+			// {
+				// Template Red_Pyro_Flaregun
+			// }
+		// }
+		WaveSpawn
+		{
+			Name "Support"
+			Support 1
+			TFBot
+			{
+				Class Pyro
+				ClassIcon blu2_lite
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a2"
+			Where spawnbot_invasion
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 3.5
+			TotalCount 15
+			MaxActive 5
+			SpawnCount 2
+			TotalCurrency 30
+			Support Limited
+			FirstSpawnOutput
+			{
+				Target gamerules
+				Action RunScriptCode
+				Param "SINS.ChangeIconFlags(`spy`,4)"
+			}
+			DoneOutput
+			{
+				Target gamerules
+				Action RunScriptCode
+				Param "SINS.ChangeIconFlags(`spy`,0)"
+			}
+			TFBot
+			{
+				Template War_Spy
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			Where spawnbot_invasion
+			WaitBeforeStarting 25
+			WaitBetweenSpawnsAfterDeath 45
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 0
+			Support 1
+			TFBot
+			{
+				Template War_Engineer
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllSpawned "wave5b2"
+			Where spawnbot
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 2
+			TotalCount 10
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 0
+			Support 1
+			TFBot
+			{
+				Template War_Scout
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave5b2"
+			Where spawnbot_invasion
+			Where spawnbot_tunnel
+			WaitBetweenSpawns 4
+			TotalCount 10
+			MaxActive 6
+			SpawnCount 2
+			TotalCurrency 0
+			Support 1
+			TFBot
+			{
+				Template War_Scout
+			}
+		}
+	}
+	
+	// Wave 6 - Universal Uncertainty: Entropy
+	// An epic boss fight with multiple phases!
+	
+	// Path is forced on cent-left
+	// Boss functions as "secondary" bomb carrier - might be too tricky on map as short as terrorlict?
+	// Gains a little more max health if team has heavy because minigun go vrrrrr ratatatata
+	
+	// Subwave 1: pre-boss
+	// - Lightspeed Scout (super scout)
+	// - Beyond Gravity (gravityless pill demos)
+	
+	// Subwave 2: boss and onward
+	
+	// Phase 1 - CLASS: SOLDIER
+	// - Cosmic Constant ~ Gravity: Jumpable laser + rapid fire rockets
+	// - SUPPORT:
+	//	 None
+	
+	// Phase 2 - CLASS: PYRO
+	// - New Life ~ Nebula: Flamethrower + Fireball Spell + Projectile Shield
+	// - SUPPORT:
+	//	 SPAWNS FROM INITIAL TELE: Giant Starfall Soldier (charged w/ Meteor spell; crits help indicate what bot it is!)
+	//	 SPAWNS FROM HP-BASED DELAY TELE: Starkiller Pyros, Comet Demos (3 / 3)
+	
+	// Phase 3 - CLASS: ENGINEER
+	// - Limitless Creation ~ Infinity: Rapid Pomson + Healing Spell
+	// - SUPPORT:
+	//	 SPAWNS FROM HP-BASED DELAY TELE: Lightspeed Scout, Starkiller Pyros, Comet Demos (1 / 3 / 3)
+	
+	// Phase "4":
+	// - Final: Universal Certainty ~ Entropy: Slow down, pomson becomes spread. After a few seconds, burn out.
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target bignet
+			Action RunScriptCode
+			Param "EntFire(`hologram_color_purple_relay`,`Trigger`)
+			EntFire(`bombpath_centerright_relay`,`Trigger`)
+			IncludeScript(`seel_terror.nut`,getroottable())
+			IncludeScript(`seel_ins.nut`,getroottable())"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		//APPARENTLY StartWaveOutput doesn't want to trigger this properly. Dastard.
+		WaveSpawn
+		{
+			Name "dummy"
+			WaitBeforeStarting 0.1
+			FirstSpawnOutput
+			{
+				Target "particle_spawn*"
+				Action "Start"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a1"
+			WaitBeforeStarting 2.1
+			StartWaveWarningSound "misc/halloween/spell_teleport.wav"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 15
+			FirstSpawnOutput
+			{
+				Target "particle_spawn*"
+				Action "Stop"
+				Delay 0
+			}
+			TFBot
+			{
+				Template Universe_Giant_Scout_Ubercan
+				FireInput
+				{
+					Target "!self"
+					Action "$TeleportToEntity"
+					Param "dest_spawn"
+					Repeats 1
+					Delay 0.1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a3"
+			WaitForAllDead "wave6a1"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 15
+			FirstSpawnOutput
+			{
+				Target "particle_spawn*"
+				Action Kill
+			}
+			TFBot
+			{
+				Template Universe_Giant_Scout_Ubercan
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a"
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 4
+			WaitBetweenSpawns 12
+			TotalCurrency 100
+			FirstSpawnOutput
+			{
+				Target "bomb_2"
+				Action Enable
+			}
+			TFBot
+			{
+				Template Universe_Giant_Demoman_Gravity
+				Attributes AlwaysCrit
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a"
+			Where spawnbot_invasion
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 12
+			TotalCurrency 100
+			TFBot
+			{
+				Template Universe_Giant_Demoman_Gravity
+				Attributes AlwaysCrit
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a"
+			Where spawnbot_tunnel
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 12
+			TotalCurrency 100
+			TFBot
+			{
+				Template Universe_Giant_Demoman_Gravity
+				Attributes AlwaysCrit
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a2"
+			Where spawnbot
+			Where spawnbot_invasion
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 1.5
+			TotalCount 40
+			MaxActive 16
+			SpawnCount 4
+			TotalCurrency 120
+			Squad
+			{
+				NoFormation 1
+				TFBot
+				{
+					Template Universe_Engineer_ShortCircuit
+				}
+				TFBot
+				{
+					Template Universe_Pyro_Fury_Spammer
+				}
+				TFBot
+				{
+					Template Universe_Pyro_Fury_Spammer
+				}
+				TFBot
+				{
+					Template Universe_Pyro_Fury_Spammer
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6b1"
+			WaitForAllDead "wave6a"
+			Where spawnbot_limited_a
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 100
+			DoneOutput
+			{
+				Target bignet 
+				Action RunScriptCode
+				Param "PopExt.DecrementWaveIconSpawnCount(`spellbook_lite_chief`, 9)"
+			}
+			TFBot
+			{
+				Template Universe_Chief_Phase1
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave6b1"
+			WaitBeforeStarting 3
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 50
+			TFBot
+			{
+				Template Universe_Giant_Soldier_Meteor
+				FireInput
+				{
+					Target "!self"
+					Action $TeleportToEntity
+					Param "chief_teledest"
+					Delay 0.1
+				}
+				FireInput
+				{
+					Target "!self"
+					Action "RunScriptCode"
+					Param "BossSound(`MVM.Robot_Teleporter_Deliver`)"
+					Repeats 1
+					Delay 0.12
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6b2"
+			WaitForAllDead "wave6b1"
+			WaitBeforeStarting 4
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 100
+			DoneOutput
+			{
+				Target bignet 
+				Action RunScriptCode
+				Param "PopExt.DecrementWaveIconSpawnCount(`spellbook_lite_chief`, 9)"
+			}
+			TFBot
+			{
+				Template Universe_Chief_Phase2
+				FireInput
+				{
+					Target "!self"
+					Action $TeleportToEntity
+					Param "chief_teledest"
+					Delay 0.1
+				}
+				FireInput
+				{
+					Target "!self"
+					Action "RunScriptCode"
+					Param "BossSound(`MVM.Robot_Teleporter_Deliver`)"
+					Repeats 1
+					Delay 0.12
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6b3"
+			WaitForAllDead "wave6b2"
+			WaitBeforeStarting 4
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 100
+			TFBot
+			{
+				Template Universe_Chief_Phase3
+				FireInput
+				{
+					Target "!self"
+					Action $TeleportToEntity
+					Param "chief_teledest"
+					Delay 0.1
+				}
+				FireInput
+				{
+					Target "!self"
+					Action "RunScriptCode"
+					Param "BossSound(`MVM.Robot_Teleporter_Deliver`)"
+					Repeats 1
+					Delay 0.12
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllSpawned "wave6b1"
+			Where spawnbot_invasion
+			Where spawnbot_tunnel
+			WaitBeforeStarting 25
+			WaitBetweenSpawns 18
+			TotalCount 50
+			MaxActive 3
+			SpawnCount 1
+			TotalCurrency 50
+			Support 1
+			TFBot
+			{
+				Template Universe_Scout
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6_phase3block"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			PointTemplate
+			{
+				Name "PT_Chief_Phase3Ent"
+			}
+		}
+		
+		//Spawns in phase 2
+		WaveSpawn
+		{
+			Name "wave6_phase3"
+			WaitForAllDead "wave6_phase3block"
+			StartWaveWarningSound "misc/halloween/spell_teleport.wav"
+			WaitBeforeStarting 2
+			Where spawnbot
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 6
+			Support Limited
+			TotalCurrency 60
+			Squad
+			{
+				NoFormation 1
+				NextSpawnerClone 3
+				TFBot
+				{
+					Template Universe_Pyro_Douse
+					FireInput
+					{
+						Target "!self"
+						Action "$TeleportToEntity"
+						Param "dest_phase2"
+						Repeats 1
+						Delay 0
+					}
+				}
+				NextSpawnerClone 3
+				TFBot
+				{
+					Template Universe_Demoman_Spammer_Fire
+					FireInput
+					{
+						Target "!self"
+						Action "$TeleportToEntity"
+						Param "dest_phase2"
+						Repeats 1
+						Delay 0
+					}
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave6_phase4block"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			PointTemplate
+			{
+				Name "PT_Chief_Phase4Ent"
+			}
+		}
+		
+		//Spawns in phase 3
+		WaveSpawn
+		{
+			Name "wave6_phase4"
+			WaitForAllDead "wave6_phase4block"
+			StartWaveWarningSound "misc/halloween/spell_teleport.wav"
+			WaitBeforeStarting 2
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 40
+			TFBot
+			{
+				Template Universe_Giant_Scout
+				FireInput
+				{
+					Target "!self"
+					Action "$TeleportToEntity"
+					Param "dest_phase3"
+					Repeats 1
+					Delay 0.02
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6_phase4"
+			WaitForAllDead "wave6_phase4block"
+			WaitBeforeStarting 2.22
+			WaitBetweenSpawns 0.22
+			Where spawnbot
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 2
+			Support Limited
+			Squad
+			{
+				NoFormation 1
+				TFBot
+				{
+					Template Universe_Pyro_Douse
+					FireInput
+					{
+						Target "!self"
+						Action "$TeleportToEntity"
+						Param "dest_phase3"
+						Repeats 1
+						Delay 0
+					}
+				}
+				TFBot
+				{
+					Template Universe_Demoman_Spammer_Fire
+					FireInput
+					{
+						Target "!self"
+						Action "$TeleportToEntity"
+						Param "dest_phase3"
+						Repeats 1
+						Delay 0
+					}
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "OnlyHereToPrecacheTheIcon"
+			WaitForAllDead "wave6_phase4"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			HideIcon 1
+			TFBot
+			{
+				Class Pyro
+				Name "I should not spawn."
+				ClassIcon pyro_flare_rain_homing_nys
+			}
+		}
+	}
+}
