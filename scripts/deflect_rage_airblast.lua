@@ -1,10 +1,12 @@
-local AMMO_COST = 25
+local AMMO_COST = 0
 local COOLDOWN = 1
 local RAGE_GAIN_PER_PROJECTILE = 10
 
 local DEFLECT_PARTICLE = "ExplosionCore_sapperdestroyed"
+local DEFLECT_AUDIO = "sound/weapons/barret_arm_zap.wav"
+local AIRBLAST_AUDIO = "sound/weapons/barret_arm_zap.wav"
 
-local AIRBLAST_RANGE = 100
+local AIRBLAST_RANGE = 150
 
 local DEFLECTABLE_PROJECTILES = {"tf_projectile_pipe", "tf_projectile_pipe_remote", "tf_projectile_rocket"
 , "tf_projectile_sentryrocket"}
@@ -61,6 +63,8 @@ local function DR_Blast(activator)
 		end
 	end
 
+	activator:PlaySound(AIRBLAST_AUDIO)
+
 	cooldowns[handle] = CurTime() + COOLDOWN
 
 	-- disable attacking while airblast animation plays
@@ -78,7 +82,7 @@ local function DR_Blast(activator)
 		end
 	end
 
-	activator.m_iAmmo[awesomeMagicNumberToGetPrimaryClip - 1] = clip - AMMO_COST
+	activator.m_iAmmo[awesomeMagicNumberToGetPrimaryClip] = clip - AMMO_COST
 
 	local origin = activator:GetAbsOrigin() + Vector(0, 0, 50)
 	local eyeAngles = getEyeAngles(activator)
@@ -96,9 +100,24 @@ local function DR_Blast(activator)
 	local bonusRage = 0
 	for _, ent in pairs(ents.FindInSphere(trace.HitPos, AIRBLAST_RANGE)) do
 		if _DEFLECTABLE_INDEX[ent.m_iClassname] then
-			util.ParticleEffect(DEFLECT_PARTICLE, ent:GetAbsOrigin())
+			-- util.ParticleEffect(DEFLECT_PARTICLE, ent:GetAbsOrigin())
+			local deflectParticle = ents.CreateWithKeys("info_particle_system", {
+				effect_name = DEFLECT_PARTICLE,
+				start_active = 1,
+				flag_as_weather = 0,
+			}, true, true)
+			deflectParticle:SetAbsOrigin(ent:GetAbsOrigin())
+			deflectParticle:Start()
+
+			activator:PlaySound(DEFLECT_AUDIO)
+
 			ent:Remove()
+
 			bonusRage = bonusRage + RAGE_GAIN_PER_PROJECTILE
+
+			timer.Simple(1, function()
+				deflectParticle:Remove()
+			end)
 		end
 	end
 
@@ -117,7 +136,7 @@ function DR_Purchased(_, activator)
 	-- 	activator:GetPlayerItemBySlot(i):SetAttributeValue("mod rage on hit penalty", 0)
 	-- end
 
-	local rage = 0
+	local rage = 1
 
 	local held = false
 

@@ -8,10 +8,13 @@ local RAGE_OVERRIDES_APPLY = {
         activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("Set DamageType Ignite", 5)
     end,
     ["throwable damage"] = function(activator)
-        activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("rocket specialist", 1)
+        activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("dmg from ranged reduced", 0.75)
     end,
     ["tool needs giftwrap"] = function(activator)
-        activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("dmg pierces resists absorbs", 1)
+        activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("weapon spread bonus", 0.5)
+    end,
+    ["allow_halloween_offering"] = function(activator)
+        activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("add cond when active", 7450)
     end
 }
 local RAGE_OVERRIDES_REMOVE = {
@@ -19,10 +22,13 @@ local RAGE_OVERRIDES_REMOVE = {
         activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("Set DamageType Ignite", nil)
     end,
     ["throwable damage"] = function(activator)
-        activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("rocket specialist", nil)
+        activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("dmg from ranged reduced", nil)
     end,
     ["tool needs giftwrap"] = function(activator)
-        activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("dmg pierces resists absorbs", nil)
+        activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("weapon spread bonus", nil)
+    end,
+    ["allow_halloween_offering"] = function(activator)
+        activator:GetPlayerItemBySlot(LOADOUT_POSITION_PRIMARY):SetAttributeValue("weapon spread bonus", 0.5)
     end
 }
 
