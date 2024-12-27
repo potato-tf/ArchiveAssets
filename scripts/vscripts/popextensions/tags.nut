@@ -456,13 +456,17 @@ local popext_funcs = {
      * CUSTOM ATTRIBUTES                                                                                                                                                  *
      * See customattributes.nut for a list of valid custom attributes and what they do                                                                                    *
      *                                                                                                                                                                    *
-     * Example: popext_customattr{attribute = `wet immunity` value = 1}                                                                                                   *
+     * Example: popext_customattr{attribute = `wet immunity`, value = 1}                                                                                                  *
      *                                                                                                                                                                    *
      * If no "weapon" keyvalue is supplied, attributes will be applied to the bots current active weapon only                                                             *
      * You can pass a weapon classname, item index, weapon handle, or english name to the weapon parameter and PopExtUtil.HasItemInLoadout will try to find it on the bot *
      * If it can't find any weapon, it it'll default back to the current active weapon                                                                                    *
      *                                                                                                                                                                    *
      * Example: popext_customattr{weapon = `tf_weapon_scattergun`, attribute = `last shot crits`, value = 1}                                                              *
+	 *                                                                                                                                                                    *
+	 * Inputting either "attribute" or "attr" into the tag is fine, since customattributes.nut refers to the attribute string as "attr"                                   *
+	 *                                                                                                                                                                    *
+	 * Example: popext_customattr{attr = `wet immunity`, value = 1}                                                                                                       *
      **********************************************************************************************************************************************************************/
 
 	popext_customattr = function(bot, args) {
@@ -473,7 +477,10 @@ local popext_funcs = {
 
 		local weapon = wep ? wep : bot.GetActiveWeapon()
 
-		CustomAttributes.AddAttr(bot, args.attribute, args.value, weapon)
+		if ("attr" in args)
+			CustomAttributes.AddAttr(bot, args.attr, args.value, weapon)
+		else
+			CustomAttributes.AddAttr(bot, args.attribute, args.value, weapon)
 	}
 
     /**********************************************************************************************************************************************
@@ -608,7 +615,7 @@ local popext_funcs = {
 		local next_action_point = "next_action_point" in args ? args.next_action_point : ""
 		local desired_distance = "desired_distance" in args ? args.desired_distance : args.duration
 		local stay_time = "stay_time" in args ? args.stay_time : args.repeats
-		local command = "command" in args ? args.command : args.ifhealthbelow
+		local command = "command" in args ? args.command : "attack sentry at next action point"
 
 		local action_point = FindByName(null, point)
 
@@ -718,7 +725,7 @@ local popext_funcs = {
 			if (victim == bot && params.damage > victim.GetHealth()) {
 				SetPropBool(bot, "m_bForcedSkin", true)
 				SetPropInt(bot, "m_nForcedSkin", 1)
-				SetPropInt(player, "m_iPlayerSkinOverride", 1)
+				SetPropInt(bot, "m_iPlayerSkinOverride", 1)
 			}
 		}
 		PopExtTags.TeamSwitchTable.ResetSkin <- function(params) {
@@ -728,7 +735,7 @@ local popext_funcs = {
 			if (b == bot && params.team == TEAM_SPECTATOR) {
 				SetPropBool(bot, "m_bForcedSkin", true)
 				SetPropInt(bot, "m_nForcedSkin", 1)
-				SetPropInt(player, "m_iPlayerSkinOverride", 1)
+				SetPropInt(bot, "m_iPlayerSkinOverride", 1)
 			}
 		}
 	}
@@ -1007,9 +1014,9 @@ local popext_funcs = {
 		bot.GetScriptScope().PlayerThinkTable.HomingProjectileScanner <- function() {
 
 			for (local projectile; projectile = FindByClassname(projectile, "tf_projectile_*");) {
-				if (projectile.GetOwner() != bot || !this.IsValidProjectile(projectile, PopExtUtil.HomingProjectiles)) continue
+				if (projectile.GetOwner() != bot || !Homing.IsValidProjectile(projectile, PopExtUtil.HomingProjectiles)) continue
 				// Any other parameters needed by the projectile thinker can be set here
-				this.AttachProjectileThinker(projectile, speed_mult, turn_power, ignoreDisguisedSpies, ignoreStealthedSpies)
+				Homing.AttachProjectileThinker(projectile, speed_mult, turn_power, ignoreDisguisedSpies, ignoreStealthedSpies)
 			}
 		}
 
@@ -1060,14 +1067,14 @@ local popext_funcs = {
     /*************************************************************************************************
      * CUSTOM WEAPON MODEL                                                                           *
      *                                                                                               *
-     * If no slot argument is supplied, this will be applied to the bots current active weapon       *
+     * If no slot argument is supplied, this will default to slot 0.                                 *
      *                                                                                               *
      * Example: popext_customweaponmodel{ model = `models/player/heavy.mdl`, slot = SLOT_SECONDARY } *
      *************************************************************************************************/
 
 	popext_customweaponmodel = function(bot, args) {
 
-		local wep = "slot" in args ? PopExtUtil.GetItemInSlot(bot, slot.tointeger()) : bot.GetActiveWeapon()
+		local wep = "slot" in args ? PopExtUtil.GetItemInSlot(bot, args.slot) : PopExtUtil.GetItemInSlot(bot, 0)
 
 		wep.SetModelSimple("model" in args ? args.model : args.type)
 	}
@@ -1202,7 +1209,7 @@ local popext_funcs = {
 	 * Applies a warpaint to give a bot a decorated weapon.                                                                                      *
 	 *                                                                                                                                           *
 	 * @param idx int        Warpaint index to apply to the weapon.                                                                              *
-	 * @param slot int?      Slot to apply to paintkit to (Default: Bot's active weapon on spawn).                                               *
+	 * @param slot int?      Slot to apply to paintkit to (Default: Slot 0).                                                                     *
 	 * @param wear flt?      Texture wear to apply to the warpaint (Default: Refers to "set_item_texture_wear", 0.0 if not set).                 *
 	 * @param seed int?      Warpaint seed to use (Default: Refers to "custom_paintkit_seed_lo" and "custom_paintkit_seed_hi", none if not set). *
 	 *                                                                                                                                           *
@@ -1225,60 +1232,76 @@ local popext_funcs = {
 	 * }                                                                                                                                         *
 	 *                                                                                                                                           *
 	 * Implementation note: seeds can be passed as strings or integers on 64-bit servers                                                         *
+	 * (integers would be preferable), but they MUST be passed as strings on 32-bit servers.                                                     *
+	 * Pass seeds as strings if you are uncertain of what version of TF2 you are targeting.                                                      *
 	 *********************************************************************************************************************************************/
 
 	popext_warpaint = function(bot, args) {
-		local weapon = null
-		local idx = args.idx.tointeger()
+
+		local slot = 0
+		// Check if the mission maker specified a slot.
+		if ("slot" in args && args.slot != null)
+			slot = args.slot.tointeger()
+		// If no slot index is provided, use slot 0 as a default.
+		//  We can't use bot.GetActiveWeapon() to guess the slot to apply to, as the bot
+		//   will always have its first slot active pre-spawn if it has any weapons.
 
 		// Get the weapon in the slot provided.
-		if ("slot" in args && args.slot != null) {
-			local slot = args.slot.tointeger()
-
-			local nobreak = true
-			for (local i = 0; i < SLOT_COUNT; ++i) {
-				weapon = GetPropEntityArray(bot, "m_hMyWeapons", i)
-				if (weapon == null || weapon.GetSlot() != slot) continue
-				nobreak = false
-				break
-			}
-			if (weapon == null || nobreak == true) {
-				local e = format("popext_warpaint: Bot '%%s' does not have a weapon in slot %i.", slot)
-				// We must delay the error by 1 tick in order to get the proper bot name.
-				EntFireByHandle(bot, "RunScriptCode",
-					format(@"local e = format(`%s`, GetPropString(self, `m_szNetname`))
-					ClientPrint(null, HUD_PRINTCONSOLE, e)
-					if (!GetListenServerHost()) printl(e)", e)
-				, SINGLE_TICK, null, null)
-				return
-			}
+		local weapon = null
+		local notfound = true
+		for (local i = 0; i < SLOT_COUNT; ++i) {
+			weapon = GetPropEntityArray(bot, "m_hMyWeapons", i)
+			if (weapon == null || weapon.GetSlot() != slot) continue
+			notfound = false
+			break
 		}
-		// If no slot index is provided, use the bot's active weapon.
-		else weapon = bot.GetActiveWeapon()
+		// Throw an error and early return if the weapon in the specified slot could not be
+		//  found.
+		if (notfound) {
+			local e = format("popext_warpaint: Bot '%%s' does not have a weapon in slot %i.", slot)
+			// We must delay the error message by 1 tick in order to get the proper bot name.
+			EntFireByHandle(bot, "RunScriptCode",
+				format(@"local e = format(`%s`, GetPropString(self, `m_szNetname`))
+				ClientPrint(null, HUD_PRINTCONSOLE, e)
+				if (!GetListenServerHost()) printl(e)", e)
+			, SINGLE_TICK, null, null)
+			return
+		}
 
-		// Set paintkit_proto_def_index as a float value (it is set incorrectly by the game).
-		weapon.AddAttribute("paintkit_proto_def_index", casti2f(idx), -1)
+		// Set "paintkit_proto_def_index" by interpreting the index as a float value, as the
+		//  attribute type is set incorrectly by the game.
+		weapon.AddAttribute("paintkit_proto_def_index", casti2f(args.idx.tointeger()), -1)
 
 		// Set item texture wear.
+		//  This must be present or the warpaint will not render, so we set to 0.0 if a
+		//   value is not provided nor already present on the weapon.
 		local wear = "wear" in args ? args.wear.tofloat() : weapon.GetAttribute("set_item_texture_wear", 0.0)
 		weapon.AddAttribute("set_item_texture_wear", wear, -1)
 
+		// Warpaint seeds are controlled by a single 64-bit integer, which is set through two
+		//  32-bit integers interpreted as a float value (for the same reason as the
+		//   warpaint index), which are:
+		//    "custom_paintkit_seed_lo" (the lower bits),
+		//    "custom_paintkit_seed_hi" (the higher bits).
+		// A seed does not need to be provided in order for the warpaint to render.
 		if ("seed" in args) {
-			local seed = args.seed.tostring()
 
 			// Simple operation if we are on 64-bit.
+			//  Split the 64-bit seed provided to two int32 values.
 			if (_intsize_ == 8) {
-				// This will overflow a Squirrel UInt, but we don't care since we only want the bits, the value is irrelevant.
-				seed = seed.tointeger()
+				// This will overflow a Squirrel int as they're signed, but we don't care
+				//  since we only want the bits; the value is irrelevant.
+				local seed = args.seed.tointeger()
 				weapon.AddAttribute("custom_paintkit_seed_lo", casti2f(seed & 0xFFFFFFFF), -1)
 				weapon.AddAttribute("custom_paintkit_seed_hi", casti2f(seed >> 32), -1)
 			}
+
 			// More involved if we are on 32-bit.
 			// DEPRECATED: This will be removed once 32-bit TF2 support is dropped.
 			else {
 				// Decompose a 64-bit decimal seed string in to four 16-bit integers,
 				//  and then compile the resulting integers to two 32 bit integers.
-				seed = seed.tostring()
+				local seed = args.seed.tostring()
 				local strlen = seed.len()
 				local digitstore = array(strlen, 0)
 
@@ -1512,13 +1535,13 @@ local popext_funcs = {
 		//this should be added in globalfixes.nut but sometimes this code tries to run before the table is created
 		if (!("ProjectileThinkTable" in projectile_scope)) projectile_scope.ProjectileThinkTable <- {}
 
-		projectile_scope.ProjectileThinkTable.HomingProjectileThink <- this.HomingProjectileThink
+		projectile_scope.ProjectileThinkTable.HomingProjectileThink <- Homing.HomingProjectileThink
 	}
 
 	function HomingProjectileThink() {
-		local new_target = this.SelectVictim(self)
-		if (new_target != null && this.IsLookingAt(self, new_target))
-			this.FaceTowards(new_target, self, projectile_speed)
+		local new_target = Homing.SelectVictim(self)
+		if (new_target != null && Homing.IsLookingAt(self, new_target))
+			Homing.FaceTowards(new_target, self, projectile_speed)
 	}
 
 	function SelectVictim(projectile) {
@@ -1646,8 +1669,6 @@ local popext_funcs = {
 			uber = 0.0
 		}
 
-		local separator = ""
-
 		//these ones aren't as re-usable as other kv's
 		if (startswith(tag, "popext_homing"))
 		{
@@ -1657,7 +1678,7 @@ local popext_funcs = {
 			tagtable.turn_power <- 1.0
 		}
 
-		tag.find("{") ? separator = "{" : separator = "|"
+		local separator = tag.find("{") ? "{" : "|"
 
 		local splittag = split(tag, separator)
 
@@ -1757,8 +1778,6 @@ local popext_funcs = {
 	}
 
 	function OnScriptHook_OnTakeDamage(params) {
-
-		local scope = params.attacker.GetScriptScope()
 
 		foreach (_, func in this.TakeDamageTable) { func(params) }
 	}

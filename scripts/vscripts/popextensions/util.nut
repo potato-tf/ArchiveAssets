@@ -508,7 +508,18 @@
 				MissionAttributes.RaiseValueError("PlayerAttributes", attrib, "Cannot set string attributes!")
 			else
 			{
-				item == null ? EntFireByHandle(player, "RunScriptCode", format("self.AddCustomAttribute(`%s`, %1.8e, -1)", attrib, value.tofloat()), -1, null, null) : EntFireByHandle(item, "RunScriptCode", format("self.AddAttribute(`%s`, %1.8e, -1); self.ReapplyProvision()", attrib, value.tofloat()), -1, null, null)
+				if (!item)
+					EntFireByHandle(player, "RunScriptCode", format("self.AddCustomAttribute(`%s`, %.2f, -1)", attrib, value.tofloat()), -1, null, null)
+				else
+				if ("CustomWeapons" in player.GetScriptScope())
+				{
+					item.AddAttribute(attrib, value.tofloat(), -1)
+					item.ReapplyProvision()
+				}
+				else
+					EntFireByHandle(item, "RunScriptCode", format("self.AddAttribute(`%s`, %.2f, -1); self.ReapplyProvision()", attrib, value.tofloat()), -1, null, null)
+
+
 				if (attrib in healthattribs) EntFireByHandle(player, "RunScriptCode", "self.SetHealth(self.GetMaxHealth())", -1, null, null)
 			}
 			//add hidden attributes to our custom attribute display
@@ -528,7 +539,7 @@
 		 EntFireByHandle(this.ClientCommand, "Command", format("slot%d", slot + 1), -1, player, player);
 	}
 
-	function Explanation(message, printColor = COLOR_YELLOW, messagePrefix = "Explanation: ", syncChatWithGameText = false, textPrintTime = -1, textScanTime = 0.02) {
+	function DoExplanation(message, printColor = COLOR_YELLOW, messagePrefix = "Explanation: ", syncChatWithGameText = false, textPrintTime = -1, textScanTime = 0.02) {
 		local rgb = this.HexToRgb("FFFF66")
 		local txtent = SpawnEntityFromTable("game_text", {
 			effect = 2,
@@ -630,11 +641,11 @@
 	}
 
 	function Explanation(message, printColor = COLOR_YELLOW, messagePrefix = "Explanation: ", syncChatWithGameText = false, textPrintTime = -1, textScanTime = 0.02) {
-		Explanation.call(PopExtUtil, message, printColor, messagePrefix, syncChatWithGameText, textPrintTime, textScanTime)
+		DoExplanation.call(PopExtUtil, message, printColor, messagePrefix, syncChatWithGameText, textPrintTime, textScanTime)
 	}
 
 	function Info(message, printColor = COLOR_YELLOW, messagePrefix = "Explanation: ", syncChatWithGameText = false, textPrintTime = -1, textScanTime = 0.02) {
-		Explanation.call(PopExtUtil, message, printColor, messagePrefix, syncChatWithGameText, textPrintTime, textScanTime)
+		DoExplanation.call(PopExtUtil, message, printColor, messagePrefix, syncChatWithGameText, textPrintTime, textScanTime)
 	}
 
 	function IsAlive(player) {
@@ -734,6 +745,7 @@
 		SetPropInt(player, "m_afButtonForced", GetPropInt(player, "m_afButtonForced") & ~button); SetPropInt(player, "m_nButtons", GetPropInt(player, "m_nButtons") & ~button)
 	}
 
+	//LEGACY: use IsPointInTrigger instead
 	function IsPointInRespawnRoom(point)
 	{
 		local triggers = []
@@ -761,6 +773,36 @@
 		return trace.hit && trace.enthit.GetClassname() == "func_respawnroom"
 	}
 
+	function IsPointInTrigger(point, classname = "func_respawnroom")
+	{
+		local triggers = []
+		for (local trigger; trigger = FindByClassname(trigger, classname);)
+		{
+			if (classname == "func_respawnroom")
+				trigger.SetCollisionGroup(COLLISION_GROUP_NONE)
+
+			trigger.RemoveSolidFlags(4) // FSOLID_NOT_SOLID
+			triggers.append(trigger)
+		}
+
+		local trace =
+		{
+			start = point,
+			end = point,
+			mask = 0
+		}
+		TraceLineEx(trace)
+
+		foreach (trigger in triggers)
+		{
+			if (classname == "func_respawnroom")
+				trigger.SetCollisionGroup(COLLISION_GROUP_RESPAWNROOMS)
+
+			trigger.AddSolidFlags(FSOLID_NOT_SOLID) // FSOLID_NOT_SOLID
+		}
+
+		return trace.hit && trace.enthit.GetClassname() == classname
+	}
 
 	//assumes user is using the SLOT_ constants
 	function SwitchWeaponSlot(player, slot) {
@@ -834,7 +876,6 @@
 			}
 		}
 
-		if (t) printl(this.GetItemIndex(t))
 		if (t != null) return t
 
 		//didn't find weapon in children, go through m_hMyWeapons instead
@@ -1581,6 +1622,25 @@
 		);
 	}
 
+	function OnWeaponFire(wep, func) {
+
+		if (wep == null) return
+
+		wep.ValidateScriptScope()
+		local scope = wep.GetScriptScope()
+
+		scope.last_fire_time <- 0.0
+
+		scope.ItemThinkTable[format("OnWeaponFire_%d_%d", wep.GetOwner().GetScriptScope().userid, wep.entindex())] <- function() {
+			local fire_time = GetPropFloat(self, "m_flLastFireTime")
+			if (fire_time > last_fire_time) {
+				func.call(scope)
+				last_fire_time = fire_time
+			}
+			return
+		}
+	}
+
 	Events = {
 
 		function OnGameEvent_mvm_wave_complete(params) { PopExtUtil.IsWaveStarted = false }
@@ -1607,6 +1667,7 @@
 		}
 
 		function OnGameEvent_post_inventory_application(params) {
+			if (GetRoundState() == GR_STATE_PREROUND) return
 
 			local player = GetPlayerFromUserID(params.userid)
 
