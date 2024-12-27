@@ -25,7 +25,6 @@
 const EFL_SPAWNER_PENDING = 1048576 // EFL_IS_BEING_LIFTED_BY_BARNACLE
 const EFL_SPAWNER_ACTIVE = 1073741824 //EFL_NO_PHYSCANNON_INTERACTION
 const EFL_SPAWNER_EXPENDED = 33554432 //EFL_DONTBLOCKLOS
-const MAX_WAVESPAWNS_PER_WAVE = 128
 
 local PopulatorEnt = CreateByClassname("info_teleport_destination")
 
@@ -41,36 +40,9 @@ local PopulatorEnt = CreateByClassname("info_teleport_destination")
 
 			if (!player.IsBotOfType(TF_BOT_TYPE)) return
 
-			local scope = player.GetScriptScope()
-
 			local spawner = FindByClassnameNearest("bot_generator", player.GetOrigin(), 256)
 
-			scope.spawner <- GetPropString(spawner, "m_iName")
-			scope.bot_attributes <- BECOME_SPECTATOR_ON_DEATH
-
-			local additional_attributes = 0
-
-			//MVM hack: these keyvalues get removed by mvm logic from bot_generator spawned bots
-			local spawner_keyvalues = {
-				m_bDisableDodge = DISABLE_DODGE,
-				m_bSuppressFire = SUPPRESS_FIRE,
-				m_bRetainBuildings = RETAIN_BUILDINGS,
-				m_iOnDeathAction = REMOVE_ON_DEATH //1 = remove
-			}
-
-			foreach (key, value in spawner_keyvalues)
-				if (NetProps.GetPropInt(spawner, key))
-				{
-					if (key == "m_iOnDeathAction" && NetProps.GetPropInt(spawner, key) == 1)
-						scope.bot_attributes = scope.bot_attributes |~ BECOME_SPECTATOR_ON_DEATH
-
-					additional_attributes = additional_attributes | value
-				}
-
-
-			scope.bot_attributes = scope.bot_attributes | additional_attributes
-
-			EntFireByHandle(player, "RunScriptCode", "self.AddBotAttribute(self.GetScriptScope().bot_attributes)", -1, null, null)
+			player.GetScriptScope().spawner <- GetPropString(spawner, "m_iName")
 		}
 
 		function WaitBetweenSpawnsAfterDeath(params) {
@@ -185,7 +157,7 @@ local PopulatorEnt = CreateByClassname("info_teleport_destination")
 		//PopulatorEnt is a null instance when this is initially called, it is valid by the time another teamplay_round_start event fires, so this works reliably
 		if (!("WaveSchedule" in getroottable()) || PopulatorEnt.IsValid()) return
 
-		WaveArray = "CustomWaveOrder" in WaveSchedule ? WaveSchedule.CustomWaveOrder : array(WaveSchedule.len())
+		("CustomWaveOrder" in WaveSchedule) ? WaveArray = WaveSchedule.CustomWaveOrder : WaveArray = array(WaveSchedule.len())
 
 		foreach(wave, wavespawns in WaveSchedule) {
 
@@ -275,7 +247,7 @@ local PopulatorEnt = CreateByClassname("info_teleport_destination")
 
 						DispatchSpawn(generator)
 
-						generator.AcceptInput("Disable", "", null, null)
+						EntFireByHandle(generator, "Disable", "", -1, null, null)
 
 						generator.ValidateScriptScope()
 
@@ -313,10 +285,10 @@ local PopulatorEnt = CreateByClassname("info_teleport_destination")
 
 									if (!g.IsEFlagSet(EFL_SPAWNER_ACTIVE) && "WaveSpawn" in g.GetScriptScope() && "WaitForAllSpawned" in g.GetScriptScope().WaveSpawn && GetPropString(self, "m_iName") == g.GetScriptScope().WaveSpawn.WaitForAllSpawned) {
 
-										self.AcceptInput("Disable", "", null, null)
+										EntFireByHandle(self, "Disable", "", -1, null, null)
 										g.AddEFlags(EFL_SPAWNER_ACTIVE)
 										g.RemoveEFlags(EFL_SPAWNER_PENDING)
-										g.AcceptInput("Enable", "", null, null)
+										EntFireByHandle(g, "Enable", "", -1, null, null)
 
 									}
 								}
@@ -359,10 +331,10 @@ local PopulatorEnt = CreateByClassname("info_teleport_destination")
 		//no wave number passed, put every wave in an array and put every wavespawn in another array at each wave
 		else {
 
-			// Create an array with each element being another MAX_WAVESPAWNS_PER_WAVE-length array.
-			// If your mission has >MAX_WAVESPAWNS_PER_WAVE wavespawns on a single wave may god help you
+			// Create an array with each element being another 128-length array.
+			// If your mission has >128 wavespawns on a single wave may god help you
 
-			local allwaves = array(GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineMaxWaveCount"), array(MAX_WAVESPAWNS_PER_WAVE,0))
+			local allwaves = array(GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineMaxWaveCount"), array(128,0))
 
 			foreach(i, wave in allwaves)
 			{

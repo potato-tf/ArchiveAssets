@@ -25,33 +25,33 @@ local iMaxEnemyCount = 0
 local iCurrentEnemyCount = 0
 local flWaveProgress = 1
 local hTFOR = Entities.FindByClassname(null,"tf_objective_resource")
-
-::SINS <-
+	
+::SINS <- 
 {
 	Cleanup = function()
 	{
 		// cleanup any persistent changes here
-
+		
 		AddThinkToEnt(hTFOR, null)
 		// keep this at the end
 		if (SINS)
 			delete ::SINS;
 	}
-
+	
 	// mandatory events
 	OnGameEvent_recalculate_holidays = function(_) { if (GetRoundState() == 3) Cleanup() }
 	OnGameEvent_mvm_wave_complete = function(_) { Cleanup() }
-
-
+	
+	
 	DEBUG = false
 	EngageDebugMode = function()
 	{
 		printl("SINS - Debug mode manually engaged!")
 	}
-
-
+	
+	
 	MaxPlayers = MaxClients().tointeger()
-
+	
 	IconsToChangeTable = {}
 	HiddenIcons = {}
 
@@ -73,7 +73,7 @@ local hTFOR = Entities.FindByClassname(null,"tf_objective_resource")
 		for(i; i < 24; i+=1) //Check: and thus, do I end at 24, or 23?
 		{
 			if (i >= 12) two = "2.",i2 = 12;
-
+			
 			local curIconName = GetPropStringArray(hTFOR, "m_iszMannVsMachineWaveClassNames"+two, i-i2)
 			if (curIconName == name)
 				return i;
@@ -86,9 +86,9 @@ local hTFOR = Entities.FindByClassname(null,"tf_objective_resource")
 	FindCountOfIcon = function(name)
 	{
 		local iIconIndex = FindIndexOfIcon(name)
-
+		
 		if (iIconIndex == null) return 0;
-
+		
 		local two = ""
 		local i2 = 0
 		if (iIconIndex >= 12) two = "2.",i2 = 12;
@@ -96,7 +96,7 @@ local hTFOR = Entities.FindByClassname(null,"tf_objective_resource")
 		return iIconCount
 	}
 
-
+	
 	//Returns the flags of the icon with the specified name.
 	//@string iconName : name of the icon to get the flags of.
 	//If the icon is not on the wavebar, returns NULL.
@@ -104,15 +104,15 @@ local hTFOR = Entities.FindByClassname(null,"tf_objective_resource")
 	{
 		local iconIndex = FindIndexOfIcon(iconName)
 		if (iconIndex == null) return null;
-
+		
 		local two = ""
 		local i2 = 0
 		if (iconIndex >= 12) two = "2.",i2 = 12; //Was this dot ever fixed? Getting fixed? Hopefully.
 		local flags = GetPropIntArray(hTFOR, "m_nMannVsMachineWaveClassFlags"+two, iconIndex)
 		return flags
 	}
-
-
+	
+	
 	//Changes icon of specified index on the wavebar to icon with the specified name. Uses parts of lite's hideicons script.
 	//@integer	index	: index of the given icon. Can be determined by counting unique icons in WaveSpawn order.
 	//@string	name	: name of the new icon.
@@ -123,8 +123,8 @@ local hTFOR = Entities.FindByClassname(null,"tf_objective_resource")
 		if (index >= 12) two = "2.",i2 = 12; //Was this dot ever fixed? Getting fixed? Hopefully.
 		SetPropStringArray(hTFOR, "m_iszMannVsMachineWaveClassNames"+two, name, index-i2)
 	}
-
-
+	
+	
 	//Changes only the wavebar icon with the specified name to the icon with the specified new name.
 	//@string	oldName	: name of the icon to change.
 	//@string	newName	: name of the new icon.
@@ -132,12 +132,12 @@ local hTFOR = Entities.FindByClassname(null,"tf_objective_resource")
 	{
 		local iconIndex = FindIndexOfIcon(oldName)
 		if (iconIndex == null) return;
-
+		
 		printf("%s found at %d! Changing to %s...\n",oldName,iconIndex,newName)
 		ChangeIconByIndex(iconIndex,newName)
 	}
-
-
+	
+	
 	//Wrapper that changes the given player's class icon. More convenient than writing it all out.
 	//Does NOT change the wavebar icon.
 	ChangeClassIcon = function(player, name)
@@ -151,17 +151,17 @@ local hTFOR = Entities.FindByClassname(null,"tf_objective_resource")
 	ChangeClassIconAndWavebar = function(player, name)
 	{
 		if (!(player)) return;
-
+		
 		local iconNameOld = GetIconByHandle(player)
 		local iconIndex = FindIndexOfIcon(oldName)
-
+		
 		if (iconIndex == null) return;
-
+		
 		printf("%s found at %d! Changing to %s...\n",iconNameOld,iconIndex,name)
 		ChangeClassIcon(player, name)
 		ChangeIconByIndex(iconIndex,name)
 	}
-
+	
 	//Changes icons of all bots that match the provided tag.
 	//@string	tag				: tag of the bots whose icon should be changed.
 	//@string	iconName		: name of the icon to change to.
@@ -174,17 +174,17 @@ local hTFOR = Entities.FindByClassname(null,"tf_objective_resource")
 			if (player == null) continue
 			if (!player.IsBotOfType(TF_BOT_TYPE)) continue
 			if (!player.HasBotTag(tag)) continue
-
+			
 			local oldIcon = GetIconByHandle(player)
-
+			
 			if (updateWavebarIcon)
 				ChangeIconByIndex(FindIndexOfIcon(oldIcon),iconName)
-
+			
 			if (updateClassIcon)
 				ChangeClassIcon(player,iconName)
 		}
 	}
-
+	
 	//Changes "flags" of the given icon.
 	//@string	iconName	: name of the icon whose flags to change.
 	//@int		flags		: flags to set on the icon. Valid values below.
@@ -193,19 +193,19 @@ local hTFOR = Entities.FindByClassname(null,"tf_objective_resource")
 	ChangeIconFlags = function(iconName,flags)
 	{
 		local iconIndex = FindIndexOfIcon(iconName)
-
+		
 		if (iconIndex == null) return;
-
+		
 		local oldFlags = GetIconFlags(iconName)
 		printf("%s found at %d! Changing its flags from %d to %d...\n",iconName,iconIndex,oldFlags,flags)
-
+		
 		local two = ""
 		local i2 = 0
 		if (iconIndex >= 12) two = "2.",i2 = 12; //Was this dot ever fixed? Getting fixed? Hopefully.
-
+		
 		SetPropIntArray(hTFOR, "m_nMannVsMachineWaveClassFlags"+two, flags, iconIndex-i2)
 	}
-
+	
 	//TODO: finish finding a neat way to do this
 	ToggleIconFlags = function(name,flagsString)
 	{
@@ -228,16 +228,16 @@ local hTFOR = Entities.FindByClassname(null,"tf_objective_resource")
 			}
 		}
 	}
-
+	
 	HideIcon = function(name)
 	{
 		local iIconIndex 				= FindIndexOfIcon(name)
 		local iIconEnemyCount			= FindCountOfIcon(name)
 		local iIconFlags 				= GetIconFlags(name)
 		local iMaxEnemyCountAfterHide 	= iMaxEnemyCount - iIconEnemyCount
-
+		
 		HiddenIcons[name] <- { flags = iIconFlags, count = iIconEnemyCount }
-
+		
 		ChangeIconFlags(name,0)
 		SetPropInt(hTFOR,"m_nMannVsMachineWaveEnemyCount",iMaxEnemyCountAfterHide)
 	}
@@ -252,7 +252,7 @@ local hTFOR = Entities.FindByClassname(null,"tf_objective_resource")
 		iIconFlags 						= HiddenIcons[name].flags
 		local iIconCount 				= HiddenIcons[name].count
 		local iMaxEnemyCountAfterUnhide = iMaxEnemyCount + iIconCount
-
+		
 		ChangeIconFlags(name, HiddenIcons[name].flags)
 		SetPropInt(hTFOR,"m_nMannVsMachineWaveEnemyCount",iMaxEnemyCountAfterUnhide)
 	}
@@ -266,28 +266,28 @@ if (SINS.DEBUG)
 ::IconCountThink <- function()
 {
 	local iCurrentEnemyCount = 0
-
+	
 	local i = 0
 	local two = ""
 	local i2 = 0
 	for(i; i < 24; i+=1)
 	{
 		if (i >= 12) two = "2.",i2 = 12;
-
+		
 		local iFlags = GetPropIntArray(hTFOR, "m_nMannVsMachineWaveClassFlags"+two, i-i2)
 		if (!(iFlags & 1)) continue; //Support is not counted, nor are any that are invisible.
-
+		
 		local iIconCount = GetPropIntArray(hTFOR, "m_nMannVsMachineWaveClassCounts"+two, i-i2)
 		iCurrentEnemyCount = iCurrentEnemyCount + iIconCount
 	}
-
+	
 	iMaxEnemyCount = GetPropInt(hTFOR, "m_nMannVsMachineWaveEnemyCount")
-
+	
 	if(SINS.DEBUG)
 	{
 		ClientPrint(null,4,format("Current enemy count / max enemy count:\n%i / %i",iCurrentEnemyCount,iMaxEnemyCount))
 	}
-
+	
 	flWaveProgress = iCurrentEnemyCount.tofloat() / iMaxEnemyCount.tofloat()
 	return -1
 }
