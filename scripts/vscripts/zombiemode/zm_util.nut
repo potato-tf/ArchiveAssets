@@ -1080,10 +1080,30 @@ const POWERUP_TIME = 30;
 ::DropGascans <- function (user)
 {
 	local scope = user.GetScriptScope().Preserved
-	if (scope.gasheld == 0) return
-	SpawnTemplate("Gascan_Drop",null,user.GetOrigin() + Vector(-8,-8,48))
-	scope.gasheld = (scope.gasheld - 1)
-	if (scope.gasheld > 0) DropGascans(user)
+
+	// =======
+	// fellen: These gas can drops have their props way offset from their parent buttons.
+	//  This is probably a bug in PopExt+, but I'm temporarily patching it here because it's
+	// very gamebreaking.
+	while (scope.gasheld > 0)
+	{
+		SpawnTemplate("Gascan_Drop", null, user.GetOrigin() + Vector(-8, -8, 48))
+		scope.gasheld--
+	}
+
+	EntFireByHandle(FindByClassname(null, "worldspawn"), "RunScriptCode",
+		@"for (local gas; gas = FindByName(gas,""gascan_prop*"");) {
+			gas.SetLocalOrigin(Vector())
+			gas.SetLocalAngles(QAngle(45.0, RandomFloat(0.0, 360.0), 0.0))
+		}",
+	-1.0, null, null)
+	// =======
+
+	// Original code:
+	// if (scope.gasheld == 0) return
+	// SpawnTemplate("Gascan_Drop",null,user.GetOrigin() + Vector(-8,-8,48))
+	// scope.gasheld = (scope.gasheld - 1)
+	// if (scope.gasheld > 0) DropGascans(user)
 }
 ::LastManWarning <- function()
 {
