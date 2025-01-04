@@ -34,7 +34,7 @@ local DEATH_INSULTS = {
 	Heavyweapons = {
 		"Consider playing a more interesting class, %s",
 		"I hope that got you to leave a negative review on the end-of-operation survey, %s",
-		"Keep standing directly infront me, %s, see how that goes next time",
+		"Keep standing directly infront of me, %s, see how that goes next time",
 	},
 	Engineer = {
 		"Build yourself better gamesense, %s",
