@@ -83,10 +83,25 @@ function __potato::OnEntitiesSpawned() {
 	}
 	delete ScriptsBuffer
 
-	// Suppress CVar change notifications for these which are always set by the game for MvM.
+	// MvM-only settings.
 	if (NetProps.GetPropBool(hGamerules, "m_bPlayingMannVsMachine")) {
+		// Suppress CVar change notifications for these which are always set by the game for MvM.
 		Convars.SetValue("mp_tournament", 1)
 		Convars.SetValue("mp_tournament_stopwatch", 0)
+
+		// Spy bots are sometimes incredibly passive because once they finish lurking in a
+		//  hiding spot, they will find a new hiding spot closer to the enemy's spawn.
+		// In MvM, this is a problem because spies will not sap teleporters for the most part
+		//  and will thus never get the chance to intercept players once they end up here.
+		// This behaviour can probably be remedied by making spies to ChangeTo a new
+		//  SpyAttack action once they lose patience with lurking instead of having them seek
+		//  a new hiding spot.
+		// For now, to see if we can make them more aggressive without detouring:
+		//  Spy bots will keep retreating until they find cover; allow them to see all cover.
+		Convars.SetValue("tf_bot_retreat_to_cover_range", 99999.0)
+		//  Make spies to immediately exit cover once they find it.
+		Convars.SetValue("tf_bot_wait_in_cover_max_time", 0.0)
+		Convars.SetValue("tf_bot_wait_in_cover_min_time", 0.0)
 	}
 }
 
