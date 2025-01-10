@@ -253,10 +253,10 @@
 	 * Prints the map fixes applied on the map to player consoles on first mission
 	 * load.
 	 */
+	PrintedMapFixes = false
 	function PrintMapFixes() {
-		if (!TestingServer) return
-		if (Descriptions.len() == 0)
-			return
+		if (!TestingServer || PrintedMapFixes) return
+		if (Descriptions.len() == 0) return
 
 		ClientPrint(null, Constants.EHudNotify.HUD_PRINTCONSOLE,
 			"\n\n== " + MapName + ": VScript map fixes have been applied. ==\nIf you are the map maker, you may wish to consider implementing these changes directly in your map:\n")
@@ -264,17 +264,18 @@
 		foreach (fix in Descriptions)
 			ClientPrint(null, Constants.EHudNotify.HUD_PRINTCONSOLE, " - " + fix + "\n")
 		ClientPrint(null, Constants.EHudNotify.HUD_PRINTCONSOLE, "\n")
+		PrintedMapFixes = true
 	}
 	// Call PrintMapFixes() once for every map on first mission load.
 	// Also auto fixup visualizer rendermodes.
 	BaseEvents = {
 		function OnGameEvent_recalculate_holidays(_) {
 			if (GetRoundState() != Constants.ERoundState.GR_STATE_PREROUND) return
+
 			// Fire on a delay to avoid a code race with map-provided events.
 			EntFireByHandle(::__potato.hWorldspawn, "RunScriptCode",
 				"__potato.MapFixes.TestVisualizers();__potato.MapFixes.PrintMapFixes()",
 			0.5, null, null)
-			delete ::__potato.MapFixes.BaseEvents
 		}
 	}
 
