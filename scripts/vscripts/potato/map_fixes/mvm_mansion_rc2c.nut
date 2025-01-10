@@ -7,8 +7,6 @@ Events <- {
 	function OnGameEvent_recalculate_holidays(_) {
 		if (GetRoundState() != Constants.ERoundState.GR_STATE_PREROUND) return
 
-		FixAllVisualizers()
-
         RegisterFix("Fixed effect_jarate overlay breaking when activating the Dead Ringer.")
         point_ccmd = Entities.CreateByClassname("point_clientcommand")
         effect_jarate = Entities.FindByName(null, "effect_jarate")

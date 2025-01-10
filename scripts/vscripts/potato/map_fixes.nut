@@ -2,18 +2,6 @@
 	// == GENERIC REUSABLE FIXES ==
 
 	/**
-	 * Indiscriminately sets kRenderTransColor on all func_respawnroomvisualizers.
-	 *
-	 * This fixes the issue where sometimes the entity texture will incorrectly render
-	 * behind entities that are spatially behind it relative to the player.
-	 */
-	function FixAllVisualizers() {
-		for (local vis; vis = Entities.FindByClassname(vis, "func_respawnroomvisualizer");)
-			NetProps.SetPropInt(vis, "m_nRenderMode", Constants.ERenderMode.kRenderTransColor)
-		RegisterFix("Added rendermode 1 to func_respawnroomvisualizer.")
-	}
-
-	/**
 	 * Indiscriminately disables all bone followers on the map.
 	 *
 	 * Bone followers are used for server-side physics calculations on some entities
@@ -218,6 +206,36 @@
 		ent.SetSolid(Constants.ESolidType.SOLID_BBOX)
 	}
 
+	/**
+	 * Indiscriminately sets kRenderTransColor on all func_respawnroomvisualizers.
+	 *
+	 * This fixes the issue where sometimes the entity texture will incorrectly render
+	 * behind entities that are spatially behind it relative to the player.
+	 */
+	function FixAllVisualizers() {
+		for (local vis; vis = Entities.FindByClassname(vis, "func_respawnroomvisualizer");)
+			NetProps.SetPropInt(vis, "m_nRenderMode", Constants.ERenderMode.kRenderTransColor)
+		RegisterFix("Added rendermode 1 to func_respawnroomvisualizer.")
+	}
+
+	/**
+	 * Tests if visualizers appear to have custom rendermodes set. If not, sets them to an
+	 * alpha-supporting rendermode.
+	 */
+	function TestVisualizers() {
+		// TODO: Add some manual override for this for future edge cases?
+		//       Probably need to re-do event handling to allow for that.
+
+		local rendermode = 0
+		for (local vis; vis = Entities.FindByClassname(vis, "func_respawnroomvisualizer");)
+			rendermode += NetProps.GetPropInt(vis, "m_nRenderMode")
+
+		// Only do something if every visualizer does not have a rendermode set
+		//  (all are kRenderNormal/0).
+		if (rendermode == 0)
+			FixAllVisualizers()
+	}
+
 	// == TESTING SERVER PRINT FUNCTIONS ==
 
 	/**
@@ -248,12 +266,13 @@
 		ClientPrint(null, Constants.EHudNotify.HUD_PRINTCONSOLE, "\n")
 	}
 	// Call PrintMapFixes() once for every map on first mission load.
+	// Also auto fixup visualizer rendermodes.
 	BaseEvents = {
 		function OnGameEvent_recalculate_holidays(_) {
 			if (GetRoundState() != Constants.ERoundState.GR_STATE_PREROUND) return
-			// Fire on a delay to avoid a code race.
-			EntFireByHandle(::__potato.hWorldspawn,
-				"RunScriptCode", "::__potato.MapFixes.PrintMapFixes()",
+			// Fire on a delay to avoid a code race with map-provided events.
+			EntFireByHandle(::__potato.hWorldspawn, "RunScriptCode",
+				"__potato.MapFixes.TestVisualizers();__potato.MapFixes.PrintMapFixes()",
 			0.5, null, null)
 			delete ::__potato.MapFixes.BaseEvents
 		}
