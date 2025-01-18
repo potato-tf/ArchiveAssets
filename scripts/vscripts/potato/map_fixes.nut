@@ -24,7 +24,7 @@
 					"m_BoneFollowerManager.m_iNumBones", 0)
 			}
 			// Kill the bone followers to free up edicts.
-			EntFireByHandle(follower, "Kill", null, -1, null, null)
+			EntFireByHandle(follower, "Kill", "", -1, null, null)
 		}
 
 		RegisterFix("Added DisableBoneFollowers 1 to prop_dynamic and (monster/npc)_furniture.")
@@ -135,7 +135,7 @@
 	}
 
 	/**
-	 * Creates a no-damage trigger_hurt that blocks building placement.
+	 * Creates a no-damage trigger_hurt.
 	 * Can be used to automatically collect cash if it can drop in an inaccessible location.
 	 *
 	 * @param Vector p1     One corner of the trigger_hurt cuboid.
