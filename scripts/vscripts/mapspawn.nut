@@ -5,9 +5,9 @@
 // We do not use mapspawn.nut for this, as it is a vanilla file that maps can include their
 //  own version of which would overwrite this file.
 
+::ROOT <- getroottable()
 // Potato server namespace.
 ::__potato <- {
-	//ROOT = getroottable()
 
 	MapName = GetMapName()
 	MapName_len = GetMapName().len()
@@ -33,6 +33,15 @@
 		function OnGameEvent_server_cvar(params) {
 			if (params.cvarname != "sv_tags") return
 			UpdateServerTags(params.cvarvalue)
+		}
+
+		function OnGameEvent_recalculate_holidays(_) {
+			if (GetRoundState() != Constants.ERoundState.GR_STATE_PREROUND)
+
+			// TODO: This script should be modified to be integrated better with this file.
+			EntFireByHandle(hWorldspawn,
+				"RunScriptFile", "fb",
+			-1, null, null)
 		}
 	}
 }
@@ -61,6 +70,11 @@ function __potato::OnEntitiesSpawned() {
 
 	// Set TestingServer to true if this is a Potato testing server.
 	UpdateServerTags()
+
+	if (!TestingServer)
+		// Scoreboard mission name formatter.
+		// TODO: Include() needs negation ability to avoid including it separately here.
+		Include("name_format", "potato")
 
 	// Include any buffered tag-dependent scripts now.
 	foreach (fp, include in ScriptsBuffer) {
@@ -129,7 +143,7 @@ function __potato::UpdateServerTags(tags = null) {
  * @param string|array tags?    Tag(s) to test against; all must be satisfied for inclusion to occur (Default: None).
  * @param table scope?          Scope to include the script in (Default: ROOT).
  */
-function __potato::Include(fp, tags = null, scope = null) {
+function __potato::Include(fp, tags = null, scope = ROOT) {
 	if (typeof tags == "string")
 		tags = [tags]
 
@@ -182,27 +196,28 @@ EntFireByHandle(::__potato.hWorldspawn, "RunScriptCode",
 	"::__potato.OnEntitiesSpawned()",
 -1, null, null)
 
-// These scripts are in the game-servers repo, not ArchiveAssets.
-// They should probably become more integrated with this script eventually.
-try IncludeScript("stringtofile.nut") catch (_) {}
-try IncludeScript("contracts.nut") catch (_) {}
-try IncludeScript("vpi/vpi.nut") catch (_) {}
-// The modules here can be found in the "vscripts/potato" folder.
-// They are not dependent on each other.
+if (::__potato.IsSigmod) {
+	// Extended ugrades refund cash exploit fix.
+	::__potato.Include("temp_refund_exploit_fix")
+}
 
-// Temporary refund exploit fix.
-::__potato.Include("temp_refund_exploit_fix")
-
-// Map-specific bug fixes.
-::__potato.Include("map_fixes")
-// Auto-formats the scoreboard mission name.
-// Disabled locally for now as support for SetProp instead of SetClientProp, while existent,
-//  is poor.
-::__potato.Include("name_format", "potato")
 // Disables respawn text on missions with no respawns.
 ::__potato.Include("hide_respawntext")
+// Map-specific bug fixes.
+::__potato.Include("map_fixes")
+// Cosmetic stretching fixes.
+::__potato.Include("vacc_hothand_fix")
 
-// Stricter VScript rules used on the testing servers.
-::__potato.Include("script_rules", "testing")
-// Judging feedback tools used on the testing servers.
-::__potato.Include("judge_feedback", "testing")
+// Testing server VScript debug tools.
+::__potato.Include("debug_tools", "testing")
+// Judging Restrictions.
+::__potato.Include("judging", "judging")
+
+// These scripts are not included in ArchiveAssets.
+// TODO: These scripts should be modified to be integrated better with this file.
+// Contract progress tracker.
+try IncludeScript("contracts.nut") catch (_) {}
+// StringToFile() server syncing.
+try IncludeScript("stringtofile.nut") catch (_) {}
+// VScript-Python interface.
+try IncludeScript("vpi/vpi.nut") catch (_) {}
