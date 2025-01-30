@@ -130,6 +130,14 @@ Events <- {
 
 			// Setup a trigger for each ambient_generic.
 			local soundtrigger = Entities.CreateByClassname("trigger_multiple")
+			// RecomputeBlockers will not see doors that intersect trigger_multiple for
+			//  blocking the nav, as the game assumes that the door is controlled by the
+			//  trigger and can be opened at any time.
+			// Simply modifying the classname is enough to fool this check.
+			// This is necessary because all of the avoids, prefers and blockers on Area 52
+			//  are broken, so the func_door itself is the only thing blocking bots from
+			//  simply pathing through the gate.
+			soundtrigger.KeyValueFromString("classname", "trigger_multiple_sound")
 			soundtrigger.KeyValueFromInt("spawnflags",
 				SF_TRIGGER_ALLOW_CLIENTS|SF_TRIGGER_DISALLOW_BOTS
 			)
@@ -173,7 +181,7 @@ Events <- {
 		}
 	}
 
-	function OnGameEvent_player_spawn(params){
+	function OnGameEvent_player_spawn(params) {
 		local p = GetPlayerFromUserID(params.userid)
 		if (params.team != 0 || p.IsBotOfType(Constants.EBotType.TF_BOT_TYPE)) return
 		// Work around a bug where late joining players will hear map spawned ambient_generics
