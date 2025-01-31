@@ -5,10 +5,12 @@ Events <- {
 
 		RegisterFix("Fixed missing rain weather particles.")
 		// Kill broken rain particles.
+		local tokill = []
 		for (local rain; rain = Entities.FindByClassname(rain, "info_particle_system");) {
 			if (rain.GetName() == "end_pit_destroy_particle") continue
-			EntFireByHandle(rain, "Kill", null, -1, null, null)
+			tokill.push(rain)
 		}
+		foreach (p in tokill) p.Kill()
 
 		// Spawn some Sawmill rain particles.
 		local rain001 = [
@@ -38,10 +40,14 @@ Events <- {
 		}
 
 		RegisterFix("Added the missing centre spawn.")
-		// Properly mark the tank spawn nav square as an invaders' spawn room.
-		MarkAsSpawn(27, Constants.ETFTeam.TF_TEAM_BLUE)
 		// Add missing BLU func_respawnroom.
-		MakeSpawnroom(Vector(-520, -5450, 1063), Vector(-120, -5040, 1263), Constants.ETFTeam.TF_TEAM_BLUE)
+		// Note that since this is done in recalculate_holidays, round start nav
+		//  recalculation has not happened yet so we don't need to manually mark the nav
+		//  below the spawnroom to fix it (as the game will do this for us).
+		local tankspawn = MakeSpawnroom(
+			Vector(-520, -5450, 1063), Vector(-120, -5077, 1263),
+			Constants.ETFTeam.TF_TEAM_BLUE
+		)
 
 		RegisterFix("Fixed cash getting stuck in the centre spawn.")
 		MakeTriggerHurt(Vector(-520, -5450, 1063), Vector(-120, -5040, 1263))
