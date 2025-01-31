@@ -62,20 +62,21 @@
 	 * @param int team			Team to affilate nav square(s) with.
 	 */
 	function MarkAsSpawn(navs, team) {
+		local spawnattrib = Constants.FTFNavAttributeType.TF_NAV_SPAWN_ROOM_RED
 		if (team == Constants.ETFTeam.TF_TEAM_BLUE)
-			team = Constants.FTFNavAttributeType.TF_NAV_SPAWN_ROOM_BLUE
-		else
-			team = Constants.FTFNavAttributeType.TF_NAV_SPAWN_ROOM_RED
+			spawnattrib = Constants.FTFNavAttributeType.TF_NAV_SPAWN_ROOM_BLUE
+
 		if (typeof navs == "array")
 			foreach (nav in navs) {
 				nav = NavMesh.GetNavAreaByID(nav)
-				nav.SetAttributeTF(team)
-				nav.ClearAttributeTF(team)
+				nav.SetAttributeTF(spawnattrib)
+				nav.ClearAttributeTF(Constants.FTFNavAttributeType.TF_NAV_BOMB_CAN_DROP_HERE)
 			}
 		else {
 			navs = NavMesh.GetNavAreaByID(navs)
-			navs.SetAttributeTF(team)
-			navs.ClearAttributeTF(team)
+			printf("SetAttributeTF(%i)\n", spawnattrib)
+			navs.SetAttributeTF(spawnattrib)
+			navs.ClearAttributeTF(Constants.FTFNavAttributeType.TF_NAV_BOMB_CAN_DROP_HERE)
 		}
 	}
 
