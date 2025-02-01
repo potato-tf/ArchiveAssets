@@ -10,5 +10,10 @@ Events <- {
 		
 		RegisterFix("Fixed client prediction errors on the tank barricade.")
 		barricade.SetSolidFlags(Constants.ESolidType.SOLID_NONE)
+
+		RegisterFix("Fixed the forward station breaking on mission swap.")
+		EntityOutputs.AddOutput(Entities.FindByClassname(null, "logic_auto"),
+			"OnMapSpawn", "FrontUpgradeStationL", "Enable"
+		"", -1, -1)
 	}
 }
