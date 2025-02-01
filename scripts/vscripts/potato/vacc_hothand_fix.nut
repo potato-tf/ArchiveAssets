@@ -7,7 +7,7 @@ class StretchFix {
     function KillStretch(player) {
 
         //some missions (trespasser, mobo, bigrock revs) use civilian for players
-        if (player.GetPlayerClass > 9) return
+        if (player.GetPlayerClass() > 9) return
 
         local class_string = this.class_strings[player.GetPlayerClass()]
 
