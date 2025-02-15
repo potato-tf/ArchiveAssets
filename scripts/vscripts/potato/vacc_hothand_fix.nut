@@ -36,11 +36,8 @@
             }
 
     }
-
-    Events = {
-        function OnGameEvent_post_inventory_application(params) {
-            EntFireByHandle(GetPlayerFromUserID(params.userid), "RunScriptCode", "StretchFix.KillStretch(self)", 0.015, null, null)
-        }
+    function OnGameEvent_post_inventory_application(params) {
+        EntFireByHandle(GetPlayerFromUserID(params.userid), "RunScriptCode", "StretchFix.KillStretch(self)", 0.015, null, null)
     }
 }
-__CollectGameEventCallbacks(::__potato.StretchFix.Events)
+__CollectGameEventCallbacks(::__potato.StretchFix)
