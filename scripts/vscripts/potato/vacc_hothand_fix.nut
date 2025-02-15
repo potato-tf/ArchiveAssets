@@ -1,4 +1,4 @@
-class StretchFix {
+::__potato.StretchFix <- {
 
     backpack_model = "models/weapons/c_models/c_medigun_defense/c_medigun_defensepack.mdl"
     itemdef_netprop = "m_AttributeManager.m_Item.m_iItemDefinitionIndex"
@@ -43,4 +43,4 @@ class StretchFix {
         }
     }
 }
-__CollectGameEventCallbacks(StretchFix.Events)
+__CollectGameEventCallbacks(::__potato.StretchFix.Events)
