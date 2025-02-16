@@ -37,7 +37,7 @@
 
     }
     function OnGameEvent_post_inventory_application(params) {
-        EntFireByHandle(GetPlayerFromUserID(params.userid), "RunScriptCode", "StretchFix.KillStretch(self)", 0.015, null, null)
+        EntFireByHandle(GetPlayerFromUserID(params.userid), "RunScriptCode", "__potato.StretchFix.KillStretch(self)", 0.015, null, null)
     }
 }
 __CollectGameEventCallbacks(::__potato.StretchFix)
