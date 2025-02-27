@@ -39,13 +39,7 @@ PopExt.AddRobotTag("bombi_explosion", {
 			if (rocket == null) return
 
 			PopExtUtil.SetDestroyCallback(rocket, function(){
-				local impactPoint = self.GetOrigin()
-				SpawnEntityFromTable("info_particle_system",
-				{
-					origin = impactPoint
-					start_active = 1
-					effect_name = "bombinomicon_burningdebris_halloween"
-				})
+				DispatchParticleEffect("bombinomicon_burningdebris_halloween", self.GetOrigin(), Vector(0,0,0))
 			})
 		})
 	}
