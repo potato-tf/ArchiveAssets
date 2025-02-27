@@ -71,6 +71,9 @@ function __potato::OnEntitiesSpawned() {
 	// Set TestingServer to true if this is a Potato testing server.
 	UpdateServerTags()
 
+	// Enable HL2 20th anniversary radial fog.
+	Include("force_radial_fog")
+
 	if (!TestingServer)
 		// Scoreboard mission name formatter.
 		// TODO: Include() needs negation ability to avoid including it separately here.
