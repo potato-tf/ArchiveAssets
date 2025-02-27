@@ -150,6 +150,43 @@ function MonochromeLogic(_, activator)
 		
 		local curHealth = activator.m_iHealth
 		local damage = damageInfo.Damage
+
+		--anti lava suicide clause.
+		if (damage == 99999.0) then
+			--print("We tripped this clause")
+			damageInfo.Damage = 0
+			damageInfo.DamageType = DMG_GENERIC
+			activator:SetAbsOrigin((Vector(-1674.74, -1130.49, 111.72)))
+			local teleParticle = ents.CreateWithKeys("info_particle_system", {
+				effect_name = "teleportedin_blue",
+				start_active = 1,
+				flag_as_weather = 0,
+			}, true, true)				
+			teleParticle:SetAbsOrigin(activator:GetAbsOrigin())
+			teleParticle:Start()
+			allPlayers = ents.GetAllPlayers()
+			for _, player in pairs(allPlayers) do
+				player:AcceptInput("$PlaySoundToSelf", "weapons/teleporter_send.wav")
+			end
+			timer.Simple(1, function()
+				teleParticle:Remove()
+			end)
+				local setHealthDmgInfo = {
+					Attacker = damageInfo.Attacker,
+					Inflictor = damageInfo.Inflictor,
+					Weapon = damageInfo.Weapon,
+					Damage = 0,
+					CritType = 0,
+					DamageType = damageInfo.DamageType,
+					DamageCustom = damageInfo.DamageCustom,
+					DamagePosition = damageInfo.DamagePosition,
+					DamageForce = damageInfo.DamageForce,
+					ReportedPosition = damageInfo.ReportedPosition,
+				}
+				--print(setHealthDmgInfo.Damage)
+				activator:TakeDamage(setHealthDmgInfo)				
+			return true
+		end			
 			
 		if (damageInfo.DamageType & DMG_CRITICAL > 0) then 
 			damage = damageInfo.Damage * 3.1
