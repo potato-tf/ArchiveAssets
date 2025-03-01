@@ -1302,8 +1302,10 @@ PopExt.AddRobotTag("engidrone", {
 })
 Contact.KillEngiDrone <- function()
 {
-    Contact.engiDroneLastLoc <- Contact.engiDrone.GetOrigin()
-    EntFireByHandle(Contact.engiDrone, "$Suicide", null, 0, null, null)
+    if(Contact.engiDrone != null && Contact.engiDrone.IsValid() && NetProps.GetPropInt(Contact.engiDrone, "m_lifeState") == 0) {
+        Contact.engiDroneLastLoc <- Contact.engiDrone.GetOrigin()
+        EntFireByHandle(Contact.engiDrone, "$Suicide", null, 0.1, null, null)
+    }
     //Contact.engiDrone.TakeDamage(9999999, 1, Contact.engiDrone)
 }
 
@@ -1363,10 +1365,12 @@ PopExt.AddRobotTag("engiboss", {
         bot.ValidateScriptScope()
         local scope = bot.GetScriptScope()
         bot.SetGravity(1.0)
-
+        Contact.KillEngiDrone()
         if(Contact.engiBoss != null) return
         bot.AddCondEx(Constants.ETFCond.TF_COND_STEALTHED_USER_BUFF, 0.1, bot)
         bot.AddCondEx(Constants.ETFCond.TF_COND_TELEPORTED, 0.5, bot)
+
+        if(Contact.engiDroneLastLoc == null) Contact.engiDroneLastLoc = Vector(-2, -1170, 667)
         local location = Contact.engiDroneLastLoc + Vector(0, 0, 500)
         location.z = Min(location.z,1000)
         Contact.engiBoss = bot
@@ -1424,7 +1428,7 @@ Contact.HurtCannonOrbital <- function() {
 ::StrikeMarkerThink <- function() {
     local scope = self.GetScriptScope()
     local parent = scope.parent
-    if(parent == null || !parent.GetAbsVelocity) return -1;
+    if(parent == null || !parent.IsValid() || !parent.GetAbsVelocity) return -1;
     local vel = parent.GetAbsVelocity()
     local newpos = self.GetOrigin()
     if(vel.Length() < 50) {
