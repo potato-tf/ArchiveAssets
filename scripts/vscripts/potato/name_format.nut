@@ -18,6 +18,7 @@
         "int": "(INT) ",
         "adv": "(ADV) ",
         "exp": "(EXP) "
+        "mas": "(MAS) "
     }
     // Phrases to not include in the formatted mission display name.
     IgnorePhrases = [
