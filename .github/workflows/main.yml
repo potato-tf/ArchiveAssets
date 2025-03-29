@@ -49,15 +49,13 @@ jobs:
       - name: Compress WAV files
         run: |
           sudo apt-get install -y ffmpeg
-          mkdir -p compressed_assets
-          cp -r tf compressed_assets/
           
           # Function to compress a WAV file to ADPCM_MS format
           compress_wav_file() {
             local file="$1"
             
             # Check if the file is already in ADPCM_MS format
-            ffmpeg_output=$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 "$file")
+            ffmpeg_output=$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 -- "$file")
             
             if [[ "$ffmpeg_output" != *"adpcm_ms"* ]]; then
               echo "Compressing: $file"
@@ -76,16 +74,17 @@ jobs:
             else
               echo "👍: $file"
             fi
+            rm "$tmp"
           }
           
           # Find and compress all WAV files in the compressed_assets copy
           echo "========= WAV Compression Report ========="
-          if [ -d "compressed_assets/tf/download/sound" ]; then
-            find compressed_assets/tf/download/sound -type f -name "*.wav" | while read -r wav_file; do
+          if [ -d "tf/download/sound" ]; then
+            find tf/download/sound -type f -name "*.wav" | while read -r wav_file; do
               compress_wav_file "$wav_file"
             done
           else
-            echo "No sound directory found in compressed_assets/tf/download/"
+            echo "No sound directory found in tf/download/"
           fi
           echo "=========================================="
 
