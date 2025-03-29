@@ -80,9 +80,13 @@ jobs:
           # Find and compress all WAV files in the compressed_assets copy
           echo "========= WAV Compression Report ========="
           if [ -d "tf/download/sound" ]; then
-            find tf/download/sound -type f -name "*.wav" | while read -r wav_file; do
+
+            find tf/download/sound -type f -name "*.wav" -print0 > /tmp/wav_files.txt
+
+            while IFS= read -r -d $'\0' wav_file; do
               compress_wav_file "$wav_file"
-            done
+            done < /tmp/wav_files.txt
+            rm /tmp/wav_files.txt
           else
             echo "No sound directory found in tf/download/"
           fi
