@@ -61,12 +61,15 @@ jobs:
             
             if [[ "$ffmpeg_output" != *"adpcm_ms"* ]]; then
               echo "Compressing: $file"
+
+              tmp="${file}.tmp.wav"
               
               # Convert to ADPCM_MS (directly overwrite in the compressed_assets directory)
-              ffmpeg -i "$file" -c:a adpcm_ms -map_metadata 0 -y "$file"
+              ffmpeg -i "$file" -c:a adpcm_ms -map_metadata 0 -y "$tmp"
               
               if [ $? -eq 0 ]; then
                 echo "✅: $file"
+                mv "$tmp" "$file"
               else
                 echo "❌: $file"
               fi
