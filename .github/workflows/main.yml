@@ -82,9 +82,8 @@ jobs:
           echo "========= WAV Compression Report ========="
           
           find . -type f -name "*.wav" | while read -r wav_file; do
-            compress_wav_file "$wav_file" &
+            compress_wav_file "$wav_file"
           done
-          wait
           echo "=========================================="
 
       - name: Create asset pack
@@ -124,24 +123,17 @@ jobs:
         run: |
 
           cd tf/download
-          for i in "22 pterodactyl@ustx.potato.tf" "22 pterodactyl@us.potato.tf" "22 pterodactyl@br.potato.tf" "22 pterodactyl@usw2.potato.tf" "22 pterodactyl@sgp.potato.tf" "22 pterodactyl@eu2.potato.tf" "27035 pterodactyl@eu.potato.tf"; do a=( $i );
+          for i in "22 pterodactyl@10.243.40.231" "22 pterodactyl@ustx.potato.tf" "22 pterodactyl@us.potato.tf" "22 pterodactyl@br.potato.tf" "22 pterodactyl@usw2.potato.tf" "22 pterodactyl@sgp.potato.tf" "22 pterodactyl@eu2.potato.tf" "27035 pterodactyl@eu.potato.tf"; do a=( $i );
           {
             ssh -o StrictHostKeyChecking=no -p ${a[0]} ${a[1]} "touch /var/tf2server/tf/occupiedservers/wake; exit 0"
 
             # don't remove generated symbolic links, they are auto removed by server
             ssh -p ${a[0]} -o StrictHostKeyChecking=no ${a[1]} "cd /var/tf2server/tf/archive; find . -type l" > ../links-${a[0]}-${a[1]}
 
-            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --update --exclude=".*" --exclude="*.bz2" --exclude-from=../links-${a[0]}-${a[1]} --exclude="tf_mvm_missioncycle.res" --exclude="mapcycle.txt" . ${a[1]}:/var/tf2server/tf/archive/
+            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --update --exclude=".*" --exclude="*.bz2" --exclude-from=../links-${a[0]}-${a[1]} --exclude="tf_mvm_missioncycle.res" --exclude="mapcycle.txt" . ${a[1]}:/var/tf2server/tf/archive/ &
             ssh -p ${a[0]} -o StrictHostKeyChecking=no ${a[1]} mkdir -p /var/www/html/gameassets/archive
-            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --update --include="*/" --include="*.bz2" --exclude="*" . ${a[1]}:/var/www/html/gameassets/archive/
+            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --update --include="*/" --include="*.bz2" --exclude="*" . ${a[1]}:/var/www/html/gameassets/archive/ &
           
           } &
           done
           wait
-
-          # for i in "2244 pterodactyl@eu9.potato.tf a0:d3:c1:5d:16:a5"; do a=( $i ); 
-          # {
-          #   ssh -o StrictHostKeyChecking=no -p ${a[0]} ${a[1]} wakeonlan ${a[2]}
-          # } &
-          # done
-          # wait
