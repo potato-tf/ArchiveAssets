@@ -46,44 +46,44 @@ jobs:
             ssh-add - <<< "${{ secrets.DEPLOY_KEY }}"
 
       # Compress WAV files before packaging
-      - name: Compress WAV files
-        run: |
-          sudo apt-get install -y ffmpeg
-          cd tf/download/sound
+      # - name: Compress WAV files
+      #  run: |
+      #    sudo apt-get install -y ffmpeg
+      #    cd tf/download/sound
           
           # Function to compress a WAV file to ADPCM_MS format
-          compress_wav_file() {
-            local file="$1"
+      #    compress_wav_file() {
+      #      local file="$1"
             
             # Check if the file is already in ADPCM_MS format
-            ffmpeg_output=$(ffprobe -v quiet -select_streams a:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 -- "$file" 2>/dev/null)
+      #      ffmpeg_output=$(ffprobe -v quiet -select_streams a:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 -- "$file" 2>/dev/null)
             
-            if [[ "$ffmpeg_output" != *"adpcm_ms"* ]]; then
-              echo "Compressing: $file"
+      #      if [[ "$ffmpeg_output" != *"adpcm_ms"* ]]; then
+      #        echo "Compressing: $file"
 
-              tmp="${file}.tmp.wav"
+      #        tmp="${file}.tmp.wav"
               
               # Convert to ADPCM_MS (directly overwrite in the compressed_assets directory)
-              ffmpeg -v error -i "$file" -c:a adpcm_ms -map_metadata 0 -y "$tmp" 2>/dev/null
+      #        ffmpeg -v error -i "$file" -c:a adpcm_ms -map_metadata 0 -y "$tmp" 2>/dev/null
               
-              if [ $? -eq 0 ]; then
-                echo "✅: $file"
-                mv -- "$tmp" "$file"
-              else
-                echo "❌: $file"
-                rm -f -- "$tmp"
-              fi
-            else
-              echo "👍: $file"
-            fi
-          }
+      #        if [ $? -eq 0 ]; then
+      #          echo "✅: $file"
+      #          mv -- "$tmp" "$file"
+      #        else
+      #          echo "❌: $file"
+      #          rm -f -- "$tmp"
+      #        fi
+      #      else
+      #        echo "👍: $file"
+      #      fi
+      #    }
           
           # Find and compress all WAV files in the compressed_assets copy
           
-          find . -type f -name "*.wav" | while read -r wav_file; do
-            compress_wav_file "$wav_file" &
-          done
-          wait
+      #    find . -type f -name "*.wav" | while read -r wav_file; do
+      #      compress_wav_file "$wav_file" &
+      #    done
+      #    wait
 
       - name: Create asset pack
         run: |
