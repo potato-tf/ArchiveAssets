@@ -424,7 +424,7 @@
 			
 			ModifyWaveBar()
 			
-			foreach (player in GetAllPlayers(2)) ProgressLog.call(player.GetScriptScope())
+			foreach (player in GetAllPlayers(2, false, false)) ProgressLog.call(player.GetScriptScope())
 		}
 		
 		OnGameEvent_mvm_wave_complete = function(params)
@@ -460,7 +460,7 @@
 			
 			if (Wave == 6) secretwave_unlocked = false
 			
-			foreach (player in GetAllPlayers(2)) ProgressLog.call(player.GetScriptScope())
+			foreach (player in GetAllPlayers(2, false, false)) ProgressLog.call(player.GetScriptScope())
 		}
 		
 		OnGameEvent_teamplay_flag_event = function(params)
@@ -4228,7 +4228,7 @@ if (!("PEA_ONETIME" in getroottable()))
 	
 	UnblockNavAreas([85, 200, 297, 298, 354, 356, 454, 623, 792, 795, 1075, 1078, 1533, 1540, 1545, 1546, 1547, 2342, 2343, 2371, 2388, 2389])
 	
-	foreach (player in GetAllPlayers(2))
+	foreach (player in GetAllPlayers(2, false, false))
 	{
 		if (player.IsFakeClient()) continue
 		
