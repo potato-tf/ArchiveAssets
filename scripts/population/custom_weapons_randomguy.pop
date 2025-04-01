@@ -1,0 +1,548 @@
+WaveSchedule
+{
+	// adding in bases with extendedupgrades breaks everything im actually going to cry
+	// RAFMOD BEGIN
+	PointTemplates [$SIGSEGV]
+	{
+		PackTemplate	// cause i dont want extra melee speed. LITE MADE THIS. ALL CREDIT FOR THIS PART GOES TO LITE. https://steamcommunity.com/profiles/76561198300633951
+		{
+			OnSpawnOutput
+			{
+				Target	!activator
+				Action	RunScriptCode
+				Param	"
+				local hPack;
+				for (local hWearable = self.FirstMoveChild(); hWearable != null; hWearable = hWearable.NextMovePeer()) {
+					if(NetProps.GetPropInt(hWearable, `m_AttributeManager.m_Item.m_iItemDefinitionIndex`) == 642) {
+						hPack = hWearable;
+						break;
+					}
+				}
+				if(hPack && hPack.IsValid()) {
+					hPack.ValidateScriptScope();
+					local hPackScope = hPack.GetScriptScope();
+					hPackScope.hOwner <- hPack.GetOwner();
+					hPackScope.PackThink <- function() {
+						local hWeapon = hOwner.GetActiveWeapon();
+						if(hWeapon && hWeapon.GetSlot() == 0) {
+							hOwner.AddCustomAttribute(`reload time increased hidden`, 0.3, 0.1);
+							hOwner.AddCustomAttribute(`fire rate penalty HIDDEN`, 0.8, 0.1);
+						}
+						return -1;
+					}
+					`PopExtUtil` in getroottable() ? PopExtUtil.AddThinkToEnt(hPack, `PackThink`) : AddThinkToEnt(hPack, `PackThink`)
+				}
+				"
+			}
+		}
+
+		LilShieldTemplate	// Royal told me that this would work. (it does)
+		{
+			OnSpawnOutput
+			{
+				Target	popscript
+				Action	$PersonalProjectileShieldPurchase
+			}
+
+			OnParentKilledOutput
+			{
+				Target	popscript
+				Action	$PersonalProjectileShieldRefunded
+			}
+		}
+	}
+
+	// weapons by randomguy
+	CustomWeapon [$SIGSEGV]	// Many pellet go brrrrr... Based off of the Super Shotgun from Doom 2.
+	{
+		Name							"The Super Shotgun"
+		OriginalItemName				"The Force-a-Nature"
+		"special item description"		"[INFO] Shoots 15 pellets. Has halved ammo and clip size."
+		"bullets per shot bonus"		2.1	// DEFIES MATH, NO CLUE WHY.
+		// "mod ammo per shot"			2
+		"maxammo primary reduced"		0.5
+		"clip size penalty"				0.17
+		"reload time decreased"			0.85
+		// fixed_shot_pattern			1
+		// "reload time increased"		1.2
+		// "fire rate bonus"			1	// remove FaN's fire rate bonus.
+		// "hand scale"				1.5	// hear me out...
+		// "damage bonus"					1.25
+		"add attributes when active"	"hand scale|1.5"	// Now shouldn't be passive.
+	}
+
+	CustomWeapon [$SIGSEGV]	// Blacky gave me this idea.
+	{
+		Name								"The Carpet Bomber"
+		OriginalItemName					"The Air Strike"
+		"special item description"			"[INFO] Increased fire and reload rate and double ammo. Rockets are smaller and deal less damage with a smaller explosion radius."
+		"damage penalty"					0.7	// 0.6
+		"blast radius decreased"			0.65	// 0.7	// 0.6
+		"projectile spread angle penalty"	3
+		"hidden primary max ammo bonus"		2
+		"clip size bonus"					2
+		"mult projectile scale"				0.5
+		"fire rate bonus hidden"			0.7
+		"reload time increased hidden"		0.7
+		paintkit_proto_def_index			420
+		set_item_texture_wear				0
+	}
+
+	CustomWeapon [$SIGSEGV]	// Pyro's Phlogistinator but banner effects.
+	{
+		Name						"The Flagbearer's Flogistinator"
+		OriginalItemName			"The Phlogistinator"
+		"special item description"	"[INFO] Banner Phlogistinator, acts like the phlogistinator but grants you Soldier's banner effects instead of crits."
+		"effect cond override"		1711376	// buffbanner (normal) + concheror (x256) + battalions (x65536)
+	}
+
+	CustomWeapon [$SIGSEGV]	// was originally just a Bison Minigun, PDA Expert gave me ideas for a rework when that ended as horribly as you could imagine.
+	{
+		Name									"The Handheld Tesla"
+		OriginalItemName						"Upgradeable TF_WEAPON_MINIGUN"
+		"special item description"				"[INFO] Tesla Minigun, shoots very short ranged, homing laser projectiles. Does 20% damage to buildings or tanks. Minicrits instead of crits."
+		"custom kill icon"						righteous_bison
+		set_item_texture_wear					0	// Factory New
+		paintkit_proto_def_index				408	// Hypergon, kinda inspired by gg humbridge exp, as in i only know this skin exists cause of that.
+		"attach particle effect"				704
+		"override projectile type"				13
+		"energy weapon penetration"				1
+		"dmg penalty vs players"				0.33
+		"projectile spread angle penalty"		5
+		// big rework ahead!
+		"mod projectile heat seek power"		50	// homing stuff
+		"mod projectile heat aim error"			360	// homing stuff
+		"mod projectile heat aim time"			1	// homing stuff
+		"mod projectile heat aim start time"	0	// homing stuff
+		"set item tint rgb"						5322826	// Noble Hatte Violet at Blacky's suggestion. Pinkish to show homing but darker to intrude on visiblity less.
+		"projectile lifetime"					.5	// less than 1 second lifespan cope
+		"dmg penalty vs buildings"				0.2	// 0.2x building damage.
+		// "mult dmg vs tanks"						0.2	// 0.2x tank damage. //player dmg penalty already trolls tanks. //this took too long to figure out. // im mad.
+		crits_become_minicrits					1	// energy weapon
+	}
+
+	DisallowUpgrade [$SIGSEGV]	// Already penetrates.
+	{
+		Upgrade		"projectile penetration heavy"
+		ItemName	"The Handheld Tesla"
+	}
+
+	CustomWeapon [$SIGSEGV]	// Pre-JI GRU. Inspured by Drcactus overclocks.
+	{
+		Name						"The Gloves of Running Urgently 2015-16 (Pre-JI)"
+		// OriginalItemName			"Gloves of Running Urgently MvM"
+		// Caused inspect issues.
+		OriginalItemName			"Gloves of Running Urgently"
+		"special item description"	"[INFO] Old GRU. No health drain, mark for death. Damage penalty."
+		"self mark for death"		3
+		"provide on active"			1
+		"damage penalty"			0.75
+		mod_maxhealth_drain_rate	0
+	}
+
+	CustomWeapon [$SIGSEGV]	// Smoll shield medigun.
+	{
+		Name							"The Battering Ram"
+		OriginalItemName				"Upgradeable TF_WEAPON_MEDIGUN"
+		"special item description"		"[INFO] Ubercharge provides minicrits. Free mini-shield with double duration and 1/3 faster charge rate."
+		"special item description 2"	"[TIP] Look downward or upwards to bring your shield closer, allowing you to bodyblock!"
+		set_item_texture_wear			0	// Factory New
+		paintkit_proto_def_index		232	// Alien Tech. Looks cool.
+		"effect cond override"			16	// this cond is buffbanner minicrits.
+		"generate rage on heal"			2	// shield.
+		"increase buff duration"		2	// 2x shield duration.
+		"rage receive scale"			1.33	// 33% faster shield charge rate.
+		"cannot giftwrap"				2	// Lua magic.
+	}
+	PrecacheModel	models/props_mvm/mvm_comically_small_player_shield.mdl [$SIGSEGV]	// for smol shield medigun. Model by Lite.
+	LuaScriptFile	scripts/small_shield_overclock.lua [$SIGSEGV]	// for smol shield medigun. by Royal.
+
+	PlayerItemEquipSpawnTemplate [$SIGSEGV]
+	{
+		Name		LilShieldTemplate
+		ItemName	"The Battering Ram"
+	}
+
+	CustomWeapon [$SIGSEGV]	// Engineer passive for more aggressive play
+	{
+		Name						"The Frontier's Aggressor"
+		OriginalItemName			"The Cozy Camper"
+		"ammo regen"				0.33
+		"health regen"				10
+		// "reload time increased hidden"	0.3
+		// "fire rate penalty HIDDEN"		0.7
+		"custom item model"			models/workshop/player/items/engineer/dec15_winter_backup/dec15_winter_backup.mdl
+		"special item description"	"[INFO] Aggressive playstyle. Increases primary firing speed by 20%, reload speed by 70% and provides health/ammo regeneration."
+	}
+
+	PlayerItemEquipSpawnTemplate [$SIGSEGV]
+	{
+		Name		PackTemplate
+		ItemName	"The Frontier's Aggressor"
+	}
+
+	// weapon concepts by PDA Expert (used with permission)
+	// CustomWeapon [$SIGSEGV]	// "op but fun" - blacky
+	// {
+	// Name											"The Follower"
+	// OriginalItemName								"Upgradeable TF_WEAPON_ROCKETLAUNCHER"
+	// "special item description"						"[INFO] Hold alt-fire to shoot rockets that home in to your crosshair instead. These rockets will deal full damage."
+	// "no damage falloff"								1
+	// "projectile speed decreased"					0.55
+	// "mod projectile heat seek power"				225
+	// "mod projectile heat aim error"					50
+	// "mod projectile heat aim time"					3.25
+	// "mod projectile heat aim start time"			0.25
+	// "damage penalty"								0.8
+	// "blast radius decreased"						0.7
+	// "mod projectile heat no predict target speed"	1
+	// "alt fire attributes"							"mod projectile heat follow crosshair|1|damage bonus hidden|1.25"
+	// paintkit_proto_def_index						420
+	// set_item_texture_wear							0
+	// "custom weapon fire sound"						=60|weapons/ar2/npc_ar2_altfire.wav
+	// "custom weapon reload sound"					=80|weapons/ar2/ar2_reload_push.wav
+	// "custom impact sound"							=90|weapons/air_burster_explode2.wav
+	// "projectile trail particle"						eyeboss_projectile
+	// "alt fire attack"								1
+	// }
+	// ^ you're getting replaced.
+	CustomWeapon [$SIGSEGV]
+	{
+		Name							"The Blast Handcannon"
+		OriginalItemName				"The Detonator"
+		"special item description"		"[INFO] Shoots fireballs instead of flares."
+		"blast dmg to self increased"	5
+		"damage penalty"				1
+		"damage bonus"					2	// 2.5 //cuz i added dmg upgrade to it.
+		"weapon burn time reduced"		0.25
+		"fire rate penalty"				1.2
+		"reload time increased"			1.35
+		"override projectile type"		2
+		paintkit_proto_def_index		414
+		"projectile trail particle"		spell_fireball_small_red
+		"custom projectile model"		models/weapons/w_models/w_drg_ball.mdl
+		"custom kill icon"				spellbook_fireball
+		"explosion particle"			halloween_explosion
+		"Set DamageType Ignite"			1
+		"Projectile speed decreased"	1.25	// changed to not conflict with upgrade
+		set_item_texture_wear			0
+		"minicrit vs burning player"	1	// 0 //hmmm, may have had this disabled for a reason. Oh well!
+		"no damage falloff"				1
+		"custom weapon fire sound"		=30|weapons/flaregun/fire.wav
+		"custom impact sound"			=80|weapons/explode4.wav
+	}
+
+	CustomWeapon [$SIGSEGV]
+	{
+		Name							"The Beggar's Bomber"
+		OriginalItemName				"The Iron Bomber"
+		"special item description"		"[INFO] Beggars-Like burst fire Iron Bomber."
+		"fuse bonus"					0.8	// beggarsing now // 1.6
+		// "projectile speed decreased"		0.6
+		// "grenade bounce speed"				1.15
+		// "grenade bounce damage"				0.112	// 0.01	// 0.112
+		// "damage penalty"					0.95	// 0.8	// 0.9
+		// "fire rate bonus"					0.1
+		// "reload time increased hidden"	3	// 6 //changed cause i removed clip upgrade
+		// "reload full clip at once"		1
+		// changing this to beggars style now.
+		"fire rate bonus HIDDEN"		0.3
+		"auto fires full clip"			1
+		// "can overload"						1
+		"reload time increased hidden"	1.2
+		// "projectile spread angle penalty"	// 3 nvm you suck	// 5	// haha
+		paintkit_proto_def_index		226
+		set_item_texture_wear			1	// 0
+		// "mult projectile scale"				1.66
+		"blast radius decreased"		0.8	// beggars like rework //0.4
+		// "explosion particle"				ExplosionCore_sapperdestroyed
+		// "projectile trail particle"			rockettrail_airstrike_line
+		// "custom projectile model"			models/weapons/c_models/c_xms_festive_ornament.mdl
+		// "custom kill icon"					deflect_promode
+		// "custom weapon reload sound"		=65|weapons/cow_mangler_reload.wav	// _final.wav
+	}
+
+	// DisallowUpgrade	// OP/too hard to balance
+	// {
+	// Upgrade		"clip size upgrade atomic"
+	// ItemName	"The Marble Zone"
+	// }
+	// CustomWeapon [$SIGSEGV]
+	// {
+	// Name									"Signal Sterilizer"
+	// OriginalItemName						"The Detonator"
+	// "special item description"				"[INFO] Shoots tracer rounds, aim at your sentry's target to deal triple damage."
+	// "blast dmg to self increased"			1
+	// "damage bonus"							3	// 1.5 //wild buff but hear me out.
+	// "damage penalty"						1
+	// "damage bonus bullet vs sentry target"	3
+	// "minicrit vs burning player"			0
+	// "set damagetype ignite"					0
+	// "mvm sentry ammo"						1.5
+	// "mark for death"						1
+	// "reload time increased"					1.66
+	// "use original class weapon animations"	1
+	// paintkit_proto_def_index				232
+	// set_item_texture_wear					0
+	// "override projectile type"				1
+	// "sniper fires tracer hidden"			1
+	// "custom weapon fire sound"				=70|weapons/shooting_star_shoot.wav
+	// }
+	// you kinda smell to balance. out.
+	CustomWeapon [$SIGSEGV]
+	{
+		Name						"The Stasis Shock"
+		OriginalItemName			"Upgradeable TF_WEAPON_BONESAW"
+		"special item description"	"[INFO] 100% chance to stun non-giant or non-semigiant robots. Can mark multiple enemies for death."
+		"custom item model"			models/workshop/player/items/medic/tauntdoctors_defibrillators/tauntdoctors_defibrillators.mdl
+		"fire rate penalty"			1.5
+		"damage penalty"			0.385	// 25 dmg.
+		"custom hit sound"			=125|ambient/energy/weld2.wav
+		"ragdolls become ash"		1
+		"add cond on hit"			12338
+		"stun on damage"			60
+		"melee range multiplier"	1.33
+		"add cond on hit duration"	3
+		"damage all connected"		1
+		"custom kill icon"			obj_attachment_sapper
+	}
+
+	CustomWeapon [$SIGSEGV]
+	{
+		Name							"The Plasma Bow"
+		OriginalItemName				"The Huntsman"
+		"custom projectile model"		models/weapons/w_models/w_drg_ball.mdl
+		"special item description"		"[INFO] Arrows bounce, can hit the same enemy multiple times."
+		"reset arrow hits on bounce"	1
+		"grenade bounce speed"			1
+		"projectile lifetime"			3
+		"projectile penetration"		1
+		"dmg penalty vs players"		0.85
+		"dmg penalty vs buildings"		0.85
+		// "fire rate bonus"				0.5 //t'was a bit overtuned. Not egregious though.
+		"ragdolls plasma effect"		1
+		"projectile trail particle"		~drg_cow_rockettrail_normal
+		"custom weapon fire sound"		=70|weapons/capper_shoot.wav
+		"custom hit sound"				=50|weapons/fx/rics/bison_projectile_impact_flesh.wav
+		"custom impact sound"			=50|weapons/fx/rics/ric4.wav
+		// "custom item model"				models/weapons/c_models/c_astral_assassin/c_bow.mdl //looks weird.
+		"custom kill icon"				cow_mangler
+		crits_become_minicrits			1
+		"mult crit dmg"					1.25
+		"hidden primary max ammo bonus"	0.8
+		"mult dmg vs tanks"				0.8	// 0.5	// kinda does shred tanks a BIT more than i'd like tbh
+	}
+
+	CustomWeapon [$SIGSEGV]
+	{
+		Name							"The Wild Revolver"
+		OriginalItemName				"Upgradeable TF_WEAPON_REVOLVER"
+		"special item description"		"[INFO] Beggars style revolver. Damage can be upgraded. Innate 50% damage bonus. CRITS HAVE FALLOFF."
+		"auto fires full clip"			1
+		"auto fires when full"			1
+		// "spread penalty"				2.2 // atrocity
+		"fire rate penalty hidden"		0.66
+		"reload time increased hidden"	1.2	// 1.1	// 1.3
+		Paintkit_proto_def_index		403
+		Set_item_texture_wear			0
+		"crit mod disabled"				0
+		crit_dmg_falloff				1
+		"clip size penalty"				0.5	// zooks idea.
+		"damage bonus HIDDEN"			1.5	// zooks idea.
+		"custom weapon fire sound"		=85|weapons/357_fire2.wav
+		"custom weapon reload sound"	=80|weapons/357/357_reload3.wav
+	}
+
+	ExtraLoadoutItems [$SIGSEGV]
+	{
+		AllowEquipOutsideSpawn	1	// Allow equipping items outside spawn
+
+		Scout
+		{
+			// Primary	"Baby Face's Blaster 2012 (OG)"
+			Primary	"The Super Shotgun"
+		}
+
+		Soldier
+		{
+			Primary	"The Carpet Bomber"
+		}
+
+		Pyro	// he gets two because uhhh umm well...
+		{
+			Primary		"The Flagbearer's Flogistinator"
+			Secondary	"The Blast Handcannon"
+		}
+
+		Demoman
+		{
+			Primary	"The Beggar's Bomber"	// R.I.P Marble Zone
+		}
+
+		HeavyWeapons	// he gets two because GRU is already in the game
+		{
+			Primary	"The Handheld Tesla"
+			Melee	"The Gloves of Running Urgently 2015-16 (Pre-JI)"
+		}
+
+		Engineer
+		{
+			Secondary	"The Frontier's Aggressor"
+		}
+
+		Medic
+		{
+			Secondary	"The Battering Ram"
+			Melee		"The Stasis Shock"
+		}
+
+		Sniper
+		{
+			Primary	"The Plasma Bow"
+		}
+
+		Spy
+		{
+			Secondary	"The Wild Revolver"
+		}
+	}
+
+	ExtendedUpgrades [$SIGSEGV]
+	{
+		Supershotty_INeedMoreBoolets
+		{
+			Name		"+25% Bullets Per Shot"
+			Attribute	"bullets per shot bonus"
+			Cap			3.1	// 2.5
+			Increment	0.25
+			Cost		400
+
+			AllowedWeapons
+			{
+				ItemName	"The Super Shotgun"
+			}
+		}
+
+		Handcannon_damage
+		{
+			Name		"+25% Damage Bonus"
+			Attribute	"damage bonus HIDDEN"
+			Cap			2
+			Increment	0.25
+			Cost		300
+
+			AllowedWeapons
+			{
+				ItemName	"The Blast Handcannon"
+			}
+		}
+
+		Handcannon_projspeed
+		{
+			Name		"+25% Projectile Speed"
+			Attribute	"projectile speed increased"
+			Cap			2
+			Increment	0.25
+			Cost		150
+
+			AllowedWeapons
+			{
+				ItemName	"The Blast Handcannon"
+			}
+		}
+
+		// Scrapped upgrade cause I ended up not liking how you can just snipe with it.
+		// Railgun_Range	// 0.5 normal, 0.1 is 20%
+		// {
+		// Name		"+20% Projectile Lifetime"
+		// Attribute	"reload time increased HIDDEN"
+		// Cap			1.5
+		// Increment	0.1
+		// Cost		250
+		// Children	Railgun_Range_JankFix
+		// SecondaryAttributes
+		// {
+		// "projectile lifetime"	1.1
+		// }
+		// AllowedWeapons
+		// {
+		// ItemName	"The Railgun"
+		// }
+		// }
+		// Railgun_Range_JankFix	// 0.5 normal, 0.1 is 20%
+		// {
+		// Name		"you shouldn't see this"	// see this is a technically a paper mario reference so any mission with this is giga based
+		// Attribute	"projectile lifetime"
+		// Cap			-9
+		// Increment	-1
+		// Cost		0
+		// Hidden		1
+		// AllowedWeapons
+		// {
+		// ItemName	"The Railgun"
+		// }
+		// }
+		BatteringRam_Damage	// dmg vs p's increases shield damage.
+		{
+			Name		"+15% Shield Damage Vs Bots and Tanks"
+			Attribute	"dmg penalty vs players"
+			Cap			1.6
+			Increment	0.15
+			Cost		400
+
+			AllowedWeapons
+			{
+				ItemName	"The Battering Ram"
+			}
+		}
+
+		Wildrevolver_Damage
+		{
+			Name		"+25% Damage Bonus"
+			Attribute	"damage bonus"
+			Cap			2
+			Increment	0.25
+			Cost		400	// 300
+
+			AllowedWeapons
+			{
+				ItemName	"The Wild Revolver"
+			}
+		}
+		// Wildrevolver_Special
+		// {
+		// Name		"[SPECIAL] High Noon"
+		// Attribute	"killstreak tier"
+		// Description	"Last shot always crits, damage increased by 35%."
+		// Cap			2
+		// Increment	2
+		// Cost		650
+		// AllowedWeapons
+		// {
+		// ItemName	"The Wild Revolver"
+		// }
+		// SecondaryAttributes
+		// {
+		// "killstreak idleeffect"	2
+		// "CARD: damage bonus"	0.35
+		// "last shot crits"		1
+		// }
+		// RequiredUpgrade
+		// {
+		// Upgrade	Wildrevolver_Damage
+		// Level	4
+		// }
+		// OnApply
+		// {
+		// OutPut	"!activator,$giveitem,Texas Ten Gallon,0,0"
+		// }
+		// OnUpgrade
+		// {
+		// Output	!activator,$playsoundtoself,weapons/saxxy_impact_gen_06.wav,0
+		// Output	!activator,speakresponseconcept,TLK_MVM_LOOT_RARE,1.5
+		// OutPut	"!activator,$giveitem,Texas Ten Gallon,0,0"
+		// }
+		// }
+	}
+	// RAFMOD END
+}

@@ -66,9 +66,9 @@ PopExt <- popExtEntity.GetScriptScope()
 			if (victim != null) {
 
 				local scope = victim.GetScriptScope()
-				local attackerscope = attacker.GetScriptScope()
-				
-				if (victim.GetClassname() == "tank_boss" && "popProperty" in scope) 
+				if (attacker != null) local attackerscope = attacker.GetScriptScope()
+
+				if (victim.GetClassname() == "tank_boss" && "popProperty" in scope)
 					if ("CritImmune" in scope.popProperty && scope.popProperty.CritImmune)
 						params.damage_type = params.damage_type &~ DMG_CRITICAL
 
@@ -118,6 +118,9 @@ PopExt <- popExtEntity.GetScriptScope()
 			if (params.team != TEAM_SPECTATOR) return
 
 			local player = GetPlayerFromUserID(params.userid)
+
+			if (!player) return //can sometimes be null when the server empties out?
+
 			local scope = player.GetScriptScope()
 
 			if (scope != null && "popWearablesToDestroy" in scope) {
@@ -182,7 +185,6 @@ PopExt <- popExtEntity.GetScriptScope()
 		function OnGameEvent_npc_hurt(params) {
 
 			local victim = EntIndexToHScript(params.entindex)
-			if (!victim) return
 			if (victim.GetClassname() == "tank_boss") {
 				local scope = victim.GetScriptScope()
 				local dead  = (victim.GetHealth() - params.damageamount) <= 0
@@ -234,7 +236,7 @@ PopExt <- popExtEntity.GetScriptScope()
 						EntFireByHandle(scope.blimpTrain, "Kill", "", -1, null, null)
 				}
 
-				if (dead && !("popFiredDeathHook" in scope)) {
+				if (dead && scope && !("popFiredDeathHook" in scope)) {
 
 					scope.popFiredDeathHook <- true
 
@@ -292,7 +294,8 @@ PopExt <- popExtEntity.GetScriptScope()
 
 				local scope = tank.GetScriptScope()
 
-				EmitSoundEx({sound_name = scope.popProperty.SoundOverrides.EngineLoop, entity = tank, flags = SND_STOP})
+				if ("popProperty" in scope && "SoundOverrides" in scope.popProperty && "EngineLoop" in scope.popProperty.SoundOverrides)
+					EmitSoundEx({sound_name = scope.popProperty.SoundOverrides.EngineLoop, entity = tank, flags = SND_STOP})
 
 				tank.RemoveEFlags(EFL_KILLME)
 				tankstokill.append(tank)
@@ -331,7 +334,7 @@ function PopulatorThink() {
 
 			local tankName = tank.GetName().tolower()
 			foreach(name, table in tankNamesWildcard)
-				if (name == tankName)
+				if (startswith(tankName, name))
 					PopExtHooks.AddHooksToScope(tankName, table, scope)
 			if (tankName in tankNames)
 				PopExtHooks.AddHooksToScope(tankName, tankNames[tankName], scope)
@@ -482,7 +485,7 @@ function PopulatorThink() {
 							EntFireByHandle(blimpTrain, "SetSpeedReal", GetPropFloat(self, "m_speed").tostring(), -1, null, null)
 					}
 				}
-				
+
 				if ("Skin" in scope.popProperty)
 					SetPropInt(tank, "m_nSkin", scope.popProperty.Skin)
 
@@ -500,7 +503,7 @@ function PopulatorThink() {
 				if ("DisableBomb" in scope.popProperty && scope.popProperty.DisableBomb)
 					for (local child = tank.FirstMoveChild(); child != null; child = child.NextMovePeer())
 						if (child.GetClassname() == "prop_dynamic")
-							if (child.GetModelName() == "models/bots/boss_bot/bomb_mechanism.mdl") 
+							if (child.GetModelName() == "models/bots/boss_bot/bomb_mechanism.mdl")
 								child.DisableDraw()
 
 				if ("DisableSmoke" in scope.popProperty && scope.popProperty.DisableSmoke) {
@@ -585,7 +588,7 @@ function PopulatorThink() {
 			_AddThinkToEnt(tank, "TankThinks")
 
 			foreach(name, table in tankNamesWildcard)
-				if (name == tankName && "OnSpawn" in table)
+				if (startswith(tankName, name) && "OnSpawn" in table)
 					table.OnSpawn(tank, tankName)
 
 			if (tankName in tankNames) {

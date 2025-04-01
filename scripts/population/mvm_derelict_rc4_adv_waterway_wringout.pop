@@ -194,6 +194,8 @@ WaveSchedule
 		//A Medic that ubers its patient, but is vulnerable itself.
 		//Uber lasts for 20 seconds, as it actually comes from a bug.
 		//Therefore, even if it ubers itself, it won't break the wave.
+		
+		//Edit 24 Aug 2024: not anymore, cutie! VScript fix implemented!
 		T_TFBot_Medic_Overclock
 		{
 			Name "Overclock Medic"
@@ -202,10 +204,11 @@ WaveSchedule
 			Item "Platinum Pickelhaube"
 			ClassIcon medic_uber
 			Attributes SpawnWithFullCharge
+			Tag "overclock" //New VScript-based fix
 			ItemAttributes
 			{
 				ItemName "tf_weapon_medigun"
-				"uber duration bonus" 32
+				"uber duration bonus" -9
 				"ubercharge rate bonus" 0.01
 				"bot medic uber health threshold" 9999 //Spawn uber cancels it out
 			}
@@ -1502,6 +1505,36 @@ WaveSchedule
 	/////////////////////////////////////////////////////////////////////////////
 	Wave //Wave 3 - Payout: $1500 + $100 bonus
 	{
+		//26 Aug 2024: VScript-based Overclock Medic fix.
+		InitWaveOutput
+		{
+			Target wave_start_relay
+			Action RunScriptCode
+			Param "		::UnUberOnUberThink <- function()
+						{
+							if (self.InCond(5))
+								self.RemoveCond(5);
+							if (NetProps.GetPropInt(self, `m_lifeState`) != 0)
+							{
+								AddThinkToEnt(self, null);
+								NetProps.SetPropString(self, `m_iszScriptThinkFunction`, ``);
+							}
+							return 0.1;
+						} 
+						::OverclockMedicCheck <- function()
+						{
+							if (!IsPlayerABot(self))
+								return;
+							if (self.HasBotTag(`overclock`))
+								AddThinkToEnt(self, `UnUberOnUberThink`);
+						}
+						function OnGameEvent_player_spawn(params)
+						{
+							local ent = GetPlayerFromUserID(params.userid);
+							EntFireByHandle(ent, `CallScriptFunction`, `OverclockMedicCheck`, -1, null, null)
+						}
+						__CollectGameEventCallbacks(this);"
+		}
 		StartWaveOutPut
 		{
 			Target wave_start_ironman_relay

@@ -13,8 +13,8 @@ local DRONES_CAP = 2
 local PHD_THRESHOLD = {
 	["Small"] = -100,
 	["Medium"] = 1,
-	["Medium2"] = 1.7,
-	["Large"] = 2.3,
+	["Medium2"] = 1.8,
+	["Large"] = 2.4,
 	["Nuke"] = 4,
 }
 
@@ -22,14 +22,14 @@ local PHD_EXPLOSIONS = {
 	["Small"] = { Particle = "hammer_impact_button", Radius = 144, Damage = 50 },
 	["Medium"] = { Particle = "ExplosionCore_buildings", Radius = 144, Damage = 125 },
 	["Medium2"] = { Particle = "ExplosionCore_Wall", Radius = 144, Damage = 200 },
-	["Large"] = { Particle = "ExplosionCore_Wall", Radius = 200, Damage = 350 }, --asplode_hoodoo
+	["Large"] = { Particle = "ExplosionCore_Wall", Radius = 200, Damage = 250 }, --asplode_hoodoo, adjusted for minicrits
 	["Nuke"] = { Particle = "skull_island_explosion", Radius = 600, Damage = 700 },
 }
 
 local PHD_FEEDBACK_CONDS = {
 	-- ["Medium"] = TF_COND_SNIPERCHARGE_RAGE_BUFF,
-	["Large"] = TF_COND_CRITBOOSTED_CARD_EFFECT,
-	["Nuke"] = TF_COND_SODAPOPPER_HYPE,
+	["Large"] = TF_COND_OFFENSEBUFF,
+	["Nuke"] = TF_COND_CRITBOOSTED_CARD_EFFECT,
 }
 
 local PARRY_TIME = 0.8
@@ -386,7 +386,7 @@ function SeducerHit(_, activator, caller)
 		return
 	end
 
-	if caller:InCond(TF_COND_INVULNERABLE_HIDE_UNLESS_DAMAGED) ~= 0 then
+	if caller:InCond(TF_COND_INVULNERABLE_HIDE_UNLESS_DAMAGED) then
 		return
 	end
 
@@ -895,7 +895,7 @@ function PHDEquip(_, activator)
 
 			local parachuting = activator:InCond(TF_COND_PARACHUTE_ACTIVE)
 
-			if parachuting ~= 0 then
+			if parachuting then
 				timeSpentParachuting = timeSpentParachuting + 0.1
 			end
 
@@ -904,7 +904,7 @@ function PHDEquip(_, activator)
 			end
 		end
 
-		if jumping == 0 then
+		if not jumping then
 			if phdData.JumpStartTime then
 				timeSpentParachuting = 0
 

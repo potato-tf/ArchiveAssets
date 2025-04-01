@@ -11,15 +11,15 @@ end
 
 function PaleBurstLogic(_, activator)
 
-	local PASSIVE_RELOAD_SPEED_FACTOR = 0.8	
+	local PASSIVE_RELOAD_SPEED_FACTOR = 0.8
 	local primary = activator:GetPlayerItemBySlot(0)
-	local secondary = activator:GetPlayerItemBySlot(1)	
+	local secondary = activator:GetPlayerItemBySlot(1)
 	local clipBonusMult = primary:GetAttributeValueByClass("mult_clipsize", 1)
 
 	local clipBonusAtomic = primary:GetAttributeValueByClass("mult_clipsize_upgrade_atomic", 0)
 
-	local maxClip = (4 * clipBonusMult) + clipBonusAtomic	
-		
+	local maxClip = (4 * clipBonusMult) + clipBonusAtomic
+
 	local reloadDuration = ((((maxClip - 1) * 0.8) + 0.92) * primary:GetAttributeValueByClass("fast_reload", 1)) * PASSIVE_RELOAD_SPEED_FACTOR;
 
 	local callbacks = {}
@@ -46,26 +46,43 @@ function PaleBurstLogic(_, activator)
 		if not IsValid(activator) or not activator:IsAlive() then
 			terminate()
 			return
-		end				
+		end
+			if primary:GetItemName() ~= "The Cow Mangler 5000" then
+				--print(primary.m_iClip1)
+				if primary.m_iClip1 == 0 then
+					activator:WeaponSwitchSlot(1)
+					secondary:SetAttributeValue("disable weapon switch", 1)
+					primary.m_iClip1 = maxClip
+					--print("Reloaded Primary")
+						if activator.m_hActiveWeapon ~= primary then
+							--print("our clip is low!")
+							timer.Simple(reloadDuration, function()
+								secondary:SetAttributeValue("disable weapon switch", 0)
+								activator:WeaponSwitchSlot(0)
+								--print("Switched to Primary")
+							end, 1)
+						end
+				end
+			else
+				print(primary.m_flEnergy)
+				if primary.m_flEnergy == 0 then
+					activator:WeaponSwitchSlot(1)
+					secondary:SetAttributeValue("disable weapon switch", 1)
+					primary.m_flEnergy = maxClip * 5
+					--print("Reloaded Primary")
+						if activator.m_hActiveWeapon ~= primary then
+							--print("our clip is low!")
+							timer.Simple(reloadDuration, function()
+								secondary:SetAttributeValue("disable weapon switch", 0)
+								activator:WeaponSwitchSlot(0)
+								--print("Switched to Primary")
+							end, 1)
+						end
+				end
+			end
+	end, 0)
 
-			--print(primary.m_iClip1)
-			if primary.m_iClip1 == 0 then	
-				activator:WeaponSwitchSlot(1)	
-				secondary:SetAttributeValue("disable weapon switch", 1)	
-				primary.m_iClip1 = maxClip
-				--print("Reloaded Primary")
-					if activator.m_hActiveWeapon ~= primary then
-						--print("our clip is low!")
-						timer.Simple(reloadDuration, function()	
-							secondary:SetAttributeValue("disable weapon switch", 0)							
-							activator:WeaponSwitchSlot(0)
-							--print("Switched to Primary")			
-						end, 1)
-					end
-			end		
-	end, 0)	
-	
-	
+
 	callbacks.died = activator:AddCallback(ON_DEATH, function()
 		terminate()
 	end)
@@ -74,5 +91,5 @@ function PaleBurstLogic(_, activator)
 	end)
 	callbacks.spawned = activator:AddCallback(ON_SPAWN, function()
 		terminate()
-	end)	
+	end)
 end

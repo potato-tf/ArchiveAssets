@@ -1,0 +1,2108 @@
+#base robot_giant.pop
+#base robot_standard.pop
+#base robot_gatebot.pop
+#base conga_weapons.pop
+
+population
+{
+	StartingCurrency	650
+	RespawnWaveTime	4
+	CanBotsAttackWhileInSpawnRoom	no
+	AddSentryBusterWhenDamageDealtExceeds	10000
+	AddSentryBusterWhenKillCountExceeds	10
+	WaveStartCountdown 5
+	
+	ForceHoliday 2
+	EventPopfile	Halloween
+	ZombiesNoWave666 1
+	BotsDropSpells 1
+	SpellsEnabled 1
+	SpellDropRateCommon 0
+	SpellDropRateGiant 1
+	NoSkeletonSplit 1
+	FastNPCUpdate 1
+	
+	SpellBookNormalRoll   // Override spell roll. The value specifies how many spell charges to give. You can duplicate spells to increase their roll chance
+	{
+		"Fireball" 2
+		"Fireball" 2
+		"Fireball" 2
+		"Fireball" 2
+		"Ball O' Bats" 3
+		"Ball O' Bats" 3
+		"Ball O' Bats" 3
+		"Ball O' Bats" 3
+		"Pumpkin MIRV" 1
+		"Pumpkin MIRV" 1
+		"Pumpkin MIRV" 1
+		"Pumpkin MIRV" 1
+		"Teleport" 1
+		"Healing Aura" 1
+	}
+	SpellBookRareRoll   // Override spell roll. The value specifies how many spell charges to give. You can duplicate spells to increase their roll chance
+	{
+		"Summon Skeletons" 1
+	}
+	
+	Mission
+	{
+		Objective	DestroySentries
+		Where	spawnbot
+		BeginAtWave	1
+		RunForThisManyWaves	7
+		InitialCooldown	30
+		CooldownTime	45
+		DesiredCount	1
+		TFBot
+		{
+			Template	T_TFBot_SentryBuster
+		}
+	}
+	Mission
+	{
+		Objective	Sniper
+		Where	spawnbot_left
+		BeginAtWave	3
+		RunForThisManyWaves	1
+		InitialCooldown	30
+		CooldownTime	25
+		DesiredCount	2
+		TFBot
+		{
+			Template	T_TFBot_Sniper
+		}
+	}
+	Mission
+	{
+		Objective	Engineer
+		Where	spawnbot
+		BeginAtWave 5
+		RunForThisManyWaves 1
+		InitialCooldown	30
+		CooldownTime	45
+		DesiredCount	1
+		TFBot
+		{
+			Template	T_TFBot_Engineer_Sentry_Battle
+		}
+	}
+	PointTemplates
+	{
+		MissionName
+		{
+			point_populator_interface
+			{
+				"targetname" "pop_interface"
+			}
+			filter_activator_tfteam
+			{
+				"targetname" "redteam"
+				"teamnum" "2"
+			}
+			filter_activator_tfteam
+			{
+				"targetname" "blueteam"
+				"teamnum" "3"
+			}
+		}
+		NoMannPower
+        {
+            NoFixup 1
+            logic_timer
+            {
+                "targetname" "mannpower_kill"
+                "RefireTime" "0.01"
+                "spawnflags" "0"
+                "UseRandomTime" "0"
+                "OnTimer" "item_powerup_rune,kill,,0,-1"
+            }
+        }
+		RedIndicator
+		{
+			prop_dynamic
+			{
+				"targetname" "robospawnsign"
+                "disableshadows" "1"
+				"angles" "0 180 0"
+                "fademindist" "-1"
+                "fadescale" "1"
+                "MaxAnimTime" "10"
+                "MinAnimTime" "5"
+                "model" "models/props_mvm/robot_spawnpoint.mdl"
+                "modelscale" "1.0"
+                "renderamt" "255"
+                "rendercolor" "255 255 255"
+                "skin" "0"
+                "solid" "0"
+                "origin" "560 -990 716"
+			}
+		}
+		bosswavelogic
+		{
+			logic_relay //Should probably change a few of the sounds so it's not just the same as electrolysis
+			{
+				"targetname" "boss_intro"
+				"OnTrigger"	"tf_gamerules,PlayVO,mvm/giant_heavy/giant_heavy_entrance.wav,2.1,-1"
+				"OnTrigger"	"tf_gamerules,PlayVO,mvm/giant_heavy/giant_heavy_entrance.wav,2.1,-1"
+				"OnTrigger"	"tf_gamerules,PlayVO,npc/combine_gunship/ping_patrol.wav,2.9,-1"
+			}
+			ambient_generic
+            {
+                "targetname"     "bosstime"
+                "health" "10"
+                "pitch" "100"
+                "spawnflags" "17"
+                "message" "#music/HL2_song16.mp3"
+            }
+			trigger_remove_tf_player_condition
+			{
+				StartDisabled 1
+				"targetname" "RemoveAllies"
+				"condition" "43"
+				"origin" "2022 3612 704"
+				"mins" "9999 9999 9999"
+				"maxs" "-9999 -9999 -9999"
+				"spawnflags" 64
+			}
+			game_text
+			{
+				"origin" "1984 1984 9999"
+				"targetname" "upper_text"
+				"message" "RAGE INCARNATE"
+				"x" "-1"
+				"y" "0.4"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "2"
+				"color" "255 255 255"
+				"fxtime" "0.2"
+				"fadeout" "1"
+				//"fadein" "0"
+				"holdtime" "5"
+			}
+			game_text
+			{
+				"origin" "1208 2036 9999"
+				"targetname" "text_lower"
+				"message" "THE MANGLED MENACE"
+				"x" "-1"
+				"y" "0.45"
+				"channel" "1"
+				"spawnflags" "1"
+				"color" "155 155 255"
+				"fadein" "0.2"
+				"fadeout" "1"
+				"holdtime" "3.8"
+			}
+			logic_case
+			{
+				"targetname"	"RandomAttackChooser"
+				"OnCase01"	"IgniterBulletsPrep,Trigger,,0,-1"
+				"OnCase02"	"ShotgunFire,Trigger,,0,-1"
+				"OnCase03"	"CheersMate,Trigger,,0,-1"
+				"OnCase04"	"DeflectorPhase,Trigger,,0,-1"
+				"OnCase05"	"TomislavPhase,Trigger,,0,-1"
+			}
+			logic_relay
+			{
+				"targetname"	"StartTheFight"
+				"OnTrigger"	"RandomAttackChooser,PickRandomShuffle,,12,-1"
+				"OnTrigger"	"boss_intro,Trigger,,4,-1"
+				"OnTrigger"	"bosstime,PlaySound,,4.5,-1"
+				"OnTrigger"	"upper_text,Display,,5,-1"
+				"OnTrigger"	"text_lower,Display,,7.1,-1"
+			}
+			logic_relay
+			{
+				"targetname"	"IgniterBulletsPrep"
+				"OnTrigger"	"pop_interface,ChangeBotAttributes,FireBulletsPrep,0,-1"
+				"OnTrigger"	"IgniterBullets,Trigger,,1,-1"
+			}
+			logic_relay
+			{
+				"targetname"	"IgniterBullets"
+				"OnTrigger"	"pop_interface,ChangeBotAttributes,FireBullets,0,-1"
+				"OnTrigger"	"RandomAttackChooser,PickRandomShuffle,,12,-1"
+			}
+			logic_relay
+			{
+				"targetname"	"ShotgunFire"
+				"OnTrigger"	"pop_interface,ChangeBotAttributes,FireballShotgun,0,-1"
+				"OnTrigger"	"RandomAttackChooser,PickRandomShuffle,,12,-1"
+			}
+			logic_relay
+			{
+				"targetname"	"CheersMate"
+				"OnTrigger"	"pop_interface,ChangeBotAttributes,YummyCrits,0,-1"
+				"OnTrigger"	"RandomAttackChooser,PickRandomShuffle,,3,-1"
+			}
+			logic_relay
+			{
+				"targetname"	"DeflectorPhase"
+				"OnTrigger"	"pop_interface,ChangeBotAttributes,Deflection,0,-1"
+				"OnTrigger"	"RandomAttackChooser,PickRandomShuffle,,12,-1"
+			}
+			logic_relay
+			{
+				"targetname"	"TomislavPhase"
+				"OnTrigger"	"pop_interface,ChangeBotAttributes,FastFiring,0,-1"
+				"OnTrigger"	"RandomAttackChooser,PickRandomShuffle,,12,-1"
+			}
+		}
+		PreciseLogic
+		{
+			trigger_add_tf_player_condition
+			{
+				"origin" "0 0 0"
+				"filtername" "blueteam"
+				"condition" "96"
+				"duration" "-1"
+				"spawnflags" "3"
+				"mins" "-256 -256 -256"
+				"maxs" "256 256 256"
+			}
+		}
+	}
+	SpawnTemplate	MissionName
+	SpawnTemplate	NoMannPower
+	SpawnTemplate	bosswavelogic
+	
+	ExtraSpawnPoint
+	{
+		Name "RedAllySpawn"
+		X 560 Y -990 Z 716
+		TeamNum 3
+	}
+	
+	Templates
+	{
+		TheGiantHeavyWeaponsGuyBossDudeFromRenfe
+		{
+			Class	Heavyweapons
+			Name	"Mangled Menace"
+			ClassIcon	heavy_ignite
+			Skill Expert
+			Health 80000
+			Scale 1.8
+			Attributes	"MiniBoss"
+			Attributes	"UseBossHealthBar"
+			WeaponRestrictions	MeleeOnly
+			CharacterAttributes
+			{
+				"move speed bonus"	0.4
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.4
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale"	0.2
+				"override footstep sound set" 2
+				"cannot pick up intelligence" 1
+			}
+			FireInput
+			{
+				Target "StartTheFight"
+				Action Trigger
+				Delay 0
+				Cooldown 0
+				Repeats 1
+			}
+			EventChangeAttributes
+			{
+				FireBulletsPrep
+				{
+					Item	"the huo long heatmaker"
+					Taunt    //Taunt periodically
+					{
+						Delay 0 //Time before the first taunt starts (Default: 10)
+						Cooldown 0 //Time between each taunt (Default: 10)
+						Repeats 0 //How many times the bot should taunt in total (Default: 0 - Infinite)
+						Duration 1 //Duration of a looping taunt (Default: 0.1)
+						Name "Taunt: Russian Rubdown" //If set, uses this item taunt instead of default
+					}
+					FireInput
+					{
+						Target player
+						Action $SetProp$m_iszClassIcon
+						Param 	pyro_hyper_lite
+						Delay 0
+						Cooldown 0
+						Repeats 1
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.4
+						"damage force reduction" 0.3
+						"airblast vulnerability multiplier" 0.4
+						"airblast vertical vulnerability multiplier" 0.1
+						"rage giving scale"	0.2
+						"override footstep sound set" 2
+						"cannot pick up intelligence" 1
+						"gesture speed increase" 4
+					}
+				}
+				FireBullets
+				{
+					Item	"the huo long heatmaker"
+					WeaponRestrictions	PrimaryOnly
+					FireInput
+					{
+						Target player
+						Action $SetProp$m_iszClassIcon
+						Param 	heavy_ignite
+						Delay 0
+						Cooldown 0
+						Repeats 1
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.4
+						"damage force reduction" 0.3
+						"airblast vulnerability multiplier" 0.4
+						"airblast vertical vulnerability multiplier" 0.1
+						"rage giving scale"	0.2
+						"override footstep sound set" 2
+						"cannot pick up intelligence" 1
+						"Set DamageType Ignite"	1
+						"weapon burn dmg increased"	3
+					}
+				}
+				FireballShotgun
+				{
+					Item	"Iron Curtain"
+					WeaponRestrictions	PrimaryOnly
+					FireInput
+					{
+						Target player
+						Action $SetProp$m_iszClassIcon
+						Param 	heavy_fireballgun
+						Delay 0
+						Cooldown 0
+						Repeats 1
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.4
+						"damage force reduction" 0.3
+						"airblast vulnerability multiplier" 0.4
+						"airblast vertical vulnerability multiplier" 0.1
+						"rage giving scale"	0.2
+						"override footstep sound set" 2
+						"cannot pick up intelligence" 1
+						"damage penalty" 0.75
+						"override projectile type extra" "spellfireball" // Attributes
+						"fire rate penalty" 20
+						"projectile spread angle penalty" 7
+						"mult projectile count" 5
+						"dmg bonus vs buildings" 5
+					}
+				}
+				YummyCrits	//Add more buffs?
+				{
+					Item	"Iron Curtain"
+					FireInput
+					{
+						Target player
+						Action $SetProp$m_iszClassIcon
+						Param 	demoknight_bottle_lite
+						Delay 0
+						Cooldown 0
+						Repeats 1
+					}
+					Addcond
+					{
+						Index	11
+						Delay	3
+						Duration	20
+					}
+					Taunt    //Taunt periodically
+					{
+						Delay 0 //Time before the first taunt starts (Default: 10)
+						Cooldown 0 //Time between each taunt (Default: 10)
+						Repeats 0 //How many times the bot should taunt in total (Default: 0 - Infinite)
+						Duration 4 //Duration of a looping taunt (Default: 0.1)
+						Name "Taunt: Cheers!" //If set, uses this item taunt instead of default
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.4
+						"damage force reduction" 0.3
+						"airblast vulnerability multiplier" 0.4
+						"airblast vertical vulnerability multiplier" 0.1
+						"rage giving scale"	0.2
+						"override footstep sound set" 2
+						"cannot pick up intelligence" 1
+						"health regen"	1800
+						"gesture speed increase" 2
+					}
+				}
+				Deflection
+				{
+					Item	"The Brass Beast"
+					WeaponRestrictions	PrimaryOnly
+					FireInput
+					{
+						Target player
+						Action $SetProp$m_iszClassIcon
+						Param 	heavy_deflector
+						Delay 0
+						Cooldown 0
+						Repeats 1
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.4
+						"damage force reduction" 0.3
+						"airblast vulnerability multiplier" 0.4
+						"airblast vertical vulnerability multiplier" 0.1
+						"rage giving scale"	0.2
+						"override footstep sound set" 2
+						"cannot pick up intelligence" 1
+						"attack projectiles" 2
+					}
+				}
+				FastFiring
+				{
+					Item	"Tomislav"
+					WeaponRestrictions	PrimaryOnly
+					FireInput
+					{
+						Target player
+						Action $SetProp$m_iszClassIcon
+						Param 	heavy_hyper
+						Delay 0
+						Cooldown 0
+						Repeats 1
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.4
+						"damage force reduction" 0.3
+						"airblast vulnerability multiplier" 0.4
+						"airblast vertical vulnerability multiplier" 0.1
+						"rage giving scale"	0.2
+						"override footstep sound set" 2
+						"cannot pick up intelligence" 1
+						"fire rate bonus" 0.4
+					}
+				}
+				
+			}
+		}
+		SuccTemplate
+		{
+			AddCond
+			{
+				Index	55
+			}
+			CharacterAttributes
+			{
+				"attach particle effect" "3043"
+			}
+		}
+		PreciseTemplate
+		{
+			SpawnTemplate	PreciseLogic
+			CharacterAttributes
+			{
+				"attach particle effect" "3041"
+			}
+		}
+		GiantHeavyDeflector
+		{
+			Class Heavyweapons
+			Name "Giant Deflector Heavy"
+			ClassIcon heavy_deflector
+			Skill Expert
+			Health 5000
+			Scale 1.8
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Item	"The U-clank-a"
+			CharacterAttributes
+			{
+				"move speed bonus"	0.4
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.4
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale"	0.9
+				"override footstep sound set" 2
+				"damage bonus"	1.2
+				"attack projectiles" 2
+			}
+		}
+		GiantHeavyHOK
+		{
+			Class Heavyweapons
+			Name "Giant Heal-on-kill Heavy"
+			ClassIcon heavy_healonkill
+			Skill Expert
+			Health 5000
+			Scale 1.8
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			CharacterAttributes
+			{
+				"move speed bonus"	0.4
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.4
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale"	0.9
+				"override footstep sound set" 2
+				"heal on kill" 2000
+			}
+		}
+		GiantHeavyHOKDeflector
+		{
+			Class Heavyweapons
+			Name "Giant Deflector Heavy"
+			ClassIcon heavy_deflector_healonkill
+			Skill Expert
+			Health 5000
+			Scale 1.8
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Item	"The U-clank-a"
+			CharacterAttributes
+			{
+				"move speed bonus"	0.4
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.4
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale"	0.9
+				"override footstep sound set" 2
+				"damage bonus"	1.2
+				"attack projectiles" 2
+				"heal on kill" 2000
+			}
+		}
+		GiantUberMedic
+		{
+			Class Medic
+			Name "Giant Uber Medic"
+			ClassIcon medic_uber_giant
+			Skill Expert
+			Health 4500
+			Attributes SpawnWithFullCharge
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"heal rate bonus" 200 // only works on mediguns that have this attribute ie quickfix
+				"bot medic uber health threshold" 1000
+			}
+		}
+		GiantKritzMedic
+		{
+			Class Medic
+			Name "Giant Kritz Medic"
+			ClassIcon 	medic_kritz2
+			Skill Expert
+			Health 4500
+			Attributes SpawnWithFullCharge
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			CharacterAttributes
+			{
+				"bot medic uber health threshold" 10000
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"heal rate bonus" 200
+				"increase buff duration"	999.0
+			}
+		}
+		GiantShieldMedic
+		{
+			Class Medic
+			Name "Giant Shield Medic"
+			ClassIcon medic_shield_lite
+			Skill Expert
+			Health 4500
+			Attributes SpawnWithFullCharge
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			Attributes ProjectileShield
+			Attributes SpawnWithFullCharge
+			FireWeapon
+            {
+				Delay 1 //Time before the first fire input starts (Default: 10)
+				Cooldown 3 //Time between each fire input (Default: 10)
+				Repeats 0 //How many times should bot use the fire input in total (Default: 0 - Infinite)
+				//IfSeeTarget 1 //When set to 1, this task activates only when the bot can see the target player (Default 0 - Always activate)
+				Duration 0.5 //How long should the button be pressed (Default: 0.1)
+				Type "Special"
+			}
+			CharacterAttributes
+			{
+				"bot medic uber deploy delay duration" 999999
+				"generate rage on heal" 2
+				"heal rate bonus" 2
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"heal rate bonus" 200 // only works on mediguns that have this attribute ie quickfix
+				"increase buff duration"	999.0
+			}
+		}
+		GiantGigaBurst
+		{
+			Class Soldier
+			Name "Giant Burst Fire Soldier"
+			ClassIcon soldier_burstfire_hyper_lite
+			Health 4200
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"damage bonus" 2.0
+				"faster reload rate" 0.4
+				"fire rate bonus" 0.2
+				"clip size upgrade atomic" 5.0
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"Projectile speed increased" 0.9
+			}
+		}
+		GiantBisonRapid
+		{
+			Class	Soldier
+			Skill	Expert
+			Health 3800
+			ClassIcon	soldier_bison_spammer
+			Attributes	"MiniBoss"
+			Name	"Giant Rapidfire Bison Soldier"
+			WeaponRestrictions	SecondaryOnly
+			Item	"The Righteous Bison"
+			CharacterAttributes
+			{
+				"fire rate bonus" 0.1
+				"reload time decreased" 0.1
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+			}
+		}
+		GiantPyroFury
+		{
+			Class	Pyro
+			Skill	Expert
+			Health 3800
+			ClassIcon	Pyro_dragon_fury
+			Attributes	"MiniBoss"
+			Name	"Giant Dragon's Fury Pyro"
+			WeaponRestrictions	PrimaryOnly
+			Item	"The Dragon's Fury"
+			CharacterAttributes
+			{
+				"fire rate bonus" 0.8
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+			}
+		}
+		PyroFury
+		{
+			Class	Pyro
+			Skill	Hard
+			ClassIcon	pyro_dragon_fury
+			Name	"Dragon's Fury Pyro"
+			WeaponRestrictions	PrimaryOnly
+			Item	"The Dragon's Fury"
+			CharacterAttributes
+			{
+				"fire rate bonus" 0.8
+			}
+		}
+		FamilyBusiness
+		{
+			Class	Heavyweapons
+			Skill	Hard
+			ClassIcon	heavy_family_business
+			Name	"Family Business Heavy"
+			WeaponRestrictions	SecondaryOnly
+			Item	"The Family Business"
+		}
+		BBoxMinigiant
+		{
+			Template	T_TFBot_Soldier_RocketShotgun
+			Skill	Hard
+			ClassIcon	soldier_blackbox_armored_seel
+			Name	"Armored Blackbox Soldier"
+			WeaponRestrictions	PrimaryOnly
+			Scale	1.35
+			Health	800
+		}
+		DemoRapidMinigiant
+		{
+			Class	Demoman
+			Skill	Hard
+			ClassIcon		demo_spammer_armored
+			Name	"Armored Rapidfire Demoman"
+			WeaponRestrictions	PrimaryOnly
+			Scale	1.35
+			Health	750
+			CharacterAttributes
+			{
+				"faster reload rate" 0.5
+				"fire rate bonus" 0.75
+			}
+		}
+		FlareRapidMinigiant
+		{
+			Class	Pyro
+			Skill	Hard
+			ClassIcon		pyro_flare_spammer_armored
+			Name	"Armored Rapid Flare Pyro"
+			WeaponRestrictions	SecondaryOnly
+			Item	"The Flare Gun"
+			Scale	1.35
+			Health	750
+			CharacterAttributes
+			{
+				"fire rate bonus" 0.4
+				"Reload time decreased" 0.2
+				"Projectile speed increased" 1.5
+			}
+		}
+		DirectHitMinigiant
+		{
+			Class	Soldier
+			Skill	Hard
+			ClassIcon		soldier_armored
+			Name	"Armored Direct Hit Soldier"
+			WeaponRestrictions	PrimaryOnly
+			Item	"The Direct Hit"
+			Scale	1.35
+			Health	850
+		}
+		GiantSkeletalSmasher
+		{
+			Class	Medic
+			Skill	Expert
+			Health	4000
+			ClassIcon	dead_blu_lite
+			Attributes	"MiniBoss"
+			Action	FetchFlag
+			Name	"Giant Skeletal Medic"
+			WeaponRestrictions	PrimaryOnly
+			Item	"The Skeletal Smasher"
+			Item	"tf_weapon_spellbook"
+			SpellDropRateCommon 0
+			SpellDropRateRare 1
+			CharacterAttributes
+			{
+				"fire rate bonus" 0.01
+				"move speed bonus"	0.65
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+			}
+		}
+		GiantHeavyFlamer
+		{
+			Class	Heavyweapons
+			Skill	Expert
+			Health	5000
+			ClassIcon	heavy_fireballgun
+			Attributes	"MiniBoss"
+			Name	"Giant Fireball Heavy"
+			WeaponRestrictions	PrimaryOnly
+			Item	"The Fuming Flamer"
+			ExtAttr IgnoreBuildings
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"dmg bonus vs buildings" 5
+				"fire rate penalty" 1.2
+			}
+		}
+		GiantHeavyShotgunFlamer
+		{
+			Class	Heavyweapons
+			Skill	Expert
+			Health	5000
+			ClassIcon	heavy_fireballshotgun
+			Attributes	"MiniBoss"
+			Name	"Giant Shotgun Fireball Heavy"
+			WeaponRestrictions	SecondaryOnly
+			ExtAttr IgnoreBuildings
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"dmg bonus vs buildings" 5
+				"override projectile type extra" "spellfireball" // Attributes
+				"fire rate penalty" 7
+				"Reload time increased" 0.001
+				"mult projectile count" 4
+				"projectile spread angle penalty" 7
+			}
+		}
+		MedicAOEHeal
+		{
+			Template	T_TFBot_Medic_QuickFix
+			AddTemplate	SuccTemplate
+			WeaponRestrictions	SecondaryOnly
+			ClassIcon	medic_armored_lite
+			Scale	1.4
+			Health	800
+		}
+		ShotgunMinigiant
+		{
+			Template	T_TFBot_Heavyweapons_Shotgun
+			WeaponRestrictions	SecondaryOnly
+			ClassIcon	heavy_shotgun_armored
+			Scale	1.4
+			Health	900
+		}
+		ILovePersia
+		{
+			Class Demoman
+			ClassIcon demoknight_persian_nys
+			Name "Persian Demoknight"
+			Skill Hard
+			Item "Ali Baba's Wee Booties"
+			Item "The Splendid Screen"
+			Item "The Persian Persuader"
+			Item "Sultan's Ceremonial"
+			MaxVisionRange 800
+			WeaponRestrictions MeleeOnly
+			ItemAttributes
+			{
+				ItemName "The Splendid Screen"
+				"Attack not cancel charge" 1
+			}
+			ItemAttributes
+			{
+				ItemName "The Persian Persuader"
+				"critboost on kill" 3
+			}
+		}
+	}
+	Wave //WAVE 1 - CASH 650
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		Explanation
+		{
+			Line	"{FF00FF}Giants throughout this mission drop spells! Equip the spellbook to take advantage of them, but at the cost of canteens!"
+		}
+		InitWaveOutput
+		{
+			Target	init_wave_relay_main
+			Action	Trigger
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	Main1
+			TotalCurrency	150
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	12
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Giant_Scout
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1b
+			TotalCurrency	50
+			TotalCount	18
+			MaxActive	12
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	0.1
+			WaitBetweenSpawns	4
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Pyro
+				Skill	Easy
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1b
+			TotalCurrency	50
+			TotalCount	10
+			MaxActive	6
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0.1
+			WaitBetweenSpawns	2.5
+			RandomSpawn 1
+			TFBot
+			{
+				Class	Soldier
+				Skill	Easy
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	100
+			TotalCount	6
+			MaxActive	4
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	15
+			RandomSpawn 1
+			TFBot
+			{
+				Template	BBoxMinigiant
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	60
+			TotalCount	7
+			MaxActive	4
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	5
+			RandomSpawn 1
+			TFBot
+			{
+				Class	Heavyweapons
+				Name	"Heavy"
+				Skill	Easy
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	40
+			TotalCount	12
+			MaxActive	5
+			SpawnCount	1
+			Where	spawnbot_left
+			WaitBeforeStarting	5
+			WaitBetweenSpawns	5
+			RandomSpawn 1
+			Support	1
+			TFBot
+			{
+				Template	T_TFBot_Scout_Sandman
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main3
+			TotalCurrency	150
+			TotalCount	2
+			MaxActive	2
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	30
+			WaitBetweenSpawns	25
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Giant_Heavyweapons
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main3
+			TotalCurrency	50
+			TotalCount	15
+			MaxActive	10
+			SpawnCount	5
+			Where	spawnbot_left
+			WaitBeforeStarting	30
+			WaitBetweenSpawns	15
+			RandomSpawn 1
+			Support 1
+			TFBot
+			{
+				Template	T_TFBot_Sniper_Huntsman
+			}
+		}
+	}
+	
+	
+	
+	Wave //WAVE 2 - CASH 700
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		InitWaveOutput
+		{
+			Target	init_wave_relay_alt
+			Action	Trigger
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	Main1
+			TotalCurrency	100
+			TotalCount	2
+			MaxActive	2
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	15
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Giant_Heavyweapons_Shotgun
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1b
+			TotalCurrency	150
+			TotalCount	18
+			MaxActive	8
+			SpawnCount	1
+			Where	spawnbot
+			Where	spawnbot_left
+			Where	spawnbot_flank
+			WaitBeforeStarting	0.1
+			WaitBetweenSpawns	1
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Demoman
+				Skill	Hard
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	150
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	3
+			Tank
+			{
+				StartingPathTrackNode	boss_path_1
+				Health	12000
+				Speed 75
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2
+			TotalCurrency	150
+			TotalCount	6
+			MaxActive	6
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	12
+			RandomSpawn 1
+			Squad
+			{
+			TFBot
+			{
+				Template	T_TFBot_Giant_Soldier
+			}
+			TFBot
+			{
+				Template	T_TFBot_Medic_BigHeal
+			}
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	150
+			TotalCount	12
+			MaxActive	5
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	5.4
+			RandomSpawn 1
+			Support	1
+			TFBot
+			{
+				Template	DemoRapidMinigiant
+			}
+		}
+	}
+	
+	
+	
+	Wave //WAVE 3 - CASH 650
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		InitWaveOutput
+		{
+			Target	init_wave_relay_main
+			Action	Trigger
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	Main1
+			TotalCurrency	100
+			TotalCount	9
+			MaxActive	9
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	15
+			RandomSpawn 1
+			Squad
+			{
+			TFBot
+			{
+				Template	GiantSkeletalSmasher
+			}
+			TFBot
+			{
+				Template	DirectHitMinigiant
+			}
+			TFBot
+			{
+				Template	DirectHitMinigiant
+			}
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1b
+			TotalCurrency	100
+			TotalCount	20
+			MaxActive	8
+			SpawnCount	2
+			Where	spawnbot
+			Where	spawnbot_left
+			Where	spawnbot_flank
+			WaitBeforeStarting	0.1
+			WaitBetweenSpawns	4.5
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Soldier_RocketPush
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2
+			TotalCurrency	100
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	12
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Giant_Soldier_Extended_Buff_Banner
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	100
+			TotalCount	8
+			MaxActive	6
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	7
+			RandomSpawn 1
+			TFBot
+			{
+				Class	Heavyweapons
+				Skill	Easy
+				Name	"Heavy"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	100
+			TotalCount	12
+			MaxActive	8
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	5
+			RandomSpawn 1
+			TFBot
+			{
+				Class	Scout
+				Name	"Scout"
+				WeaponRestrictions	PrimaryOnly
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	150
+			TotalCount	6
+			MaxActive	4
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	10
+			RandomSpawn 1
+			Support	1
+			TFBot
+			{
+				Template	T_TFBot_Soldier_Extended_Concheror
+			}
+		}
+	}
+	
+	
+	
+	Wave //WAVE 4 - CASH 600
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		InitWaveOutput
+		{
+			Target	init_wave_relay_alt
+			Action	Trigger
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	Main1
+			TotalCurrency	100
+			TotalCount	3
+			MaxActive	2
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	20
+			RandomSpawn 1
+			TFBot
+			{
+				Template	GiantHeavyFlamer
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1
+			TotalCurrency	100
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	20
+			RandomSpawn 1
+			TFBot
+			{
+				Template	GiantSkeletalSmasher
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1b
+			TotalCurrency	50
+			TotalCount	24
+			MaxActive	8
+			SpawnCount	2
+			Where	spawnbot_left
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	2.9
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Pyro_Flaregun //SWAP THESE OUT FOR SOMETHING MORE POTENT
+				Attributes	AlwaysCrit
+			}
+		}
+//		WaveSpawn
+//		{
+//			WaitForAllDead	Main1
+//			WaitForAllSpawned	Main1b
+//			Name	Main2b
+//			TotalCurrency	50
+//			TotalCount	18
+//			MaxActive	8
+//			SpawnCount	2
+//			Where	spawnbot
+//			Where	spawnbot_left
+//			WaitBeforeStarting	0
+//			WaitBetweenSpawns	4
+//			RandomSpawn 1
+//			TFBot
+//			{
+//				Template	T_TFBot_Heavyweapons_Shotgun
+//				Item	"The Concheror"
+//				Name	"Shotgun Concheror"
+//				ClassIcon	heavy_shotgun_conch_yoovy
+//				Attributes	"SpawnWithFullCharge"
+//				Attributes	"AlwaysCrit"
+//				Skill	Easy
+//				CharacterAttributes
+//				{
+//					"increase buff duration"	9.0
+//				}
+//			}
+//		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main3
+			TotalCurrency	150
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	8
+			RandomSpawn 1
+			TFBot
+			{
+				Template	GiantPyroFury
+				Attributes	"AlwaysCrit"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main3
+			TotalCurrency	150
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	8
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Giant_Soldier_RocketShotgun
+				Item	"The Original"
+				ClassIcon	soldier_rocketshotgun
+				Name	"Giant Tripleburst Soldier"
+				CharacterAttributes
+				{
+					"clip size bonus" 0.75
+					"damage bonus" 0.55
+					"fire rate bonus" 0.001
+					"clip size upgrade atomic" 0
+					"blast radius increased" 1.25
+					//"Projectile speed increased" 0.4
+					"projectile spread angle penalty" 4
+					"faster reload rate" 0.6
+				}
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main3b
+			TotalCurrency	50
+			TotalCount	24
+			MaxActive	8
+			SpawnCount	2
+			Where	spawnbot
+			Where	spawnbot_left
+			Where	spawnbot_flank
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	4
+			RandomSpawn 1
+			Support	1
+			TFBot
+			{
+				Template	T_TFBot_Sniper_Huntsman
+				Attributes	"AlwaysCrit"
+				Skill	Easy
+			}
+		}
+	}
+	
+	
+	
+	Wave //WAVE 5 - CASH 700
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		Explanation
+		{
+			Line	"{FF00FF}Glowing bots apply buffs to allies nearby! Take them out quickly!"
+		}
+		InitWaveOutput
+		{
+			Target	init_wave_relay_main
+			Action	Trigger
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	Main1
+			TotalCurrency	150
+			TotalCount	12
+			MaxActive	9
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	10
+			RandomSpawn 1
+			Squad
+			{
+			TFBot
+			{
+				Template	T_TFBot_Giant_Demoman
+				ClassIcon	demo_rapid_giant
+			}
+			TFBot
+			{
+				Template	MedicAOEHeal
+			}
+			TFBot
+			{
+				Template	MedicAOEHeal
+			}
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1b
+			TotalCurrency	150
+			TotalCount	24
+			MaxActive	8
+			SpawnCount	2
+			Where	spawnbot_flank
+			WaitBeforeStarting	0.1
+			WaitBetweenSpawns	3.5
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Heavyweapons_Shotgun
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2
+			TotalCurrency	150
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	10
+			RandomSpawn 1
+			TFBot
+			{
+				Template	GiantHeavyHOK
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	150
+			TotalCount	10
+			MaxActive	6
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	7
+			RandomSpawn 1
+			Support	1
+			TFBot
+			{
+				Template	T_TFBot_Demoman_Samurai
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	100
+			TotalCount	18
+			MaxActive	8
+			SpawnCount	2
+			Where	spawnbot_flank
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	3
+			RandomSpawn 1
+			Support	1
+			TFBot
+			{
+				Class	Scout
+				WeaponRestrictions	SecondaryOnly
+				ClassIcon	scout_pistol_nys
+				Skill	Easy
+				Name	"Scout"
+				Attributes	"AlwaysCrit"
+			}
+		}
+	}
+	
+	
+	
+	Wave //WAVE 6 - CASH 650
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		InitWaveOutput
+		{
+			Target	init_wave_relay_main
+			Action	Trigger
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	Main1
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	20
+			RandomSpawn 1
+			Tank
+			{
+				StartingPathTrackNode	boss_path_2
+				Health	15000
+				OnKilledOutput                                  
+				{
+					Target boss_dead_relay
+					Action Trigger                         
+				}
+				OnBombDroppedOutput                             
+				{
+					Target boss_deploy_relay 
+					Action Trigger                         
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1b
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	20
+			RandomSpawn 1
+			Tank
+			{
+				StartingPathTrackNode	boss_path_1
+				Health	15000
+				OnKilledOutput                                  
+				{
+					Target boss_dead_relay
+					Action Trigger                         
+				}
+				OnBombDroppedOutput                             
+				{
+					Target boss_deploy_relay 
+					Action Trigger                         
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1
+			TotalCurrency	100
+			TotalCount	8
+			MaxActive	4
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	7.5
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Giant_Demo_Burst
+				AddTemplate	PreciseTemplate
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1
+			TotalCurrency	100
+			TotalCount	24
+			MaxActive	8
+			SpawnCount	1
+			Where	spawnbot_flank
+			Where	spawnbot_left
+			WaitBeforeStarting	0.1
+			WaitBetweenSpawns	2.5
+			RandomSpawn 1
+			TFBot
+			{
+				Class	Heavyweapons
+				Skill	Easy
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2
+			TotalCurrency	50
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	15
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Giant_Soldier_SlowBarrage
+				AddTemplate	SuccTemplate
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2
+			TotalCurrency	50
+			TotalCount	2
+			MaxActive	2
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	20
+			RandomSpawn 1
+			Tank
+			{
+				StartingPathTrackNode	boss_path_1
+				Health	16000
+				OnKilledOutput                                  
+				{
+					Target boss_dead_relay
+					Action Trigger                         
+				}
+				OnBombDroppedOutput                             
+				{
+					Target boss_deploy_relay 
+					Action Trigger                         
+				}
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	75
+			TotalCount	20
+			MaxActive	8
+			SpawnCount	2
+			Where	spawnbot_flank
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	5
+			RandomSpawn 1
+			Support	1
+			TFBot
+			{
+				Template	T_TFBot_Heavyweapons_Heavyweight_Champ_Fast
+				Attributes	"AlwaysCrit"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	75
+			TotalCount	20
+			MaxActive	8
+			SpawnCount	2
+			Where	spawnbot_left
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	5
+			RandomSpawn 1
+			Support	1
+			TFBot
+			{
+				Template	PyroFury
+			}
+		}
+	}
+	
+	
+	
+	Wave //WAVE 7 - CASH 700
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		InitWaveOutput
+		{
+			Target	init_wave_relay_alt
+			Action	Trigger
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	Main1
+			TotalCurrency	100
+			TotalCount	6
+			MaxActive	4
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	8
+			RandomSpawn 1
+			Squad
+			{
+			TFBot
+			{
+				Template	GiantHeavyShotgunFlamer
+			}
+			TFBot
+			{
+				Template	T_TFBot_Giant_Soldier_Spammer
+				Item	"The Direct	Hit"
+				Attributes	AlwaysCrit
+			}
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1b
+			TotalCurrency	100
+			TotalCount	32
+			MaxActive	8
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	0.1
+			WaitBetweenSpawns	3.6
+			RandomSpawn 1
+			TFBot
+			{
+				Template	ILovePersia
+				Attributes	"AlwaysCrit"
+				Name	"Blame Sergeant Table"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2
+			TotalCurrency	100
+			TotalCount	4
+			MaxActive	3
+			SpawnCount	1
+			Where	spawnbot
+			Where	spawnbot_flank
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	12
+			RandomSpawn 1
+			TFBot
+			{
+				Template	T_TFBot_Giant_Heavyweapons_Shotgun
+//				Attributes	"AlwaysCrit"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	100
+			TotalCount	4
+			MaxActive	4
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	8
+			RandomSpawn 1
+			TFBot
+			{
+				Template	GiantBisonRapid
+				AddTemplate	PreciseTemplate
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead	Main1
+			WaitForAllSpawned	Main1b
+			Name	Main2b
+			TotalCurrency	100
+			TotalCount	30
+			MaxActive	9
+			SpawnCount	3
+			Where	spawnbot
+			Where	spawnbot_flank
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	4
+			RandomSpawn 1
+			Support	1
+			TFBot
+			{
+				Template	T_TFBot_Soldier_Extended_Buff_Banner
+			}
+		}
+	}
+	
+	
+	
+	Wave //FINAL WAVE - CASH 700
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		Explanation
+		{
+			Line "{red}Scouts in support are giant this wave."
+		}
+		InitWaveOutput
+		{
+			Target	init_wave_relay_alt
+			Action	Trigger
+		}
+		StartWaveOutput
+		{
+			Target	wave_start_relay
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		WaveSpawn
+		{
+			Name	BOSSMAN
+			TotalCurrency	100
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	15
+			RandomSpawn 1
+			TFBot
+			{
+				Template	TheGiantHeavyWeaponsGuyBossDudeFromRenfe
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1
+			TotalCurrency	200
+			TotalCount	10
+			MaxActive	2
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	18
+			RandomSpawn 1
+			Support	1
+			TFBot
+			{
+				Template	T_TFBot_Giant_Scout
+				ClassIcon	scout_giant
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1b
+			TotalCurrency	200
+			TotalCount	28
+			MaxActive	4
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	0.1
+			WaitBetweenSpawns	9
+			RandomSpawn 1
+			Support	1
+			TFBot
+			{
+				Template	T_TFBot_Pyro
+				Skill	Easy
+			}
+		}
+		WaveSpawn
+		{
+			Name	Main1b
+			TotalCurrency	200
+			TotalCount	28
+			MaxActive	4
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	0.1
+			WaitBetweenSpawns	8
+			RandomSpawn 1
+			Support	1
+			RandomChoice
+			{
+			TFBot
+			{
+				Template	T_TFBot_Demoman
+				Skill	Hard
+				Attributes	"AlwaysCrit"
+			}
+			TFBot
+			{
+				Template	T_TFBot_Demoman
+				Skill	Easy
+				Attributes	"AlwaysCrit"
+			}
+			}
+		}
+		WaveSpawn
+		{
+			Name	PrecacheIcons
+			TotalCurrency	0
+			TotalCount	2
+			MaxActive	2
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	99999
+			WaitBetweenSpawns	10
+			RandomSpawn 1
+			Support	1
+			HideIcon 1
+			Squad
+			{
+			TFBot
+			{
+				Template	T_TFBot_Pyro
+				ClassIcon	heavy_hyper
+			}
+			TFBot
+			{
+				Template	T_TFBot_Pyro
+				ClassIcon	heavy_ignite
+			}
+			TFBot
+			{
+				Template	T_TFBot_Pyro
+				ClassIcon	pyro_hyper_lite
+			}
+			}
+		}
+	}
+}

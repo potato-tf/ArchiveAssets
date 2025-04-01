@@ -1,6 +1,11 @@
 #base robot_randomguy_default.pop
 #base overclock_cactus_general.pop //thanks DrCactus
 // based off of the Reverse MvM example mission for Potato's Custom MvM Servers, Made by Braindawg
+// fix out of spawn prewave
+// do esoteric tank model thing to stop the freezes
+// icons for bigrock and gpop
+// use teleport instead of spawnpoint (will be a pain)
+// w4 mainwave tank use same icon as support
 WaveSchedule
 {
 	Templates
@@ -86,6 +91,7 @@ WaveSchedule
 	SetCreditTeam 3
 	SniperAllowHeadshots 1	// sniper and amby un-exist without this
 	// Optional stuff
+	ForceRedMoney 1 // Force drop red money (default: 0) works with the tank
 	ImprovedAirblast 0
 	MaxSpeedLimit 9999 //goodbye speed limit!!!
 	SendBotsToSpectatorImmediately 1	// keeps the populator less clogged, bot projectiles vanish on death + causes weird killcams
@@ -177,6 +183,125 @@ WaveSchedule
 	// Digging through decompiled .vmf's will better teach you how certain relays/entities work, many parts of a vmf look exactly like this
 	PointTemplates
 	{
+		tankmodels	// put this stuff in your pointtemplates area
+		{
+			// models
+			NoFixup 1
+			//leftspawn model preloading
+			prop_dynamic
+			{
+				targetname tankload
+				model "models/bots/boss_bot/boss_tankred.mdl"
+				disableshadows 1
+				origin "900 -2960 10"
+				modelscale 0
+			}
+			prop_dynamic
+			{
+				targetname tankload
+				model "models/bots/boss_bot/boss_tankred_damage1.mdl"
+				disableshadows 1
+				origin "900 -2960 10"
+				modelscale 0
+			}
+			prop_dynamic
+			{
+				targetname tankload
+				model "models/bots/boss_bot/boss_tankred_damage2.mdl"
+				disableshadows 1
+				origin "900 -2960 10"
+				modelscale 0
+			}
+			prop_dynamic
+			{
+				targetname tankload
+				model "models/bots/boss_bot/boss_tankred_damage3.mdl"
+				disableshadows 1
+				origin "900 -2960 10"
+				modelscale 0
+			}
+			// prop_dynamic
+			// {
+			// 	targetname tankload
+			// 	model "models/bots/boss_bot/boss_tankred_part1_destruction.mdl"
+			// 	disableshadows 1
+			// 	origin "900 -2960 10"
+			// 	modelscale 0
+			// } //can't hide this. unfortunate
+			prop_dynamic
+			{
+				targetname tankload
+				model "models/bots/boss_bot/tankred_track_l.mdl"
+				disableshadows 1
+				origin "900 -2960 10"
+				modelscale 0
+			}
+			prop_dynamic
+			{
+				targetname tankload
+				model "models/bots/boss_bot/tankred_track_r.mdl"
+				disableshadows 1
+				origin "900 -2960 10"
+				modelscale 0
+			}
+			//rightspawn model preloading
+			prop_dynamic
+			{
+				targetname tankload
+				model "models/bots/boss_bot/boss_tankred.mdl"
+				disableshadows 1
+				origin "2950 -2550 -50"
+				modelscale 0
+			}
+			prop_dynamic
+			{
+				targetname tankload
+				model "models/bots/boss_bot/boss_tankred_damage1.mdl"
+				disableshadows 1
+				origin "2950 -2550 -50"
+				modelscale 0
+			}
+			prop_dynamic
+			{
+				targetname tankload
+				model "models/bots/boss_bot/boss_tankred_damage2.mdl"
+				disableshadows 1
+				origin "2950 -2550 -50"
+				modelscale 0
+			}
+			prop_dynamic
+			{
+				targetname tankload
+				model "models/bots/boss_bot/boss_tankred_damage3.mdl"
+				disableshadows 1
+				origin "2950 -2550 -50"
+				modelscale 0
+			}
+			// prop_dynamic
+			// {
+			// 	targetname tankload
+			// 	model "models/bots/boss_bot/boss_tankred_part1_destruction.mdl"
+			// 	disableshadows 1
+			// 	origin "2950 -2550 -50"
+			// 	modelscale 0
+			// } //can't hide this. unfortunate
+			prop_dynamic
+			{
+				targetname tankload
+				model "models/bots/boss_bot/tankred_track_l.mdl"
+				disableshadows 1
+				origin "2950 -2550 -50"
+				modelscale 0
+			}
+			prop_dynamic
+			{
+				targetname tankload
+				model "models/bots/boss_bot/tankred_track_r.mdl"
+				disableshadows 1
+				origin "2950 -2550 -50"
+				modelscale 0
+			}
+		}
 		spawnpoints	// put this stuff in your pointtemplates area
 		{
 			// models
@@ -188,9 +313,15 @@ WaveSchedule
 				model models/props_mvm/robot_spawnpoint.mdl
 				disableshadows 1
 				defaultanim idle
-				origin "1530 199 -430"
+				origin "1530 200 -421"
 				angles "0 0 0"
 				skin 3
+			}
+
+			info_target
+			{
+				targetname tunnelspawn
+				origin "1530 200 -420"
 			}
 
 			prop_dynamic	// towerspawn
@@ -204,6 +335,12 @@ WaveSchedule
 				skin 3
 			}
 
+			info_target
+			{
+				targetname towerspawn
+				origin "1534 770 -211"
+			}
+
 			prop_dynamic	// towerspawn 2
 			{
 				targetname spawnpoint_hologram
@@ -215,15 +352,31 @@ WaveSchedule
 				skin 3
 			}
 
+			info_target
+			{
+				targetname towerspawn_2
+				origin "1535 1306 -211"
+			}
+
 			prop_dynamic	// redspawn giant
 			{
 				targetname spawnpoint_hologram
 				model models/props_mvm/robot_spawnpoint.mdl
 				disableshadows 1
 				defaultanim idle
-				origin "-1231 2213 -130"
+				origin "-1231 2213 -129"
 				angles "0 0 0"
 				skin 3
+			}
+			info_target
+			{
+				targetname redspawn_giant
+				origin "-1231 2213 -127"
+			}
+			info_target
+			{
+				targetname hatchspawn
+				origin "-1378 1534 -91"
 			}
 			// on logic, turns on the hologram when logic is activated
 			NoFixup 1
@@ -527,7 +680,7 @@ WaveSchedule
 				targetname spawnbarrierA1
 				parentname spawnbarrierA
 				mins "-400 -150 -400"
-				maxs "500 150 1200"
+				maxs "500 150 1600"
 				StartDisabled 0
 			}
 			NoFixup 1
@@ -851,6 +1004,7 @@ WaveSchedule
 	SpawnTemplate corelogic
 	SpawnTemplate annotations
 	SpawnTemplate spawnpoints
+	SpawnTemplate tankmodels
 	SpawnTemplate antigriefbomb
 	SpawnTemplate rockvoid
 
@@ -1010,7 +1164,7 @@ WaveSchedule
 		WaveSpawn
 		{
 			Name giants_tunnel
-			Where tunnelspawn
+			Where red_player_teamspawn
 			TotalCount 3
 			MaxActive 3
 			SpawnCount 1
@@ -1033,13 +1187,21 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "tunnelspawn" //name of an info_target
+				}
 			}
 		}
 
 		WaveSpawn
 		{
 			Name robots_tunnel
-			Where tunnelspawn
+			Where red_player_teamspawn
 			TotalCount 30
 			MaxActive 10
 			SpawnCount 10
@@ -1061,13 +1223,21 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "tunnelspawn" //name of an info_target
+				}
 			}
 		}
 
 		WaveSpawn
 		{
 			Name robots_tower
-			Where towerspawn
+			Where red_player_teamspawn
 			TotalCount 10
 			MaxActive 10
 			SpawnCount 5
@@ -1092,6 +1262,14 @@ WaveSchedule
 						"crit mod disabled" 0
 					}
 					Action Mobber
+					FireInput
+					{
+						Target !self //targets the bot this is on
+						Action $TeleportToEntity
+						Cooldown 9999
+						Delay 0
+						Param "towerspawn" //name of an info_target
+					}
 				}
 
 				TFBot
@@ -1109,6 +1287,14 @@ WaveSchedule
 						"crit mod disabled" 0
 					}
 					Action Mobber
+					FireInput
+					{
+						Target !self //targets the bot this is on
+						Action $TeleportToEntity
+						Cooldown 9999
+						Delay 0
+						Param "towerspawn" //name of an info_target
+					}
 				}
 			}
 		}
@@ -1116,7 +1302,7 @@ WaveSchedule
 		WaveSpawn
 		{
 			Name robots_base
-			Where towerspawn
+			Where red_player_teamspawn
 			TotalCount 15
 			MaxActive 10
 			SpawnCount 5
@@ -1142,6 +1328,14 @@ WaveSchedule
 						"crit mod disabled" 0
 					}
 					Action Mobber
+					FireInput
+					{
+						Target !self //targets the bot this is on
+						Action $TeleportToEntity
+						Cooldown 9999
+						Delay 0
+						Param "towerspawn" //name of an info_target
+					}
 				}
 
 				TFBot
@@ -1159,6 +1353,14 @@ WaveSchedule
 						"crit mod disabled" 0
 					}
 					Action Mobber
+					FireInput
+					{
+						Target !self //targets the bot this is on
+						Action $TeleportToEntity
+						Cooldown 9999
+						Delay 0
+						Param "towerspawn" //name of an info_target
+					}
 				}
 			}
 		}
@@ -1197,7 +1399,7 @@ WaveSchedule
 		{
 			// hatch defender
 			Name hatchdefender
-			Where hatchspawn
+			Where red_player_teamspawn
 			TotalCount 1
 			MaxActive 1
 			SpawnCount 1
@@ -1231,6 +1433,14 @@ WaveSchedule
 				{
 					"force distribute currency on death" 1
 					"crit mod disabled" 0
+				}
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "hatchspawn" //name of an info_target
 				}
 			}
 
@@ -1476,7 +1686,7 @@ WaveSchedule
 		WaveSpawn
 		{
 			Name robots_tower
-			Where towerspawn
+			Where red_player_teamspawn
 			TotalCount 20
 			MaxActive 12
 			SpawnCount 10
@@ -1498,13 +1708,21 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "towerspawn" //name of an info_target
+				}
 			}
 		}
 
 		WaveSpawn
 		{
 			Name giants_tunnel
-			Where tunnelspawn
+			Where red_player_teamspawn
 			TotalCount 4
 			MaxActive 4
 			SpawnCount 2
@@ -1529,6 +1747,14 @@ WaveSchedule
 						"crit mod disabled" 0
 					}
 					Action Mobber
+					FireInput
+					{
+						Target !self //targets the bot this is on
+						Action $TeleportToEntity
+						Cooldown 9999
+						Delay 0
+						Param "tunnelspawn" //name of an info_target
+					}
 				}
 
 				TFBot
@@ -1546,6 +1772,14 @@ WaveSchedule
 						"crit mod disabled" 0
 					}
 					Action Mobber
+					FireInput
+					{
+						Target !self //targets the bot this is on
+						Action $TeleportToEntity
+						Cooldown 9999
+						Delay 0
+						Param "tunnelspawn" //name of an info_target
+					}
 				}
 			}
 
@@ -1572,7 +1806,7 @@ WaveSchedule
 		{
 			Name robots_tower
 			WaitForAllDead giants_tunnel
-			Where towerspawn
+			Where red_player_teamspawn
 			TotalCount 5
 			MaxActive 5
 			SpawnCount 5
@@ -1594,6 +1828,14 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "towerspawn" //name of an info_target
+				}
 			}
 		}
 
@@ -1601,7 +1843,7 @@ WaveSchedule
 		{
 			Name robots_tower
 			WaitForAllDead giants_tunnel
-			Where RedSpawn_giant
+			Where red_player_teamspawn
 			TotalCount 2
 			MaxActive 1
 			SpawnCount 1
@@ -1622,6 +1864,14 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "redspawn_giant" //name of an info_target
+				}
 			}
 		}
 
@@ -1689,7 +1939,7 @@ WaveSchedule
 		{
 			Name robots_basegiant
 			WaitForAllSpawned robots_tower
-			Where RedSpawn_giant
+			Where red_player_teamspawn
 			TotalCount 3
 			MaxActive 3
 			SpawnCount 1
@@ -1712,6 +1962,14 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "redspawn_giant" //name of an info_target
+				}
 			}
 		}
 
@@ -1719,7 +1977,7 @@ WaveSchedule
 		{
 			// hatch defender
 			Name hatchdefender
-			Where hatchspawn
+			Where red_player_teamspawn
 			TotalCount 1
 			MaxActive 1
 			SpawnCount 1
@@ -1742,6 +2000,14 @@ WaveSchedule
 				{
 					"force distribute currency on death" 1
 					"crit mod disabled" 0
+				}
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "hatchspawn" //name of an info_target
 				}
 			}
 
@@ -1997,7 +2263,7 @@ WaveSchedule
 		WaveSpawn
 		{
 			Name giants_start
-			Where tunnelspawn
+			Where red_player_teamspawn
 			TotalCount 1
 			MaxActive 1
 			SpawnCount 1
@@ -2019,13 +2285,21 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "tunnelspawn" //name of an info_target
+				}
 			}
 		}
 
 		WaveSpawn
 		{
 			Name giants_start
-			Where RedSpawn_giant
+			Where red_player_teamspawn
 			TotalCount 3
 			MaxActive 2
 			SpawnCount 1
@@ -2049,13 +2323,21 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "redspawn_giant" //name of an info_target
+				}
 			}
 		}
 
 		WaveSpawn
 		{
 			Name robots_tower
-			Where towerspawn
+			Where red_player_teamspawn
 			TotalCount 15
 			MaxActive 9
 			SpawnCount 3
@@ -2083,6 +2365,14 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "towerspawn" //name of an info_target
+				}
 			}
 		}
 
@@ -2125,7 +2415,7 @@ WaveSchedule
 		{
 			// hatch defender
 			Name hatchdefender
-			Where hatchspawn
+			Where red_player_teamspawn
 			TotalCount 1
 			MaxActive 1
 			SpawnCount 1
@@ -2148,6 +2438,14 @@ WaveSchedule
 				{
 					"force distribute currency on death" 1
 					"crit mod disabled" 0
+				}
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "hatchspawn" //name of an info_target
 				}
 			}
 
@@ -2356,7 +2654,7 @@ WaveSchedule
 		WaveSpawn
 		{
 			Name start
-			Where tunnelspawn
+			Where red_player_teamspawn
 			TotalCount 3
 			MaxActive 3
 			SpawnCount 1
@@ -2406,6 +2704,14 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "tunnelspawn" //name of an info_target
+				}
 			}
 
 			FirstSpawnOutPut
@@ -2418,7 +2724,7 @@ WaveSchedule
 		WaveSpawn
 		{
 			Name start
-			Where tunnelspawn
+			Where red_player_teamspawn
 			TotalCount 45
 			MaxActive 20
 			SpawnCount 15
@@ -2442,6 +2748,14 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "tunnelspawn" //name of an info_target
+				}
 			}
 		}
 
@@ -2459,7 +2773,7 @@ WaveSchedule
 			{
 				Health 10000 //15000
 				Name tankbossred
-				ClassIcon tank_red	// _lite
+				ClassIcon tank_red_lite
 				Model models/bots/boss_bot/boss_tankred.mdl
 				StartingPathTrackNode tankpath1_7
 				TeamNum 2
@@ -2493,7 +2807,7 @@ WaveSchedule
 		WaveSpawn
 		{
 			Name deez
-			Where towerspawn_2
+			Where red_player_teamspawn
 			TotalCount 1
 			MaxActive 1
 			SpawnCount 1
@@ -2516,6 +2830,14 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "towerspawn_2" //name of an info_target
+				}
 			}
 		}
 
@@ -2523,7 +2845,7 @@ WaveSchedule
 		{
 			Name robots_tower
 			WaitForAllDead tank
-			Where towerspawn
+			Where red_player_teamspawn
 			TotalCount 12
 			MaxActive 6
 			SpawnCount 6
@@ -2547,6 +2869,14 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "towerspawn" //name of an info_target
+				}
 			}
 		}
 
@@ -2584,7 +2914,7 @@ WaveSchedule
 		{
 			// hatch defender
 			Name hatchdefender
-			Where hatchspawn
+			Where red_player_teamspawn
 			TotalCount 1
 			MaxActive 1
 			SpawnCount 1
@@ -2634,6 +2964,14 @@ WaveSchedule
 				{
 					"force distribute currency on death" 1
 					"crit mod disabled" 0
+				}
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "hatchspawn" //name of an info_target
 				}
 			}
 
@@ -2739,7 +3077,28 @@ WaveSchedule
 
 		WaveSpawn
 		{
+			Name dummytankicon
+			TotalCount 1337	// nice clean 999 on the wavebar
+			MaxActive 1
+			SpawnCount 11
+			Support 1
+			WaitBeforeStarting 123456
+
+			TFBot
+			{
+				Class Scout
+				Name "Deez Nuts"
+				ClassIcon tank_red_lite
+			}
+		}
+
+		WaveSpawn
+		{
 			Name redtank
+			//i was dumber when i made this, didn't realise randomchoice squad tanks necessitated a Where, that's why i gave up in 2021 and just used diff icons.
+			//it can easily be added back in as a bot icon after hidden and won't eat the mainwave icon.
+			//why? bots and tanks are different icons even when they're the same icon... for some reason.
+			Where red_player_teamspawn
 			TotalCount 4
 			Support Limited
 			MaxActive 4
@@ -2747,6 +3106,10 @@ WaveSchedule
 			WaitBetweenSpawns 30
 			FirstSpawnWarningSound mvm/mvm_tele_deliver.wav
 
+			RandomChoice
+			{
+			Squad
+			{
 			Tank
 			{
 				Health 60000
@@ -2767,6 +3130,8 @@ WaveSchedule
 					Target redwin_relay
 					Action Trigger
 				}
+			}
+			}
 			}
 
 			FirstSpawnOutPut
@@ -2913,7 +3278,7 @@ WaveSchedule
 		WaveSpawn
 		{
 			Name tower
-			Where towerspawn
+			Where red_player_teamspawn
 			TotalCount 15
 			MaxActive 10
 			SpawnCount 5
@@ -2936,13 +3301,21 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "towerspawn" //name of an info_target
+				}
 			}
 		}
 
 		WaveSpawn
 		{
 			Name start
-			Where tunnelspawn
+			Where red_player_teamspawn
 			TotalCount 2
 			MaxActive 2
 			SpawnCount 2
@@ -2965,11 +3338,20 @@ WaveSchedule
 						"crit mod disabled" 0
 					}
 					Action Mobber
+					FireInput
+					{
+						Target !self //targets the bot this is on
+						Action $TeleportToEntity
+						Cooldown 9999
+						Delay 0
+						Param "tunnelspawn" //name of an info_target
+					}
 				}
 
 				TFBot
 				{
 					Template T_TFBot_Giant_Medic
+					ClassIcon medic_pop
 
 					AddCond
 					{
@@ -2982,6 +3364,14 @@ WaveSchedule
 						"crit mod disabled" 0
 					}
 					// Action Mobber
+					FireInput
+					{
+						Target !self //targets the bot this is on
+						Action $TeleportToEntity
+						Cooldown 9999
+						Delay 0
+						Param "tunnelspawn" //name of an info_target
+					}
 				}
 			}
 
@@ -3008,7 +3398,7 @@ WaveSchedule
 		{
 			Name tower
 			WaitForAllDead start
-			Where towerspawn
+			Where red_player_teamspawn
 			TotalCount 10
 			MaxActive 10
 			SpawnCount 10
@@ -3031,6 +3421,14 @@ WaveSchedule
 						"crit mod disabled" 0
 					}
 					Action Mobber
+					FireInput
+					{
+						Target !self //targets the bot this is on
+						Action $TeleportToEntity
+						Cooldown 9999
+						Delay 0
+						Param "towerspawn" //name of an info_target
+					}
 				}
 
 				TFBot
@@ -3048,6 +3446,14 @@ WaveSchedule
 						"crit mod disabled" 0
 					}
 					// Action Mobber
+					FireInput
+					{
+						Target !self //targets the bot this is on
+						Action $TeleportToEntity
+						Cooldown 9999
+						Delay 0
+						Param "towerspawn" //name of an info_target
+					}
 				}
 			}
 		}
@@ -3056,7 +3462,7 @@ WaveSchedule
 		{
 			Name deez
 			WaitForAllDead start
-			Where towerspawn_2
+			Where red_player_teamspawn
 			TotalCount 1
 			MaxActive 1
 			SpawnCount 1
@@ -3065,6 +3471,7 @@ WaveSchedule
 			TFBot
 			{
 				Template T_TFBot_Soldier_BurstFire
+				ClassIcon soldier_burstfire_hyper_lite
 
 				AddCond
 				{
@@ -3077,6 +3484,14 @@ WaveSchedule
 					"crit mod disabled" 0
 				}
 				Action Mobber
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "towerspawn" //name of an info_target
+				}
 			}
 		}
 
@@ -3085,7 +3500,7 @@ WaveSchedule
 			// hatch defender
 			Name hatchdefender
 			WaitForAllDead start
-			Where hatchspawn
+			Where red_player_teamspawn
 			TotalCount 1
 			MaxActive 1
 			SpawnCount 1
@@ -3108,6 +3523,14 @@ WaveSchedule
 				{
 					"force distribute currency on death" 1
 					"crit mod disabled" 0
+				}
+				FireInput
+				{
+					Target !self //targets the bot this is on
+					Action $TeleportToEntity
+					Cooldown 9999
+					Delay 0
+					Param "hatchspawn" //name of an info_target
 				}
 			}
 

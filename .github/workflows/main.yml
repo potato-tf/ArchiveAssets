@@ -7,12 +7,14 @@ on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
+  
+concurrency:
+  group: main
+  cancel-in-progress: true
+  
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -27,6 +29,11 @@ jobs:
         with:
           path: tf/download
 
+      - uses: zerotier/github-action@v1
+        with:
+          auth_token: ${{ secrets.ZEROTIER_KEY }}
+          network_id: e4da7455b253a261
+
       # Install wakeonlan
       - name: Make scripts executable
         run: sudo apt-get install -y wakeonlan
@@ -37,7 +44,47 @@ jobs:
         run: |
             ssh-agent -a $SSH_AUTH_SOCK > /dev/null
             ssh-add - <<< "${{ secrets.DEPLOY_KEY }}"
-        
+
+      # Compress WAV files before packaging
+      # - name: Compress WAV files
+      #  run: |
+      #    sudo apt-get install -y ffmpeg
+      #    cd tf/download/sound
+          
+          # Function to compress a WAV file to ADPCM_MS format
+      #    compress_wav_file() {
+      #      local file="$1"
+            
+            # Check if the file is already in ADPCM_MS format
+      #      ffmpeg_output=$(ffprobe -v quiet -select_streams a:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 -- "$file" 2>/dev/null)
+            
+      #      if [[ "$ffmpeg_output" != *"adpcm_ms"* ]]; then
+      #        echo "Compressing: $file"
+
+      #        tmp="${file}.tmp.wav"
+              
+              # Convert to ADPCM_MS (directly overwrite in the compressed_assets directory)
+      #        ffmpeg -v error -i "$file" -c:a adpcm_ms -map_metadata 0 -y "$tmp" 2>/dev/null
+              
+      #        if [ $? -eq 0 ]; then
+      #          echo "✅: $file"
+      #          mv -- "$tmp" "$file"
+      #        else
+      #          echo "❌: $file"
+      #          rm -f -- "$tmp"
+      #        fi
+      #      else
+      #        echo "👍: $file"
+      #      fi
+      #    }
+          
+          # Find and compress all WAV files in the compressed_assets copy
+          
+      #    find . -type f -name "*.wav" | while read -r wav_file; do
+      #      compress_wav_file "$wav_file" &
+      #    done
+      #    wait
+
       - name: Create asset pack
         run: |
           mv 'tf/download/.github/HOW TO INSTALL!.gif' .
@@ -73,21 +120,18 @@ jobs:
         env:
             SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          for i in "2244 pterodactyl@eu9.potato.tf a0:d3:c1:5d:16:a5"; do a=( $i ); 
-          {
-            ssh -o StrictHostKeyChecking=no -p ${a[0]} ${a[1]} wakeonlan ${a[2]}
-          } &
-          done
-          wait
 
           cd tf/download
-          for i in "22 pterodactyl@us.potato.tf" "22 pterodactyl@sgp.potato.tf" "22 pterodactyl@eu2.potato.tf" "27035 pterodactyl@eu.potato.tf" "2244 pterodactyl@eu9.potato.tf" "22 pterodactyl@aus.potato.tf"; do a=( $i );
+          for i in "22 pterodactyl@10.243.40.231" "22 pterodactyl@ustx.potato.tf" "22 pterodactyl@us.potato.tf" "22 pterodactyl@br.potato.tf" "22 pterodactyl@usw2.potato.tf" "22 pterodactyl@sgp.potato.tf" "22 pterodactyl@eu2.potato.tf" "27035 pterodactyl@eu.potato.tf"; do a=( $i );
           {
             ssh -o StrictHostKeyChecking=no -p ${a[0]} ${a[1]} "touch /var/tf2server/tf/occupiedservers/wake; exit 0"
 
-            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --delete --update --exclude=".*" --exclude="*.bz2" --exclude="tf_mvm_missioncycle.res" --exclude="mapcycle.txt" . ${a[1]}:/var/tf2server/tf/archive/
+            # don't remove generated symbolic links, they are auto removed by server
+            ssh -p ${a[0]} -o StrictHostKeyChecking=no ${a[1]} "cd /var/tf2server/tf/archive; find . -type l" > ../links-${a[0]}-${a[1]}
+
+            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --update --exclude=".*" --exclude="*.bz2" --exclude-from=../links-${a[0]}-${a[1]} --exclude="tf_mvm_missioncycle.res" --exclude="mapcycle.txt" . ${a[1]}:/var/tf2server/tf/archive/ &
             ssh -p ${a[0]} -o StrictHostKeyChecking=no ${a[1]} mkdir -p /var/www/html/gameassets/archive
-            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --delete --update --include="*/" --include="*.bz2" --exclude="*" . ${a[1]}:/var/www/html/gameassets/archive/
+            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --update --include="*/" --include="*.bz2" --exclude="*" . ${a[1]}:/var/www/html/gameassets/archive/ &
           
           } &
           done

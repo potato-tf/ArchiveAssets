@@ -1,10 +1,13 @@
 WaveSchedule
 {
-//	LuaScriptFile "scripts/deflect_rage_airblast.lua"
+	LuaScriptFile "scripts/deflect_rage_airblast.lua"
 	PrecacheModel "models/props_mvm/mvm_comically_small_player_shield.mdl"
 //	LuaScriptFile "scripts/shield_sentry_oc.lua"
 	LuaScriptFile "scripts/holdfireuntilfullupgrade.lua"
-	LuaScriptFile "scripts/lua_knockback_rage_cactus.lua"	
+	LuaScriptFile "scripts/lua_knockback_rage_cactus.lua"
+	LuaScriptFile "scripts/cowmangler_charge_shot_attribute.lua"
+	LuaScriptFile "scripts/small_shield_overclock.lua"
+	CustomUpgradesFile	"mvm_upgrades_cactus_rework_a1.txt" 
 
 	DisallowUpgrade	  //RPG
 	{
@@ -42,6 +45,7 @@ WaveSchedule
             "reload full clip at once" 1 // "damage bonus hidden" at level 1 or more blocks this upgrade 
         }
     }
+	
 
 
     ExtendedUpgrades  
@@ -62,35 +66,88 @@ WaveSchedule
 			Tier 1
 			PlayerUpgrade 1
 		}
+		Dummy
+		{
+			Name "+10 Max Health"
+			Attribute "max health additive bonus"
+			Cap 50
+			Increment 10
+			Cost 150
+			Description "+10 Max Health on Wearer" 
+			PlayerUpgrade 1
+		}
 		Scattergun_A
 		{
-			Name "Unstable Mod: Cycle Overload"
-			Attribute "CARD: damage bonus"
-			Cap 1.2
-			Increment 0.2
+			Name "Unstable Mod: Mini Shells"
+			Attribute "clip size penalty HIDDEN"
+			Cap 2
+			Increment 1
 			Cost 0
-			Description "+20% damage bonus +20% firing speed -100% accuracy -100% slower reload -34% clip size" 
+			Description "+Slow enemy on hit +100% clip +30% reload +100% ammo +Destroy projectiles -40% damage penalty" 
 			Tier 1
 			SecondaryAttributes
 			{
 				"provide on active" 1
-				"spread penalty" 1	
-				"Reload time increased" 1
-				"fire rate bonus HIDDEN" -0.2
-//				"halloween reload time decreased" 0.5
-				"clip size penalty" -0.34
+				"halloween reload time decreased" -0.3
+				"attack projectiles" 1
+				"damage penalty" -0.4
+				"hidden primary max ammo bonus" 1
+				"slow enemy on hit" 1
 			}
 			AllowPlayerClass Scout
             AllowedWeapons
 			{
-				Slot "Primary"
+				SimilarToItem "TF_WEAPON_SCATTERGUN"
 			}
 			DisallowedWeapons // Disallow those weapons
 			{
-				ItemName "The Soda Popper"
-				ItemName "The Force-a-Nature"
-				ItemName "The Shortstop"
 				ItemName "Baby Face's Blaster"
+				ItemName "The Back Scatter"
+			}
+		}
+		Scattergun_Clean_A
+		{
+			Name "Stable Mod: Slim Shells"
+			Attribute "fire rate bonus HIDDEN"
+			Cap 0.85
+			Increment -0.15
+			Cost 0
+			Description "+15% firing speed +25% accuracy +20% reload speed" 
+			Tier 1
+			SecondaryAttributes
+			{
+				"weapon spread bonus" -0.25
+				"halloween reload time decreased" -0.2
+			}
+			AllowPlayerClass Scout
+            AllowedWeapons
+			{
+				SimilarToItem "TF_WEAPON_SCATTERGUN"
+			}
+			DisallowedWeapons // Disallow those weapons
+			{
+				ItemName "Baby Face's Blaster"
+				ItemName "The Back Scatter"
+			}
+		}
+		Scattergun_Clean_B
+		{
+			Name "Stable Mod: Compressed Shells"
+			Attribute "bullets per shot bonus"
+			Cap 1.4
+			Increment 0.4
+			Cost 0
+			Description "+40% bullets per shot" 
+			Tier 1
+			AllowPlayerClass Scout
+            AllowedWeapons
+			{
+				SimilarToItem "TF_WEAPON_SCATTERGUN"
+			}
+			DisallowedWeapons // Disallow those weapons
+			{
+				ItemName "Baby Face's Blaster"
+				ItemName "The Back Scatter"
 			}
 		}
 		BabyFace
@@ -113,7 +170,26 @@ WaveSchedule
 				ItemName "Baby Face's Blaster"
 			}
 		}
-		Backscatter
+		BabyFace_b // new wow epic
+		{
+			Name "Unstable Mod: Mega Magnet"
+			Attribute "mult credit collect range"
+			Cap 2
+			Increment 1
+			Cost 0
+			SecondaryAttributes
+			{
+				"healing received penalty" -0.2
+				"move speed penalty" 0.05
+			}
+			Description "+100% credit pickup range +5% movement speed -20% healing from all sources" 
+			Tier 1
+            AllowedWeapons
+			{
+				ItemName "Baby Face's Blaster"
+			}
+		}
+		Backscatter 
 		{
 			Name "Unstable Mod: Expanded Crit Module"
 			Attribute "crit from behind"
@@ -132,21 +208,82 @@ WaveSchedule
 				ItemName "The Back Scatter"
 			}
 		}
+		Backscatter // new wow epic
+		{
+			Name "Unstable Mod: Lever Action"
+			Attribute "weapon spread bonus"
+			Cap 0.5
+			Increment -0.5
+			Cost 0
+			SecondaryAttributes
+			{
+				"can headshot" 1
+//				"clip size penalty" -0.41
+				"headshot damage increase" 1
+				"fire rate penalty" 0.25
+				"bullets per shot bonus" -0.75
+				"CARD: damage bonus" 1
+			}
+			Description "+Can Headshot for +100% damage +50% more accurate +100% damage -25% firing speed -75% bullets per shot" 			
+			Tier 1
+            AllowedWeapons
+			{
+				ItemName "The Back Scatter"
+			}
+		}
 		Shortstop
 		{
-			Name "Unstable Mod: Special Delivery"
+			Name "Stable Mod: Special Delivery"
 			Attribute "max health additive bonus"
 			Cap 25
 			Increment 25
 			Cost 0
 			SecondaryAttributes
 			{
-				"reload time increased hidden" -0.46
-//				"fire rate penalty HIDDEN" 0.3
+				"increased jump height" .1
 				"provide on active" -1
-				"no double jump" 1
 			}
-			Description "+25 max hp +50% faster reload -No double jump" 
+			Description "+25 max hp +10% jump height" 
+			Tier 1
+			AllowPlayerClass Scout
+            AllowedWeapons
+			{
+				ItemName "The Shortstop"
+			}
+		}
+		Shortstop_b
+		{
+			Name "Stable Mod: Hollow Point Rounds"
+			Attribute "CARD: damage bonus"
+			Cap 1.1
+			Increment 0.1
+			Cost 0
+			SecondaryAttributes
+			{
+				"Reload time decreased" -0.46
+			}
+			Description "+50% faster reload +10% damage bonus" 
+			Tier 1
+			AllowPlayerClass Scout
+            AllowedWeapons
+			{
+				ItemName "The Shortstop"
+			}
+		}
+		Shortstop_c
+		{
+			Name "Unstable Mod: Dairy Mags"
+			Attribute "add cond on hit" 
+			SecondaryAttributes
+			{
+				"add cond on hit duration" 2.0
+				"fire rate penalty HIDDEN" 0.75
+				"damage penalty" -0.2
+			}
+			Cap 27
+			Increment 27
+			Cost 0
+			Description "+Mad Milk on hit for 2 seconds -75% firing speed -20% damage penalty" 
 			Tier 1
 			AllowPlayerClass Scout
             AllowedWeapons
@@ -165,9 +302,8 @@ WaveSchedule
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
 				"scattergun has knockback" -1
-				"Reload time increased" 0.15
 			}
-			Description "+20% more accurate -No special knockback -15% slower reload"
+			Description "+20% more accurate -No special knockback"
 			Tier 1
 			AllowPlayerClass Scout
             AllowedWeapons
@@ -201,17 +337,16 @@ WaveSchedule
 		}
 		PistolMilk
 		{
-			Name "Unstable Mod: Dairy Mags"
+			Name "Stable Mod: Dairy Mags"
 			Attribute "add cond on hit" 
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
 				"add cond on hit duration" 3.5
-				"fire rate penalty HIDDEN" 0.75
 			}
 			Cap 27
 			Increment 27
 			Cost 0
-			Description "+Mad Milk on hit -75% firing speed" 
+			Description "+Mad Milk on hit for 3.5 seconds" 
 			Tier 1
             AllowPlayerClass Scout
 			AllowedWeapons
@@ -224,7 +359,7 @@ WaveSchedule
 ////Scout Misc
 		BonkSoda
 		{
-			Name "Stable Mod: Battalion's Bonk-up"
+			Name "Unstable Mod: Battalion's Bonk-up"
 			Attribute "effect cond override" 
 			Cap 7194
 			Increment 7194
@@ -249,13 +384,31 @@ WaveSchedule
 			Cap 1
 			Increment 1
 			Cost 0
-			Description "+Projectile ignites and marks target on hit -50% bleed damage"
+			Description "+Projectile ignites +200% bleed strength"
 			Tier 1
 			SecondaryAttributes
 			{
-				"mark for death" 1
-				"damage all connected" 1
-				"mult bleeding dmg" -0.5
+				"mult bleeding delay" -0.5
+				"mult bleeding dmg" 2
+			}
+			AllowedWeapons
+			{
+				ItemName "The Flying Guillotine"
+			}
+		}	
+		Cleaver_b
+		{
+			Name "Stable Mod: Biohazard Blade"
+			Attribute "add cond on hit" 
+			Cap 24
+			Increment 24
+			Cost 0
+			Description "+Jarate on hit for 2 seconds +Drain 5% uber per bleed tick"
+			Tier 1
+			SecondaryAttributes
+			{
+				"subtract victim medigun charge on hit" 5
+				"add cond on hit duration" 2
 			}
 			AllowedWeapons
 			{
@@ -265,20 +418,13 @@ WaveSchedule
 ////Scout Melee
 		BatA  ///includes Fish
 		{
-			Name "Unstable Mod: Support Swing"
+			Name "Stable Mod: Mark Module"
 			Attribute "mark for death"
 			Cap 1
 			Increment 1
 			Cost 0
-			Description "+On Hit: apply mark for death and milk -25 max hp" 
+			Description "+On Hit: Mark enemy for death" 
 			Tier 1
-			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
-			{
-				"max health additive penalty" -25
-				"add cond on hit" 27
-				"add cond on hit duration" 6
-//				"damage penalty" -0.2
-			}
 			AllowedWeapons
 			{
 				ClassName TF_WEAPON_BAT 
@@ -286,49 +432,153 @@ WaveSchedule
 				ItemName "Festive Bat 2011"
 				ItemName "Festive Holy Mackerel"
 				ItemName "The Wrap Assassin"
-				ItemName "The Sandman"
 			}
 			DisallowedWeapons // Disallow those weapons
 			{
 				ItemName "The Fan O'War"
+				ItemName "The Sandman"
+//				ItemName "The Boston Basher"
+				ItemName "The Candy Cane"
+				ItemName "Sun-on-a-Stick"
+				ItemName "The Atomizer"
+			}
+		}
+		BatB  ///includes Fish
+		{
+			Name "Stable Mod: Heavy lead"
+			Attribute "damage bonus"
+			Cap 1.5
+			Increment 0.5
+			Cost 0
+			Description "+50% damage bonus" 
+			Tier 1
+			AllowedWeapons
+			{
+				ClassName TF_WEAPON_BAT 
+				ItemName "The Holy Mackerel"
+				ItemName "Festive Bat 2011"
+				ItemName "Festive Holy Mackerel"
+			}
+			DisallowedWeapons // Disallow those weapons
+			{
+				ItemName "The Fan O'War"
+				ItemName "The Wrap Assassin"
+				ItemName "The Sandman"
+//				ItemName "The Boston Basher"
+				ItemName "The Candy Cane"
+				ItemName "Sun-on-a-Stick"
+				ItemName "The Atomizer"
+			}
+		}
+		basher_a
+		{
+			Name "Stable Mod: Biohazard Tip"
+			Attribute "hit self on miss"
+			Cap 0
+			Increment -1
+			Cost 0
+			Tier 1
+			Description "+On hit: coat enemy in jarate for one second +Cannot self-hit" 
+			SecondaryAttributes
+			{
+				"add cond on hit" 24
+				"add cond on hit duration" 1
+			}
+			AllowedWeapons
+			{
+				ItemName "The Boston Basher"
+				ItemName "Three-Rune Blade"
+			}
+		}
+		basher_b
+		{
+			Name "Unstable Mod: Barbed Wire"
+			Attribute "damage bonus"
+			Cap 2
+			Increment 1
+			Cost 0
+			Tier 1
+			Description "+100% damage bonus +200% bleed strength -Increased self hit vulnerability" 
+			SecondaryAttributes
+			{
+				"mult bleeding delay" -0.5
+				"mult bleeding dmg" 2
+				"no self effect" 1
+			}
+			AllowedWeapons
+			{
+				ItemName "The Boston Basher"
+				ItemName "Three-Rune Blade"
+			}
+		}
+		SandmanA
+		{
+			Name "Stable Mod: FaN Module"
+			Attribute "damage causes airblast"
+			Cap 1
+			Increment 1
+			Cost 0
+			Description "Melee Swings and projectile knocks enemy back on hit +50% damage per swing" 
+			Tier 1
+			SecondaryAttributes
+			{
+				"damage bonus" 0.5
+			}
+			AllowedWeapons
+			{
+				ItemName "The Sandman"
 			}
 		}
 		SandmanA
 		{
 			Name "Unstable Mod: Craftsman's Bat"
-			Attribute "mult bleeding dmg"
-			Cap 3
-			Increment 3
+			Attribute "melee attack rate bonus"
+			Cap 0.6
+			Increment -0.4
 			Cost 0
-			Description "+On Hit: Bleed for 5 seconds +15 max health +2x bleed damage -35% slower swing speed" 
+			Description "+15 max health +40% faster swing speed" 
 			Tier 1
 			SecondaryAttributes
 			{
 				"max health additive penalty" 15
-				"mult bleeding dmg" 2
-				"bleeding duration" 5
-				"fire rate penalty" 0.35
 			}
 			AllowedWeapons
 			{
 				ItemName "The Sandman"
-				ItemName "The Boston Basher"
 			}
 		}
 		CandyCaneA
 		{
 			Name "Unstable Mod: Sugar Shock"
-			Attribute "mark for death"
-			Cap 1
-			Increment 1
+			Attribute "add cond on hit"
+			Cap 27
+			Increment 27
 			Cost 0
-			Description "+Marks Target +25% Blast Resistance +On hit: speedboost -15 max hp" 
+			Description "+Applies Mad Milk on hit for 4 seconds -10 max health" 
 			Tier 1
 			SecondaryAttributes
 			{
+				"add cond on hit duration" 4
+				"max health additive penalty" -10	
+			}
+			AllowedWeapons
+			{
+				ItemName "The Candy Cane"
+			}
+		}
+		CandyCaneB
+		{
+			Name "Stable Mod: Peppermint Pummel"
+			Attribute "speed_boost_on_hit_enemy"
+			Cap 5
+			Increment 5
+			Cost 0
+			Description "+On hit: speedboost for 5 seconds +25% blast resistance +20% damage bonus" 
+			Tier 1
+			SecondaryAttributes
+			{
+				"damage bonus" 0.2
 				"dmg taken from blast increased" -0.25
-				"max health additive penalty" -15
-				"speed_boost_on_hit_enemy" 5
 			}
 			AllowedWeapons
 			{
@@ -339,14 +589,51 @@ WaveSchedule
 		{
 			Name "Unstable Mod: Soul Scorcher"
 			Attribute "damage bonus vs burning"
-			Cap 5
-			Increment 5
+			Cap 4
+			Increment 4
 			Cost 0
-			Description "+6x damage to burning enemies -90% damage to non-burning targets" 
+			Description "+4x damage to burning enemies -75% damage to non-burning targets" 
 			Tier 1
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"dmg penalty vs nonburning" -0.9
+				"dmg penalty vs nonburning" -0.75
+			}
+			AllowedWeapons
+			{
+				ItemName "Sun-on-a-Stick"
+			}
+		}
+		SunOnAStickB
+		{
+			Name "Unstable Mod: Infernal Hex"
+			Attribute "crit vs burning players"
+			Cap 0
+			Increment -1
+			Cost 0
+			Description "+Applies Gas on hit +Mark For Death -No longer crits burning players" 
+			Tier 1
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"add cond on hit" 123
+				"mark for death" 1
+			}
+			AllowedWeapons
+			{
+				ItemName "Sun-on-a-Stick"
+			}
+		}
+		SunOnAStick_clean
+		{
+			Name "Stable Mod: Volcanic Armor"
+			Attribute "afterburn immunity"
+			Cap 1
+			Increment 1
+			Cost 0
+			Description "Immune to afterburn when active and fire resistance is global" 
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"dmg taken from fire reduced" 0.25
+				"dmg taken from fire reduced on active" 0.25
 			}
 			AllowedWeapons
 			{
@@ -357,8 +644,8 @@ WaveSchedule
 		{
 			Name "Unstable Mod: Heavy Material"
 			Attribute "dmg from ranged reduced"
-			Cap 0.7
-			Increment -0.3
+			Cap 0.5
+			Increment -0.5
 			Cost 0
 			SecondaryAttributes
 			{
@@ -366,7 +653,27 @@ WaveSchedule
 				"provide on active" 1
 				"mark for death" 1
 			}
-			Description "+Marks Target +resist all ranged damage by 30% -15% slower move speed" 
+			Description "While Active: +Marks Target +Resist all ranged damage by 50% -15% slower move speed" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Atomizer"
+			}
+		}
+		AtomizerB
+		{
+			Name "Stable Mod: Light Material"
+			Attribute "move speed bonus"
+			Cap 1.1
+			Increment 0.1
+			Cost 0
+			SecondaryAttributes
+			{
+				"increased jump height" 0.25
+				"crit from behind" 1
+				"provide on active" 1
+			}
+			Description "+5% faster movement speed +25% jump height +Crits from behind" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -384,12 +691,11 @@ WaveSchedule
 			{
 				"damage bonus HIDDEN" 0.25
 				"clip size penalty" -0.75
-				"Blast radius increased" 0.35
+				"Blast radius increased" 0.5
 				"reload time increased hidden" 0.75
-//				"fire rate penalty HIDDEN" 0.2
 				"projectile no deflect" 1
 			}
-			Description "(i)Rockets now arc +25% damage bonus +35% blast radius -75% clip size -75% reload speed" 
+			Description "(i)Rockets now arc and cannot be deflected +25% damage bonus +50% blast radius -75% clip size -75% reload speed" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -405,12 +711,14 @@ WaveSchedule
 				ItemName "The Direct Hit"
 				ItemName "The Liberty Launcher"
 				ItemName "The Black Box"
+				ItemName "Festive Black Box"
 				ItemName "The Beggar's Bazooka"
+				
 			}
 		}
 		MoneyJumper
 		{
-			Name "Unstable Mod: Cash Vacuum"
+			Name "Stable Mod: Cash Vacuum"
 			Attribute "mult credit collect range" 
 			Cap 3
 			Increment 2
@@ -426,6 +734,28 @@ WaveSchedule
 				ItemName "Rocket Jumper"
 			}
 		}
+		Jumper_A
+		{
+			Name "Stable Mod: Bottomless Clip"
+			Attribute "mult credit collect range" 
+			Cap 1.1
+			Increment 0.1
+			Cost 0
+			SecondaryAttributes 
+			{
+				"mod max primary clip override" -1
+				"deploy time decreased" 0.35
+				"self add cond on hit" 34
+				"damage penalty" 0.001
+				"self add cond on hit duration" 2
+			}
+			Description "+Does not need to reload +On hit: Crits for 2 seconds" 
+			Tier 1
+            AllowedWeapons
+			{
+				ItemName "Rocket Jumper"
+			}
+		}
 		DirectHitB
 		{
 			Name "Unstable Mod: Extra Gunpowder"
@@ -435,12 +765,30 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"CARD: damage bonus" 0.25
+				"CARD: damage bonus" 0.35
 				"Blast radius decreased" -0.2
 				"dmg pierces resists absorbs" 1
+			}
+			Description "+35% damage +Attacks pierce damage resistances +Cannot be deflected -20% smaller blast radius" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Direct Hit"
+			}
+		}
+		DirectHitA
+		{
+			Name "Unstable Mod: Loaded Payload"
+			Attribute "projectile no deflect"
+			Cap 1
+			Increment 1
+			Cost 0
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"Blast radius decreased" 0.45
 				"clip size penalty HIDDEN" -0.25
 			}
-			Description "+25% damage +Attacks pierce damage resistances -20% smaller blast radius -25% clip size" 
+			Description "+45% blast radius +Cannot be deflected -25% clip size" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -486,21 +834,48 @@ WaveSchedule
 		{
 			Name "Unstable Mod: Tank Buster"
 			Attribute "mult dmg vs tanks" 
-			Cap 1.25
-			Increment 0.25
+			Cap 1.2
+			Increment 0.2
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
 				"Projectile speed decreased" -0.2
 				"heal on hit for rapidfire" 15
 				"health on radius damage" -20
+				"mod soldier buff range" 0.25
 			}
-			Description "+Heal on hit stacks with multiple enemies +25% damage Vs. Tanks -20% slower projectile speed" 
+			Description "+Heal on hit stacks with multiple enemies +25% banner range +20% damage Vs. Tanks -20% projectile speed" 
 			Tier 1
 			AllowedWeapons
 			{
 				ItemName "The Black Box"
 				ItemName "Festive Black Box"
+			}
+		}
+		cowmangler_mastery
+		{
+			Name "Stable Mod: Charge Shot Mastery"
+			Description "-50% charge shot cost + charge shot marks for death" 
+			Attribute "throwable fire speed"
+			Increment 1
+			Cap 2
+			Cost 0
+			AllowedWeapons 
+			{
+				ItemName "The Cow Mangler 5000"
+			}
+			SecondaryAttributes
+			{
+				// override charged shot cost
+				"throwable damage" 2
+			}
+			OnApply
+			{
+				Output "popscript,$CustomChargeShotStart,,0"
+			}
+			OnDowngrade
+			{
+				Output "popscript,$CustomChargeShotStop,,0"
 			}
 		}
 		LibertyLauncherA
@@ -512,11 +887,10 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"damage penalty" -0.15
-				"blast radius increased" 0.35
-				"hidden primary max ammo bonus"	0.5
+				"damage penalty" -0.1
+				"rocket jump damage reduction" -0.7
 			}
-			Description "+40% firing speed 35% larger blast radius +50% ammo -15% damage penalty" 
+			Description "+40% firing speed +70% rocket jump reistance -10% damage" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -525,7 +899,30 @@ WaveSchedule
 		}
         AirstrikeA
 		{
-			Name "Unstable Mod: Smart Rockets"
+			Name "Unstable Mod: Mega Missiles"
+			Attribute "rocket jump damage reduction"
+			Cap 1
+			Increment 0.15
+			Cost 0
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"blast radius increased" 0.5
+				"Projectile speed decreased" -0.25
+				"damage bonus HIDDEN" 0.2
+				"blast dmg to self increased" 0.15
+				"mod projectile heat follow crosshair" 1
+				"mod projectile heat seek power" 360
+			}
+			Description "+20% Damage +Rockets Follow Crosshair -25% projectile speed +50% Blast Radius -30% self damage vulnerability" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Air Strike"
+			}
+		}
+        AirstrikeB
+		{
+			Name "Unstable Mod: Carpet Bomber"
 			Attribute "rocket jump damage reduction"
 			Cap 1
 			Increment 0.15
@@ -533,14 +930,13 @@ WaveSchedule
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
 				"rocketjump attackrate bonus" -0.15
-				"mod projectile heat follow crosshair" 1
-				"mod projectile heat seek power" 360
-				"clip size penalty" -0.5
-				"damage penalty" -0.15
-				"Projectile speed decreased" -0.20
-				"projectile detonate time" 2.5
+				"blast radius increased" 0.5
+				"clip size bonus" 0.5
+				"damage penalty" -0.2
+				"no damage falloff" 1
+				"add damage per target" 0.05
 			}
-			Description "+15% increase to rocket jump bonuses +Rockets follow cross-hair -50% clip size -20% slower projectile speed -no reduced self blast damage" 
+			Description "+15% rocket jump bonuses +5% damage per enemy caught in blast +50% blast radius +50% clip size +No Explosion Falloff -20% damage penalty" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -550,20 +946,51 @@ WaveSchedule
 ////Soldier Secondary
 		ShotgunMark
 		{
-			Name "Stable Mod: Debuff Rounds"
+			Name "Unstable Mod: Debuff Rounds"
 			Attribute "Mark for death" 
 			Cap 1
 			Increment 1
 			Cost 0
-			Description "Weapon will now mark 1 target for death +20% damage bonus" 
+			Description "+Mark For Death +Jarate for 2 seconds +25% Reload +30% Firing Speed -15% Damage" 
 			SecondaryAttributes 
 			{
-				"damage bonus" 0.2
+				"Reload time decreased" -0.25
+				"fire rate bonus HIDDEN" -0.3
+				"damage penalty" -0.15
+				"add cond on hit" 24
+				"add cond on hit duration" 2
 			}
 			Tier 1
 			AllowedWeapons
 			{
 				ClassName TF_WEAPON_SHOTGUN_SOLDIER
+			}
+			DisallowedWeapons // Disallow those weapons
+			{
+				ItemName "The Reserve Shooter"
+			}
+		}
+		ShotgunA
+		{
+			Name "Unstable Mod: Hollow Point bullets"
+			Attribute "damage bonus" 
+			Cap 1.5
+			Increment 0.5
+			Cost 0
+			Description "+50% damage bonus +20% firing speed -25% clip size" 
+			SecondaryAttributes 
+			{
+				"fire rate bonus HIDDEN" 0.2
+				"clip size penalty" -0.25
+			}
+			Tier 1
+			AllowedWeapons
+			{
+				ClassName TF_WEAPON_SHOTGUN_SOLDIER
+			}
+			DisallowedWeapons // Disallow those weapons
+			{
+				ItemName "The Reserve Shooter"
 			}
 		}
 		ReserveA
@@ -580,7 +1007,7 @@ WaveSchedule
 				"parachute attribute" 1
 				"weapon spread bonus" -0.5
 			}
-			Description "+Deals crits and fires 40% faster while rocket jumping +50% accuracy -50% slower firing speed" 
+			Description "+Deals crits and fires 40% faster while rocket jumping +50% accuracy -50% firing speed" 
 			Tier 1
             Allowplayerclass Soldier
 			AllowedWeapons
@@ -588,53 +1015,138 @@ WaveSchedule
 				ItemName "The Reserve Shooter"
 			}
 		}
-		Gunboats
+		ReserveB
 		{
-			Name "Stable Mod: Titanium Soles"
-			Attribute "mult credit collect range" 
-			Cap 3
+			Name "Unstable Mod: Explosive Shells"
+			Attribute "mult dmg vs airborne"
+			Cap 11
+			Increment 10
+			Cost 0
+			SecondaryAttributes 
+			{
+
+				"explosive bullets" 150
+				"explosion particle" "merasmus_bomb_explosion"
+				"explosion particle on direct hit" "merasmus_bomb_explosion"
+				"bullets per shot bonus" -0.8
+				"damage bonus" 1.0
+				"Reload time increased" 0.2
+				"mult dmg vs giants" 5
+				"mult dmg vs tanks" 8
+				"alt fire attack" 1
+				"add attributes on hit" "damage force reduction|1|2|airblast vertical vulnerability multiplier|1.65|2|airblast vulnerability multiplier|0|2"
+				"alt fire attributes" "damage causes airblast|1|damage penalty|-1.0"
+			}
+			Description "+Deals massive damage to airborne non-giant robots +increased damage to giants and tanks +knockback on hit -80% bullets per shot -20% slower reload" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Reserve Shooter"
+			}
+		}
+		BisonA
+		{
+			Name "Unstable Mod: AI Assist"
+			Attribute "mod projectile heat aim time"
+			Cap 2
 			Increment 2
 			Cost 0
 			SecondaryAttributes 
 			{
-				"cancel falling damage" 1
-				"maxammo primary increased"	0.25
+				"mod projectile heat aim start time" 0.5
+				"mod projectile heat seek power" 360
+				"damage penalty" -0.2
 			}
-			Description "+increased cash collection range +fall damage immunity +25% primary ammo -No Stomping (Mantreads)" 
+			Description "+Projectile will chase enemies for 2 seconds -20% damage" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Righteous Bison"
+			}
+		}
+		BisonA
+		{
+			Name "Unstable Mod: Unstable Core"
+			Attribute "damage bonus"
+			Cap 1.25
+			Increment 0.25
+			Cost 0
+			SecondaryAttributes 
+			{
+				"Reload time increased" 0.5
+				"projectile lifetime" 4
+				"Set DamageType Ignite" 1
+				"fire rate bonus HIDDEN" -0.2
+			}
+			Description "+25% damage +20% firing speed +Ignite on hit -50% reload -Projectile lasts 4 seconds" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Righteous Bison"
+				ItemName "The Pomson 6000"
+			}
+		}
+		GunboatsA
+		{
+			Name "Stable Mod: Titanium Soles"
+			Attribute "mult credit collect range" 
+			Cap 1.1
+			Increment 0.1
+			Cost 0
+			SecondaryAttributes 
+			{
+				"cancel falling damage" 1
+				"rocket specialist" 1
+			}
+			Description "+Free Rocket Specialist +fall damage immunity" 
 			Tier 1
 			AllowedWeapons
 			{
 				ItemName "The Gunboats"
-				ItemName "The Thermal Thruster"
-				ItemName "Stickybomb Jumper"
-				ItemName "The Mantreads"
 			}
 		}
-		Gunboats/para
+		GunboatsB
 		{
-			Name "Unstable Mod: Slim Rockets"
+			Name "Stable Mod: Extra Inventory Space"
+			Attribute "maxammo primary increased" 
+			Cap 2.0
+			Increment 1.0
+			Cost 0
+			Description "+100% Primary Ammo +20% rocket jump resistance" 
+			SecondaryAttributes 
+			{
+				"rocket jump damage reduction" -0.2
+			}
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Gunboats"
+			}
+		}
+		para_a
+		{
+			Name "Unstable Mod: Improved Reload Technique"
 			Attribute "halloween reload time decreased"
-			Cap 0.8
-			Increment -0.2
+			Cap 0.75
+			Increment -0.25
 			Cost 0
 			SecondaryAttributes 
 			{
 //				"max health additive penalty" -25
 //				"faster reload rate" -0.9
-				"maxammo primary reduced" -0.5
-				"maxammo secondary reduced" -0.5
+				"maxammo primary reduced" -0.25
+				"maxammo secondary reduced" -0.25
 			}
-			Description "+20% faster primary reload -50% max primary/secondary ammo" 
+			Description "+25% weapon reload -25% max primary/secondary ammo" 
 			Tier 1
 			AllowedWeapons
 			{
-				ItemName "The Gunboats"
 				ItemName "The B.A.S.E. Jumper"
 			}
 		}
 		Mantreads
 		{
-			Name "Unstable Mod: Heavy Duty Boots"
+			Name "Stable Mod: Heavy Duty Boots"
 			Attribute "move speed bonus"
 			Cap 1.1
 			Increment 0.1
@@ -652,6 +1164,24 @@ WaveSchedule
 			AllowedWeapons
 			{
 				ItemName "The Mantreads"
+//				ItemName "The Thermal Thruster"
+			}
+		}
+		Thermal
+		{
+			Name "Stable Mod: Titanium Soles"
+			Attribute "mult credit collect range" 
+			Cap 3
+			Increment 2
+			Cost 0
+			SecondaryAttributes 
+			{
+				"maxammo primary increased" 0.5
+			}
+			Description "+increased cash collection range +50% Primary Ammo" 
+			Tier 1
+			AllowedWeapons
+			{
 				ItemName "The Thermal Thruster"
 			}
 		}
@@ -670,47 +1200,10 @@ WaveSchedule
 			Description "Increased air control and can re-deploy +50% max primary ammo" 
 			Tier 1
             Allowplayerclass Soldier
-//            Allowplayerclass Demoman
+            Allowplayerclass Demoman
 			AllowedWeapons
 			{
 				ItemName "The B.A.S.E. Jumper"
-			}
-		}
-		PanicB
-		{
-			Name "Stable Mod: Combo Slugs"
-			Attribute "minicritboost on kill"
-			Cap 5
-			Increment 5
-			Cost 0
-			Description "+On Kill: 5 seconds of mini-crits +35% damage bonus" 
-			Tier 1
-			SecondaryAttributes
-			{
-				"damage bonus" 0.35
-			}
-            Allowplayerclass Engineer
-            Allowplayerclass Heavyweapons
-            Allowplayerclass Pyro
-			Allowplayerclass Spy
-			AllowedWeapons
-			{
-				ItemName "Panic Attack Shotgun"
-				ItemName "The Family Business"
-				ClassName TF_WEAPON_SHOTGUN_HWG
-				ClassName TF_WEAPON_SHOTGUN_PRIMARY
-				//ItemName "The Family Business"
-				ClassName  	TF_WEAPON_REVOLVER 
-			}
-			DisallowedWeapons // Disallow those weapons
-			{
-				ItemName "The Frontier Justice"
-				ItemName "The Pomson 6000"
-				ItemName "The Rescue Ranger"
-				ItemName "The Widowmaker"
-				ItemName "The Enforcer"
-				ItemName "Festive Ambassador"
-				ItemName "The Ambassador"
 			}
 		}
 		Panic
@@ -741,22 +1234,60 @@ WaveSchedule
 				ItemName "Panic Attack Shotgun"
 			}
 		}
+		PanicB
+		{
+			Name "Stable Mod: Combo Slugs"
+			Attribute "minicritboost on kill"
+			Cap 5
+			Increment 5
+			Cost 0
+			Description "+On Kill: 5 seconds of mini-crits +25% damage bonus" 
+			Tier 1
+			SecondaryAttributes
+			{
+				"damage bonus" 0.25
+			}
+            Allowplayerclass Engineer
+            Allowplayerclass Heavyweapons
+            Allowplayerclass Pyro
+			Allowplayerclass Spy
+			AllowedWeapons
+			{
+				ItemName "Panic Attack Shotgun"
+				ItemName "The Family Business"
+				ClassName TF_WEAPON_SHOTGUN_HWG
+				ClassName TF_WEAPON_SHOTGUN_PRIMARY
+				ItemName "The Family Business"
+				SimilarToItem  	"Festive Revolver 2014" 
+				ClassName TF_WEAPON_SHOTGUN_PYRO 				
+			}
+			DisallowedWeapons // Disallow those weapons
+			{
+				ItemName "The Frontier Justice"
+				ItemName "The Pomson 6000"
+				ItemName "The Rescue Ranger"
+				ItemName "The Widowmaker"
+				ItemName "The Enforcer"
+				ItemName "Festive Ambassador"
+				ItemName "The Ambassador"
+				ItemName "The Reserve Shooter"
+			}
+		}
 //////MELEE SOLDIER
 		ShovelA
 		{
 			Name "Stable Mod: Support Beacon"
 			Attribute "mod soldier buff range"
-			Cap 2.0
-			Increment 1.0
+			Cap 1.5
+			Increment 0.5
 			Cost 0
             Allowplayerclass Soldier
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				//"increase buff duration" 1.5
-				"provide on active" 1
+				"increase buff duration" 0.25
 				"damage bonus" 0.5
 			}
-			Description "(i)When active: +100% buff range +50% damage bonus" 
+			Description "+50% buff range +25% buff duration +50% damage bonus" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -778,11 +1309,11 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"mult credit collect range" 1
-//				"damage bonus" 0.35
-				"dmg taken from bullets increased" 0.1
+				"mult credit collect range" 1.5
+				"damage bonus" 0.35
+				"dmg taken from bullets increased" 0.05
 			}
-			Description "+increased cash collection radius and +100% melee range -10% bullet vulnerability" 
+			Description "+increased cash collection radius +150% melee range +35% damage bonus -5% bullet vulnerability" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -800,10 +1331,10 @@ WaveSchedule
 			{
 				"mult dmg vs giants" 1.0
 				"damage bonus" 0.25
-				"fire rate penalty"	0.15
+				"fire rate penalty"	0.1
 				"melee range multiplier"	0.5
 			}
-			Description "+Damages all enemies connected via medi-beam +100% damage to giant robots -15% slower swing speed" 
+			Description "+Damages enemies connected to medi-beam +25% damage +100% damage vs. giants +50% range -10% swing speed"
 			Tier 1
 			AllowedWeapons
 			{
@@ -819,10 +1350,10 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"melee range multiplier"	1
+				"melee range multiplier"	0.5
 				"fire rate penalty" 0.1
 			}
-			Description "+On Kill: 4 seconds of critical hits -10% swing speed" 
+			Description "+On Kill: 4 seconds of critical hits +50% range -10% swing speed" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -831,7 +1362,7 @@ WaveSchedule
 		}
 		Equalizer
 		{
-			Name "Unstable Mod: Survival Training"
+			Name "Stable Mod: Survival Training"
 			Attribute "damage bonus"
 			Cap 1.25
 			Increment 0.25
@@ -839,8 +1370,6 @@ WaveSchedule
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
 				"dmg from ranged reduced" -0.35
-				"provide on active" 1
-				//"hit self on miss" 1
 			}
 			Description "+25% damage +resist all ranged damage by 35%" 
 			Tier 1
@@ -852,28 +1381,28 @@ WaveSchedule
 		ZatSoldierA
 		{
 			Name "Unstable Mod: Samurai Spirit"
-			Attribute "provide on active"
-			Cap 1
-			Increment 1
+			Attribute "minicritboost on kill"
+			Cap 2.5
+			Increment 2.5
 			Cost 0
 			Allowplayerclass Soldier
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"add cond on kill" 16
-				"move speed bonus" 0.1
+				"mult_player_movespeed_active" 0.1
 				"fire rate bonus" -0.2
-				"add cond on kill duration" 2
+				"increase buff duration" 0.5
+				"mod soldier buff range" 1.0
 				"maxammo secondary reduced" -0.35
 				"maxammo primary reduced" -0.35
 			}
-			Description "+On kill: Minicrit for 2 seconds +100% buff duration and radius +20% swing speed -35% ammo penalty" 
+			Description "+On kill: Minicrit for 2 seconds +10% move speed +25% buff duration +100% buff range +20% swing speed -35% ammo penalty" 
 			Tier 1
 			AllowedWeapons
 			{
 				ItemName "The Half-Zatoichi"
 			}
 		}
-		FlameClean
+		Flamer_a
 		{
 			Name "Unstable Mod: Caustic Fumes"
 			Attribute "add cond on hit"
@@ -885,13 +1414,14 @@ WaveSchedule
 				//"bleeding duration" 3
 				"airblast_pushback_disabled" 1
 				"slow enemy on hit" 1
+				"flame_speed" 5400
+				"flame_drag" 4.75				
 			}
-			Description "+Ignite non-ignitable targets +100% chance to slow target -airblast no longer pushes back robots" 
+			Description "+Ignite non-ignitable targets +100% chance to slow target +35% flamethrower range -airblast no longer pushes back robots" 
 			Tier 1
             AllowedWeapons
 			{
-				ClassName TF_WEAPON_FLAMETHROWER 
-				ItemName "Festive Flamethrower 2011"
+				SimilarToItem "Festive Flamethrower 2011"
 			}
 			DisallowedWeapons // Disallow those weapons
 			{
@@ -899,19 +1429,65 @@ WaveSchedule
 				ItemName "The Backburner"
 				ItemName "The Dragon's Fury"
 				ItemName "The Degreaser"
+				ItemName "Flagbearer's Flogistinator"
+			}
+		}
+		Flamer_b
+		{
+			Name "Unstable Mod: Face Melter"
+			Attribute "CARD: damage bonus"
+			Cap 1.5
+			Increment 0.5
+			Cost 0
+			SecondaryAttributes
+			{
+				"move speed penalty" -0.1
+				"maxammo primary reduced" -0.5
+			}
+			Description "+50% damage bonus -10% move speed -50% ammo penalty" 
+			Tier 1
+            AllowedWeapons
+			{
+				SimilarToItem "Festive Flamethrower 2011"
+			}
+			DisallowedWeapons // Disallow those weapons
+			{
+				ItemName "The Phlogistinator"
+				ItemName "The Backburner"
+				ItemName "The Dragon's Fury"
+				ItemName "The Degreaser"
+				ItemName "Flagbearer's Flogistinator"
 			}
 		}
 		Backburner
 		{
-			Name "Unstable Mod: Acidic Compound"
+			Name "Stable Mod: Acidic Compound"
+			Attribute "dmg pierces resists absorbs"
+			Cap 1
+			Increment 1
+			SecondaryAttributes
+			{
+				"mult dmg vs tanks" 0.2
+			}
+			Description "+20% extra damage to tanks +Attacks Pierce Resistances" 
+			Tier 1
+            AllowedWeapons
+			{
+				ItemName "The Backburner"
+				ItemName "Festive Backburner 2014"
+			}
+		}
+		Backburner_b
+		{
+			Name "Unstable Mod: Prototype Module"
 			Attribute "airblast disabled"
 			Cap 1
 			Increment 1
 			SecondaryAttributes
 			{
-				"mult dmg vs tanks" 0.15
+				"max health additive bonus" 25
 			}
-			Description "+15% extra damage to tanks -No Airblast" 
+			Description "+25 max health -No Airblast" 
 			Tier 1
             AllowedWeapons
 			{
@@ -923,52 +1499,50 @@ WaveSchedule
 		{
 			Name "Unstable Mod: Leech Valve"
 			Attribute "heal on hit for rapidfire"
-			Cap 20
-			Increment 20
+			Cap 15
+			Increment 15
 			Cost 0
+			Tier 1
 			SecondaryAttributes
 			{
-				"damage penalty" -0.1
+				"max health additive bonus" 25
+				"weapon burn dmg increased" 2
+				"weapon burn time increased" 2
+				"add cond on hit" 123
+				"mult_item_meter_charge_rate" 0.1
 			}
-			Description "+20 hp per hit -10% damage penalty" 
-			Tier 1
+			Description "+Ignites non-igniteable targets +25 hp +15 hp per hit +200% burn strength -10% repressurization" 
             AllowedWeapons
 			{
 				ItemName "The Dragon's Fury"
 			}
 		}
-//		circuit_phlog
-//		{
-//			Name "Unstable Mod: Projectile Vacuum"
-//			Description "weee" 
-//			Attribute "cannot giftwrap" 
-//			Cap 1 
-//			Increment 1
-//			Cost 0
-//			Description "+Converts projectiles into mmph with alt-fire -No longer gains mmph from damage" //
-//
-//			AllowedWeapons 
-//			{
-//				ItemName "The Phlogistinator"
-//			}//
-//
-//			// these are required
-//			OnApply
-//			{
-//				// DR stands for deflect rage
-//				Output "popscript,$DR_Purchased,,0"
-//			}
-//			OnDowngrade
-//			{
-//				Output "popscript,$PersonalProjectileShieldRefunded,,0"
-//			}
-//		}
+		DragonB
+		{
+			Name "Unstable Mod: Unstable Pressure Valve"
+			Attribute "alt-fire disabled"
+			Cap 1
+			Increment 1
+			Cost 0
+			Tier 1
+			SecondaryAttributes
+			{
+				"mult_item_meter_charge_rate" -0.2
+				"mod ammo per shot" 2
+			}
+			Description "+20% repressurization speed -1 additional ammo per shot -No Airblast" 
+            AllowedWeapons
+			{
+				ItemName "The Dragon's Fury"
+			}
+		}
+
 		Degreaser
 		{
 			Name "Unstable Mod: Gas Jockey"
 			Attribute "move speed bonus"
 			Cap 1.15
-			Increment 0.1
+			Increment 0.15
 			Cost 0
 			SecondaryAttributes
 			{
@@ -976,8 +1550,10 @@ WaveSchedule
 				"damage penalty" -0.15
 				"airblast_pushback_disabled" 1
 				"mult airblast refire time" -0.5
+				"flame_speed" 5400
+				"flame_drag" 4.75	
 			}
-			Description "15% move-speed +50% faster airblast +Attacks pierce damage resistances -15% less damage -airblast no longer pushes back robots" 
+			Description "15% move speed +50% airblast speed +35% flame range +Attacks pierce resistances -15% less damage -airblast no longer pushes back" 
 			Tier 1
             AllowedWeapons
 			{
@@ -987,18 +1563,17 @@ WaveSchedule
 ////Pyro Secondary
 		FlaregunA
 		{
-			Name "Unstable Mod: Volcanic Compound"
+			Name "Unstable Mod: Heavy Duty Flare"
 			Attribute "damage bonus"
-			Cap 1.35
-			Increment 0.35
+			Cap 1.5
+			Increment 0.5
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"Projectile speed decreased" -0.35
-				"weapon burn time reduced" -0.8
+				"weapon burn time reduced" -0.25
 				"maxammo primary reduced" -0.5
 			}
-			Description "+50% damage bonus -35% slower projectile speed -80% afterburn time -50% primary ammo" 
+			Description "+50% damage bonus -25% afterburn time -50% primary ammo" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1006,20 +1581,40 @@ WaveSchedule
 				ItemName "Festive Flare Gun"
 			}
 		}
-		ScorchDet
+		FlaregunB
 		{
-			Name "Unstable Mod: Volcanic Compound"
-			Attribute "Blast radius increased"
-			Cap 1.5
-			Increment 0.5
+			Name "Stable Mod: Premium Rounds"
+			Attribute "damage bonus"
+			Cap 1.15
+			Increment 0.15
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"Projectile speed decreased" -0.35
-				"mult afterburn delay" 0.5
-				"damage penalty" -0.5
+				"mult afterburn delay" 0.25
 			}
-			Description "+35% explosion radius +50% faster afterburn -35% slower projectile speed -50% damage penalty" 
+			Description "+15% damage bonus +25% faster burn" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Flare Gun"
+				ItemName "Festive Flare Gun"
+			}
+		}
+		Det_A
+		{
+			Name "Unstable Mod: Winger Mechanism"
+			Attribute "increased jump height"
+			Cap 1.3
+			Increment 0.3
+			Cost 0
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"boots falling stomp" 1
+				"weapon burn time reduced" -0.9
+				"maxammo secondary reduced" -0.75
+				"provide on active" 1
+			}
+			Description "+30% Jump Height +Mantreads Stomp -90% afterburn time -75% ammo" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1027,20 +1622,85 @@ WaveSchedule
 				ItemName	"The Scorch Shot"
 			}
 		}
-		ManMelter
+		Det_B
 		{
-			Name "Unstable Mod: Molten Core"
-			Attribute "bleeding duration"
-			Cap 3
-			Increment 3
+			Name "Unstable Mod: Volcanic Compound"
+			Attribute "Blast radius increased"
+			Cap 1.35
+			Increment 0.35
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"Projectile speed decreased" -0.5
-				"mult afterburn delay" 2
-				"mult bleeding dmg" 3
+				"Projectile speed decreased" -0.2
+				"mult afterburn delay" 0.5
+				"damage penalty" -0.25
 			}
-			Description "+On Hit: Bleed for 3 seconds +200% faster afterburn -50% projectile speed" 
+			Description "+35% explosion radius +50% faster afterburn -20% slower projectile speed -25% damage penalty" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName	"The Detonator"
+				ItemName	"The Scorch Shot"
+			}
+		}
+		Scorch
+		{
+			Name "Unstable Mod: Magma Payload"
+			Attribute "Blast radius decreased"
+			Cap 0.5
+			Increment -0.5
+			Cost 0
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"stun on hit" "0.5"
+				"stun on hit slow" 0.6
+				"stun on hit type" "movement"
+				"mod flaregun fires pellets with knockback" -1
+			}
+			Description "+Afterburn slows enemy by 60% -50% blast radius -Cannot knockback robots" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName	"The Scorch Shot"
+			}
+		}
+		ManMelter_A
+		{
+			Name "Unstable Mod: Radiation lens"
+			Attribute "subtract victim medigun charge on hit"
+			Cap 25
+			Increment 25
+			Cost 0
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"weapon burn time reduced" -1
+				"heal on hit for rapidfire" 20
+				"mark for death" 1
+			}
+			Description "+Mark For Death +Drain 25% medigun charge per hit +20 hp per hit -No Afterburn" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Manmelter"
+			}
+		}
+		ManMelter
+		{
+			Name "Stable Mod: Condensed Core"
+			Attribute "add cond on hit"
+			Cap 123
+			Increment 123
+			Cost 0
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"weapon burn dmg increased" 1
+				"weapon burn time increased" 1
+				"add cond on hit duration" 4
+				"mult projectile count" 2
+				"ignores other projectiles" 1
+				"damage penalty" -0.25
+			}
+			Description "+Applies Gas on hit +100% burn strength +Fires 2 condensed projectiles -25% damage penalty" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1058,7 +1718,7 @@ WaveSchedule
 			{
 				"bullets per shot bonus" 0.5
 				"spread penalty" 0.35
-				"mult afterburn delay" 1.5
+				"mult afterburn delay" 0.5
 			}
 			Description "+Weapon ignites targets +50% bullets per shot -35% less accurate" 
 			Tier 1
@@ -1083,9 +1743,9 @@ WaveSchedule
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
 				"effect cond override" 24
-				"mult effect duration" -0.75
+				"mult effect duration" -0.6
 			}
-			Description "Gas Effect now coats robots in jarate -70% effect duration"
+			Description "Gas Effect now coats robots in jarate -60% effect duration"
 			Tier 1
             AllowPlayerClass Pyro
 			AllowedWeapons
@@ -1098,8 +1758,8 @@ WaveSchedule
 		{
 			Name "Unstable Mod: Heavy Mallet"
 			Attribute "dmg taken from bullets reduced"
-			Cap 0.65
-			Increment -0.35
+			Cap 0.5
+			Increment -0.5
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
@@ -1107,7 +1767,7 @@ WaveSchedule
 				"damage force reduction" -0.9
 				"dmg penalty vs players" -0.25
 			}
-			Description "(i)When active all +35% bullet resistance +90% resistant to knockback -25% Damage vs. Players"
+			Description "(i)When active: +50% bullet resistance +90% resistant to knockback -25% Damage vs. Players"
 			Tier 1
 			AllowedWeapons
 			{
@@ -1115,25 +1775,28 @@ WaveSchedule
 				ItemName "The Maul"
 			}
 		}
-//		Powerjack
-//		{
-//			Name "Unstable Mod Exposed Battery"
-//			Attribute "critboost on kill"
-//			Cap 3
-//			Increment 3
-//			Cost 0
-//			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
-//			{
+		Powerjack
+		{
+			Name "Unstable Mod Exposed Battery"
+			Attribute "critboost on kill"
+			Cap 2
+			Increment 2
+			Cost 0
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
 //				"damage penalty" -0.2
-//				"dmg taken increased" 0.3
-//			}
-//			Description "+3 seconds of critical hits on kill -20% damage penalty -30% damage vulnerability"
-//			Tier 1
-//			AllowedWeapons
-//			{
-//				ItemName "The Powerjack"
-//			}
-//		}
+				"move speed bonus" -0.15
+				"heal on kill" -25
+				"provide on active" -1
+				"increase buff duration" -0.5
+			}
+			Description "+2 seconds of critical hits on kill -25hp on kill -15% move speed -50% mmmph duration"
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Powerjack"
+			}
+		}
 		Neon
 		{
 			Name "Unstable Mod: Gordbort Capacitor"
@@ -1141,10 +1804,10 @@ WaveSchedule
 			Cap 1
 			Increment 1
 			Cost 0
-			Description "+Damages all robots connected via medibeam -25% slower swing speed"
+			Description "+Damages all robots connected via medibeam -20% slower swing speed"
 			SecondaryAttributes 
 			{
-				"fire rate penalty"		0.25
+				"fire rate penalty"		0.2
 			}
 			Tier 1
 			AllowedWeapons
@@ -1154,7 +1817,36 @@ WaveSchedule
 		}
 		PyroMeleeA
 		{
-			Name "Unstable Mod: Armor Breaking"
+			Name "Stable Mod: Extra fuel canisters"
+			Attribute "maxammo primary increased"
+			Cap 1.5
+			Increment 0.5
+			Cost 0
+			SecondaryAttributes
+			{
+				"deploy time decreased" -0.35
+				"maxammo secondary increased" 1
+			}
+			Description "+50% primary Ammo +100% secondary ammo +35% faster deploy time" 
+			Tier 1
+            Allowplayerclass Pyro
+			AllowedWeapons
+			{
+				SimilarToItem	"TF_WEAPON_FIREAXE"
+			}
+			DisallowedWeapons // Disallow those weapons
+			{
+				ItemName "The Back Scratcher"
+				ItemName "The Third Degree"		
+				ItemName "The Hot Hand"
+				ItemName "The Neon Annihilator"
+				ItemName "The Powerjack"
+				
+			}
+		}
+		PyroMeleeB
+		{
+			Name "Stable Mod: Armor Breaking"
 			Attribute "damage bonus"
 			Cap 1.2
 			Increment 0.2
@@ -1163,14 +1855,13 @@ WaveSchedule
 			{
 				"mult dmg vs giants" 0.35
 				"mult dmg vs tanks" 0.35
-				"fire rate penalty"	0.2
 			}
-			Description "+20% damage +35% bonus damage Vs. tanks and giants -20% swing speed" 
+			Description "+20% damage +35% bonus damage against tanks and giants" 
 			Tier 1
             Allowplayerclass Pyro
 			AllowedWeapons
 			{
-				Slot	"Melee"
+				SimilarToItem	"TF_WEAPON_FIREAXE"
 			}
 			DisallowedWeapons // Disallow those weapons
 			{
@@ -1178,6 +1869,8 @@ WaveSchedule
 				ItemName "The Third Degree"		
 				ItemName "The Hot Hand"
 				ItemName "The Neon Annihilator"
+				ItemName "The Powerjack"
+				SimilarToItem "The Axtinguisher"
 				
 			}
 		}
@@ -1192,28 +1885,50 @@ WaveSchedule
 			{
 				"dmg penalty vs nonburning" -0.75
 				"attack_minicrits_and_consumes_burning" -1
+				"melee range multiplier"	0.7
+				"melee bounds multiplier"	0.5
 			}
-			Description "+Crits vs. burning players +No Longer extinguishes target -75% damage to non-burning players"
+			Description "+Crits vs. burning players +No Longer extinguishes target +70% melee range +50% melee width -75% damage to non-burning players"
 			Tier 1
 			AllowedWeapons
 			{
-				ItemName "The Axtinguisher"
-				ItemName "The Postal Pummeler"
-				ItemName "Festive Axtinguisher"
+				SimilarToItem "The Axtinguisher"
+			}
+		}
+		AxtinguisherB
+		{
+			Name "Unstable Mod: Feudal Fire Axe"
+			Attribute "restore health on kill"
+			Cap 50
+			Increment 50
+			Cost 0
+			SecondaryAttributes
+			{
+				"honorbound" 1
+				"melee range multiplier"	0.7
+				"melee bounds multiplier"	0.5
+			}
+			Description "+On kill: Restore 50% of Base Health +70% melee range +50% melee width -Weapon is honorbound"
+			Tier 1
+			AllowedWeapons
+			{
+				SimilarToItem "The Axtinguisher"
 			}
 		}
 		ThirdDegree
 		{
-			Name "Unstable Mod: Spine Zapper"
+			Name "Stable Mod: Spine Zapper"
 			Attribute "crit from behind"
 			Cap 1
 			Increment 1
 			Cost 0
-			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			SecondaryAttributes
 			{
-				"max health additive penalty" -15
+				"subtract victim medigun charge on hit" 20
+				"melee range multiplier"	0.7
+				"melee bounds multiplier"	0.5
 			}
-			Description "+Crit from behind -15 max hp"
+			Description "+Crit from behind +drain 20% uber +70% melee range +50% melee width"
 			Tier 1
 			AllowedWeapons
 			{
@@ -1239,6 +1954,26 @@ WaveSchedule
 				ItemName "The Back Scratcher"
 			}
 		}
+		Rake_b
+		{
+			Name "Stable Mod: Back Breaker"
+			Attribute "crit from behind"
+			Cap 1
+			Increment 1
+			Cost 0
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"damage bonus" 0.15
+				"melee range multiplier"	0.7
+				"melee bounds multiplier"	0.5
+			}
+			Description "+15% damage bonus +Crit from behind +70% melee range +50% melee width"
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Back Scratcher"
+			}
+		}
 		VolcanoFragment
 		{
 			Name "Unstable Mod: Hell-Forged Heal"
@@ -1250,8 +1985,10 @@ WaveSchedule
 			{
 				"mult afterburn delay" 1.5
 				"damage penalty" -0.2
+				"melee range multiplier"	0.7
+				"melee bounds multiplier"	0.5
 			}
-			Description "+On Hit: Heal 25hp +150% faster afterburn -20% damage penalty"
+			Description "+On Hit: Heal 25hp +150% faster afterburn +70% melee range +50% melee width -20% damage penalty"
 			Tier 1
 			AllowedWeapons
 			{
@@ -1265,7 +2002,7 @@ WaveSchedule
 			Cap 5
 			Increment 5
 			Cost 0
-			Description "+70% melee range +85% damage bonus +On ally hit: gives both players a speed bonus for 5 seconds"
+			Description "+70% melee range +50% melee width +85% damage bonus +On ally hit: gives both players a speed bonus for 5 seconds"
 			Tier 1
 			AllowedWeapons
 			{
@@ -1274,7 +2011,7 @@ WaveSchedule
 			SecondaryAttributes
 			{
 				"melee range multiplier"	0.7
-				"melee bounds multiplier"	0.55
+				"melee bounds multiplier"	0.5
 				"damage penalty" 0.2
 				"damage bonus" 0.65
 			}
@@ -1291,9 +2028,8 @@ WaveSchedule
 				"fire rate bonus HIDDEN" -0.3
 				"auto fires full clip" 1
 				"projectile spread angle penalty" 3
-//				"blast radius increased" 0.35
 			}
-			Description "(i)Beggars Style Reload +30% faster firing speed +35% splash radius -2 degrees of deviation" 
+			Description "(i)Beggars Style Reload +30% faster firing speed +35% splash radius -3 degrees of deviation" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1303,6 +2039,36 @@ WaveSchedule
 			DisallowedWeapons // Disallow those weapons
 			{
 				ItemName "The Loch-n-Load"
+				ItemName "The Beggar's Bomber"
+			}
+		}
+		GrenadeLauncherB
+		{
+			Name "Unstable Mod: Big Bertha"
+			Attribute "mult projectile scale" 
+			Cap 1.5
+			Increment 0.5
+			Cost 0
+			SecondaryAttributes
+			{
+				"fire rate bonus HIDDEN" 0.2
+				"blast radius increased" 0.5
+				"Projectile speed decreased" -0.4
+				"CARD: damage bonus" 0.15
+				"Reload time increased" 0.25
+
+			}
+			Description "+50% explosion Radius +15% damage bonus -40% projectile speed -25% reload speed -20% firing speed" 
+			Tier 1
+			AllowedWeapons
+			{
+				ClassName TF_WEAPON_GRENADELAUNCHER
+				ItemName "Festive Grenade Launcher"
+			}
+			DisallowedWeapons // Disallow those weapons
+			{
+				ItemName "The Loch-n-Load"
+				ItemName "The Beggar's Bomber"
 			}
 		}
 		LochB
@@ -1315,12 +2081,14 @@ WaveSchedule
 			SecondaryAttributes
 			{
 				"damage penalty" -0.3
-				"projectile spread angle penalty" 2
+				"projectile spread angle penalty" 3
 				"sticky air burst mode" -1
 				"grenade damage reduction on world contact" -0.5
 				"fuse bonus" -0.8
+				"Blast radius decreased" -0.5
+				"clip size penalty" -0.5
 			}
-			Description "+Weapon now fires 2 bombs simultaneously +Pipes do not shatter -30% damage penalty -80% shorter fuse time" 
+			Description "+Fires 2 bombs +Pipes don't shatter -30% damage penalty -80% shorter fuse time -50% blast radius -50% clip -3 degrees of deviation" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1345,26 +2113,26 @@ WaveSchedule
 				"grenade launcher mortar mode" 0
 				"CARD: damage bonus" 0.2
 			}
-			Description "+On Hit: Refill 75% Shield +Explode on impact +20% damage bonus -50% clip size" 
+			Description "+On Hit: Refill 75% Shield +On Kill: minicrit for 5 seconds +Explode on impact +20% damage bonus -50% clip size" 
 			Tier 1
 			AllowedWeapons
 			{
 				ItemName "The Loose Cannon"
 			}
 		}
-		StickyA
+		StickyB
 		{
 			Name "Unstable Mod: Extra Adhesive"
 			Attribute "max pipebombs decreased"
-			Cap -3
-			Increment -3
+			Cap -2
+			Increment -2
 			Cost 0
 			SecondaryAttributes
 			{
-				"sticky arm time bonus" -0.1
+				"sticky arm time bonus" -0.15
 				"stickybomb stick to enemies" 1
 			}
-			Description "+10% faster arm-time +bombs stick to enemies -3 max active sticky bombs" 
+			Description "+15% faster arm-time +bombs stick to enemies -2 max active sticky bombs" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1395,7 +2163,7 @@ WaveSchedule
 				"stickybomb charge rate" -10
 				"sticky arm time penalty" -0.4
 			}
-			Description "(i)Uses Beggar's style reload +35% faster firing speed +0.4s faster arm time +2 max active sticky bombs -6 degree spread" 
+			Description "(i)Uses Beggar's style reload +35% faster firing speed +0.4s faster arm time +2 max active sticky bombs +sticks to enemies -6 degree spread" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1406,17 +2174,18 @@ WaveSchedule
 		{
 			Name "Unstable Mod: Prototype Sensor"
 			Attribute "stickybomb fizzle time"
-			Cap 1.5
-			Increment 1.5
+			Cap 2
+			Increment 2
 			Cost 0
 			SecondaryAttributes
 			{
 				"clip size penalty" 0.25
 				"stickybomb_charge_damage_increase" 0.15
 				"mult projectile scale" 1.0
-				"stickybomb charge rate" -0.15
+				"stickybomb charge rate" -0.2
+				"stickybomb stick to enemies" 1
 			}
-			Description "+25% clip size +15% damage at full charge +15% Charge speed -Stickies fizzle after 1.5 seconds" 
+			Description "+25% clip size +15% damage at full charge +20% Charge speed +sticks to enemies -Stickies fizzle after 2 seconds" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1433,12 +2202,11 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes
 			{
-				"max health additive bonus" -25
 				"maxammo secondary reduced" -0.5
-				"halloween reload time decreased" 0.75
-				"mult credit collect range" 2
+				"halloween reload time decreased" 0.25
+				"mult credit collect range" 3
 			}
-			Description "+200% Cash collection range -50% Sticky Ammo -25hp -75% Sticky Bomb Reload" 
+			Description "+300% Cash collection range -50% Sticky Ammo -25% Secondary Reload" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1456,11 +2224,12 @@ WaveSchedule
 			SecondaryAttributes
 			{
 				"max health additive bonus" -25
-				"move speed bonus shield required" 0.1
-				"kill refills meter" 0.25
-				"mult charge turn control" 2.0
+				"move speed bonus shield required" 0.2
+				"kill refills meter" 0.5
+				"mult charge turn control" 3.0
+				"rocket jump damage reduction" -0.8
 			}
-			Description "+2x all passive stats -25 max hp" 
+			Description "+2x all passive stats +80% blast jump resistance -25 max hp" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1477,17 +2246,15 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes
 			{
-				"halloween reload time decreased" 0.7
+				"halloween reload time decreased" 0.2
 				"add cond on kill duration" 4
+				"maxammo primary increased" 0.5
 			}
-			Description "+On Shield Kill: 4 seconds of crits -35% primary reload" 
+			Description "+On Shield Kill: 4 seconds of crits +50% max primary ammo -20% primary reload" 
 			Tier 1
 			AllowedWeapons
 			{
-				ItemName "Festive Targe 2014"
-				ItemName "The Chargin' Targe"
 				ItemName "The Splendid Screen"
-				ItemName "The Tide Turner"
 			}
 		}
 		Targe_A
@@ -1499,12 +2266,31 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes
 			{
-				"dmg taken from fire reduced" 0.25
-				"dmg taken from blast reduced" 0.15
-				"halloween reload time decreased" 0.75
-				"health from credits" 20
+				"halloween reload time decreased" 0.5
+				"health from credits" 40
 			}
-			Description "+Heal from credits collected -25% fire resistance -15% Blast resistance -75% primary reload" 
+			Description "+Heal from credits collected -50% primary reload" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "Festive Targe 2014"
+				ItemName "The Chargin' Targe"
+			}
+		}
+		Targe_B
+		{
+			Name "Unstable Mod: Heavy Duty Shield"
+			Attribute "stickybomb stick to enemies" 
+			Cap 1
+			Increment 1
+			Cost 0
+			SecondaryAttributes
+			{
+				"halloween reload time decreased" 0.2
+				"mult dmgtaken from melee" -0.4
+				"dmg taken from bullets reduced" -0.3
+			}
+			Description "+40% melee resistance +30% bullet resistance -20% Primary Reload speed" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1521,12 +2307,10 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes
 			{
-				"dmg taken from fire reduced" 0.2
-				"dmg taken from blast reduced" 0.2
-				"halloween reload time decreased" 0.75
-				"health from credits" 20
+				"halloween reload time decreased" 0.5
+				"health from credits" 35
 			}
-			Description "+Heal from credits collected -20% fire/blast resistance -75% reload" 
+			Description "+Heal from credits collected -50% reload" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1542,12 +2326,10 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes
 			{
-				"dmg taken from fire reduced" 0.15
-				"dmg taken from blast reduced" 0.15
-				"halloween reload time decreased" 0.75
-				"health from credits" 20			
+				"halloween reload time decreased" 0.5
+				"health from credits" 30		
 			}
-			Description "+Heal from credits collected -25% fire resistance -15% Blast resistance -75% reload" 
+			Description "+Heal from credits collected -50% reload" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1559,7 +2341,7 @@ WaveSchedule
 		Bottle
 		{
 			Name "Unstable Mod: Gardener Module"
-			Description "+Crits while blast jumping -10% slower swing speed"
+			Description "+Crits while blast jumping +25% damage bonus +35% melee range -10% slower swing speed"
 			AllowPlayerClass Demoman
 			AllowedWeapons
 			{
@@ -1572,8 +2354,9 @@ WaveSchedule
 			Cap 1
 			SecondaryAttributes
 			{
+				"damage bonus" 0.25
 				"fire rate penalty"		0.1
-				"melee range multiplier"	0.25
+				"melee range multiplier"	0.35
 			}
 		}
 		CaberA
@@ -1600,8 +2383,8 @@ WaveSchedule
 		{
 			Name "Unstable Mod: Scottish Steel"
 			Attribute "fire rate penalty"
-			Cap 1.25
-			Increment	0.25
+			Cap 1.2
+			Increment	0.2
 			Cost 0
 			SecondaryAttributes
 			{	
@@ -1610,7 +2393,7 @@ WaveSchedule
 				"charge time increased" 1.5
 				"crit from behind" 1
 			}
-			Description "+1.5 Charge Duration +400% Turn Control +15% damage resistance +Crit from behind -25% Swing Speed" 
+			Description "+1.5 Charge Duration +400% Turn Control +15% damage resistance +Crit from behind -20% Swing Speed" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1626,15 +2409,17 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes
 			{	
-				"fire rate penalty" 0.2
+				"fire rate penalty" 0.1
 			}
-			Description "+Weapon can now random crit -20% swing speed" 
+			Description "+Weapon can now random crit -10% swing speed" 
 			Tier 1
 			AllowedWeapons
 			{
 				ItemName "The Eyelander"
 				ItemName "Festive Eyelander"
 				ItemName "The Persian Persuader"
+				ItemName "The Horseless Headless Horseman's Headtaker"
+				ItemName "The Claidheamohmor"
 			}
 		}
 		Persian
@@ -1646,21 +2431,61 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes
 			{	
-				"fire rate penalty" 0.2
+				"fire rate penalty" 0.1
 				"maxammo primary reduced" 0.8
 				"maxammo secondary reduced" 0.8
 			}
-			Description "+200% Impact Damage -20% slower swing speed +80% primary and secondary ammo" 
+			Description "+200% Impact Damage -10% slower swing speed +80% primary and secondary ammo" 
 			Tier 1
 			AllowedWeapons
 			{
 				ItemName "The Persian Persuader"
 			}
 		}
+		Heavy_stock_a
+		{
+			Name "Stable Mod: Thinned Drum Walls"
+			Description "+25% Ammo +5% faster spinup +Can holster while spun"
+			AllowPlayerClass HeavyWeapons
+			AllowedWeapons
+			{
+				SimilarToItem	"Festive Minigun 2011"
+			}
+			Cost 0
+			Attribute "mod minigun can holster while spinning" 
+			Increment 1
+			Cap 1
+			Tier 1
+			SecondaryAttributes
+			{
+				"hidden primary max ammo bonus" 0.25
+				"minigun spinup time decreased" -0.05
+			}
+		}
+		Heavy_stock_b
+		{
+			Name "Unstable Mod: Exhaust Vectoring"
+			Description "+10% damage bonus +Can holster while revved -50% less accurate spread"
+			AllowPlayerClass HeavyWeapons
+			AllowedWeapons
+			{
+				SimilarToItem	"Festive Minigun 2011"
+			}
+			Cost 0
+			Attribute "damage bonus" 
+			Increment 0.1
+			Cap 1.1
+			Tier 1
+			SecondaryAttributes
+			{
+				"spread penalty" 0.5
+				"mod minigun can holster while spinning" 1
+			}
+		}
 		HeavyBalancedBrass
 		{
 			Name "Unstable Mod: Defense Framework"
-			Description "+30% Spinup resistance +spin-up time penalty is removed -movement is disabled while spun-up -10% damage -100% overheal"
+			Description "+30% Spinup resistance +50% spinup speed +50% crit resistance +Can holster while revved -movement is disabled while spun-up -10% damage -100% overheal"
 			AllowPlayerClass HeavyWeapons
 			AllowedWeapons
 			{
@@ -1696,7 +2521,7 @@ WaveSchedule
 				"damage penalty" 0.2
 				"hidden primary max ammo bonus" -0.25
 			}
-			Description "+20% damage +30% faster spinup -100% move speed while spun-up -20% spinup resistance -25% max ammo" 
+			Description "+20% damage +30% faster spinup +Can holster while revved -100% move speed while spun-up -20% spinup resistance -25% max ammo" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1717,7 +2542,7 @@ WaveSchedule
 				"hidden primary max ammo bonus" -0.5
 				"tool needs giftwrap" 1
 			}
-			Description "+no movement penalty when spun-up +Rage now pierces resistances -50% max ammo" 
+			Description "+Move at full speed while revved +No rage penalty (+While enraged: +Pierce Resistance +50% accuracy) -50% max ammo" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1745,7 +2570,7 @@ WaveSchedule
 				"damage penalty" 0.1
 				"throwable fire speed" 1
 			}
-			Description "+10% damage bonus +Rage now applies afterburn -200% faster ammo drain" 
+			Description "+10% damage bonus +No rage penalty (+While enraged: +Ignite on hit) -200% faster ammo drain" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1813,7 +2638,7 @@ WaveSchedule
 				"deploy time decreased" -0.35
 				"maxammo secondary increased" 1
 			}
-			Description "+35% faster switch speed +50% minigun ammo +100% shotgun ammo" 
+			Description "+35% faster deploy time +50% minigun ammo +100% shotgun ammo" 
 			Tier 1
 			AllowPlayerClass Heavyweapons
 			AllowedWeapons
@@ -1830,6 +2655,7 @@ WaveSchedule
 				ItemName "Fists of Steel"
 				ItemName "The Killing Gloves of Boxing"
 				ItemName "The Holiday Punch"
+				ItemName "The Gloves of Running Urgently 2015-16 (Pre-JI)"
 			}
 		}
 		GRU_B
@@ -1844,7 +2670,7 @@ WaveSchedule
 				"mod_maxhealth_drain_rate" -10
 				"mult_player_movespeed_active" 0.05
 			}
-			Description "+No hp drain -Marked for death" 
+			Description "+No hp drain +5% movement speed -Marked for death" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1883,9 +2709,9 @@ WaveSchedule
 			SecondaryAttributes
 			{
 				"mod_maxhealth_drain_rate" -10
-				"dmg taken increased" 0.2
+				"dmg taken increased" 0.1
 			}
-			Description "+No hp drain +Crits when minicrits -20% damage vulnerability" 
+			Description "+No hp drain +Crits when minicrits -10% damage vulnerability" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1895,16 +2721,17 @@ WaveSchedule
 		Warriors
 		{
 			Name "Unstable Mod: Warrior's Code"
-			Attribute "honorbound"
-			Cap 1
-			Increment 1
+			Attribute "damage bonus"
+			Cap 1.5
+			Increment 0.2
 			Cost 0
 			SecondaryAttributes
 			{
+				"maxammo primary reduced" -0.5
 				"dmg taken increased" -0.3
-				"fire rate penalty" 0.3
+				"provide on active" -1
 			}
-			Description "+30% damage resistance -weapon is now honorbound -30% slower swing speed" 
+			Description "+30% damage resistance +50% damage bonus -50% primary ammo" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -1932,7 +2759,32 @@ WaveSchedule
 				ItemName "Fists of Steel"
 			}
 		}
-		EngieShotguns
+		EngieShotguns_noFJ
+		{
+			Name "Unstable Mod: Custom Engineered Shotgun"
+			Attribute "engineer building teleporting pickup"
+			Cap 100
+			Increment 100
+			Cost 0
+			SecondaryAttributes
+			{
+				"mark for death on building pickup" 1
+				"damage bonus" 0.35
+			}
+			Description "+Rescue Ranger Haul +35% damage bonus -Self mark for death when hauling buildings" 
+			Tier 1
+            Allowplayerclass Engineer
+			AllowedWeapons
+			{
+				ClassName "TF_WEAPON_SHOTGUN_PRIMARY"
+			}
+			DisallowedWeapons // Disallow those weapons
+			{
+				ItemName "The Widowmaker"
+				ItemName "The Frontier Justice"
+			}
+		}
+		FJ
 		{
 			Name "Unstable Mod: Custom Engineered Shotgun"
 			Attribute "engineer building teleporting pickup"
@@ -1948,18 +2800,12 @@ WaveSchedule
             Allowplayerclass Engineer
 			AllowedWeapons
 			{
-				ClassName "TF_WEAPON_SHOTGUN_PRIMARY"
-				//ItemName "The Pomson 6000"
-				ItemName "The Frontier Justice"
-			}
-			DisallowedWeapons // Disallow those weapons
-			{
-				ItemName "The Widowmaker"
+				SimilarToItem "The Frontier Justice"
 			}
 		}
 		Pomson
 		{
-			Name "Unstable Mod: Improved Transistors"
+			Name "Stable Mod: Improved Transistors"
 			Attribute "engineer building teleporting pickup"
 			Cap 100
 			Increment 100
@@ -1972,7 +2818,7 @@ WaveSchedule
 				"damage bonus HIDDEN" 1.0
 				"bleeding duration" 1
 			}
-			Description "+Use 100 metal to pick up your buildings from long range +fires Bison laser" 
+			Description "+Use 100 metal to pick up your buildings from long range +fires Bison laser (+100% damage bonus +100% projectile speed)" 
 			Tier 1
             Allowplayerclass Engineer
 			AllowedWeapons
@@ -1980,41 +2826,57 @@ WaveSchedule
 				ItemName "The Pomson 6000"
 			}
 		}	
-		PomsonB
+		Widow
 		{
-			Name "Unstable Mod: Burst Lens"
-			Attribute "hold fire until full reload"
-			Cap 1
-			Increment 1
+			Name "Unstable Mod: Sentry Companion A.I"
+			Attribute "engy sentry radius increased"
+			Cap 1.2
+			Increment 0.2
 			Cost 0
 			SecondaryAttributes
 			{
-				"projectile spread angle penalty" 2
-				"mult projectile count" 2
-				"projectile lifetime" 0.75
-				"reload time increased hidden" 0.5
+				"mod ammo per shot" 25
+				"damage bonus bullet vs sentry target" 0.3
 			}
-			Description "+Fires 3 projectiles -Projectiles fizzle after 0.75 seconds -Cannot be fired until fully reloaded" 
+			Description "+30% damage to sentry's targets +25% sentry range -25 increased metal per shot" 
 			Tier 1
 			AllowedWeapons
 			{
-				ItemName "The Pomson 6000"
-				ItemName "The Righteous Bison"
+				ItemName "The Widowmaker"
 			}
 		}
 		Ranger
 		{
 			Name "Unstable Mod: Compact Sensor"
 			Attribute "maxammo metal reduced"
-			Cap 0.75
-			Increment -0.25
+			Cap 0.8
+			Increment -0.2
 			Cost 0
 			SecondaryAttributes
 			{
 				"engineer building teleporting pickup" -50
 				"clip size penalty" -0.16
 			}
-			Description "+hauling cost reduced to 50 metal -15% clip size -25% max metal" 
+			Description "+hauling cost reduced to 50 metal -15% clip size -20% max metal" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Rescue Ranger"
+			}
+		}
+		Ranger_b
+		{
+			Name "Unstable Mod: Crossbow Bolts"
+			Attribute "engineer building teleporting pickup"
+			Cap 150
+			Increment 50
+			Cost 0
+			SecondaryAttributes
+			{
+				"override projectile type" -10
+				"damage penalty" -0.25
+			}
+			Description "+Now headshots -Hauling Cost increased to 150 metal -25% damage penalty" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -2042,27 +2904,6 @@ WaveSchedule
 				ItemName "The C.A.P.P.E.R"
 			}
 		}
-//		shield_gen_sentry
-//		{
-//			Name "Personal Shield Generator"
-//			Description "Attach a projectile shield to your sentry guns. Decreased primary sentry fire rate" 
-//			Attribute "throwable fire speed" // this should not be changed as lua logic relies on checking for this
-//			Cap 2 
-//			Increment 1
-//			Cost 350
-//
-//			AllowedWeapons 
-//			{
-//				ClassName "TF_WEAPON_PDA_ENGINEER_BUILD"
-//			}
-//
-//			SecondaryAttributes
-//			{
-//				// 0.5 firerate
-//				"engy sentry fire rate increased" 2
-//				"mult firerocket rate" 0.5
-//			}
-//		}
 		PistolEngieB
 		{
 			Name "Stable Mod: Combat Sensor"
@@ -2072,10 +2913,12 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"damage bonus bullet vs sentry target" 1
-				"building cost reduction" -0.5
+				"damage bonus bullet vs sentry target" 0.75
+				"building cost reduction" -0.75
+				"damage bonus" 0.25
+				"engy sentry radius increased" 1.0
 			}
-			Description "+100% damage to sentry target +on kill: gain 6 seconds of minicrits +Building cost reduced by 50%" 
+			Description "+75% damage to sentry target +25% damage bonus +100% sentry range +Minicrit on kill +75% cheaper buildings" 
 			Tier 1
             AllowPlayerClass Engineer
 			AllowedWeapons
@@ -2086,17 +2929,16 @@ WaveSchedule
 		}
 		Wrangler
 		{
-			Name "Unstable Mod: Sentry Jumper"
+			Name "Stable Mod: Sentry Jumper"
 			Attribute "rocket jump damage reduction"
 			Cap 0.05
 			Increment -0.95
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"maxammo metal reduced" -0.15
 				"cancel falling damage" 1
 			}
-			Description "+90% less damage from sentry jumping -15% less metal" 
+			Description "+90% less damage from sentry jumping +No Fall damage" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -2121,9 +2963,29 @@ WaveSchedule
 				"dmg penalty vs players" -0.35
 				"alt-fire disabled" 1	
 				"add onhit addammo" 10
-				"attack projectiles" 2
+				"no self effect" 1
+				"bleeding duration" 4
+				"engy building health bonus" 0.5
 			}
-			Description "+Primary fire now uses an explosive +10 metal per hit -250% slower firing speed -No Alt fire" 
+			Description "+Primary fire is now explosive +10 metal per hit +On hit: bleed -250% slower firing speed +50% building health -No Alt fire" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Short Circuit"
+			}
+		}
+		Circuit_b
+		{
+			Name "Stable Mod: Mechanical Augmentation"
+			Attribute "move speed bonus"
+			Cap 1.15
+			Increment 0.15
+			Cost 0
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"halloween reload time decreased" -0.25
+			}
+			Description "+25% primary reload +15% movement speed" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -2145,7 +3007,7 @@ WaveSchedule
 				"engy disposable sentries" 1
 				"mult teleporter recharge rate" -0.5
 			}
-			Description "+1 disposable sentry gun +50% more effecient dispenser and teleporter +25% Melee Damage" 
+			Description "+1 disposable sentry gun +200% dispenser strength +200% dispenser strength +50% teleporter recharge" 
 			Tier 1
             Allowplayerclass Engineer
             AllowedWeapons
@@ -2162,9 +3024,11 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"damage bonus" 0.5
+				"damage bonus" 1.0
+				"halloween reload time decreased" -0.5
+				"engy building health bonus" 1.0
 			}
-			Description "+75 max hp +50% melee damage" 
+			Description "+75 max hp +100% melee damage +50% reload to all weapons +100% building health bonus" 
 			Tier 1
             Allowplayerclass Engineer
             AllowedWeapons
@@ -2196,6 +3060,63 @@ WaveSchedule
 				ItemName "The Southern Hospitality"
 			}
 		}
+		Wrench_a
+		{
+			Name "Stable Mod: Upgrade Optimization"
+			Attribute "engy dispenser radius increased"
+			Cap 1.5
+			Increment 0.5
+			Cost 0
+			AllowPlayerClass Engineer
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"upgrade rate decrease" 1
+				"mult dispenser rate" 0.5
+			}
+			Description "+100% upgrade rate +50% dispenser range +50% dispenser strength" 
+			Tier 1
+            AllowedWeapons
+			{
+				SimilarToItem "Festive Wrench 2011"
+				ItemName "The Southern Hospitality"
+				ItemName "The Eureka Effect"
+			}
+		}
+		Wrench_b
+		{
+			Name "Stable Mod: Battle Augmentations"
+			Attribute "mvm sentry ammo" 
+			Cap 1.5
+			Increment 0.5
+			Cost 0
+			AllowPlayerClass Engineer
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"mult firerocket rate" -0.4
+			}
+			Description "+50% sentry ammo +40% Sentry Rocket Firing Speed" 
+			Tier 1
+            AllowedWeapons
+			{
+				SimilarToItem "Festive Wrench 2011"
+				ItemName "The Jag"
+			}
+		}
+		jag_a
+		{
+			Name "Stable Mod: Haste Gear"
+			Attribute "Construction rate increased"
+			Cap 1.75
+			Increment 0.45
+			Cost 0
+			AllowPlayerClass Engineer
+			Description "+45% construction speed" 
+			Tier 1
+            AllowedWeapons
+			{
+				SimilarToItem "The Jag"
+			}
+		}
 		WatchMoney
 		{
 			Name "Stable Mod: Cash Vacuum"
@@ -2205,7 +3126,7 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"health from credits" 15
+				"health from credits" 30
 			}
 			Description "+200% Cash Collection Range +heals from cash collected" 
 			Tier 1
@@ -2283,9 +3204,8 @@ WaveSchedule
 				"disable buildings on hit" 4
 				"subtract victim medigun charge on hit" 25
 				"clip size penalty HIDDEN" -0.35
-				"dmg penalty vs players" -0.35
 			}
-			Description "+Marks target for death +Drains 25% uber +Disables buildings -Fires a low damage syringe"
+			Description "+Marks target for death +Drains 25% uber +Disables buildings -Fires a syringe -35% clip size"
 			Tier 1
             AllowedWeapons
 			{
@@ -2296,6 +3216,7 @@ WaveSchedule
 				ItemName "The Enforcer"
 				ItemName "Festive Ambassador"
 				ItemName "The Ambassador"
+				ItemName "The Wild Revolver"
 			}
 		}
 		Amby
@@ -2307,17 +3228,114 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"crit_dmg_falloff" -1
-				"Reload time increased" 0.5
 				"clip size penalty HIDDEN" -0.5
 				"fire rate penalty HIDDEN" 0.2
 			}
-			Description "+headshot explode +No Crit falloff -50% slower reload -50% Mag size -20% slower firing speed"
+			Description "+headshots explode -50% Mag size -20% slower firing speed"
 			Tier 1
             AllowedWeapons
 			{
 				ItemName "The Ambassador"
 				ItemName "Festive Ambassador"
+			}
+		}
+		Amby_B
+		{
+			Name "Stable Mod: Skullcracker"
+			Attribute "can headshot" 
+			Cap 1
+			Increment 1
+			Cost 0
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"crit_dmg_falloff" -1
+				"headshot damage increase" 0.25
+			}
+			Description "+No Headshot cooldowwn +25% headshot damage"
+			Tier 1
+            AllowedWeapons
+			{
+				ItemName "The Ambassador"
+				ItemName "Festive Ambassador"
+			}
+		}
+		Knife_A
+		{
+			Name "Stable Mod: Direct Deposit"
+			Attribute "collect currency on kill" 
+			Cap 1
+			Increment 1
+			Cost 0
+			Description "+On kill: robot drops red money (automatically collected)"
+			Tier 1
+            Allowplayerclass Spy
+            AllowedWeapons
+			{
+				Slot "Melee"
+			}
+		}
+		Big_Earner
+		{
+			Name "Unstable Mod: Longer blade"
+			Attribute "collect currency on kill" 
+			Cap 1
+			Increment 1
+			Cost 0
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{
+				"melee range multiplier"	0.6
+				"melee bounds multiplier"	0.2
+				"damage penalty" -0.15
+			}
+			Description "+50% melee range +Collects money on kill -15% damage penalty"
+			Tier 1
+            AllowedWeapons
+			{
+				ItemName "The Big Earner"
+
+			}
+		}
+		Sapper
+		{
+			Name "Unstable Overclock: Malware payload"
+			Attribute "effect cond override" 
+			Cap 3283736
+			Increment 3283736
+			Cost 0
+			SecondaryAttributes
+			{
+				"effect add attributes" "damage penalty|0.5"
+			}
+			Description "+Sapper Applies Milk, Jarate and lowers damage by 50% +Sapper is not consumed on use -Cannot stun" 
+			Tier 1
+            AllowPlayerClass Spy
+            AllowedWeapons
+			{
+                ItemName "The Red-Tape Recorder"
+				SimilarToItem TF_WEAPON_BUILDER_SPY
+				ItemName "Festive Sapper"
+			}
+		}
+		Sapper_b
+		{
+			Name "Unstable Overclock: Battery Transfer"
+			Attribute "mult cloak meter consume rate" 
+			Cap 1.5
+			Increment 0.5
+			Cost 0
+			SecondaryAttributes
+			{
+				"effect bar recharge rate increased" -0.5
+				"cloak regen rate decreased" -0.25
+			}
+			Description "+50% faster recharge rate -50% cloak drain -25% cloak regeneration" 
+			Tier 1
+            AllowPlayerClass Spy
+            AllowedWeapons
+			{
+                ItemName "The Red-Tape Recorder"
+				SimilarToItem TF_WEAPON_BUILDER_SPY
+				ItemName "Festive Sapper"
 			}
 		}
 		XbowBalancedA
@@ -2329,11 +3347,10 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"add cond on hit duration" 4.0
-				"reload time increased hidden" 0.75
-				"damage penalty" -0.5
+				"add cond on hit duration" 3.0
+				"reload time increased hidden" 0.5
 			}
-			Description "+On hit: Apply 4 seconds of Mad Milk -75% slower reload speed -50% damage penalty" 
+			Description "+On hit: Apply 4 seconds of Mad Milk -50% slower reload speed" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -2351,18 +3368,16 @@ WaveSchedule
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
 				"reload time increased hidden" 0.35
-				"damage penalty" -0.20
 				"grenade bounce speed" 1
-				"projectile lifetime" 2.5
-				"mult bleeding dmg" 3
+				"projectile lifetime" 1.75
 				"projectile no deflect" 1		
 				"reset arrow hits on bounce" 1
-				"clip size penalty HIDDEN" 2
-				"maxammo primary reduced" 0.35
-				"grenade bounce damage" -0.15
+				"grenade bounce damage" -0.35
 				"mult dmg vs tanks" -.20
+				"fire rate penalty" 1
+				"maxammo primary reduced" -0.15
 			}
-			Description "+Bouncy Syringes +Reload entire clip +2 clip size -20% damage -35% slower reload -15% damage per bounce" 
+			Description "+Bouncy Syringes -50% ammo -35% slower reload -100% firing speed -35% damage per bounce" 
 			Tier 1
 			AllowedWeapons
 			{
@@ -2393,26 +3408,34 @@ WaveSchedule
 			}
 		}
 ///mediguns
-		MedigunC
+		MedigunA
 		{
 			Name "Unstable Mod: Broken Shield Lens"
 			Attribute "heal rate bonus"
 			Cap 1.20
 			Increment 0.20
 			Cost 0
-			Description "+Regenerate patient ammo/metal +Heal buildings +20% faster heal rate +No uber build penalty on overhealed patients -65% shield duration -100% shield damage" 
+			Description "+25 max hp +20% heal rate +15% uber build +Patients regen ammo +50% shield damage -Small shield size" 
 			Tier 1
 			SecondaryAttributes 
 			{
 				"ubercharge overheal rate penalty" 0.15
-				"increase buff duration" -0.65
-				"dmg penalty vs players" -1.0
-				"medic machinery beam" 4
 				"medigun passive attributes" "ammo regen|0.5|metal regen|125"
+				"max health additive bonus" 25
+				"generate rage on heal" 2
+				"dmg penalty vs players" 1.5 //50% damage bonus
+				"increase buff duration" 0.5
+			}
+			OnApply
+			{
+				Output "popscript,$PersonalProjectileShieldPurchase,,0"
+			}
+			OnDowngrade
+			{
+				Output "popscript,$PersonalProjectileShieldRefunded,,0"
 			}
             AllowedWeapons
 			{
-				ItemName "The Kritzkrieg"
 				ClassName TF_WEAPON_MEDIGUN
 				ItemName "Festive Medigun 2011"
 			}
@@ -2420,6 +3443,28 @@ WaveSchedule
 			{
 				ItemName "The Quick-Fix"
 				ItemName "The Vaccinator"
+				ItemName "The Kritzkrieg"
+				ItemName "The Battering Ram"
+			}
+		}
+		MedigunB
+		{
+			Name "Unstable Mod: Rüstung Chip"
+			Attribute "heal rate bonus"
+			Cap 1.25
+			Increment 0.25
+			Cost 0
+			Description "+25% heal rate -10% overheal rate penalty (i)Ubercharge: Increase move, weapon and reload speed +Can apply uber to multiple patients" 
+			Tier 1
+			SecondaryAttributes 
+			{
+				"medigun keep charged effect" 1
+				"effect cond override" 2106481
+				"ubercharge overheal rate penalty" 0.1
+			}
+            AllowedWeapons
+			{
+				ItemName "The Kritzkrieg"
 			}
 		}
 		QuickFix
@@ -2463,6 +3508,7 @@ WaveSchedule
             DisallowedWeapons
             {
                 ItemName "The Ubersaw"
+				ItemName "The Stasis Shock"
             }
 		}
 		BonesawCleanB
@@ -2472,7 +3518,7 @@ WaveSchedule
 			Cap 10
 			Increment 10
 			Cost 0
-			Description "+Mark For Death +20% damage bonus" 
+			Description "+Mark For Death +35% damage bonus" 
 			Tier 1
             Allowplayerclass Medic
             AllowedWeapons
@@ -2481,14 +3527,14 @@ WaveSchedule
 			}
 			SecondaryAttributes 
 			{
-				"damage bonus" 0.2
+				"damage bonus" 0.35
 			}
             DisallowedWeapons
             {
-                ItemName "The Ubersaw"
+                SimilarToItem "The Ubersaw"
 				ItemName "The Amputator"
 				ItemName "The Vita-Saw"
-				
+				ItemName "The Stasis Shock"
             }
 		}
 		Amputator
@@ -2519,24 +3565,35 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"mult bleeding dmg" -0.5
+				"mult bleeding dmg" -0.2
 			}
-			Description "+40% faster zoom time +50% faster charge speed -50% explosive headshot damage" 
+			Description "+40% faster zoom time +50% faster charge speed -20% explosive headshot damage" 
+			Tier 1
+            AllowedWeapons
+			{
+				SimilarToItem "The Bazaar Bargain"
+			}
+		}
+		RifleB
+		{
+			Name "Unstable Mod: Hitman's Scope"
+			Attribute "mod soldier buff type" 
+			Cap 6
+			Increment 6
+			Cost 0
+			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
+			{			
+				"rage on kill" 35
+				"rage on assists" 15
+				"no primary ammo from dispensers while active" 1
+				"mult bleeding dmg" -0.25
+			}
+			Description "+Rifle has focus -No ammo from dispensers while active -25% explosive headshot damage" 
 			Tier 1
             Allowplayerclass Sniper
             AllowedWeapons
 			{
-				Slot "Primary"
-			}
-            DisallowedWeapons
-			{
-				ItemName "The Hitman's Heatmaker"
-				ItemName "The Huntsman"
-				ItemName "The Fortified Compound"
-				ItemName "Festive Huntsman"
-				ItemName "Shooting Star"
-				ItemName "The Machina"
-				ItemName "The Sydney Sleeper"
+				SimilarToItem "Festive Sniper Rifle 2011"
 			}
 		}
 		Sleeper
@@ -2549,9 +3606,9 @@ WaveSchedule
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
 				"add attributes on hit" "damage penalty|0.65|5|move speed penalty|0.75|5"
-				"mult bleeding dmg" -0.5
+				"mult bleeding dmg" -0.25
 			}
-			Description "+Robots are slowed by 25% and deal 35% less damage for 5 seconds -50% explosive headshot damage" 
+			Description "+Robots are slowed by 25% and deal 35% less damage for 5 seconds -25% explosive headshot damage" 
 			Tier 1
             Allowplayerclass Sniper
             AllowedWeapons
@@ -2568,10 +3625,13 @@ WaveSchedule
 			Cost 0
 			SecondaryAttributes //Secondary attributes applied when upgrade is applied, for each upgrade level
 			{
-				"mult bleeding dmg" -0.35
+				"mult bleeding dmg" -0.75
 				"Sniper charge per sec" -0.25
+				"mod soldier buff type" 6
+				"rage on kill" 35
+				"rage on assists" 15
 			}
-			Description "+Jarate splash headshot -35% explosive headshot damage -25% charge rate" 
+			Description "+Jarate splash headshot +Focus -75% explosive headshot damage -25% charge rate" 
 			Tier 1
             Allowplayerclass Sniper
             AllowedWeapons
@@ -2589,15 +3649,16 @@ WaveSchedule
 			SecondaryAttributes
 			{
 				"projectile lifetime" 3.5
-				"mult bleeding dmg" 3
+				"mult bleeding dmg" 4
 				"mod projectile heat aim start time" 3
 				"mod projectile heat seek power" 360
-				"dmg penalty vs players" -0.25
+				"dmg penalty vs players" -0.2
 				"cannot headshot" 1
 				"projectile no deflect" 1
 				"reset arrow hits on bounce" 1
+				"mult dmg vs tanks" -0.35
 			}
-			Description "+Arrows now bounce +3x bleed damage +Arrows will seek target after 3 seconds -25% damage penalty -No Headshots" 
+			Description "+Arrows now bounce +4x bleed damage +Arrows will seek target after 3 seconds -20% damage penalty -No Headshots" 
 			Tier 1
             AllowedWeapons
 			{
@@ -2627,6 +3688,27 @@ WaveSchedule
 				ItemName "The Classic"
 			}
 		}
+		Machina
+		{
+			Name "Unstable Mod: Anti Material Rifle"
+			Attribute "sniper full charge damage bonus"
+			Cap 1.35
+			Increment 0.2
+			Cost 0
+			SecondaryAttributes  
+			{
+				"aiming movespeed decreased" -0.9
+				"mod ammo per shot" 2
+				"mult bleeding dmg" -0.15
+			}
+			Description "+20% charge damage -2 ammo per shot -90% speed whole scoped -15% explosive headshot damage" 
+			Tier 1
+            Allowplayerclass Sniper
+            AllowedWeapons
+			{
+				ItemName "The Machina"
+			}
+		}
 		SMG
 		{
 			Name "Unstable Mod: Headshot Mode"
@@ -2640,8 +3722,10 @@ WaveSchedule
 				"mult bleeding dmg" -0.9
 				"explosive sniper shot" 1
 				"fire rate penalty HIDDEN" 0.5
+				"headshot damage increase" 0.25
+				"damage bonus" 0.5
 			}
-			Description "+Deals low damage explosive headshots -50% slower firing speed" 
+			Description "+Deals low damage explosive headshots +50% damage bonus -50% slower firing speed" 
 			Tier 1
             AllowedWeapons
 			{
@@ -2656,12 +3740,11 @@ WaveSchedule
 			{
 				"add cond on hit duration" 3.0
 				"reload time increased hidden" 0.25
-				"damage bonus" 0.20
 			}
 			Cap 24
 			Increment 24
 			Cost 0
-			Description "+Applies Jarate for 2 seconds +20% damage bonus -25% slower reload " 
+			Description "+Applies Jarate for 3 seconds +25% damage bonus -25% slower reload " 
 			Tier 1
 			AllowedWeapons
 			{
@@ -2689,6 +3772,25 @@ WaveSchedule
 				ItemName "The Tribalman's Shiv"
 			}
 		}
+		Shah
+		{
+			Name "Unstable Mod: Basher Blade"
+			Attribute "hit self on miss" 
+			Cap 1
+			Increment 1
+			Cost 0
+			SecondaryAttributes  
+			{
+				"mult crit when health is below percent" -0.5
+				"mult dmgtaken from melee" -0.25
+			}
+			Description "+Crits when below 50% health +25% resistance to melee -On Miss: Hit yourself, wanka" 
+			Tier 1
+			AllowedWeapons
+			{
+				ItemName "The Shahanshah"
+			}
+		}
 		croc_back
 		{
 			Name "Stable Mod: Thicker Hide"
@@ -2696,33 +3798,34 @@ WaveSchedule
 			SecondaryAttributes  
 			{
 				"dmg taken from crit reduced" 0.75
+				"mult dmgtaken from melee" -0.35
 			}
 			Cap 25
 			Increment 25
 			Cost 0
-			Description "+25 max hp +75% crit resistance" 
+			Description "+25 max hp +75% crit resistance +35% melee resistance" 
 			Tier 1
 			AllowedWeapons
 			{
 				ItemName "Darwin's Danger Shield"
 			}
 		}
-		croc_back_b
+		razor
 		{
 			Name "Stable Mod: Supply Storage"
 			Attribute "maxammo primary increased" 
+			Cap 1.5
+			Increment 0.5
+			Cost 0
+			Description "+50% max ammo +35% melee resistance" 
 			SecondaryAttributes  
 			{
-				"dmg taken from fire reduced" 0.5
+				"mult dmgtaken from melee" -0.35
 			}
-			Cap 1.25
-			Increment 0.25
-			Cost 0
-			Description "+25% max ammo -50% fire resistance" 
 			Tier 1
 			AllowedWeapons
 			{
-				ItemName "Darwin's Danger Shield"
+				ItemName "The Razorback"
 			}
 		}
 	}	
