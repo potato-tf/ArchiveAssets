@@ -13,7 +13,7 @@ if (!("CONST" in getroottable()))
             foreach(k, v in b)
             {
                 CONST[k] <- v != null ? v : 0
-                ROOT[k] <- v != null ? v : 0
+                ROOT[k]  <- v != null ? v : 0
             }
     }
 }
@@ -75,19 +75,15 @@ class __Potato_GasNerf {
                     gas.GetAttribute(attrib_damagerate, 0.0) != damage_rate &&
                     gas.GetAttribute(attrib_chargerate, 0.0) != passive_rate
                 ) {
-                    // gas.RemoveAttribute(attrib_damagerate)
-                    // gas.RemoveAttribute(attrib_chargerate)
                     gas.AddAttribute(attrib_damagerate, damage_rate, -1)
                     gas.AddAttribute(attrib_chargerate, passive_rate, -1)
-                    // gas.AddAttribute("dmg penalty vs players", __Potato_GasNerf.__gas_damage_mult) //handle this in OnTakeDamage instead
-                    // gas.AddAttribute("mult_item_meter_charge_rate", 0.01, -1)
                     gas.ReapplyProvision()
                 }
-                // else if (!gas.GetAttribute("explode_on_ignite", 0.0)) {
-                    // gas.RemoveAttribute(attrib_damagerate)
-                    // gas.RemoveAttribute(attrib_chargerate)
-                    // gas.ReapplyProvision()
-                // }
+                else if (!gas.GetAttribute("explode_on_ignite", 0.0)) {
+                    gas.AddAttribute(attrib_damagerate, 750.0, -1)
+                    gas.AddAttribute(attrib_chargerate, 60.0, -1)
+                    gas.ReapplyProvision()
+                }
                 // Start empty on spawn
                 // m_bRegenerating is true when switching loadouts with tf_respawn_on_loadoutchange 1 and touching a resupply cabinet
                 if (!GetPropBool(player, "m_Shared.m_bInUpgradeZone") && !GetPropBool(player, "m_bRegenerating"))
@@ -95,32 +91,6 @@ class __Potato_GasNerf {
                     SetPropIntArray(player, "m_iAmmo", 0, 4)
                     SetPropFloatArray(player, "m_Shared.m_flItemChargeMeter", 0.0, 1)
                 }
-
-                //TESTING REMOVE ME
-                //TESTING REMOVE ME
-                //TESTING REMOVE ME
-                //TESTING REMOVE ME
-                //TESTING REMOVE ME
-                EntFireByHandle(player, "RunScriptCode", "SetPropIntArray(self, `m_iAmmo`, 1, 4); SetPropFloatArray(self, `m_Shared.m_flItemChargeMeter`, 100.0, 1)", 0.1, null, null)
-
-                // not necessary just read m_flItemChargeMeter
-                // local next_charge_timestamp = Time() + passive_rate
-                // gas.ValidateScriptScope()
-                // local gas_scope = gas.GetScriptScope()
-                // gas_scope.passive_charge_progress <- 0.0
-                // gas_scope.total_charge_progress <- 0.0
-                // gas_scope.ChargeBarThink <- function()
-                // {
-                    // if ( GetPropFloat(self, "m_flEffectBarRegenTime") == Time() )
-                    // {
-                        // local passive_charge_progress = ( ( next_charge_timestamp - Time() ) - passive_rate ) / -passive_rate
-                        // gas_scope.total_charge_progress += passive_charge_progress
-                        // return -1
-                    // }
-                    // next_charge_timestamp = Time() + passive_rate
-                    // return -1
-                // }
-                // AddThinkToEnt(gas, "ChargeBarThink")
             }
         }
 
@@ -161,16 +131,6 @@ class __Potato_GasNerf {
                 }
                 local damage_type = params.damage_type
 
-                // TESTING REMOVE ME
-                // TESTING REMOVE ME
-                // TESTING REMOVE ME
-                // TESTING REMOVE ME
-                // if (damage_type & DMG_BURN && !(damage_type & DMG_PLASMA))
-                // {
-                //     params.early_out = true
-                //     return false
-                // }
-
                 // handle damage range calculations for the dragons fury so crit build time is consistent with non-crits
                 local damage_mult = 1.0
                 if (attacker.GetActiveWeapon().GetClassname() == "tf_weapon_rocketlauncher_fireball" && damage_type & DMG_ACID) //DMG_IGNITE
@@ -195,7 +155,6 @@ class __Potato_GasNerf {
                     gaswep.RemoveAttribute("item_meter_damage_for_full_charge")
                     gaswep.AddAttribute("item_meter_damage_for_full_charge", (damage_rate * (3 / damage_mult)), -1)
                     gaswep.ReapplyProvision()
-                    // SetPropFloatArray(attacker, chargemeter_netprop, gasmeter - (gas_dmg * 3), 1)
                 }
                 else if (!(damage_type & DMG_ACID) && gaswep.GetAttribute("item_meter_damage_for_full_charge", 0.0) != damage_rate)
                 {
@@ -217,6 +176,7 @@ class __Potato_GasNerf {
                     // NOTE: TF_DMG_CUSTOM_BURNING is what controls the flamethrower killicon, we remove it to set a custom one
                     // unfortunately it is also used to stop the gas from recharging on itself
                     // setting lifestate to dead right before damage will cause pGenericMeterUser->ShouldUpdateMeter to return false
+
                     // victim.TakeDamageCustom(__Potato_GasNerf.__gas_inflictor_dummy, attacker, gaswep, Vector(), victim.GetOrigin(), damage_amount, DMG_BURN|DMG_PREVENT_PHYSICS_FORCE, TF_DMG_CUSTOM_BURNING)
 
                     SetPropInt(attacker, "m_lifeState", 1)
