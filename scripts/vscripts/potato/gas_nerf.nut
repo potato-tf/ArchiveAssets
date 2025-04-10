@@ -19,6 +19,7 @@ if (!("ConstantNamingConvention" in ROOT))
             ROOT[k]  <- v != null ? v : 0
         }
 }
+local itemdef_netprop = "m_AttributeManager.m_Item.m_iItemDefinitionIndex"
 
 // TODO: Use consistent formatting with the rest of the mapfixes (extend __potato table and setdelegate for cleaner variable access).
 // Classes instantiate faster (not super important) and are the "correct" way to do inheritance.  Unsure if class delegation is different.
@@ -50,36 +51,33 @@ class __Potato_GasNerf
                 scope = player.GetScriptScope()
             }
 
-            //only check pyro
+            // only check pyro
             if (player.GetPlayerClass() == 7)
             {
-                //find gas in our loadout
-                local gas = null
+                // find gas and phlog in our loadout
                 for (local i = 0; i < 7; i++)
                 {
                     local wep = GetPropEntityArray(player, "m_hMyWeapons", i)
 
-                    if (wep == null || wep.GetSlot() != 1 || GetPropInt(wep, "m_AttributeManager.m_Item.m_iItemDefinitionIndex") != 1180)
+                    if (wep == null)
                         continue
 
-                    gas = wep
-                    scope.gaswep <- gas
-                    break
+                    if (GetPropInt(wep, itemdef_netprop) == 1180)
+                        scope.gaswep <- wep
+                    else if (GetPropInt(wep, itemdef_netprop) == 594)
+                        scope.phlogwep <- wep
                 }
 
                 // no gas equipped
-                if (!gas)
-                {
-                    if ("gaswep" in scope)
-                        delete scope.gaswep
-
+                if (!("gaswep" in scope))
                     return
-                }
 
                 local passive_rate = __Potato_GasNerf.__gas_passive_recharge_rate
                 local damage_rate = __Potato_GasNerf.__gas_damage_recharge_rate
                 local attrib_damagerate = "item_meter_damage_for_full_charge"
                 local attrib_chargerate = "item_meter_charge_rate"
+
+                local gas = scope.gaswep
 
                 //apply rebalance attribs
                 if (gas.GetAttribute("explode_on_ignite", 0.0))
@@ -160,7 +158,8 @@ class __Potato_GasNerf
             // ignore bots and null ents
             if (!attacker || !weapon || !attacker.IsPlayer() || attacker.IsFakeClient()) return
 
-            local gaswep = "gaswep" in attacker_scope ? attacker_scope.gaswep : null
+            local gaswep   = "gaswep" in attacker_scope ? attacker_scope.gaswep : null
+            local phlogwep = "phlogwep" in attacker_scope ? attacker_scope.phlogwep : null
 
             if (!gaswep || !gaswep.IsValid() || !gaswep.GetAttribute("explode_on_ignite", 0.0))
                 return
@@ -178,22 +177,6 @@ class __Potato_GasNerf
                 }
                 local damage_type = params.damage_type
 
-                // handle damage range calculations for the dragons fury so crit build time is consistent with non-crits
-                local damage_mult = 1.0
-                local damage_range = __Potato_GasNerf.__damage_range
-
-                local attacker_weapon = attacker.GetActiveWeapon()
-                if (damage_type & DMG_ACID && attacker_weapon && attacker_weapon.GetClassname() == "tf_weapon_rocketlauncher_fireball") //DMG_IGNITE
-                {
-                    local distance = (victim.GetCenter() - attacker.GetCenter()).Length()
-                    local optimal_distance = 512
-                    local center = distance / optimal_distance
-
-                    center = center > 2.5 ? 2.5 : center < 0.5 ? 0.5 : center
-
-                    damage_mult = (1.0 - (center * damage_range)) + damage_range
-                    damage_mult = damage_mult < 0.5 ? 0.5 : damage_mult > 1.2 ? 1.2 : damage_mult
-                }
                 // local charge_per_tick = ((Time() + passive_rate) / Time()) / passive_rate
 
                 // bad hack for crit charging, works but we should modify the meter directly instead
@@ -202,6 +185,22 @@ class __Potato_GasNerf
                 local damage_rate = __Potato_GasNerf.__gas_damage_recharge_rate
                 if (damage_type & DMG_ACID)
                 {
+                    local damage_mult = 1.0
+                    local attacker_weapon = attacker.GetActiveWeapon()
+
+                    // handle damage range calculations for the dragons fury so crit build time is consistent with non-crits
+                    if (attacker_weapon && attacker_weapon.GetClassname() == "tf_weapon_rocketlauncher_fireball")
+                    {
+                        local damage_range = __Potato_GasNerf.__damage_range
+                        local distance = (victim.GetCenter() - attacker.GetCenter()).Length()
+                        local optimal_distance = 512
+                        local center = distance / optimal_distance
+
+                        center = center > 2.5 ? 2.5 : center < 0.5 ? 0.5 : center
+
+                        damage_mult = (1.0 - (center * damage_range)) + damage_range
+                        damage_mult = damage_mult < 0.5 ? 0.5 : damage_mult > 1.2 ? 1.2 : damage_mult
+                    }
                     gaswep.RemoveAttribute("item_meter_damage_for_full_charge")
                     gaswep.AddAttribute("item_meter_damage_for_full_charge", (damage_rate * (3 / damage_mult)), -1)
                     gaswep.ReapplyProvision()
@@ -215,7 +214,7 @@ class __Potato_GasNerf
             }
 
             // ignore flagged victims to avoid infinite loops, check for gas index, check if TF_DMG_CUSTOM_BURN and check dmg amount
-            else if (params.damage_stats == TF_DMG_CUSTOM_BURNING && params.damage == 350 && GetPropInt(weapon, "m_AttributeManager.m_Item.m_iItemDefinitionIndex") == 1180)
+            else if (params.damage_stats == TF_DMG_CUSTOM_BURNING && params.damage == 350 && GetPropInt(weapon, itemdef_netprop) == 1180)
             {
                 params.damage = 0
                 params.early_out = true
@@ -232,13 +231,19 @@ class __Potato_GasNerf
 
                     gas_killicon.KeyValueFromString("classname", "firedeath")
 
+                    // don't charge phlog
+                    if (phlogwep && phlogwep.IsValid())
+                        phlogwep.AddAttribute("mod soldier buff type", 4.0, -1)
+
                     // non-alive lifestate fixes self-recharging when not using TF_DMG_CUSTOM_BURNING
                     SetPropInt(attacker, "m_lifeState", 1)
                     victim.TakeDamageEx(gas_killicon, attacker, gaswep, Vector(), victim.GetOrigin(), __Potato_GasNerf.__gas_damage_amount, DMG_BURN|DMG_PREVENT_PHYSICS_FORCE)
                     SetPropInt(attacker, "m_lifeState", 0)
-
                     // set it back or else it'll get cleaned up, preserved ents use classname checks
                     gas_killicon.KeyValueFromString("classname", "move_rope")
+
+                    if (phlogwep && phlogwep.IsValid())
+                        phlogwep.AddAttribute("mod soldier buff type", 5.0, -1)
 
                     // flag to avoid infinite TakeDamage loops
                     victim.AddEFlags(EFL_IS_BEING_LIFTED_BY_BARNACLE)
