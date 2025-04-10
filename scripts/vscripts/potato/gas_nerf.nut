@@ -114,8 +114,10 @@ class __Potato_GasNerf
         {
             local player = GetPlayerFromUserID(params.userid)
 
-            //remove takedamage flag from bots on respawn
-            if (player.IsFakeClient() && player.IsEFlagSet(EFL_IS_BEING_LIFTED_BY_BARNACLE))
+            // remove takedamage flag from bots on respawn
+            // validity checks are due to rafmod deleting the player reference in player_team or something
+
+            if (player && player.IsValid() && player.IsFakeClient() && player.IsEFlagSet(EFL_IS_BEING_LIFTED_BY_BARNACLE))
                 player.RemoveEFlags(EFL_IS_BEING_LIFTED_BY_BARNACLE)
         }
 
