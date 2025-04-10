@@ -210,6 +210,8 @@ if (::__potato.IsSigmod) {
 ::__potato.Include("map_fixes")
 // Cosmetic stretching fixes.
 ::__potato.Include("vacc_hothand_fix")
+// Gas nerf.
+::__potato.Include("gas_nerf")
 
 // Testing server VScript debug tools.
 ::__potato.Include("debug_tools", "testing")
