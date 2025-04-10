@@ -69,7 +69,7 @@ class __Potato_GasNerf
                 }
 
                 // no gas equipped
-                if (!("gaswep" in scope))
+                if (!("gaswep" in scope) || !scope.gaswep || !scope.gaswep.IsValid())
                     return
 
                 local passive_rate = __Potato_GasNerf.__gas_passive_recharge_rate
