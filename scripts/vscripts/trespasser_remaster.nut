@@ -322,26 +322,27 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 			// 	compilestring(format("Trespasser.Wins[\"%s\"] <- %s", sNetworkID, sScriptData))()
 
 			//test database read
-			VPI.AsyncCall({
-				func="VPI_DB_Trespasser_ReadWrite",
-				kwargs= {
-					query_mode="read",
-					network_id=sNetworkIDSlice
-				},
-				callback=function(response, error) {
+			if ("VPI" in ROOT)
+				VPI.AsyncCall({
+					func="VPI_DB_Trespasser_ReadWrite",
+					kwargs= {
+						query_mode="read",
+						network_id=sNetworkIDSlice
+					},
+					callback=function(response, error) {
 
-					if (typeof(response) != "array" || !response.len())
-					{
-						Trespasser.Wins[sNetworkID] <- [0, false, false]
-						printl("empty win data for " + sNetworkID + ": " + response)
-						return;
+						if (typeof(response) != "array" || !response.len())
+						{
+							Trespasser.Wins[sNetworkID] <- [0, false, false]
+							printl("empty win data for " + sNetworkID + ": " + response)
+							return;
+						}
+						local r = response[0]
+						printl("READ: Win data for " + sNetworkID + ": "+r[0]+"|"+r[1]+"|"+r[2])
+
+						Trespasser.Wins[sNetworkID] <- [r[0], r[1], r[2]]
 					}
-					local r = response[0]
-					printl("READ: Win data for " + sNetworkID + ": "+r[0]+"|"+r[1]+"|"+r[2])
-
-					Trespasser.Wins[sNetworkID] <- [r[0], r[1], r[2]]
-				}
-			})
+				})
 			// Wins[sNetworkID] <- [10, true, true] // debug
 		}
 	}
@@ -364,16 +365,17 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 
 			local sNetworkIDSlice = sNetworkID.slice(5, sNetworkID.find("]"))
 			//test database write
-			VPI.AsyncCall({
-				func="VPI_DB_Trespasser_ReadWrite",
-				kwargs= {
-					query_mode="write",
-					network_id=sNetworkIDSlice,
-					wins=Array[0],
-					solo_win=Array[1],
-					all_survivors_alive_win=Array[2]
-				}
-			})
+			if ("VPI" in ROOT)
+				VPI.AsyncCall({
+					func="VPI_DB_Trespasser_ReadWrite",
+					kwargs= {
+						query_mode="write",
+						network_id=sNetworkIDSlice,
+						wins=Array[0],
+						solo_win=Array[1],
+						all_survivors_alive_win=Array[2]
+					}
+				})
 		}
 	}
 
