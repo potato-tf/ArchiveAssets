@@ -77,11 +77,11 @@ if (!("ConstantNamingConvention" in ROOT))
 			})
 			NetProps.SetPropEntity(marker, "m_hOwner", p) // CBaseEntity.SetOwner() does not work here.
 			marker.SetTeam(p.GetTeam())
-			marker.SetBodygroup(1, p.GetPlayerClass() - 1) // Sets $bodygroup "class".
+			marker.SetBodygroup(marker.FindBodygroupByName("class"), p.GetPlayerClass() - 1)
 			p.GetScriptScope().ReviveMarker <- marker // Store the marker for manual deletion later.
 		}
 		marker.SetModelSimple(ReviveTombstone)
-		marker.SetSize(Vector(), Vector())
+		marker.AddSolidFlags(Constants.FSolid.FSOLID_CUSTOMRAYTEST|Constants.FSolid.FSOLID_CUSTOMBOXTEST)
 	}
 
 	// Clean up lingering revive markers whenever a player spawns.
