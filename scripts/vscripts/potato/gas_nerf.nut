@@ -155,10 +155,12 @@ class __Potato_GasNerf
             local attacker = params.attacker
             local victim = params.const_entity
 
+            if (!attacker) return
+
             local attacker_scope = attacker.GetScriptScope()
 
             // ignore bots and null ents
-            if (!attacker || !weapon || !attacker.IsPlayer() || attacker.IsFakeClient()) return
+            if (!weapon || !attacker.IsPlayer() || attacker.IsFakeClient()) return
 
             local gaswep   = "gaswep" in attacker_scope ? attacker_scope.gaswep : null
             local phlogwep = "phlogwep" in attacker_scope ? attacker_scope.phlogwep : null
