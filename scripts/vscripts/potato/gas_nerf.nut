@@ -27,8 +27,8 @@ local itemdef_netprop = "m_AttributeManager.m_Item.m_iItemDefinitionIndex"
 // class GasNerf extends __Potato
 class __Potato_GasNerf
 {
-    __gas_damage_recharge_rate  = 4000.0
-    __gas_passive_recharge_rate = 180.0
+    __gas_damage_recharge_rate  = 3000.0
+    __gas_passive_recharge_rate = 120.0
     // __gas_damage_mult        = ( 90 / 350 ) //used for dmg penalty vs players
     __gas_damage_amount         = 125.0
     __gas_reignite_immune_time  = 5.0
@@ -72,12 +72,13 @@ class __Potato_GasNerf
                 if (!("gaswep" in scope) || !scope.gaswep || !scope.gaswep.IsValid())
                     return
 
-                local passive_rate = __Potato_GasNerf.__gas_passive_recharge_rate
-                local damage_rate = __Potato_GasNerf.__gas_damage_recharge_rate
                 local attrib_damagerate = "item_meter_damage_for_full_charge"
                 local attrib_chargerate = "item_meter_charge_rate"
 
                 local gas = scope.gaswep
+
+                local passive_rate = __Potato_GasNerf.__gas_passive_recharge_rate
+                local damage_rate = __Potato_GasNerf.__gas_damage_recharge_rate / gas.GetAttribute("mult_item_meter_charge_rate", 1.0)
 
                 //apply rebalance attribs
                 if (gas.GetAttribute("explode_on_ignite", 0.0))
@@ -140,6 +141,7 @@ class __Potato_GasNerf
                 ClientPrint(player, HUD_PRINTTALK, format("\x01- Damage reduced:\x07F5B111 350\x01 → \x07F5B111%d", __Potato_GasNerf.__gas_damage_amount))
                 ClientPrint(player, HUD_PRINTTALK, format("\x01- Damage for full charge:\x07F5B111 750\x01 → \x07F5B111%d", __Potato_GasNerf.__gas_damage_recharge_rate))
                 ClientPrint(player, HUD_PRINTTALK, format("\x01- Passive recharge:\x07F5B111 60\x01 → \x07F5B111%d", __Potato_GasNerf.__gas_passive_recharge_rate))
+                ClientPrint(player, HUD_PRINTTALK, "\x01- Damage charging\x07F5B111 does not scale with charge rate upgrades\x01")
                 ClientPrint(player, HUD_PRINTTALK, "\x01- Gas meter\x07F5B111 does not save between lives\x01")
                 ClientPrint(player, HUD_PRINTTALK, "\x01- Crit damage\x07F5B111 does not contribute to charge\x01")
                 ClientPrint(player, HUD_PRINTTALK, "\x01- Can now be resisted by\x07F5B111 fire resistance")
@@ -186,7 +188,8 @@ class __Potato_GasNerf
                 // bad hack for crit charging, works but we should modify the meter directly instead
                 // was skill issuing before by ignoring the charge rate upgrade value I think
                 // according to the code, formula is: current meter + ( (damage / ( damage to charge * charge rate upgrade value ) ) * 100.0 )
-                local damage_rate = __Potato_GasNerf.__gas_damage_recharge_rate
+                local damage_rate = __Potato_GasNerf.__gas_damage_recharge_rate / gaswep.GetAttribute("mult_item_meter_charge_rate", 1.0)
+                local attrib_damagerate = "item_meter_damage_for_full_charge"
                 if (damage_type & DMG_ACID)
                 {
                     local damage_mult = 1.0
@@ -205,14 +208,15 @@ class __Potato_GasNerf
                         damage_mult = (1.0 - (center * damage_range)) + damage_range
                         damage_mult = damage_mult < 0.5 ? 0.5 : damage_mult > 1.2 ? 1.2 : damage_mult
                     }
-                    gaswep.RemoveAttribute("item_meter_damage_for_full_charge")
-                    gaswep.AddAttribute("item_meter_damage_for_full_charge", (damage_rate * (3 / damage_mult)), -1)
+
+                    gaswep.RemoveAttribute(attrib_damagerate)
+                    gaswep.AddAttribute(attrib_damagerate, (damage_rate * (3 / damage_mult)), -1)
                     gaswep.ReapplyProvision()
                 }
-                else if (!(damage_type & DMG_ACID) && gaswep.GetAttribute("item_meter_damage_for_full_charge", 0.0) != damage_rate)
+                else if (!(damage_type & DMG_ACID) && gaswep.GetAttribute(attrib_damagerate, 0.0) != damage_rate)
                 {
-                    gaswep.RemoveAttribute("item_meter_damage_for_full_charge")
-                    gaswep.AddAttribute("item_meter_damage_for_full_charge", damage_rate, -1)
+                    gaswep.RemoveAttribute(attrib_damagerate)
+                    gaswep.AddAttribute(attrib_damagerate, damage_rate, -1)
                     gaswep.ReapplyProvision()
                 }
             }
