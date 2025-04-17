@@ -7,10 +7,17 @@
 	// Respawn wave times (in seconds) exceeding this value will be hidden
 	TimerThreshold = 1000.0
 
+	maxclients = MaxClients().tointeger()
+
+	TF_BOT_TYPE = Constants.EBotType.TF_BOT_TYPE
+
 	// Check if we should hide text for this mission (RespawnWaveTime exceeds 1000s).
 	function TestAndApply() {
-		for (local player; player = Entities.FindByClassname(player, "player");) {
-			if (player.IsBotOfType(Constants.EBotType.TF_BOT_TYPE)) continue
+		for (local i = 1; i <= maxclients; i++)
+		{
+			local player = PlayerInstanceFromIndex(i)
+			if (!player || player.IsBotOfType(TF_BOT_TYPE))
+				continue
 
 			// Assume player team by team of the first human found.
 			if (NetProps.GetPropFloatArray(hGamerules, "m_TeamRespawnWaveTimes", player.GetTeam()) < TimerThreshold
@@ -26,9 +33,12 @@
 		if (hPlyrMgr.GetScriptThinkFunc() != "") return
 
 		hPlyrMgr.GetScriptScope().RespawnTextThink <- function() {
-			for (local player; player = Entities.FindByClassname(player, "player");) {
-				if (player.IsBotOfType(Constants.EBotType.TF_BOT_TYPE) || player.IsAlive())
+			for (local i = 1; i <= maxclients; i++)
+			{
+				local player = PlayerInstanceFromIndex(i)
+				if (!player || player.IsBotOfType(TF_BOT_TYPE) || player.IsAlive())
 					continue
+
 				NetProps.SetPropFloatArray(self, "m_flNextRespawnTime",
 					::__potato.HideRespawnText.texttype, player.entindex())
 			}
