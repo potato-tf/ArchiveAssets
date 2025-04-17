@@ -13,7 +13,7 @@
 
 			if (Disabled || !alltalk_enabled) return
 			local player = GetPlayerFromUserID(params.userid)
-            local name = Convars.GetClientConvarValue("name")
+            local name = Convars.GetClientConvarValue("name", player.entindex())
 
 			local text = params.text
 			if (player.GetTeam() == TEAM_SPECTATOR)
