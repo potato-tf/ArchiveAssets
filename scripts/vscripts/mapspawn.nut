@@ -212,8 +212,6 @@ if (::__potato.IsSigmod) {
 ::__potato.Include("vacc_hothand_fix")
 // Gas nerf.
 ::__potato.Include("gas_nerf")
-// All Chat
-::__potato.Include("allchat")
 
 // Testing server VScript debug tools.
 ::__potato.Include("debug_tools", "testing")
