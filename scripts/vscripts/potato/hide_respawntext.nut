@@ -7,13 +7,11 @@
 	// Respawn wave times (in seconds) exceeding this value will be hidden
 	TimerThreshold = 1000.0
 
-	maxclients = MaxClients().tointeger()
-
 	TF_BOT_TYPE = Constants.EBotType.TF_BOT_TYPE
 
 	// Check if we should hide text for this mission (RespawnWaveTime exceeds 1000s).
 	function TestAndApply() {
-		for (local i = 1; i <= maxclients; i++)
+		for (local i = 1; i <= MaxClients().tointeger(); i++)
 		{
 			local player = PlayerInstanceFromIndex(i)
 			if (!player || player.IsBotOfType(TF_BOT_TYPE))
@@ -33,7 +31,7 @@
 		if (hPlyrMgr.GetScriptThinkFunc() != "") return
 
 		hPlyrMgr.GetScriptScope().RespawnTextThink <- function() {
-			for (local i = 1; i <= maxclients; i++)
+			for (local i = 1; i <= MaxClients().tointeger(); i++)
 			{
 				local player = PlayerInstanceFromIndex(i)
 				if (!player || player.IsBotOfType(TF_BOT_TYPE) || player.IsAlive())
