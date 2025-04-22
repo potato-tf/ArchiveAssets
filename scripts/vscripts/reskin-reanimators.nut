@@ -80,6 +80,7 @@ if (!("ConstantNamingConvention" in ROOT))
 			marker.SetBodygroup(marker.FindBodygroupByName("class"), p.GetPlayerClass() - 1)
 			p.GetScriptScope().ReviveMarker <- marker // Store the marker for manual deletion later.
 		}
+		if (!marker || !marker.IsValid()) return
 		marker.SetModelSimple(ReviveTombstone)
 		marker.AddSolidFlags(Constants.FSolid.FSOLID_CUSTOMRAYTEST|Constants.FSolid.FSOLID_CUSTOMBOXTEST)
 	}
