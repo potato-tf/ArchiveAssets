@@ -34,16 +34,13 @@ if (!("ConstantNamingConvention" in ROOT))
 	ReviveTombstone = "models/props_mvm/mvm_revive_tombstone_blu.mdl"
 	// === END CONFIGURATION ===
 
-	// Unimplemented: Set to true to allow tf_bots to drop reanimators.
-	AllowBots = false
-
 	IsSigmod = Convars.GetBool("sig_etc_misc") != null
 	sig_blue_allow_revive = Convars.GetBool("sig_mvm_jointeam_blue_allow_revive") ? true : false
 
 	// Returns true if this player's reanimator should be modified.
 	function AllowTargetPlayer(p)
-		return AllowBots || !p.IsBotOfType(TF_BOT_TYPE)
-			|| TargetTeam == TEAM_ANY || p.GetTeam() == TargetTeam
+		return !p.IsBotOfType(TF_BOT_TYPE) &&
+			(TargetTeam == TEAM_ANY || p.GetTeam() == TargetTeam)
 
 	// Fired every player death.
 	function OnGameEvent_player_death(params) {
@@ -80,9 +77,8 @@ if (!("ConstantNamingConvention" in ROOT))
 			marker.SetBodygroup(marker.FindBodygroupByName("class"), p.GetPlayerClass() - 1)
 			p.GetScriptScope().ReviveMarker <- marker // Store the marker for manual deletion later.
 		}
-		if (!marker || !marker.IsValid()) return
 		marker.SetModelSimple(ReviveTombstone)
-		marker.AddSolidFlags(Constants.FSolid.FSOLID_CUSTOMRAYTEST|Constants.FSolid.FSOLID_CUSTOMBOXTEST)
+		marker.AddSolidFlags(FSOLID_CUSTOMRAYTEST|FSOLID_CUSTOMBOXTEST)
 	}
 
 	// Clean up lingering revive markers whenever a player spawns.
@@ -131,3 +127,5 @@ __CollectGameEventCallbacks(::ReskinReanimators)
 
 for (local p; p = Entities.FindByClassname(p, "player");)
 	p.ValidateScriptScope()
+
+PrecacheModel(::ReskinReanimators.ReviveTombstone)
