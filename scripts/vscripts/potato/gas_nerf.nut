@@ -30,7 +30,7 @@ class __Potato_GasNerf
     __gas_damage_recharge_rate  = 3000.0
     __gas_passive_recharge_rate = 120.0
     // __gas_damage_mult        = ( 90 / 350 ) //used for dmg penalty vs players
-    __gas_damage_amount         = 125.0
+    __gas_damage_amount         = 150.0
     __gas_reignite_immune_time  = 5.0
     __damage_range              = Convars.GetFloat("tf_damage_range")
 
