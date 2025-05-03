@@ -10,7 +10,7 @@
 	
 	OnGameEvent_player_spawn = function(params) {
 		local player = GetPlayerFromUserID(params.userid)
-		if(player.GetTeam() == 2) return
+		if(!IsPlayerABot(player)) return
 		
 		EntFire("milkRepellent", "callscriptfunction", "checkBot", -1, player)
 	}
