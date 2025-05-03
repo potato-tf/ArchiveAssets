@@ -1,0 +1,1908 @@
+#base robot_giant.pop
+#base robot_standard.pop
+#base altmode.pop
+
+WaveSchedule {
+
+	StartingCurrency 950
+	RespawnWaveTime 2
+	CanBotsAttackWhileInSpawnRoom no
+	HealOnKillOverhealMelee 1 [$SIGSEGV]
+	NoRomevisionCosmetics 1 [$SIGSEGV]
+	NoMissionInfo 1 [$SIGSEGV]
+	
+	ForceHoliday 2 [$SIGSEGV]
+	NoHolidayPickups 1 [$SIGSEGV]
+	NoCritPumpkin 1 [$SIGSEGV]
+	NoThrillerTaunt 1 [$SIGSEGV]
+	
+	LuaScriptFile "scripts/watermedic.lua" [$SIGSEGV]
+	
+	PrecacheModel "models/props_mvm/mvm_comically_small_player_shield.mdl" [$SIGSEGV]
+
+	PlayerAttributes {
+		"penetrate teammates" 1
+	}
+
+	ExtendedUpgrades {
+		Upgrade {
+			Name "+25% Damage"
+			Attribute "damage bonus"
+			Cap 2
+			Increment .25
+			Cost 300
+			AllowPlayerClass Medic
+			AllowedWeapons {
+				Classname tf_weapon_syringegun_medic
+			}
+		}
+		Upgrade {
+			Name "+25% Damage"
+			Attribute "damage bonus"
+			Description "Also increases crossbow healing done"
+			Cap 2
+			Increment .25
+			Cost 250
+			AllowPlayerClass Medic
+			AllowedWeapons {
+				Classname tf_weapon_crossbow
+			}
+		}
+		Upgrade {
+			Name "+25% Damage"
+			Attribute "damage bonus"
+			Description "Also reduces knockback taken"
+			Cap 2
+			Increment .25
+			Cost 250
+			AllowPlayerClass Medic
+			AllowedWeapons {
+				Slot Melee
+			}
+			SecondaryAttributes {
+				"airblast vulnerability multiplier" -0.25
+				"airblast vertical vulnerability multiplier" -0.25
+				"damage force reduction" -0.1
+			}
+			DisallowedWeapons {
+				ItemName "The Amputator"
+			}
+		}
+		Upgrade {
+			Name "+25% Damage"
+			Attribute "damage bonus"
+			Description "Also reduces knockback taken"
+			Cap 2.5
+			Increment .25
+			Cost 200
+			AllowedWeapons {
+				ItemName "The Amputator"
+			}
+			SecondaryAttributes {
+				"airblast vulnerability multiplier" -0.1667
+				"airblast vertical vulnerability multiplier" -0.1667
+				"damage force reduction" -0.0833
+			}
+		}
+		Upgrade {
+			Name "+2s Crits On Kill"
+			Attribute "critboost on kill"
+			Cap 4
+			Increment 2
+			Cost 350
+			AllowedWeapons {
+				Slot Melee
+			}
+		}
+		Upgrade {
+			Name "+10% Firing speed"
+			Attribute "fire rate penalty"
+			Cap 1
+			Increment -.1
+			Cost 50
+			AllowedWeapons {
+				ItemName "The Solemn Vow"
+			}
+		}
+		VacuumMedibeam {
+			Name "Vacuum attachment"
+			Description "Medibeam can now target bots and damage them. Disconnects if shield is activated. Healing Mastery increases damage."
+			Attribute "mod see enemy health"
+			Cap 1
+			Increment 1
+			Cost 600
+			
+			AllowedWeapons {
+				ClassName "TF_WEAPON_MEDIGUN"
+			}
+			DisallowedWeapons {
+				ItemName "The Quick-Fix"
+				ItemName "The Kritzkrieg"
+			}
+			
+			SecondaryAttributes
+			{
+				"special item description" "Medibeam can now target bots and damage them. Disconnects if shield is activated" 
+			}
+			
+			OnApply {
+				//upgrade bought -> apply
+				//switch weapon  -> apply
+				Output "!activator,RunScriptFile,luigis_remansion.nut,0"
+				Output "!activator,CallScriptFunction,levelCheck,0"
+			}
+			OnDowngrade {
+				Output "!activator,CallScriptFunction,RefundMain,0"
+			}
+		}
+		VacuumMedibeamKritz {
+			Name "Vacuum attachment"
+			Description "Medibeam can now target bots and damage them. Disconnects if shield is activated. Healing Mastery increases damage."
+			Attribute "mod see enemy health"
+			Cap 1
+			Increment 1
+			Cost 600
+			
+			AllowedWeapons {
+				ItemName "The Kritzkrieg"
+			}
+					
+			SecondaryAttributes
+			{
+				"special item description" "Medibeam can now target bots and damage them. Disconnects if shield is activated" 
+				"special item description 2" "Kritzkrieg ubercharges triple damage dealt."
+			}
+			
+			OnApply {
+				//upgrade bought -> apply
+				//switch weapon  -> apply
+				Output "!activator,RunScriptFile,luigis_remansion.nut,0"
+				Output "!activator,CallScriptFunction,levelCheck,0"
+			}
+			OnDowngrade {
+				Output "!activator,CallScriptFunction,RefundMain,0"
+			}
+		}
+		VacuumMedibeamQF {
+			Name "Vacuum attachment"
+			Description "Medibeam can now target bots and damage them. Disconnects if shield is activated. Healing Mastery increases damage."
+			Attribute "mod see enemy health"
+			Cap 1
+			Increment 1
+			Cost 800
+			
+			AllowedWeapons {
+				ItemName "The Quick-Fix"
+			}
+					
+			SecondaryAttributes
+			{
+				"special item description" "Medibeam can now target bots and damage them. Disconnects if shield is activated" 
+				"special item description 2" "Quick-Fix ubercharges triple damage dealt."
+			}
+			
+			OnApply {
+				//upgrade bought -> apply
+				//switch weapon  -> apply
+				Output "!activator,RunScriptFile,luigis_remansion.nut,0"
+				Output "!activator,CallScriptFunction,levelCheck,0"
+			}
+			OnDowngrade {
+				Output "!activator,CallScriptFunction,RefundMain,0"
+			}
+		}
+	}
+
+	Mission {
+		Objective Sniper
+		InitialCooldown 60
+		Where spawnbot_sniper
+		BeginAtWave 3
+		RunForThisManyWaves 1
+		CooldownTime 60
+		DesiredCount 2
+		
+		TFBot
+		{
+			Class Sniper
+			Skill Hard
+			MaxVisionRange 3000
+		}
+	}
+	Mission {
+		Objective Spy
+		InitialCooldown 60
+		Where spawnbot_spy
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		CooldownTime 60
+		DesiredCount 2
+
+		TFBot
+		{
+			Class Spy
+			Skill Expert
+		}
+	}
+	
+	PointTemplates {
+		Combo_Pyro { //taken from royal
+			NoFixup 1
+
+			logic_relay {
+				"targetname" "combo_primary_to_secondary"
+				"spawnflags" "2"
+
+				"OnTrigger" "!self,EnableRefire,,0,-1"
+				"OnTrigger" "!activator,$RemoveItemAttribute,fire input on hit|0,0,-1" 
+				"OnTrigger" "!activator,$WeaponSwitchSlot,1,0,-1"
+				"OnTrigger" "!activator,$AddPlayerAttribute,disable weapon switch|1,0.01,-1" 
+				"OnTrigger" "!activator,$RemovePlayerAttribute,disable weapon switch,0.6,-1" 
+				"OnTrigger" "!activator,$WeaponSwitchSlot,0,0.61,-1"
+				"OnTrigger" "!activator,$AddItemAttribute,fire input on hit|combo_primary_to_secondary^Trigger^|0,0.62,-1"
+			}
+		}
+		RotateShield { //by royal
+			OnSpawnOutput
+			{
+				Target "rotate"
+				Action "Start"
+			}
+
+			OnSpawnOutput
+			{
+				Target "rotate2"
+				Action "Start"
+			}
+			
+			OnSpawnOutput
+			{	
+				Target "rotate3"
+				Action "Start"
+			}
+			
+			OnSpawnOutput
+			{
+				Target "rotate4"
+				Action "Start"
+			}
+
+			OnSpawnOutput
+			{
+				Target "rotate"
+				Action "SetParent"
+				Param ""
+			}
+			
+			OnSpawnOutput
+			{
+				Target "rotate2"
+				Action "SetParent"
+				Param ""
+			}
+			
+			OnSpawnOutput
+			{
+				Target "rotate3"
+				Action "SetParent"
+				Param ""
+			}
+			
+			OnSpawnOutput
+			{
+				Target "rotate4"
+				Action "SetParent"
+				Param ""
+			}
+
+			OnSpawnOutput
+			{
+				Target "popscript"
+				Action "$RegisterShield"
+				param "projectile_shield"
+				Delay 0.1
+			}
+			
+			OnSpawnOutput
+			{
+				Target "popscript"
+				Action "$RegisterShield"
+				param "projectile_shield2"
+				Delay 0.1
+			}
+			
+			OnSpawnOutput
+			{
+				Target "popscript"
+				Action "$RegisterShield"
+				param "projectile_shield3"
+				Delay 0.1
+			}
+			
+			OnSpawnOutput
+			{
+				Target "popscript"
+				Action "$RegisterShield"
+				param "projectile_shield4"
+				Delay 0.1
+			}
+			
+			OnSpawnOutput
+			{
+				Target "rotate_position"
+				Action "Trigger"
+			}
+
+			logic_relay
+			{
+				"targetname" "rotate_position"
+			 	"spawnflags" "2"
+
+			 	"OnTrigger" "rotate,$TeleportToEntity,!activator,0,-1"
+				"OnTrigger" "rotate2,$TeleportToEntity,!activator,0,-1"
+				"OnTrigger" "rotate3,$TeleportToEntity,!activator,0,-1"
+				"OnTrigger" "rotate4,$TeleportToEntity,!activator,0,-1"
+				
+			 	"OnTrigger" "!self,Trigger,,0.01,-1"
+			}
+
+			entity_medigun_shield
+			{
+				"parentname" "rotate"
+				"targetname" "projectile_shield"
+				"origin" "160 0 40"
+				"spawnflags" "1"
+				"teamnum" "3"
+				"skin" "1"
+			}
+			
+			entity_medigun_shield
+			{
+				"parentname" "rotate2"
+				"targetname" "projectile_shield2"
+				"origin" "0 160 40"
+				"spawnflags" "1"
+				"teamnum" "3"
+				"skin" "1"
+			}
+			
+			entity_medigun_shield
+			{
+				"parentname" "rotate3"
+				"targetname" "projectile_shield3"
+				"origin" "-160 0 40"
+				"spawnflags" "1"
+				"teamnum" "3"
+				"skin" "1"
+			}
+			
+			entity_medigun_shield
+			{
+				"parentname" "rotate4"
+				"targetname" "projectile_shield4"
+				"origin" "0 -160 40"
+				"spawnflags" "1"
+				"teamnum" "3"
+				"skin" "1"
+			}
+
+			func_rotating
+			{
+				"targetname" "rotate"
+				"origin" "0 0 0"
+
+				"$modules" "fakeparent"
+				"$positiononly" "1"
+
+				"mins" "-0.1 -0.1 -0.1"
+				"maxs" "0.1 0.1 0.1"
+
+				"dmg" "0"
+				"fanfriction" "100" 
+				"maxspeed" "60"
+				"spawnflags" "64"
+				"volume" "0"
+			}
+			
+			func_rotating
+			{
+				"targetname" "rotate2"
+				"origin" "0 0 0"
+
+				"$modules" "fakeparent"
+				"$positiononly" "1"
+
+				"mins" "-0.1 -0.1 -0.1"
+				"maxs" "0.1 0.1 0.1"
+
+				"dmg" "0"
+				"fanfriction" "100" 
+				"maxspeed" "60"
+				"spawnflags" "64"
+				"volume" "0"
+			}
+			
+			func_rotating
+			{
+				"targetname" "rotate3"
+				"origin" "0 0 0"
+
+				"$modules" "fakeparent"
+				"$positiononly" "1"
+
+				"mins" "-0.1 -0.1 -0.1"
+				"maxs" "0.1 0.1 0.1"
+
+				"dmg" "0"
+				"fanfriction" "100" 
+				"maxspeed" "60"
+				"spawnflags" "64"
+				"volume" "0"
+			}
+			
+			func_rotating
+			{
+				"targetname" "rotate4"
+				"origin" "0 0 0"
+
+				"$modules" "fakeparent"
+				"$positiononly" "1"
+
+				"mins" "-0.1 -0.1 -0.1"
+				"maxs" "0.1 0.1 0.1"
+
+				"dmg" "0"
+				"fanfriction" "100" 
+				"maxspeed" "60"
+				"spawnflags" "64"
+				"volume" "0"
+			}
+		}
+	}
+
+	Templates {
+		NoAggroOutsideBarrier {
+			EventChangeAttributes {
+				default {
+				}
+				changetarget {
+					InterruptAction {
+						Delay 1
+						Repeat 0
+						Target RandomEnemy
+						AimTarget RandomEnemy
+						KillAimTarget 1
+						WaitUntilDone 1
+						AlwaysLook 1
+						OnDoneChangeAttributes "default"
+					}
+				}
+			}
+		}
+		medboss {
+			Class Medic
+			Name "The King of the Robot Ghosts"
+			Health 10010
+			Skill Expert
+			Scale 2
+			FastUpdate 1
+			Action mobber
+			Attributes MiniBoss
+			Attributes AlwaysCrit
+			Attributes UseBossHealthBar
+			CustomEyeGlowColor "255 0 49"
+			//item "Zombie Medic"
+			
+			//UseHumanModel 1
+			//UseHumanAnimations 1
+			
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"zombiezombiezombiezombie" 1
+				//"player skin override" 1
+			}
+			
+			EventChangeAttributes {
+				default {
+					WeaponRestrictions MeleeOnly
+					Item "The Vita-Saw"
+					ItemAttributes {
+						ItemName "The Vita-Saw"
+						"aoe heal chance" 80
+						"melee cleave attack" 1
+						"hand scale" 1.05
+						"melee range multiplier" 1.75
+					}
+					CharacterAttributes {
+						"rage giving scale" .8 //.4 for 10%
+						"stomp player force" 40
+						"move speed bonus"	0.7
+					}
+				}
+				shotgun {
+					Item "TF_WEAPON_SHOTGUN_PRIMARY"
+					WeaponRestrictions PrimaryOnly
+					
+					ItemAttributes {
+						ItemName "TF_WEAPON_SHOTGUN_PRIMARY"
+						"damage bonus" 3
+						"faster reload rate" 0.8
+						"fire rate bonus" 0.4
+						"fixed_shot_pattern" 1
+						"bullets per shot bonus" 1.5
+						"scattergun has knockback" 1
+					}
+					CharacterAttributes {
+						"rage giving scale" .6
+						"stomp player force" 40
+						"move speed bonus"	0.5
+					}
+				}
+				crossbow {
+					Item "The Crusader's Crossbow"
+					Attributes HoldFireUntilFullReload
+					WeaponRestrictions PrimaryOnly
+					AimOffset "0 0 40" //aims 20 hu above
+					ItemAttributes {
+						ItemName "The Crusader's Crossbow"
+						"mod projectile heat seek power" 360
+						"mod projectile heat aim error" 180
+						"projectile spread angle penalty" 5
+						"clip size upgrade atomic" 8
+						"faster reload rate" 0.5
+						//"fire rate bonus" .5
+						//"damage bonus" 2
+						"projectile acceleration start time" 3
+						"projectile trail particle" eyeboss_projectile
+						"projectile penetration" 1
+					}
+					AddCond {
+						Name "TF_COND_SODAPOPPER_HYPE"
+					}
+					CharacterAttributes {
+						"rage giving scale" .4
+						"stomp player force" 40
+						"move speed bonus"	0.5
+					}
+				}
+				vita2 {
+					WeaponRestrictions MeleeOnly
+					Item "The Vita-Saw"
+					ItemAttributes {
+						ItemName "The Vita-Saw"
+						"aoe heal chance" 80
+						//"melee cleave attack" 1
+						//"hand scale" 1.01
+						//"melee range multiplier" 1.25
+					}
+					CharacterAttributes {
+						"rage giving scale" .4
+						"stomp player force" 0
+					}
+					FireInput {
+						Target "RotateShield"
+						Action "ForceSpawnAtEntityOrigin"
+						Param "!activator"
+						Delay 0
+						Repeats 1
+					}
+				}
+			}
+		}
+		spellmed {
+			Class Medic
+			Name "Magical Medic"
+			Skill Expert
+			Action Mobber
+			Attributes DisableDodge
+			Item "tf_weapon_spellbook"
+			Item "Zombie Medic"
+			StripItemSlot 1
+			//MoveBehindEnemy 1
+			
+			UseHumanModel 1
+			UseHumanAnimations 1
+			
+			CharacterAttributes {
+				"SPELL: Halloween voice modulation" 1
+			}
+		}
+		playermedmobber{
+			Class Medic
+			Name "Duplicitous Doppelganger"
+			Skill Expert
+			Action Mobber
+			Attributes DisableDodge
+			
+			UseHumanModel 1
+			UseHumanAnimations 1
+		}
+	}
+	
+	Wave { //w1, 500
+		initwaveoutput {
+			target medonly_hill_init_relay
+			action trigger
+		}
+		StartWaveOutput {
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput {
+			Target hill_wave_finished_relay
+			Action Trigger
+		}
+		
+		Wavespawn {
+			Name "w1a"
+			Where spawnbot_entrance
+			Totalcount 50
+			Maxactive 4
+			Spawncount 2
+			WaitBetweenSpawns 4.5
+			
+			RandomChoice {
+				TFBot {
+					Template T_TFBot_Heavyweapons_Heavyweight_Champ_Fast
+				}
+				TFBot {
+					Template T_TFBot_Heavyweapons_Heavyweight_Champ
+				}	
+			}			
+		}
+		Wavespawn {
+			Name "w1b"
+			Where spawnbot_entrance_right
+			Totalcount 12
+			Maxactive 2
+			Spawncount 2
+			WaitBeforeStarting 1
+			tfbot
+			{
+				Class Pyro
+				Name "Detonator Pyro"
+				Skill Normal
+				ClassIcon pyro_detonator_lite
+				Item "The Detonator"
+				WeaponRestrictions SecondaryOnly
+			}
+		}
+		Wavespawn {
+			Name "w1b"
+			Where spawnbot_entrance_right
+			Totalcount 18
+			Maxactive 3
+			Spawncount 3
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 5
+			tfbot
+			{
+				Class Engineer
+				Name "Short Circuit Engie"
+				ClassIcon engineer_shortcircuit_lite
+				Item "The Short Circuit"
+				WeaponRestrictions SecondaryOnly
+				Action FetchFlag [$SIGSEGV]
+			}
+		}
+		Wavespawn {
+			Name "w1c"
+			Where spawnbot_entrance
+			Totalcount 2
+			Maxactive 1
+			Spawncount 1
+			WaitForAllSpawned "w1b"
+			WaitBeforeStarting 5
+			TotalCurrency 500
+			TFBot {
+				Template T_TFBot_Giant_Demo_RapidFire
+				Skill Hard
+			}
+		}
+		WaveSpawn {
+			Name "w1d"
+			Where spawnbot_entrance
+			WaitForAllDead "w1c"
+			TotalCount 12
+			MaxActive 3
+			SpawnCount 3
+			WaitBeforeStarting 5
+			//WaitBetweenSpawns 15
+			
+			Squad {
+				TFBot {
+					Template T_TFBot_Heavyweapons_Fist
+				}
+				TFBot {
+					Template T_TFBot_Pyro
+					Skill Easy
+				}
+				TFBot {
+					Template T_TFBot_Pyro
+					Skill Easy
+				}
+			}
+		}
+	}
+	Wave { //w2, $800
+		initwaveoutput {
+			target bombpath_choose_relay
+			action trigger
+		}
+		StartWaveOutput {
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput {
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn {
+			Name "w2a"
+			Where spawnbot_invasion
+			TotalCount 27
+			MaxActive 6
+			SpawnCount 2
+			WaitBetweenSpawns 3
+			
+			TFBot {
+				ClassIcon scout_bat_nys
+				Template T_TFBot_Scout_Melee
+				Skill Easy
+			}
+		}
+		WaveSpawn {
+			Name "w2f"
+			Where spawnbot
+			TotalCount 12
+			MaxActive 3
+			SpawnCount 1
+			WaitBetweenSpawns 5
+			
+			TFBot {
+				Class Soldier
+				Skill Normal
+				WeaponRestrictions PrimaryOnly	
+			}
+		}
+		WaveSpawn {
+			Name "w2b"
+			Where spawnbot
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 2
+			WaitBetweenSpawns 25
+			TotalCurrency 400
+			
+			Squad {
+				TFBot {
+					Template T_TFBot_Giant_Pyro
+					ItemAttributes {
+						ItemName "tf_weapon_flamethrower"
+						"airblast disabled" 1
+					}
+				}
+				TFBot {
+					Name "Kritzkrieg Medic"
+					Class Medic
+					ClassIcon medic_kritz
+					Skill Hard
+					Attributes SpawnWithFullCharge
+					Item "The Kritzkrieg"
+					WeaponRestrictions SecondaryOnly
+					ItemAttributes
+					{
+						ItemName "The Kritzkrieg"
+						"uber duration bonus" -10
+					}
+					CharacterAttributes
+					{
+						"bot medic uber health threshold" 3000
+					}
+				}
+			}
+		}
+		WaveSpawn {
+			Name "w2c"
+			Where spawnbot_right
+			Support Limited
+			TotalCount 48
+			MaxActive 4
+			SpawnCount 1
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 3
+			WaitForAllSpawned "w2a"
+			
+			TFBot {
+				Template T_TFBot_Sniper_Huntsman
+				Skill Normal
+			}
+		}
+		Wavespawn {
+			Name "w2d"
+			where spawnbot_right
+			totalcount 18
+			maxactive 6
+			spawncount 6
+			WaitForAllSpawned "w2b"
+			WaitBeforeStarting 25
+			//WaitBetweenSpawns 10
+			Squad {
+				TFBot {
+					Class Soldier
+					Skill Normal
+					Item "The Cow Mangler 5000"
+					Attributes HoldFireUntilFullReload
+				}
+				TFBot {
+					Template T_TFBot_Medic_SlowRecharge
+					ItemAttributes {
+						ItemName "TF_WEAPON_MEDIGUN"
+						"uber duration bonus" -3
+					}
+					CharacterAttributes {
+						"heal rate bonus" 0.1
+					}
+				}
+			}	
+		}
+		Wavespawn {
+			Name "w2e"
+			Where spawnbot
+			Support Limited
+			Totalcount 28
+			Maxactive 4
+			Spawncount 2
+			WaitForAllSpawned "w2b"
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 7
+			TFBot
+			{
+				Name "Iron Bomber Demoman"
+				Class Demoman
+				Skill Normal
+				Item "The Iron Bomber"
+			}
+		}
+		Wavespawn {
+			Name "w2e"
+			Where spawnbot
+			Totalcount 4
+			Maxactive 1
+			Spawncount 1
+			WaitForAllSpawned "w2b"
+			TotalCurrency 400
+			WaitBeforeStarting 25
+			WaitBetweenSpawns 14
+			TFBot
+			{
+				Template T_TFBot_Sniper_Huntsman_Spammer
+				ClassIcon sniper_bow_multi
+				Skill Hard	
+			}
+		}
+	}
+	Wave { //w3 $1300
+		initwaveoutput {
+			target bombpath_choose_relay
+			action trigger
+		}
+		StartWaveOutput {
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput {
+			Target wave_finished_relay
+			Action Trigger
+		}
+	
+		WaveSpawn { //assuming 3 meds at base dmg, should take approx 45-60s
+			Name "w3a"
+			TotalCount 1
+			TotalCurrency 400
+			
+			Tank {
+				Name "tankboss"
+				Health 20000
+				StartingPathTrackNode "path_0"
+				
+				OnBombDroppedOutput
+				{
+					Target bomb_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+		WaveSpawn { 
+			Name "w3a"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 20
+			TotalCurrency 450
+			
+			TFBot {
+				Template T_TFBot_Giant_Soldier
+			}
+		}
+		WaveSpawn {
+			Name "w3a"
+			Where spawnbot_right
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 20
+			
+			TFBot {
+				Class Soldier
+				Name "Conch Soldier"
+				Skill Normal
+				ClassIcon soldier_conch
+				Attributes SpawnWithFullCharge
+				Item "The Concheror"
+				ItemAttributes {
+					ItemName "TF_WEAPON_ROCKETLAUNCHER"
+					"fire rate penalty" 1.2
+				}
+			}
+		}
+		WaveSpawn {
+			Name "w3a"
+			Where spawnbot
+			TotalCount 25
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 10
+			
+			TFBot {
+				Class Engineer
+				Name "Pomson Engie"
+				Skill Hard
+				ClassIcon engineer_pomson
+				Item "The Pomson 6000"
+				WeaponRestrictions PrimaryOnly
+				Action FetchFlag
+				ItemAttributes {
+					ItemName "The Pomson 6000"
+					"subtract victim medigun charge on hit" 0
+				}
+			}
+		}
+		WaveSpawn {
+			Name "w3c"
+			Where spawnbot
+			WaitForAllDead "w3a"
+			TotalCount 18 //24
+			MaxActive 6
+			SpawnCount 6
+			
+			TFBot {
+				Class Heavy
+				Name "Tomislav Heavy"
+				ClassIcon heavy_tomislav_two
+				Skill Normal
+				Item "Tomislav"
+				WeaponRestrictions PrimaryOnly
+			}
+		}
+		WaveSpawn {
+			Name "w3c"
+			Where spawnbot_right
+			WaitForAllDead "w3a"
+			TotalCount 27
+			MaxActive 6
+			SpawnCount 2
+			//WaitBeforeStarting 5
+			WaitBetweenSpawns 3
+			
+			TFBot {
+				Class Demoman
+				Name "Quickiebomb Demoman"
+				ClassIcon demo_quickie
+				Skill Normal
+				Item "The Quickiebomb Launcher"
+				WeaponRestrictions SecondaryOnly
+				ItemAttributes { //rip speen
+					ItemName "TF_WEAPON_GRENADELAUNCHER"
+					"is_passive_weapon" 1
+					"override projectile type" 7
+					"fire rate penalty" 2401
+				}
+			}
+		}
+		WaveSpawn {
+			Name "w3e"
+			Where spawnbot
+			WaitForAllDead "w3a"
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 17
+			
+			TFBot {
+				Template T_TFBot_Giant_Soldier_Spammer
+				Name "Giant Rapid Fire Bison"
+				ClassIcon soldier_bison_spammer_giant
+				Item "The Righteous Bison"
+				WeaponRestrictions SecondaryOnly
+				ItemAttributes {
+					ItemName "The Righteous Bison"
+					"faster reload rate" -0.8
+					"fire rate bonus" 0.5
+				}
+			}
+		}
+		WaveSpawn {
+			Name "w3d"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			WaitForAllSpawned "w3c"
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 15
+			TotalCurrency 250
+			
+			TFBot {
+				Template T_TFBot_Giant_Demo_Burst
+			}
+		}
+		WaveSpawn {
+			Name "w3d"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			WaitForAllSpawned "w3c"
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 15
+			TotalCurrency 200
+			
+			TFBot {
+				Template T_TFBot_Giant_DemoMan_PrinceTavish
+				CharacterAttributes {
+					"move speed bonus" 0.65
+				}
+			}
+		}
+		WaveSpawn {
+			Name "w3d"
+			Where spawnbot_invasion
+			Support Limited
+			TotalCount 32
+			MaxActive 8
+			SpawnCount 2
+			WaitForAllSpawned "w3c"
+			WaitBeforeStarting 4
+			WaitBetweenSpawns 4
+			
+			TFBot {
+				Class Sniper
+				Name "SMG Sniper"
+				ClassIcon sniper_smg_tind
+				Skill Normal
+				WeaponRestrictions SecondaryOnly
+				ItemAttributes {
+					ItemName "TF_WEAPON_SMG"
+					"fire rate penalty" 1.5
+					"Reload time increased" 1.2
+				}
+			}
+		}
+	}
+	
+	Wave { //w4 1350
+		initwaveoutput {
+			target bombpath_choose_relay
+			action trigger
+		}
+		StartWaveOutput {
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput {
+			Target wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn {
+			Name "w3a"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			WaitBetweenSpawns 15
+			TotalCurrency 600
+			
+			TFBot {
+				Template T_TFBot_Giant_Scout
+				CharacterAttributes {
+					"move speed bonus" .875
+				}
+			}
+		}
+		WaveSpawn {
+			Name "w3b"
+			Where spawnbot_invasion
+			TotalCount 33
+			MaxActive 9
+			SpawnCount 3
+			WaitBetweenSpawns 3
+			
+			TFBot {
+				Template T_TFBot_Heavyweapons_Shotgun
+			}
+		}
+		WaveSpawn {
+			Name "w3e"
+			Where spawnbot
+			TotalCount 32
+			MaxActive 8
+			SpawnCount 4
+			WaitBetweenSpawns 8
+			
+			TFBot {
+				Template T_TFBot_Demo_Burst
+			}
+		}
+		WaveSpawn {
+			Name "w3c"
+			Where spawnbot_right
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 2
+			WaitForAllSpawned "w3a"
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 35
+			TotalCurrency 750
+			
+			Squad {
+				TFBot {
+					Template T_TFBot_Giant_Heavyweapons
+				}
+				TFBot {
+					Template T_TFBot_Giant_Medic
+				}
+			}
+		}
+		WaveSpawn {
+			Name "w3d"
+			Where spawnbot_right
+			TotalCount 30
+			MaxActive 10
+			SpawnCount 5
+			WaitBetweenSpawns 10
+			WaitForAllDead "w3c"
+			
+			TFBot {
+				Class Pyro
+				Name "Dragon's Fury Pyro"
+				ClassIcon pyro_dragon_fury_swordstone
+				Skill Normal
+				MaxVisionRange 800
+				WeaponRestrictions PrimaryOnly
+				Item "The Dragon's Fury"
+			}
+		}
+		WaveSpawn {
+			Name "w3h"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			WaitBetweenSpawns 15
+			WaitForAllDead "w3c"
+			
+			TFBot {
+				Template T_TFBot_Giant_Soldier_Spammer_Reload
+			}
+		}
+	}
+	
+	Wave { //w5, hunt mode, $1250
+		InitWaveOutput {
+			Target altmode_init_reviveonly_locked_relay
+			Action Trigger
+		}
+		StartWaveOutput {
+			Target altmode_wave_start_reviveonly_relay
+			Action Trigger
+		}
+		DoneOutput {
+			Target altmode_wave_finished_relay
+			Action Trigger
+		}
+		
+		SpawnTemplate "Combo_Pyro"
+
+		WaveSpawn {
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			Support Limited
+			Where spawnbot_altmode
+			
+			LastSpawnOutput {
+				Target wave_start_relay
+				Action RunScriptCode
+				Delay 0.1
+				Param "
+					findTimerBot(null, false, null, false)
+				"
+			}
+			
+			TFBot {
+				Template TimerBot
+				Health 151
+			}
+		}
+		WaveSpawn { //scout
+			Name "w4a"
+			Where spawnbot_altmode
+			TotalCount 5
+			MaxActive 5
+			SpawnCount 5
+			TotalCurrency 200
+			WaitBeforeStarting 0.1
+			
+			DoneOutput {
+				Target altmode_script
+				Action CallScriptFunction
+				Param PickNextRoom
+			}
+			
+			Squad {				
+				TFBot {
+					Class Scout
+					Name "Giant Winger Scout"
+					ClassIcon scout_winger_lite_giant
+					Item "The Winger"
+					Health 3000
+					Skill Expert
+					WeaponRestrictions SecondaryOnly
+					Attributes MiniBoss
+					Action passive
+					//Template noaggrooutsidebarrier
+					CharacterAttributes
+					{
+						"damage force reduction" 0.7
+						"airblast vulnerability multiplier" 0.7
+						"override footstep sound set" 5
+					}
+					ItemAttributes {
+						ItemName "The Winger"
+						"clip size bonus" 1
+						"fire rate bonus" .75
+						"damage bonus" 1.5 //10 clip * ~30? damage = 300 before res
+					}
+				}
+				TFBot {
+					Class Scout
+					Name "Giant Winger Scout"
+					ClassIcon scout_winger_lite_giant
+					Item "The Winger"
+					Health 3000
+					Skill Expert
+					WeaponRestrictions SecondaryOnly
+					Attributes MiniBoss
+					Action Passive
+					//Template noaggrooutsidebarrier
+					CharacterAttributes
+					{
+						"damage force reduction" 0.7
+						"airblast vulnerability multiplier" 0.7
+						"override footstep sound set" 5
+					}
+					ItemAttributes {
+						ItemName "The Winger"
+						"clip size bonus" 1
+						"fire rate bonus" .75
+						"damage bonus" 1.5 //10 clip * ~30? damage = 300 before res
+					}
+				}
+				TFBot {
+					Class Scout
+					Name "Soda Popper Scout"
+					ClassIcon scout_pop_armored
+					Health 1250
+					Scale 1.5
+					Skill Expert
+					Attributes Autojump
+					AutoJumpMin 3
+					AutoJumpMax 6
+					Item "The Soda Popper"
+					Action Passive
+					//Template noaggrooutsidebarrier
+				}
+				TFBot {
+					Class Scout
+					Name "Soda Popper Scout"
+					ClassIcon scout_pop_armored
+					Health 1250
+					Scale 1.5
+					Skill Expert
+					Attributes Autojump
+					AutoJumpMin 3
+					AutoJumpMax 6
+					Item "The Soda Popper"
+					Action Passive
+					//Template noaggrooutsidebarrier
+				}
+				TFBot {
+					Template T_TFBot_Giant_Scout_Baseball_Armored
+					Template noaggrooutsidebarrier
+					Action Passive
+				}
+			}
+		}
+		WaveSpawn { //engineer
+			Name "w4b"
+			Where spawnbot_altmode
+			TotalCount 5
+			MaxActive 5
+			SpawnCount 5
+			WaitForAllDead "w4a"
+			TotalCurrency 300
+			
+			DoneOutput {
+				Target altmode_script
+				Action CallScriptFunction
+				Param PickNextRoom
+			}
+			
+			Squad {
+				TFBot {
+					Class Engineer
+					Name "Giant Piercing Burst Ranger"
+					ClassIcon engineer_ranger_nys_penetrate_giant
+					Item "The Rescue Ranger"
+					Skill Expert
+					WeaponRestrictions PrimaryOnly
+					Health 4000
+					Action Passive
+					Attributes MiniBoss
+					Attributes HoldFireUntilFullReload
+					//Template noaggrooutsidebarrier
+					ItemAttributes {
+						ItemName "The Rescue Ranger"
+						"projectile spread angle penalty" 5
+						//"auto fires full clip" 1
+						//"auto fires when full" 1
+						"fire rate bonus" 0.1
+						"clip size upgrade atomic" 7.0
+						"faster reload rate" 0.4
+						"projectile penetration" 1
+					}
+					CharacterAttributes {
+						"move speed bonus" 0.5
+						"damage force reduction" 0.5
+						"airblast vulnerability multiplier" 0.6
+						"override footstep sound set" 5
+					}
+				}
+				
+				TFBot {
+					Name "Combo Pyro"
+					Class Pyro 
+					ClassIcon pyro_degreaser_flare
+					Item "The Degreaser"
+					Item "The Flare Gun"
+					Skill Expert
+					Health 1750
+					Scale 1.5
+					Action Passive
+					//Template noaggrooutsidebarrier
+					ItemAttributes {
+						ItemName "The Degreaser"
+						"fire input on hit" "combo_primary_to_secondary^Trigger^"
+						"airblast disabled" 1
+						"damage penalty" 0.1
+					}
+					ItemAttributes {
+						ItemName "The Flare Gun"
+						"damage penalty" 1
+						"faster reload rate" 0.3
+					}  
+				}
+				TFBot {
+					Name "Combo Pyro"
+					Class Pyro 
+					ClassIcon pyro_degreaser_flare
+					Item "The Degreaser"
+					Item "The Flare Gun"
+					Skill Expert
+					Health 1750
+					Scale 1.5
+					Action Passive
+					//Template noaggrooutsidebarrier
+					ItemAttributes {
+						ItemName "The Degreaser"
+						"fire input on hit" "combo_primary_to_secondary^Trigger^"
+						"airblast disabled" 1
+						"damage penalty" 0.1
+					}
+					ItemAttributes {
+						ItemName "The Flare Gun"
+						"damage penalty" 1
+						"faster reload rate" 0.3
+					}  
+				}
+				TFBot {
+					Class Pyro
+					Name "Dragon's Fury Pyro"
+					ClassIcon pyro_dragon_fury_swordstone
+					Skill Hard
+					Health 1750
+					Scale 1.5
+					MaxVisionRange 800
+					Action Passive
+					WeaponRestrictions PrimaryOnly
+					Item "The Dragon's Fury"
+					//Template noaggrooutsidebarrier
+				}
+				TFBot {
+					Class Pyro
+					Name "Dragon's Fury Pyro"
+					ClassIcon pyro_dragon_fury_swordstone
+					Skill Hard
+					Health 1750
+					Scale 1.5
+					MaxVisionRange 800
+					Action Passive
+					WeaponRestrictions PrimaryOnly
+					Item "The Dragon's Fury"
+					//Template noaggrooutsidebarrier
+				}
+			}
+		}
+		WaveSpawn { //soldier
+			Name "w4c"
+			Where spawnbot_altmode
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 6
+			WaitForAllDead "w4b"
+			TotalCurrency 200
+			
+			DoneOutput {
+				Target altmode_script
+				Action CallScriptFunction
+				Param PickNextRoom
+			}
+			
+			Squad {
+				TFBot {
+					Class Soldier
+					Name "Giant Burst Soldier"
+					ClassIcon soldier_spammer
+					Health 3800
+					Skill Expert
+					Item "The Air Strike"	
+					WeaponRestrictions PrimaryOnly
+					Attributes MiniBoss
+					Attributes HoldFireUntilFullReload
+					Action Passive
+					//Template noaggrooutsidebarrier
+					ItemAttributes {
+						ItemName "The Air Strike"
+						"faster reload rate" -0.8
+						"fire rate bonus" 0.5
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.5
+						"damage force reduction" 0.4
+						"airblast vulnerability multiplier" 0.4
+						"override footstep sound set" 3
+					}
+				}
+				TFBot {
+					Class Soldier
+					Name "Equalizer Soldier"
+					Item "The Equalizer"
+					WeaponRestrictions MeleeOnly
+					Scale 1.5
+					Health 1500
+					ClassIcon soldier_equalizer_armored
+					Action Passive
+					//Template noaggrooutsidebarrier
+				}
+				TFBot {
+					Template T_TFBot_Giant_Soldier_Spammer
+					Name "Rapid Fire Bison"
+					ClassIcon soldier_bison_spammer
+					Item "The Righteous Bison"
+					WeaponRestrictions SecondaryOnly
+					Scale 1.5
+					Health 1500
+					Skill Expert
+					Action Passive
+					//Template noaggrooutsidebarrier
+					ItemAttributes {
+						ItemName "The Righteous Bison"
+						"faster reload rate" -0.8
+						"fire rate bonus" 0.5
+					}
+				}
+			}
+		}
+		WaveSpawn { //heavy
+			Name "w4d"
+			Where spawnbot_altmode
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			TotalCurrency 300
+			WaitForAllDead "w4c"
+			
+			DoneOutput {
+				Target altmode_script
+				Action CallScriptFunction
+				Param PickNextRoom
+			}
+			
+			Squad {
+				TFBot {
+					Class Heavyweapons
+					Skill Expert
+					WeaponRestrictions MeleeOnly
+					Name "Bootleg Captain Punch"
+					ClassIcon heavy_chief
+					Health 6000
+					Item "War Head"
+					Item "Fists of Steel"
+					Attributes MiniBoss
+					Action Passive
+					//Template NoAggroOutsideBarrier
+					ItemAttributes
+					{
+						ItemName "Fists of Steel"
+						"fire rate bonus" 0.8
+						"damage bonus" 5
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.5
+						"damage force reduction" 0.3
+						"airblast vulnerability multiplier" 0.3
+						"override footstep sound set" 2
+					}
+				}
+				TFBot {
+					Class Heavy
+					Name "Huo-Long Heavy"
+					Health 1500
+					Scale 1.5
+					ClassIcon heavy_heater
+					Skill Normal
+					Action Passive
+					Item "The Huo Long Heatmaker"
+					WeaponRestrictions PrimaryOnly
+					//Template noaggrooutsidebarrier
+				}
+				TFBot {
+					Class Heavy
+					Name "Huo-Long Heavy"
+					Health 1500
+					Scale 1.5
+					ClassIcon heavy_heater
+					Skill Normal
+					Action Passive
+					Item "The Huo Long Heatmaker"
+					WeaponRestrictions PrimaryOnly
+					//Template noaggrooutsidebarrier
+				}
+			}
+		}
+		WaveSpawn { //sniper
+			Name "w4e"
+			Where spawnbot_altmode
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			WaitForAllDead "w4d"
+			
+			DoneOutput {
+				Target altmode_script
+				Action CallScriptFunction
+				Param PickNextRoom
+			}
+			
+			Squad {
+				TFBot {
+					Class Sniper
+					Name "Giant Hipfire Sniper"
+					ClassIcon sniper_alwaysfire_giant
+					Item "The Machina"
+					Skill Expert
+					WeaponRestrictions PrimaryOnly
+					Health 4000
+					Action Passive
+					Attributes MiniBoss
+					Attributes AlwaysFireWeapon
+					//Template noaggrooutsidebarrier
+					ItemAttributes {
+						ItemName "The Machina"
+						"sniper only fire zoomed" 0
+						"faster reload rate" .8
+					}
+					CharacterAttributes {
+						"move speed bonus" 0.5
+						"damage force reduction" 0.5
+						"airblast vulnerability multiplier" 0.6
+						"override footstep sound set" 5
+					}
+				}
+				TFBot {
+					Template T_TFBot_Sniper_Huntsman_Spammer
+					ClassIcon sniper_bow_multi
+					Skill Expert
+					Action Passive
+					//Template noaggrooutsidebarrier
+					ItemAttributes {
+						ItemName "The Huntsman"
+						"arrow mastery" 1
+						"grenade bounce speed" 0.8
+					}
+				}
+				TFBot {
+					Template T_TFBot_Sniper_Huntsman_Spammer
+					ClassIcon sniper_bow_multi
+					Skill Expert
+					Action Passive
+					//Template noaggrooutsidebarrier
+					ItemAttributes {
+						ItemName "The Huntsman"
+						"arrow mastery" 1
+						"grenade bounce speed" 0.8
+					}
+				}
+				TFBot {
+					Class Sniper
+					Name "Jarate Sniper"
+					ClassIcon sniper_jarate_spammer
+					Health 1200
+					Scale 1.5
+					Skill Expert
+					Attributes SpawnWithFullCharge
+					Action Passive
+					StripItemSlot 0
+					StripItemSlot 2
+					Item "Jarate"
+					//Template noaggrooutsidebarrier
+					ItemAttributes {
+						ItemName "Jarate"
+						"effect bar recharge rate increased" 0.001
+					}
+				}
+			}
+		}
+		WaveSpawn { //demo
+			Name "w4f"
+			Where spawnbot_altmode
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			WaitForAllDead "w4e"
+			TotalCurrency 200
+			
+			DoneOutput {
+				Target altmode_script
+				Action CallScriptFunction
+				Param "DoneRoom"
+			}
+			
+			Squad {
+				TFBot {
+					Class Demoman
+					Skill Expert
+					WeaponRestrictions PrimaryOnly
+					Name "Bootleg Major Bomber"
+					ClassIcon demo_bomber
+					Health 5000
+					Item "Prince Tavish's Crown"
+					Attributes HoldFireUntilFullReload
+					Attributes MiniBoss
+					//Attributes AlwaysCrit
+					Action Passive
+					//Template noaggrooutsidebarrier
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_GRENADELAUNCHER"
+						"fire rate bonus" 0.2
+						"faster reload rate" 0.3
+						"clip size penalty" 3.0
+						"Projectile speed increased" 1.5
+					}
+					CharacterAttributes
+					{
+						"move speed bonus"	0.5
+						"damage force reduction" 0.4
+						"airblast vulnerability multiplier" 0.4
+						"override footstep sound set" 4
+					}
+				}
+				
+				TFBot {
+					Class Demoman
+					Name "Loch-n-Load Demo"
+					ClassIcon demo_loch
+					Skill Expert
+					Health 1750
+					Scale 1.5
+					Item "The Loch-n-Load"
+					Item "The Chargin' Targe"
+					Action Passive
+					//Template noaggrooutsidebarrier
+				}
+				TFBot {
+					Class Demoman
+					Name "Loch-n-Load Demo"
+					ClassIcon demo_loch
+					Skill Expert
+					Health 1750
+					Scale 1.5
+					Item "The Loch-n-Load"
+					Item "The Chargin' Targe"
+					Action Passive
+					//Template noaggrooutsidebarrier
+				}
+			}
+		}
+	}
+	Wave { //6, welcome to schizo hour
+		InitWaveOutput {
+			Target altmode_init_reviveonly_relay
+			Action Trigger
+		}
+		StartWaveOutput {
+			Target altmode_roof_wave_start_reviveonly_relay
+			Action Trigger
+		}
+		DoneOutput {
+			Target altmode_wave_finished_relay
+			Action Trigger
+		}
+		
+		WaveSpawn {
+			name "w5a"
+			Where spawnbot_boss
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 1
+			
+			TFBot {
+				template medboss
+				tag gmed
+				tag giantgiant
+				
+				FireInput {
+					Target "popscript"
+					Action "$Phase1"
+					Delay 0
+					Repeats 1
+				}
+			}
+		}
+		WaveSpawn {
+			name "w5b"
+			Where spawnbot_roof
+			Support Limited
+			TotalCount 25
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 3
+			TotalCurrency 2400
+			HideIcon 1
+		
+			RandomChoice {
+				TFBot {
+					Template spellmed
+					Spell {
+						Delay 5
+						Cooldown 5
+						Type "Teleport"
+					}
+				}
+				TFBot {
+					Template spellmed
+					Spell {
+						Delay 5
+						Cooldown 5
+						Type "Teleport"
+					}
+				}
+				TFBot {
+					Template spellmed
+					Spell {
+						Delay 5
+						Cooldown 5
+						Type "Invisibility"
+					}
+				}
+				TFBot {
+					Template spellmed
+					Spell {
+						Delay 5
+						Cooldown 5
+						Type "Fireball"
+					}
+				}
+				TFBot {
+					Template spellmed
+					CharacterAttributes {
+						"cancel falling damage" 1
+					}
+					Spell {
+						Delay 5
+						Cooldown 5
+						Type "Superjump"
+					}
+				}
+			}
+		}
+		WaveSpawn {
+			Name "w5c"
+			Where spawnbot_altmode
+			WaitForAllDead "w5b"
+			Support Limited
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 6
+			HideIcon 1
+			
+			StartWaveOutput {
+				target wave_start_relay
+				action runscriptfile
+				param "mimiclisteners.nut"
+			}
+			
+			Squad {
+				NoFormation 1
+			
+				TFBot {
+					Template playermedmobber
+					Tag attack1
+					
+					FireInput {
+						Target "popscript"
+						Action "$Phase2"
+						Delay 0
+						Repeats 1
+					}
+				}
+				TFBot {
+					Template playermedmobber
+					Tag attack2
+				}
+				TFBot {
+					Template playermedmobber
+					Tag attack3
+				}
+				TFBot {
+					Template playermedmobber
+					Tag attack4
+				}
+				TFBot {
+					Template playermedmobber
+					Tag attack5
+				}
+				TFBot {
+					Template playermedmobber
+					Tag attack6
+				}
+			}
+		}
+	}
+}
