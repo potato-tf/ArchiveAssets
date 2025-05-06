@@ -29,6 +29,7 @@ class __Potato_GasNerf
 {
     __gas_damage_recharge_rate  = 3000.0
     __gas_passive_recharge_rate = 120.0
+    __gas_loss_on_death         = false
     // __gas_damage_mult        = ( 90 / 350 ) //used for dmg penalty vs players
     __gas_damage_amount         = 150.0
     __gas_reignite_immune_time  = 5.0
@@ -95,7 +96,7 @@ class __Potato_GasNerf
 
                     // Start empty on spawn
                     // m_bRegenerating is true when switching loadouts with tf_respawn_on_loadoutchange 1 and touching a resupply cabinet
-                    if (!GetPropBool(player, "m_Shared.m_bInUpgradeZone") && !GetPropBool(player, "m_bRegenerating"))
+                    if (__Potato_GasNerf.__gas_loss_on_death && !GetPropBool(player, "m_Shared.m_bInUpgradeZone") && !GetPropBool(player, "m_bRegenerating"))
                     {
                         SetPropIntArray(player, "m_iAmmo", 0, 4)
                         SetPropFloatArray(player, "m_Shared.m_flItemChargeMeter", 0.0, 1)
@@ -142,7 +143,7 @@ class __Potato_GasNerf
                 ClientPrint(player, HUD_PRINTTALK, format("\x01- Damage for full charge:\x07F5B111 750\x01 → \x07F5B111%d", __Potato_GasNerf.__gas_damage_recharge_rate))
                 ClientPrint(player, HUD_PRINTTALK, format("\x01- Passive recharge:\x07F5B111 60\x01 → \x07F5B111%d", __Potato_GasNerf.__gas_passive_recharge_rate))
                 ClientPrint(player, HUD_PRINTTALK, "\x01- Damage charging\x07F5B111 does not scale with charge rate upgrades\x01")
-                ClientPrint(player, HUD_PRINTTALK, "\x01- Gas meter\x07F5B111 does not save between lives\x01")
+                if (__Potato_GasNerf.__gas_loss_on_death) ClientPrint(player, HUD_PRINTTALK, "\x01- Gas meter\x07F5B111 does not save between lives\x01")
                 ClientPrint(player, HUD_PRINTTALK, "\x01- Crit damage\x07F5B111 does not contribute to charge\x01")
                 ClientPrint(player, HUD_PRINTTALK, "\x01- Can now be resisted by\x07F5B111 fire resistance")
                 ClientPrint(player, HUD_PRINTTALK, "\x01- Explosions\x07F5B111 can not stack\x01")
