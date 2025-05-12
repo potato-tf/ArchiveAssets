@@ -245,9 +245,15 @@ class __Potato_GasNerf
                         phlogwep.AddAttribute("mod soldier buff type", 4.0, -1)
 
                     // non-alive lifestate fixes self-recharging when not using TF_DMG_CUSTOM_BURNING
-                    SetPropInt(attacker, "m_lifeState", 1)
-                    victim.TakeDamageEx(gas_killicon, attacker, gaswep, Vector(), victim.GetOrigin(), __Potato_GasNerf.__gas_damage_amount, DMG_BURN|DMG_PREVENT_PHYSICS_FORCE)
-                    SetPropInt(attacker, "m_lifeState", 0)
+                    if (attacker.IsAlive())
+                    {
+                        SetPropInt(attacker, "m_lifeState", 1)
+                        victim.TakeDamageEx(gas_killicon, attacker, gaswep, Vector(), victim.GetOrigin(), __Potato_GasNerf.__gas_damage_amount, DMG_BURN|DMG_PREVENT_PHYSICS_FORCE)
+                        SetPropInt(attacker, "m_lifeState", 0)
+                    }
+                    else
+                        victim.TakeDamageEx(gas_killicon, attacker, gaswep, Vector(), victim.GetOrigin(), __Potato_GasNerf.__gas_damage_amount, DMG_BURN|DMG_PREVENT_PHYSICS_FORCE)
+
                     // set it back or else it'll get cleaned up, preserved ents use classname checks
                     gas_killicon.KeyValueFromString("classname", "move_rope")
 
