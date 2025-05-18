@@ -20,8 +20,5 @@ Events <- {
 			Vector(-520, -5450, 1063), Vector(-120, -5077, 1263),
 			Constants.ETFTeam.TF_TEAM_BLUE
 		)
-
-		RegisterFix("Fixed cash getting stuck in the centre spawn.")
-		MakeTriggerHurt(Vector(-520, -5450, 1063), Vector(-120, -5040, 1263))
 	}
 }

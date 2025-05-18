@@ -8,8 +8,5 @@ Events <- {
 		MarkAsSpawn([27, 73, 3438, 3440, 3441], Constants.ETFTeam.TF_TEAM_BLUE)
 		// Add missing BLU func_respawnroom.
 		MakeSpawnroom(Vector(-2688, 2688, 0), Vector(-1920, 3328, 60), Constants.ETFTeam.TF_TEAM_BLUE)
-
-		RegisterFix("Fixed cash getting stuck in the tank spawn.")
-		MakeTriggerHurt(Vector(-2688, 2688, 0), Vector(-1920, 3328, 60))
 	}
 }
