@@ -1,9 +1,14 @@
-// This is a special VScript file that will run before mapspawn.nut when using sigsegv-mvm
-//  (https://github.com/rafradek/sigsegv-mvm/) with sig_util_vscript_load_init_scripts "1"
-//  set.
-// We use this file on Potato to apply both global and map-specific fixes and utility.
-// We do not use mapspawn.nut for this, as it is a vanilla file that maps can include their
-//  own version of which would overwrite this file.
+// The note below this is for serverinit.nut 
+// this file caused scoping issues for certain scripts so we ended up using mapspawn.nut instead.
+
+/********************************************************************************************
+ * This is a special VScript file that will run before mapspawn.nut when using sigsegv-mvm  *
+ *  (https://github.com/rafradek/sigsegv-mvm/) with sig_util_vscript_load_init_scripts "1"  *
+ *  set.                                                                                    *
+ * We use this file on Potato to apply both global and map-specific fixes and utility.      *
+ * We do not use mapspawn.nut for this, as it is a vanilla file that maps can include their *
+ * own version of which would overwrite this file.                                          *
+ ********************************************************************************************/
 
 ::ROOT <- getroottable()
 // Potato server namespace.
@@ -220,9 +225,10 @@ if (::__potato.IsSigmod) {
 
 // These scripts are not included in ArchiveAssets.
 // TODO: These scripts should be modified to be integrated better with this file.
+
 // Contract progress tracker.
 try IncludeScript("contracts.nut") catch (_) {}
-// StringToFile() server syncing.
+// File I/O hooks to add a permission model and chunked file writes.
 try IncludeScript("stringtofile.nut") catch (_) {}
 // VScript-Python interface.
 try IncludeScript("vpi/vpi.nut") catch (_) {}
