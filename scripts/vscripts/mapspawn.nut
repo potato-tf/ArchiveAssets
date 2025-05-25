@@ -1,4 +1,4 @@
-// The note below this is for serverinit.nut 
+// The note below this is for serverinit.nut
 // this file caused scoping issues for certain scripts so we ended up using mapspawn.nut instead.
 
 /********************************************************************************************
@@ -208,6 +208,10 @@ if (::__potato.IsSigmod) {
 	// Extended ugrades refund cash exploit fix.
 	::__potato.Include("temp_refund_exploit_fix")
 }
+
+// Fix func_respawnroom bounds check causing cash to be collected in accessible locations.
+// NOTE: This is responsible for any reports of cash dropping out-of-bounds in spawn rooms.
+::__potato.Include("temp_fix_cash_collection", "archive")
 
 // Disables respawn text on missions with no respawns.
 ::__potato.Include("hide_respawntext")
