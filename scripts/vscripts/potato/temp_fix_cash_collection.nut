@@ -103,7 +103,6 @@ if (!(GetMapName() in maps))
 		// Restore spawn positions for RecomputeBlockers and then and queue moving them away.
 		RestoreSpawns()
 		QueueMoveSpawns()
-		return true
 	}
 
 	function OnGameEvent_teamplay_round_start(_)
@@ -117,7 +116,10 @@ if (!(GetMapName() in maps))
 		local scope = nav_interface.GetScriptScope()
 
 		scope.InputRecomputeBlockers <- function()
+		{
 			PotatoSpawnCash.OnRecomputeBlockers()
+			return true
+		}
 		scope.Inputrecomputeblockers <- scope.InputRecomputeBlockers
 	}
 }
