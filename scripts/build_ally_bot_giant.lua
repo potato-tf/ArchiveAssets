@@ -1871,31 +1871,27 @@ function checkIfMeleeHitAlly(param, activator, calller)
 		--ripped from my med hunter script, hybrid of red sniper laser check and some original work on my end
 	
 		local TraceLineOfSight = {
-			start = activator, -- Start position vector. Can also be set to entity, in this case the trace will start from entity eyes position
-			distance = 100, -- Used if endpos is nil
-			angles = getEyeAngles(activator), -- Used if endpos is nil
-			mask = MASK_SOLID, -- Solid type mask, see MASK_* globals
-			collisiongroup = COLLISION_GROUP_PLAYER, -- Pretend the trace to be fired by an entity belonging to this group. See COLLISION_GROUP_* globals
+			start = activator,
+			distance = 100,
+			angles = getEyeAngles(activator),
+			mask = MASK_SOLID,
+			collisiongroup = COLLISION_GROUP_PLAYER,
 		}
 		local lineOfSightTraceTable = util.Trace(TraceLineOfSight)
 		
 		local hitEntity = lineOfSightTraceTable.Entity
-		--print(lineOfSightTraceTable.Entity)
 	
-		if IsValid(hitEntity) and hitEntity:IsPlayer() and hitEntity.m_iTeamNum == activator.m_iTeamNum then
+		if IsValid(hitEntity) and hitEntity:IsPlayer() and hitEntity:IsBot() and hitEntity.m_iTeamNum == activator.m_iTeamNum then
 			local healedMaxHealth = hitEntity.m_iMaxHealth + hitEntity:GetAttributeValueByClass("add_maxhealth_nonbuffed", 0)
 			+ hitEntity:GetAttributeValueByClass("add_maxhealth", 0)
 			--code to consume metal taken from b8's tank repair script
 		
-			local METAL_TO_HEALTH_RATIO
-		
+			local METAL_TO_HEALTH_RATIO = 16
+			-- TODO: This should be a bot tag
 			if hitEntity:GetPlayerName() == "Giant VIP Heavy" then
 				METAL_TO_HEALTH_RATIO = 8
-			else
-				METAL_TO_HEALTH_RATIO = 16
 			end
 		
-			--print("Hit entity was healed!")
 			--Metal before hit
 			local oldMetal = activator.m_iAmmo[TF_AMMO_METAL]
 		
@@ -1906,19 +1902,13 @@ function checkIfMeleeHitAlly(param, activator, calller)
 			end		
 		
 			local metalLost = (oldMetal - newMetal)
-			--print(metalLost)
-			hitEntity.m_iHealth = hitEntity.m_iHealth + (metalLost * METAL_TO_HEALTH_RATIO * activator:GetAttributeValueByClass("mult_repair_value", 1))
+			hitEntity.m_iHealth = hitEntity.m_iHealth + 1 + (metalLost * METAL_TO_HEALTH_RATIO * activator:GetAttributeValueByClass("mult_repair_value", 1))
 		
-			hitEntity:TakeDamage({ -- make the bot take 1 damage so the sentry healthbar updates.
+			hitEntity:TakeDamage({ -- make the bot take 1 damage so the sentry healthbar updates, compensated by adding +1 hp above.
 				Damage = 1,
 				Attacker = activator,
 				Weapon = none,
 			})
-			hitEntity:TakeDamage({ -- make the bot take -1 damage to nullify effect of earlier damage, could just add 1 to heal value, but I won't
-				Damage = -1,
-				Attacker = activator,
-				Weapon = none,
-			})		
 		
 			if hitEntity.m_iHealth < healedMaxHealth and metalLost > 0 then
 				activator:PlaySoundToSelf("Weapon_Wrench.HitBuilding_Success")
@@ -1934,7 +1924,6 @@ function checkIfMeleeHitAlly(param, activator, calller)
 			if IsValid(building) then	
 				building.m_iHealth = bot.m_iHealth
 			end
-		end	
-	
-end	
-	
+		end
+	util.FinishLagCompensation(activator)
+end
