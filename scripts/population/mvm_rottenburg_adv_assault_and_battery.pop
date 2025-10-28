@@ -1,0 +1,1766 @@
+//////////////////////////////////////////
+//	VERSION 11.0
+//	(Advanced) Assault and Battery, a Mission by Crosse?! (https://steamcommunity.com/id/myinventoryisnotforsale/)
+//	mvm_rottenburg, a map by Valve
+//	Fiercest Warrior ver 0 & ver 7 Dual Mix by Zer0Destinate/Veserr0 on YouTube (https://www.youtube.com/channel/UCeoQG-anLzmj3OO55b_ltlw)
+//	If there are discrepancies with the wave descriptions compared to what actually comes out, I'm probably either too lazy to fix them or I forgot to do so.
+//////////////////////////////////////////
+
+/////////////////////
+// Pop Start
+/////////////////////
+
+#base robot_giant.pop
+#base robot_standard.pop
+#base robot_crosse.pop
+#base robot_crossegiants.pop
+
+	WaveSchedule
+	{
+		/////////////////////
+		//	Initialization
+		/////////////////////
+		
+		PointTemplates
+		{
+			HeatWaveMusic
+			{ 
+				NoFixUp 1
+				logic_relay
+				{
+					"origin" "0 0 0" 
+					"targetname" "coolrelay"
+					"OnTrigger" "bots_win,AddOutput,OnRoundWin mus_heatwave_fail:Trigger:0:-1"
+				}
+				ambient_generic 
+				{
+					health 10
+					message #*heatwaveintro.mp3
+					radius 20
+					spawnflags 49
+					targetname mus_heatintro
+				}
+				ambient_generic 
+				{
+					health 10
+					message #*heatwaveloop.mp3
+					radius 20
+					spawnflags 49 // it's set to 49 because mp3 files can't loop, that only works for .wav files with added cuepoints
+                targetname mus_heatloop
+				}
+				logic_relay
+				{
+					spawnflags "2"
+					targetname mus_heatintro_relay 
+					"OnTrigger" "mus_heatintro,PlaySound,,0,-1"
+					"OnTrigger" "coolrelay,Trigger,,0,-1"
+					"OnTrigger" "mus_heatloop_relay,Trigger,,24.528,-1"
+				}
+				logic_relay
+				{
+					spawnflags "2"
+					targetname mus_heatloop_relay // it's why this relay actually makes the song 'loop'
+					"OnTrigger" "mus_heatloop,PlaySound,,0,-1"
+					"OnTrigger" "mus_heatloop_relay,Trigger,,144.395,-1"
+				}
+				logic_relay
+				{
+					spawnflags "2"
+					targetname mus_heatwave_fail
+					"OnTrigger" "mus_heatloop,Volume,0,0,-1"
+					"OnTrigger" "mus_heatloop_relay,CancelPending,,0,-1"
+					"OnTrigger" "player,$playsoundtoself,replay/youtube_uploadfinished.wav,0,-1"
+				}
+				logic_relay
+				{
+					spawnflags "2"
+					targetname mus_heatwave_end_relay
+					"OnTrigger" "mus_heatloop,Volume,0,0,-1"
+					"OnTrigger" "mus_heatloop_relay,CancelPending,,0,-1"
+					"OnTrigger" "mus_heatoutro,PlaySound,,0,-1"
+				}
+				ambient_generic 
+				{
+					health 10
+					message #*heatwaveoutro.mp3
+					radius 20
+					spawnflags 49
+					targetname mus_heatoutro
+				}
+			}
+		}
+
+
+		SpawnTemplate HeatWaveMusic
+		
+		StartingCurrency	1500
+		RespawnWaveTime	6
+		CanBotsAttackWhileInSpawnRoom	no
+		Advanced	1
+
+		/////////////////////
+		// Missions
+		/////////////////////
+
+		///////////
+		//	Spy
+		///////////
+
+		Mission	//	Normal Spy W2 and 3
+		{
+			Objective Spy
+		
+			InitialCooldown	30
+			Where	spawnbot_mission_spy
+			BeginAtWave	2
+			RunForThisManyWaves 2
+			CooldownTime	45
+			DesiredCount	3
+		
+			TFBot
+			{
+				Template T_TFBot_CrosseNormalSpy
+			}
+		}
+
+		////////////////
+		//	Engineer
+		////////////////
+
+		Mission // Teleporting Engineers W2-4
+		{
+			Objective Engineer  
+
+			InitialCooldown 30
+			Where spawnbot
+			BeginAtWave 2
+			RunForThisManyWaves 4
+			CooldownTime 60
+			DesiredCount 1
+
+			TFBot
+			{
+				Template T_TFBot_Engineer_Sentry_Teleporter
+				TeleportWhere spawnbot
+				TeleportWhere flankers
+				Attributes TeleportToHint
+				Health 600
+			}
+		}
+
+		//////////////
+		//	Sniper
+		//////////////
+
+
+		Mission //	Sniper W1
+		{
+			Objective Sniper
+
+			InitialCooldown 20
+			Where spawnbot_mission_sniper
+			BeginAtWave 1
+			RunForThisManyWaves 1
+			CooldownTime 20
+			DesiredCount 2
+
+			TFBot
+			{
+				Template T_TFBot_Sniper
+			}
+		}
+		Mission //	Sniper W6
+		{
+			Objective Sniper
+
+			InitialCooldown 20
+			Where spawnbot_mission_sniper
+			BeginAtWave 6
+			RunForThisManyWaves 1
+			CooldownTime 20
+			DesiredCount 3
+
+			TFBot
+			{
+				Template T_TFBot_Sniper
+			}
+		}
+
+		//////////////////////
+		//	Sentry Busters
+		//////////////////////
+
+		AddSentryBusterWhenDamageDealtExceeds	2000
+		AddSentryBusterWhenKillCountExceeds	15
+
+		Mission // Sentry Busters
+		{
+			Objective DestroySentries
+	
+			InitialCooldown 15
+			Where spawnbot
+			BeginAtWave 1
+			RunForThisManyWaves 6
+			CooldownTime 30
+	
+				TFBot
+				{
+					Template T_TFBot_SentryBuster
+				}
+		}
+
+		/////////////////////
+		// Wave List
+		// START 1500$ - W1 1100$ (2600$ EOW) - W2 1100$ (3700$ EOW) - W3 1100$ (4800$ EOW) - W4 800$ (5600$ EOW) - W5 900$ (6500$ EOW) - W6 1800$ - TOTAL 8300$
+		/////////////////////
+
+		/////////////////////
+		// Wave 1 - 1500$ - +1100$ EoW - 2 GRF Soldiers, 4 GPyros, 1 GT1 Demo, 1 GRegen, 12 Big-Heals, 30 Bat Scouts, 20 Demoknights and 8 Heater Heavies SUPPORTED BY Punchies, Bison Soldiers and Snipers
+		/////////////////////
+
+
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay_classic
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+	WaveSpawn
+		{
+			Name	W1GSoldierAndMeds
+			
+			TotalCurrency	200
+			TotalCount	6
+			MaxActive	6
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	10
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier_Spammer
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+					Attributes	IgnoreEnemies
+					Name	"Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+					Attributes	IgnoreEnemies
+					Name	"Quick-Uber Medic"
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W1Scouts
+			
+			TotalCurrency	100
+			TotalCount	40
+			MaxActive	15
+			SpawnCount	7
+			Where	flankers
+			
+			WaitBeforeStarting	1
+			WaitBetweenSpawns	0
+			
+			TFBot
+			{
+				Class	Scout
+				Skill	Easy
+				ClassIcon	scout
+			}
+		}
+		WaveSpawn
+		{
+			Name	W1GPyroAndHeavies
+			
+			WaitForAllSpawned	"W1GSoldierAndMeds"
+			TotalCurrency	150
+			TotalCount	8
+			MaxActive	8
+			SpawnCount	4
+			Where	spawnbot
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	20
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_GManmelterPyro
+					ItemAttributes
+					{
+						ItemName	"TF_WEAPON_FLAMETHROWER"
+						"airblast disabled" 1
+					}
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseHeaterHeavy
+					Attributes	DisableDodge
+					Item	"Engineer Welding Mask"
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseHeaterHeavy
+					Attributes	DisableDodge
+					Item	"Engineer Welding Mask"
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseHeaterHeavy
+					Attributes	DisableDodge
+					Item	"Engineer Welding Mask"
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W1GDemoAndGMed1
+			
+			WaitForAllSpawned	"W1GPyroAndHeavies"
+			TotalCurrency	250
+			TotalCount	4
+			MaxActive	4
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	30
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Demoman
+				}
+				TFBot
+				{
+					Template	T_TFBot_Giant_Medic_Regen
+					Attributes	IgnoreEnemies
+					Item	"The Surgeon's Stahlhelm"
+					Name	"Giant Regen Medic"
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W1PunchySupport
+			
+			WaitForAllSpawned	"W1GPyroAndHeavies"
+			TotalCurrency	150
+			TotalCount	30
+			MaxActive	6
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	5
+			Support 1
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Heavyweight_Champ
+					Name	"Punchy, the Invincible"
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W1Bisons
+			
+			WaitForAllSpawned	"W1GPyroAndHeavies"
+			TotalCurrency	150
+			TotalCount	15
+			MaxActive	5
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	5
+			WaitBetweenSpawns	5
+			Support	1
+			
+			TFBot
+			{
+				Template T_TFBot_CrosseSoldierBison
+			}
+		}
+	}
+
+
+/////////////////////
+// Wave 2 - 2600$ - +1100$ EoW - 5 GKnights, 2 GShotgun Heavies, 3 Clusterbomb GDemos, 30 Loch Shotgunner Demos, 20 DF Pyros, 9 Buff Soldiers, SUPPORTED BY Normal Spies and Winger Scouts
+/////////////////////
+
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay_classic
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+	WaveSpawn
+		{
+			Name W2Demos
+			
+			TotalCurrency	100
+			TotalCount	24
+			MaxActive	6
+			SpawnCount	4
+			Where	spawnbot
+			WaitBeforeStarting	1
+			WaitBetweenSpawns	7
+			
+			TFBot
+			{
+				Class	Demoman
+				Skill	Normal
+				ClassIcon	demo
+			}
+		}
+	WaveSpawn
+		{
+			Name	W2GScouts
+			
+			TotalCurrency	150
+			TotalCount	4
+			MaxActive	2
+			SpawnCount	1
+			Where	flankers
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	15
+			
+			TFBot
+			{
+				Template	T_TFBot_Giant_Scout_Baseball
+			}
+		}
+	WaveSpawn
+		{
+			Name	W2GSoldiers
+		
+			TotalCurrency     150
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	1
+			Where	flankers
+			WaitBeforeStarting	1
+			WaitBetweenSpawns	20
+		
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W2Tank1
+			
+			WaitForAllSpawned	"W2GSoldiers"
+			TotalCurrency	150
+			TotalCount 1
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	0
+			
+			FirstSpawnOutput
+			{
+				Target	boss_spawn_relay
+				Action	Trigger
+                Target    bignet
+                Action    RunScriptCode
+                Param    "
+                ClientPrint(null,3,`\x0799CCFFTank HP - 20K`)
+                "
+			}
+			
+			Tank
+			{
+				Health 20000
+				Speed 75
+				StartingPathTrackNode	"tank_path_a_10"
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W2Shortstops
+			
+			WaitForAllSpawned	"W2Demos"
+			TotalCurrency	150
+			TotalCount	20
+			MaxActive	15
+			SpawnCount	5
+			Where	flankers
+			WaitBeforeStarting	5
+			WaitBetweenSpawns	3
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_CrosseScoutShortstop
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseScoutShortstop
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseScoutShortstop
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseScoutShortstop
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseScoutShortstop
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W2GHeavies
+			
+			WaitForAllSpawned	"W2GSoldiers"
+			TotalCurrency	150
+			TotalCount	5
+			MaxActive	5
+			SpawnCount	5
+			Where	spawnbot
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	20
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Heavyweapons
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+					Attributes	IgnoreEnemies
+					Name	"Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+					Attributes	IgnoreEnemies
+					Name	"Quick-Uber Medic"
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseKritzMed
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseKritzMed
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W2ScoutSupport
+			
+			WaitForAllSpawned	"W2Shortstops"
+			TotalCurrency	150
+			TotalCount	30
+			MaxActive	6
+			SpawnCount	4
+			Where	flankers
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	5
+			Support	1
+			
+			Squad
+			{
+				TFBot
+				{
+					Class	scout
+					Skill	Hard
+				}
+			}
+		}
+	}
+
+/////////////////////
+// Wave 3 - 3700$ - +1100$ EoW - 3 Krit Bison Shotgunner GSoldiers, 2 GDeflectors, 2 GRF Soldiers, 2 GRegen Shields, 30 DH Soldiers, 8 UMeds, 12 Huntsman Spammer Snipers and 24 Pyros SUPPORTED BY Demoknights, Spies and Teleporting Engies
+/////////////////////
+
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay_classic
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+		
+	WaveSpawn
+		{
+			Name W3GBisonShotguns
+			
+			TotalCurrency	150
+			TotalCount	4
+			MaxActive	4
+			SpawnCount	1
+			Where	flankers
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	15
+			
+			FirstSpawnOutput
+			{
+				Target	boss_spawn_relay
+				Action	Trigger
+                Target    bignet
+                Action    RunScriptCode
+                Param    "
+                ClientPrint(null,3,`\x0799CCFFReminder: Bomb always spawns Flankers!`)
+                "
+			}
+			
+			TFBot
+			{
+				Template	T_TFBot_CrosseGBison
+			}
+		}
+	WaveSpawn
+		{
+			Name W3GBuff
+			
+			TotalCurrency	150
+			TotalCount	12
+			MaxActive	12
+			SpawnCount	6
+			Where	spawnbot
+			WaitBeforeStarting	1
+			WaitBetweenSpawns	15
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier_Extended_Buff_Banner
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseDirectHit
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseDirectHit
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseDirectHit
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseDirectHit
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseDirectHit
+				}
+			}
+		}
+		
+	WaveSpawn
+		{
+			Name W3Demoflanks
+			
+			TotalCurrency 150
+			TotalCount	24
+			MaxActive	10
+			SpawnCount 6
+			Where	spawnbot
+			Where	flankers
+			WaitBeforeStarting	1
+			WaitBetweenSpawns	5
+			
+			TFBot
+			{
+				Template	T_TFBot_Demo_Burst
+			}
+		}
+			
+	WaveSpawn
+		{
+			Name	W3GSoldierUmeds
+			
+			WaitForAllSpawned	"W3GBuff"
+			TotalCurrency	150
+			TotalCount	10
+			MaxActive	10
+			SpawnCount	5
+			Where	spawnbot
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	15
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier_Spammer
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+					Attributes	IgnoreEnemies
+					Name	"Quick Uber Medic"
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+					Attributes	IgnoreEnemies
+					Name	"Quick Uber Medic"
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+					Attributes	IgnoreEnemies
+					Name	"Quick Uber Medic"
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+					Attributes	IgnoreEnemies
+					Name	"Quick Uber Medic"
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W3GHeater1
+			
+			WaitForAllSpawned	"W3GSoldierUmeds"
+			TotalCurrency	100
+			TotalCount	2
+			MaxActive	2
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	20
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Heater
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseGKritz
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W3GHeater2
+			
+			WaitForAllSpawned	"W3GHeater1"
+			TotalCurrency	100
+			TotalCount	2
+			MaxActive	2
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	20
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Heater
+				}
+				TFBot
+				{
+					Template	T_TFBot_Giant_Medic_Regen
+					Attributes	IgnoreEnemies
+					Item	"The Surgeon's Stahlhelm"
+					Name	"Giant Regen Medic"
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W3BowsNPyros
+			
+			WaitForAllSpawned	"W3Demoflanks"
+			TotalCurrency	100
+			TotalCount	18
+			MaxActive	6
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	0
+			Support	Limited
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Sniper_Huntsman
+					ItemAttributes
+					{
+						ItemName	"The Huntsman"
+						"Set DamageType Ignite" 1
+					}
+				}
+				TFBot
+				{
+					Template	T_TFBot_Pyro
+					ItemAttributes
+					{
+						ItemName	"TF_WEAPON_FLAMETHROWER"
+						"airblast disabled"	1
+					}
+				}
+				TFBot
+				{
+					Template	T_TFBot_Pyro
+					ItemAttributes
+					{
+						ItemName	"TF_WEAPON_FLAMETHROWER"
+						"airblast disabled"	1
+					}
+				}
+			}
+		}
+	}
+
+/////////////////////
+// Wave 4 - 4800$ - +800$ EoW - 2 GBonks, 3 Gas Jockey GPyros, 1 GBurst DH, 1 Buff Conch Duo, 2 Tanks (20k per, 40k total) 30 Krit Poppers, 10 BBoxes, 10 Kritz Meds SUPPORTED BY Detonator Spammers, Krit Axtins and Kunai Spies
+/////////////////////
+
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay_classic
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+	WaveSpawn
+		{
+			Name	W4GBonkScout
+			
+			TotalCurrency	100
+			TotalCount	4
+			MaxActive	2
+			SpawnCount	1
+			Where	spawnbot
+			Where	flankers
+			Randomspawn	1
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	30
+			
+			TFBot
+			{
+				Template	T_TFBot_Giant_Scout_Fast
+			}
+		}
+	WaveSpawn
+		{
+			Name W4Tank1
+			
+			TotalCurrency	225
+			TotalCount 1
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	0
+			
+			FirstSpawnOutput
+			{
+				Target	boss_spawn_relay
+				Action	Trigger
+                Target    bignet
+                Action    RunScriptCode
+                Param    "
+                ClientPrint(null,3,`\x0799CCFFTank HP - 25K`)
+                "
+			}
+			
+			Tank
+			{
+				Health 25000
+				Speed 75
+				StartingPathTrackNode	"tank_path_a_10"
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W4GManglers
+			
+			TotalCurrency	80
+			TotalCount	2
+			MaxActive	2
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	20
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_CrosseGBurstMangler
+					Attributes	AlwaysCrit
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W4KritzShotguns
+			
+			TotalCurrency	100
+			TotalCount	40
+			MaxActive	12
+			SpawnCount	8
+			Where spawnbot
+			WaitBeforeStarting	1
+			WaitBetweenSpawns	5
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Heavyweapons_Shotgun
+					ClassIcon	heavy_shotgun_crosse
+					Item	"The Well-Rounded Rifleman"
+					Item	"Deadbeats"
+					ItemAttributes
+					{
+						ItemName	"Deadbeats"
+						"set item tint RGB"    13595446
+					}
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseKritzMed
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W4PolyPyros
+			
+			WaitForAllSpawned	"W4KritzShotguns"
+			TotalCurrency	20
+			TotalCount	40
+			MaxActive	8
+			SpawnCount	2
+			Where	spawnbot
+			where	flankers
+			WaitBeforeStarting	5
+			WaitBetweenSpawns	3
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_CrossePolyPyro
+					ClassIcon	pyro_polycount_crosse
+					Attributes	AlwaysFireWeapon
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W4GShotties
+			
+			WaitForAllSpawned	"W4KritzShotguns"
+			TotalCurrency	50
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	30
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Heavyweapons_Shotgun
+					ClassIcon	heavy_shotgun_crosse_giant
+					Item	"The Well-Rounded Rifleman"
+					Item	"Deadbeats"
+					ItemAttributes
+					{
+						ItemName	"Deadbeats"
+						"set item tint RGB"    13595446
+					}
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W4GConches
+			
+			WaitForAllSpawned	"W4KritzShotguns"
+			TotalCurrency	50
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	30
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier_Extended_Concheror
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W4GSoldiers1
+			
+			WaitForAllSpawned	"W4GConches"
+			TotalCurrency	25
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	5
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_CrosseGSoldierDirectHit
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+					Attributes	IgnoreEnemies
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+					Attributes	IgnoreEnemies
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W4GSoldiers2
+			
+			WaitForAllSpawned	"W4GConches"
+			TotalCurrency	25
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	5
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_CrosseGBuffRapid
+					ClassIcon	banner_buff_conch
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+					Attributes	IgnoreEnemies
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+					Attributes	IgnoreEnemies
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W4GSoldiers3
+			
+			WaitForAllSpawned	"W4GConches"
+			TotalCurrency	25
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	5
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_CrosseGConchRapid
+					ClassIcon	banner_buff_conch
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+					Attributes	IgnoreEnemies
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic
+					Attributes	IgnoreEnemies
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W4GSoldiers4
+			
+			WaitForAllSpawned	"W4GSoldiers1"
+			TotalCurrency	75
+			TotalCount	4
+			MaxActive	4
+			SpawnCount	4
+			Where	spawnbot
+			WaitBeforeStarting	20
+			WaitBetweenSpawns	10
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_CrosseGSoldierDirectHit
+				}
+				TFBot
+				{
+					Template	T_TFBot_Giant_Medic_Regen
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseGBuffRapid
+					ClassIcon	banner_buff_conch
+					ItemAttributes
+					{
+						ItemName	"TF_WEAPON_ROCKETLAUNCHER"
+						"mod weapon blocks healing"	1
+					}
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseGConchRapid
+					ClassIcon	banner_buff_conch
+					ItemAttributes
+					{
+						ItemName	"TF_WEAPON_ROCKETLAUNCHER"
+						"mod weapon blocks healing"	1
+					}
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W4DetonatorSupport
+			
+			TotalCurrency	25
+			WaitForAllSpawned	"W4PolyPyros"
+			TotalCount	25
+			MaxActive	15
+			SpawnCount	5
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	10
+			Support	1
+			
+			TFBot
+			{
+				Template	T_TFBot_Pyro_Flaregun
+				ClassIcon	pyro_detonator
+				Item	"The Detonator"
+			}
+		}
+	}
+
+/////////////////////
+// Wave 5 - 5600$ - +900$ by EoW - 8 Krit GRF Soldiers, 10 Supers, 1 Tank (50k total) 8 UMeds, 60 Fat Scouts, 30 Krit Bowmen SUPPORTED BY Normal Soldiers (Failsafe) and Kunai Spies
+/////////////////////
+
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay_classic
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+	WaveSpawn
+		{
+			Name W5CritGSoldiersAndBigHeals
+			
+			TotalCurrency	200
+			TotalCount	8
+			MaxActive	4
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	10
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Soldier_Spammer
+					Attributes	AlwaysCrit
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_BigHeal
+					Attributes	IgnoreEnemies
+					Name	"Big-Heal Medic"
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W5Tank1
+			
+			TotalCurrency	100
+			TotalCount 1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			
+			FirstSpawnOutput
+			{
+				Target	boss_spawn_relay
+				Action	Trigger
+                Target    bignet
+                Action    RunScriptCode
+                Param    "
+                ClientPrint(null,3,`\x0799CCFFTank HP - 30K`)
+                "
+			}
+			
+			Tank
+			{
+				Health 30000
+				Speed 75
+				StartingPathTrackNode	"tank_path_b_1"
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W5Tank2
+			
+			WaitForAllSpawned	"W5GHeavyAndMedics"
+			TotalCurrency	100
+			TotalCount 1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			
+			FirstSpawnOutput
+			{
+				Target	boss_spawn_relay
+				Action	Trigger
+                Target    bignet
+                Action    RunScriptCode
+                Param    "
+                ClientPrint(null,3,`\x0799CCFFTank HP - 15K / Tank Speed - 90`)
+                "
+			}
+			
+			Tank
+			{
+				Health 15000
+				Speed 90
+				StartingPathTrackNode	"tank_path_b_1"
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W5Supers
+			
+			TotalCurrency	100
+			TotalCount	5
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	45
+			WaitBetweenSpawns	0
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Scout_Fast
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W5GHeavyAndMedics
+			
+			WaitForAllSpawned	"W5CritGSoldiersAndBigHeals"
+			TotalCurrency	100
+			TotalCount	6
+			MaxActive	4
+			SpawnCount	2
+			Where	spawnbot
+			WaitBeforeStarting	30
+			WaitBetweenSpawns	20
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Heavyweapons
+				}
+				TFBot
+				{
+					Template	T_TFBot_Giant_Medic_Regen
+					Attributes	IgnoreEnemies
+					Item	"The Surgeon's Stahlhelm"
+					Name	"Giant Regen Medic"
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W5GBurstRapid
+			
+			WaitForAllSpawned	"W5GHeavyAndMedics"
+			TotalCurrency	100
+			TotalCount	7
+			MaxActive	7
+			SpawnCount	7
+			Where	spawnbot
+			WaitBeforeStarting	15
+			WaitBetweenSpawns	15
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Soldier_Giant_Powershell
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template	T_TFBot_Medic_QuickUber
+				}
+				TFBot
+				{
+					Template	T_TFBot_Pyro
+					Skill	Normal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Pyro
+					Skill	Normal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Pyro
+					Skill	Normal
+				}
+				TFBot
+				{
+					Template	T_TFBot_Pyro
+					Skill	Normal
+				}
+			}
+		}
+	
+	WaveSpawn
+		{
+			Name W5LArmorScouts
+			
+			TotalCurrency	100
+			TotalCount	50
+			MaxActive	8
+			SpawnCount	4
+			Where	flankers
+			WaitBeforeStarting	7
+			WaitBetweenSpawns	10
+			Support	1
+			
+			Squad
+			{
+				TFBot
+				{
+					Class	Scout
+					ClassIcon	scout
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W5CritBowmen
+			
+			TotalCurrency	100
+			TotalCount	50
+			MaxActive	3
+			SpawnCount	3
+			Where	flankers
+			WaitBeforeStarting	7
+			WaitBetweenSpawns	0
+			Support	Limited
+			
+			TFBot
+			{
+				Template	T_TFBot_Sniper_Huntsman
+				Attributes	AlwaysCrit
+			}
+		}
+	}
+
+/////////////////////
+// Wave 6 - 6500$ - +1800$ by EoW - 3 Tanks (20k, 20k, 25k), 1 Krit Colonel, 1 Deflector GHeavy, Heat Wave (GHeavy Boss w/ Deflector Heater firing incediary rounds), 1 Blast Bullet Vacc Combo, 6 Gas Jockey GPyros, 16 Umeds and 30 Krit Standard Deflectors SUPPORTED BY Pyros and Burst Demos
+/////////////////////
+
+	Wave
+	{
+		WaitWhenDone	65
+		Checkpoint	Yes
+		StartWaveOutput
+		{
+			Target	wave_start_relay_classic
+			Action	Trigger
+		}
+		DoneOutput
+		{
+			Target	wave_finished_relay
+			Action	Trigger
+		}
+	WaveSpawn
+		{
+			Name W6GManglerMiniBoss
+			
+			TotalCurrency	50
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	30
+			
+			FirstSpawnOutPut
+            {
+                Target    bignet
+                Action    RunScriptCode
+                Param    "
+                ClientPrint(null,3,`\x0799CCFFBoss HP - 15K`)
+                "
+            }
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_CrosseGBurstMangler
+					Health	15000
+					Attributes	UseBossHealthBar
+					
+					ItemAttributes
+					{
+						Itemname	"The Cow Mangler 5000"
+						"damage bonus"	1.5
+					}
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W6Conches
+			
+			TotalCurrency	50
+			TotalCount	6
+			MaxActive	1
+			SpawnCount	1
+			where	spawnbot
+			WaitBeforeStarting	1
+			WaitBetweenSpawns	0
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_CrosseConchSoldierPseudogiant
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W6PvtBarrages
+			
+			TotalCurrency	40
+			TotalCount	25
+			MaxActive	8
+			SpawnCount	5
+			Where	spawnbot
+			Where	flankers
+			WaitBeforeStarting	1
+			WaitBetweenSpawns	0
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_CrosseSoldierPvtBarrage
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name	W6GFanScouts
+			
+			TotalCurrency	60
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	1
+			Where	flankers
+			WaitBeforeStarting	10
+			WaitBetweenSpawns	15
+			
+			TFBot
+			{
+				Template	T_TFBot_Giant_Scout_FAN
+			}
+		}
+	WaveSpawn
+		{
+			Name W6Tank1
+			
+			TotalCurrency	50
+			TotalCount 1
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	0
+			
+			FirstSpawnOutput
+			{
+				Target	boss_spawn_relay
+				Action	Trigger
+                Target    bignet
+                Action    RunScriptCode
+                Param    "
+                ClientPrint(null,3,`\x0799CCFFTank HP - 20K`)
+                "
+			}
+			
+			Tank
+			{
+				Health 20000
+				Speed 75
+				StartingPathTrackNode	"tank_path_b_10"
+				OnKilledOutput
+				{
+					Target	boss_dead_relay
+					Action	Trigger
+				}
+				OnBombDroppedOutput
+				{
+					Target	boss_deploy_relay
+					Action	Trigger
+				}
+			}
+		}
+	WaveSpawn
+		{
+			Name W6Finale1
+			
+			WaitForAllSpawned	"W6GFanScouts"
+			TotalCurrency	75
+			TotalCount	1
+			MaxActive	1
+			SpawnCount	1
+			Where	spawnbot
+			WaitBeforeStarting	30
+			WaitBetweenSpawns	0
+			
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_Giant_Scout_FAN
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	W6GPyros
+			
+			WaitForAllSpawned	"W6FinaleHeatWaveBoss"    
+			TotalCurrency	75
+			TotalCount	4
+			MaxActive	4
+			SpawnCount	1
+			Where	flankers
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	15
+			
+			TFBot
+			{
+				Template	T_TFBot_CrosseGJockeyPyro
+			}
+		}
+		WaveSpawn
+		{
+			Name	W6FinaleHeatWaveBoss
+			
+			WaitForAllSpawned	"W6Finale1"
+			TotalCurrency	50
+			TotalCount	3
+			MaxActive	3
+			SpawnCount	3
+			Where	spawnbot
+			WaitBeforeStarting	13
+			WaitBetweenSpawns	0
+			StartWaveWarningSound	#heatwaveintrodialogue.mp3
+			
+			StartWaveOutput
+			{
+				Target	mus_heatintro_relay
+				Action	Trigger
+			}
+			
+			FirstSpawnOutPut
+            {
+                Target    bignet
+                Action    RunScriptCode
+                Param    "
+                ClientPrint(null,3,`\x0799CCFFBoss HP - 35K / Remember! Heat Wave is heavily armoured while his Medics are alive!`)
+				ClientPrint(null,3,`\x0799CCFFTheme: Fiercest Warrior ver. 0/7 mashup by @zer0destiny_0 (and RGG Studios) on YouTube!`)
+                "
+            }
+
+			
+			DoneOutput
+			{
+				Target mus_heatwave_end_relay
+				Action Trigger
+			}
+			
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_CrosseHeatWaveBoss
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseGMedVaccBlast
+					ClassIcon	medic_vac_duo_bb
+				}
+				TFBot
+				{
+					Template	T_TFBot_CrosseGMedVaccBullet
+					ClassIcon	medic_vac_duo_bb
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name	W6PyrosNMeds
+			
+			WaitForAllSpawned	"W6FinaleHeatWaveBoss"
+			TotalCurrency 50
+			TotalCount	40
+			MaxActive	8
+			SpawnCount	2
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	2
+			Where	spawnbot
+			Where	flankers
+			Support 1
+		
+			Squad
+			{
+				TFBot
+				{
+					Template	T_TFBot_CrossePolyPyro
+					Skill	Expert
+				}
+			}
+		}
+	}
+}

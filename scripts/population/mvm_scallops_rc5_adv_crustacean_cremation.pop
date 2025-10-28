@@ -1,0 +1,2148 @@
+#base robot_giant.pop
+#base robot_standard.pop
+//
+// Starting Currency: 1200
+//
+// +----------+----------+----------+
+// | Wave     | Currency | A+       |
+// +----------+----------+----------+
+// | Wave 1   | 800      | 900      |
+// | Wave 2   | 1325     | 1425     |
+// | Wave 3   | 1000     | 1100     |
+// | Wave 4   | 1000     | 1100     |
+// | Wave 5   | 1200     | 1300     |
+// | Wave 6   | 850      | 950      |
+// +----------+----------+----------+
+// | Total    | 6175     | 6775     |
+// +----------+----------+----------+
+//
+
+// Scallops Advanced Mission - 6 Waves
+WaveSchedule
+{
+    StartingCurrency                      1200
+    RespawnWaveTime                       6
+    FixedRespawnWaveTime                  Yes
+    CanBotsAttackWhileInSpawnRoom         No
+    Advanced                              1
+    BotTeleportUberDuration               2  
+
+	// Teletank
+	PrecacheModel "models/bots/boss_bot/boss_tank_building.mdl"
+	PrecacheModel "models/bots/boss_bot/boss_tank_building_damage1.mdl"
+	PrecacheModel "models/bots/boss_bot/boss_tank_building_damage2.mdl"
+	PrecacheModel "models/bots/boss_bot/boss_tank_building_damage3.mdl"
+	PrecacheModel "models/bots/boss_bot/tank_track_l_building.mdl"
+	PrecacheModel "models/bots/boss_bot/tank_track_r_building.mdl"
+	PrecacheModel "models/bots/boss_bot/bomb_mechanism_building.mdl"
+
+    Mission
+    {
+        Objective           DestroySentries
+        Where               spawnbot_a
+        Where               spawnbot_b
+        BeginAtWave         1
+        RunForThisManyWaves 6
+        DesiredCount        1
+        InitialCooldown     15
+        CooldownTime        30
+        TFBot
+        {
+            Template T_TFBot_SentryBuster
+            Tag dont_highlight
+        }
+    }
+    
+    Mission
+	{
+		Objective Spy
+		InitialCooldown 10
+		Where spawnbot_invasion
+		BeginAtWave 2
+		RunForThisManyWaves 1
+		CooldownTime 50
+		DesiredCount 3
+		
+		TFBot
+		{
+			Class Spy
+            Skill Expert
+            Item "Crustaceous Cowl"
+            Item "The Spycrab"
+            Tag dont_highlight
+		}
+	}
+
+    Mission
+	{
+		Objective Spy
+		InitialCooldown 14
+		Where spawnbot_invasion
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		CooldownTime 40
+		DesiredCount 4
+		
+		TFBot
+		{
+			Class Spy
+            Skill Expert
+            Item "Crustaceous Cowl"
+            Item "The Spycrab"
+            Tag dont_highlight
+		}
+	}
+    
+    Templates
+    {
+        T_TFBot_Pyro_Fast
+        {
+            Class Pyro
+            Skill Normal
+            ClassIcon pyro_fast
+            Item "TTG Max Hat"
+            Item "Robin Walkers"
+            Name "Fast Pyro"
+            ItemAttributes
+            {
+                ItemName "TF_WEAPON_FLAMETHROWER"
+                "airblast disabled" 1
+                "move speed bonus" 1.25
+            }
+        }
+
+        T_TFBot_Demoman_Knight_Persuader
+		{
+			Class Demoman
+            Skill Hard
+			Name "Persian Demoknight"
+			ClassIcon demoknight_persian_nys
+			Item "The Splendid Screen"
+			Item "The Persian Persuader"
+            Item "Sultan's Ceremonial"
+			WeaponRestrictions MeleeOnly
+		}
+        
+        T_TFBot_Giant_Medic_BuffBanner
+        {
+            Class Medic
+			Name "Giant Buff Banner Medic"
+			ClassIcon medic_buff_lite
+			Skill Expert
+			Health 4500
+			Item "The Quick-Fix"
+            Item "The Buff Banner"
+			Item "The Combat Medic's Crusher Cap"
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+            Attributes SpawnWithFullCharge
+            Tag medic_buff_remove_shield
+			
+			ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+				"ubercharge rate bonus" 0.01
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"heal rate bonus" 200
+                "increase buff duration" 9.0
+                "bot medic uber deploy delay duration" 9999
+			}
+        }
+        
+        T_TFBot_Pyro_Flare_Fast
+		{
+			Class Pyro
+            Skill Hard
+			Name "Fast Flare Pyro"
+			ClassIcon pyro_flare
+			Item "The Flare Gun"
+			WeaponRestrictions SecondaryOnly
+            ItemAttributes
+            {
+                ItemName "The Flare Gun"
+                "fire rate bonus" 0.5
+            }
+		}
+
+        T_TFBot_Scout_Sandman_Armored
+        {
+            Class Scout
+            Skill Hard
+            Health 390
+            Scale 1.25
+            Name "Armored Hyper League Scout"
+            ClassIcon scout_stun_armored
+            WeaponRestrictions MeleeOnly
+			Item "The Sandman"
+			Item "Batter's Helmet"
+            Item "The Bolt Boy"
+			
+			ItemAttributes
+			{
+				ItemName "The Sandman"
+				"effect bar recharge rate increased" 0.25
+                "move speed penalty" 0.8
+			}
+        }
+        
+        T_TFBot_Sniper_Bow_Milk_Armored
+        {
+            Class Sniper
+            Skill Normal
+            Health 375
+            Scale 1.25
+            Name "Armored Milk Huntsman Sniper"
+            ClassIcon sniper_bow_milk
+            Item "The Huntsman"
+            Item "Desert Marauder"
+            WeaponRestrictions PrimaryOnly
+            ItemAttributes
+            {
+                ItemName "The Huntsman"
+                "add cond on hit" 27  
+                "add cond on hit duration" 8  
+                "move speed penalty" 0.8
+            }
+        }
+
+        T_TFBot_Medic_Shield
+        {
+            Class Medic
+            Name "Shield Medic"
+            ClassIcon medic_shield_lite
+            Skill Expert
+            Attributes ProjectileShield
+            Attributes SpawnWithFullCharge
+            Attributes IgnoreEnemies
+            Item "Berlin Brain Bowl"
+            
+            ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+            ItemAttributes
+            {
+                ItemName "TF_WEAPON_MEDIGUN"
+                "generate rage on heal" 2
+                "increase buff duration" 50
+                "ubercharge rate bonus" 0.01
+                "heal rate bonus" 200
+            }
+			CharacterAttributes
+			{
+                "bot medic uber deploy delay duration" 90000
+			}
+        }
+        
+        T_TFBot_Medic_QuickFix_NoUber
+		{
+			Class Medic
+			Name "Quick-Fix Medic"
+			Skill Easy
+			Item "The Quick-Fix"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+            ItemAttributes
+            {
+                ItemName "The Quick-Fix"
+                "ubercharge rate bonus" 0.1
+            }
+		}
+
+        T_TFBot_Medic_BigHeal_Armored
+        {
+            ClassIcon medic_armored
+            Class Medic
+            Health 450
+            Scale 1.25
+            Name "Armored Medic"
+            Item "Berliner's Bucket Helm"
+            Item "The Quick-Fix"
+            Skill Expert
+            ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+            ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+				"ubercharge rate bonus" 0.01
+			}
+            CharacterAttributes
+            {
+                "heal rate bonus" 10
+            }
+        }
+
+        T_TFBot_Scout_BackScatter
+		{
+			Class Scout
+            Skill Normal
+			Name "Back Scatter Scout"
+			ClassIcon scout_backscatter_lite
+			Item "The Back Scatter"
+            Item "The Fed-Fightin' Fedora"
+			WeaponRestrictions PrimaryOnly
+		}
+
+        T_TFBot_Scout_Cola
+        {
+            Class Scout
+            Skill Normal
+			Name "Crit-a-Cola Scout"
+			ClassIcon scout_cola
+			Item "Crit-a-Cola"
+            Item "Bonk Helm"
+            ItemAttributes
+            {
+                ItemName "Bonk Helm"
+                "set item tint RGB" 5322826
+            }
+        }
+
+        T_TFBot_Scout_FanOWar
+        {
+            Class Scout
+            Name "Fan O'War Scout"
+            ClassIcon scout_fanowar
+            Skill Expert
+            Item "The Fan O'War"
+            Item "The Human Cannonball"
+            WeaponRestrictions MeleeOnly
+        }
+
+        T_TFBot_Giant_Heavy_Tomislav
+        {
+            Class Heavy
+            Health 5000
+            MaxVisionRange 1200
+            Skill Expert
+            Attributes MiniBoss
+            Name "Giant Tomislav Heavy"
+            Item "Tomislav"
+            Item "Modest Metal Pile of Scrap"
+            ClassIcon heavy_accurate
+            WeaponRestrictions PrimaryOnly
+            ItemAttributes
+            {
+                ItemName "Tomislav"
+                "damage bonus" 1.5
+            }
+            CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+			}
+        }
+
+        T_TFBot_Soldier_Bazooka
+        {
+            Class Soldier
+            Skill Normal
+            Name "Beggar's Bazooka Soldier"
+            ClassIcon soldier_bazooka
+            WeaponRestrictions PrimaryOnly
+            Attributes HoldFireUntilFullReload
+            Item "The Beggar's Bazooka"
+            Item "The Lucky Shot"
+            ItemAttributes
+            {
+                ItemName "The Beggar's Bazooka"
+                "auto fires full clip" 0
+                "can overload" 0
+            }
+        }
+
+        T_TFBot_Soldier_Spammer
+		{
+			Class Soldier
+			Name "Rapid Fire Soldier"
+			ClassIcon soldier_spammer
+			Skill Normal
+			WeaponRestrictions PrimaryOnly
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"faster reload rate" -0.8
+				"fire rate bonus" 0.5
+
+			}
+		}
+
+        T_TFBot_Pyro_DragonsFury
+        {
+            Class Pyro
+            Skill Normal
+            Name "Dragon's Fury Pyro"
+            ClassIcon pyro_dragon_fury_swordstone
+            WeaponRestrictions PrimaryOnly
+            Item "The Dragon's Fury"
+            Item "Burning Beanie"
+            Item "The Special Eyes"
+        }
+
+        T_TFBot_Heavyweapons_Deflector
+		{
+			Class Heavy
+			Name "Deflector Heavy"
+			ClassIcon heavy_deflector
+			Skill Hard
+			Item "The U-clank-a"
+			Item "Deflector"
+			WeaponRestrictions PrimaryOnly
+			MaxVisionRange 1200
+			ItemAttributes
+			{
+				ItemName "Deflector"
+				"attack projectiles" 1
+			}
+		}
+
+        T_TFBot_Giant_Pyro_DragonsFury
+        {
+            Class Pyro
+            Skill Expert
+            Attributes MiniBoss
+            Health 3000
+            Name "Giant Dragon's Fury Pyro"
+            ClassIcon pyro_dragon_fury_swordstone_giant
+            WeaponRestrictions PrimaryOnly
+            Item "The Dragon's Fury"
+            Item "Burning Beanie"
+            Item "The Special Eyes"
+            CharacterAttributes
+			{
+				"move speed penalty" 0.5
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+        }
+
+        T_TFBot_Giant_Heavy_BrassBeast
+        {
+            Class Heavy
+            Skill Expert
+			Health 5000
+            MaxVisionRange 1200
+			Name "Giant Brass Beast Heavy"
+			ClassIcon heavy_brass_nys_giant
+			Item "The Brass Beast"
+            Item "Der Maschinensoldaten-Helm"
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "The Brass Beast"
+				"damage bonus"	1.7
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+			}
+        }
+
+        T_TFBot_Giant_Scout_Baseball_Spammer
+		{
+			Class Scout
+			Name "Major League Spammer"
+			ClassIcon scout_stun_spammer
+			Skill Expert
+			Health 1600
+			Item "Batter's Helmet"
+			Item "MNC Mascot Outfit"
+			Item "The Sandman"
+			WeaponRestrictions MeleeOnly
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "The Sandman"
+				"effect bar recharge rate increased" 0.0001
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"override footstep sound set" 5
+			}
+		}
+
+        T_TFBot_Giant_Pyro_Phlog_Boss
+        {
+            Class Pyro
+            Skill Expert
+            Health 15000
+            Name "Major Bonecremator"
+            ClassIcon pyro_phlog_skull
+            Item "Skullbrero"
+            Item "The Last Breath"
+            Item "The Special Eyes"
+            Item "The Phlogistinator"
+            Item "The Flare Gun" // switch to after his giant medic dies
+            Attributes MiniBoss
+            Attributes UseBossHealthBar
+            Attributes AlwaysFireWeapon
+            Attributes DisableDodge
+            WeaponRestrictions PrimaryOnly
+            AimOffset "0 0 40"  
+
+            ItemAttributes
+            {
+                ItemName "The Phlogistinator"
+                "mark for death" 1
+            }
+            ItemAttributes
+            {
+                ItemName "The Flare Gun"
+                "fire rate bonus" 0.04
+                "projectile spread angle penalty" 5
+                "Projectile speed decreased" 0.5
+            }
+            CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.2
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale"	0.1
+				"override footstep sound set" 6
+			}
+        }
+
+        T_TFBot_Giant_Medic_Shield
+        {
+            Class Medic
+            Health 4500
+            Name "Giant Shield Medic"
+            ClassIcon medic_shield_lite
+            Skill Expert
+            Attributes MiniBoss
+            Attributes ProjectileShield
+            Attributes SpawnWithFullCharge
+            Attributes IgnoreEnemies
+            Item "Berlin Brain Bowl"
+
+            ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+            ItemAttributes
+            {
+                ItemName "TF_WEAPON_MEDIGUN"
+                "generate rage on heal" 2
+                "increase buff duration" 50
+                "ubercharge rate bonus" 0.01
+                "heal rate bonus" 200
+            }
+			CharacterAttributes
+			{
+				"move speed penalty" 0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+                "bot medic uber deploy delay duration" 90000
+			}
+        }
+    }
+    
+    ////////////////////////////////
+    // Wave 1
+    ////////////////////////////////
+    Wave
+    {
+        InitWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param
+			"
+				EntFire(`wave_init_relay`, `Trigger`)
+				EntFire(`tutorial_relay`, `Trigger`)
+                EntFire(`gamerules`, `RunScriptFile`, `bomb_backtrack_scallops.nut`)
+			"
+		}
+        StartWaveOutput
+        {
+            Target wave_start_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+
+        // Soldiers (B)
+        WaveSpawn
+        {
+            Name "1a_soldierB"
+            Where spawnbot_b
+            MaxActive 6
+            SpawnCount 2
+            TotalCount 20
+            WaitBetweenSpawns 3.5
+            WaitBeforeStarting 0
+            TotalCurrency 50
+
+            TFBot
+            {
+                Class Soldier
+                ClassIcon soldier_scallops_mix
+            }
+        }
+        
+        // Heavyweight Champs (A)
+        WaveSpawn
+        {
+            Name "1a_heavyA"
+            Where spawnbot_a
+            MaxActive 6
+            SpawnCount 2
+            TotalCount 22
+            WaitBetweenSpawns 4
+            WaitBeforeStarting 0
+            TotalCurrency 100
+
+            TFBot
+            {
+                Template T_TFBot_Heavyweapons_Heavyweight_Champ
+                ClassIcon heavy_champ_scallops_red
+            }
+        }
+        
+        // Soldier (A)
+        WaveSpawn
+        {
+            Name "1a_soldierA"
+            Where spawnbot_a
+            MaxActive 2
+            SpawnCount 2
+            TotalCount 8
+            WaitBetweenSpawns 10
+            WaitBeforeStarting 10
+            TotalCurrency 50
+            
+            TFBot
+            {
+                Class Soldier
+                ClassIcon soldier_scallops_mix
+            }
+        }
+
+        // Giant Heavy (A)
+        WaveSpawn
+        {
+            Name "1a_giantheavyA"
+            Where spawnbot_a
+            MaxActive 1
+            SpawnCount 1
+            TotalCount 1
+            WaitBeforeStarting 20
+            TotalCurrency 100
+
+            TFBot
+            {
+                Template T_TFBot_Giant_Heavy_Tomislav
+                ClassIcon heavy_tomislav_two_scallops_red
+            }
+        }
+        
+        // Super Heavyweight Champ (B)
+        WaveSpawn
+        {
+            Name "1a_giantheavyB"
+            Where spawnbot_b
+            MaxActive 4
+            SpawnCount 4
+            TotalCount 4
+            WaitBeforeStarting 20
+            TotalCurrency 100
+
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Boxing_Heavy
+                    ClassIcon heavy_champ_scallops_blue
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    ClassIcon medic_uber_scallops_mix
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    ClassIcon medic_uber_scallops_mix
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    ClassIcon medic_uber_scallops_mix
+                }
+            }
+        }
+
+        // Support Scouts (A)
+        WaveSpawn
+        {
+            Support 1
+            Where spawnbot_a
+            WaitForAllSpawned "1a_heavyA"
+            MaxActive 4
+            SpawnCount 2
+            TotalCount 12
+            WaitBetweenSpawns 6
+            WaitBeforeStarting 8
+            TotalCurrency 25
+
+            TFBot
+            {
+                Class Scout
+                Skill Easy
+                ClassIcon scout_scallops_mix
+            }
+        }
+
+        // Support Scouts (B)
+        WaveSpawn
+        {
+            Support 1
+            Where spawnbot_b
+            WaitForAllSpawned "1a_soldierB"
+            MaxActive 4
+            SpawnCount 2
+            TotalCount 12
+            WaitBetweenSpawns 6
+            WaitBeforeStarting 8
+            TotalCurrency 25
+
+            TFBot
+            {
+                Class Scout
+                Skill Easy
+                ClassIcon scout_scallops_mix
+            }
+        }
+
+        // Persuader Demoknights (B)
+        WaveSpawn
+        {
+            Support Limited
+            Where spawnbot_b
+            WaitForAllDead "1a_giantheavyB"
+            MaxActive 4
+            SpawnCount 2
+            TotalCount 26
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 6
+            TotalCurrency 50
+
+            TFBot
+            {
+                Template T_TFBot_Demoman_Knight_Persuader
+                ClassIcon demo_persian_scallops_blue
+            }
+        }
+
+        // Giant Sandman Scouts (B)
+        WaveSpawn
+        {
+            Name "1b_giantscoutB"
+            Where spawnbot_b
+            WaitForAllDead "1a_giantheavyB"
+            MaxActive 1
+            SpawnCount 1
+            TotalCount 1
+            WaitBeforeStarting 10
+            TotalCurrency 100
+            
+            TFBot
+            {
+                Template T_TFBot_Giant_Scout_Baseball_Spammer
+                ClassIcon scout_stun_spammer_scallops_blue
+            }
+        }
+
+        // Giant Soldiers
+        WaveSpawn
+        {
+            Name "1b_giantsoldierA"
+            Where spawnbot_a
+            WaitForAllDead "1a_giantheavyA"
+            MaxActive 4
+            SpawnCount 4
+            TotalCount 4
+            WaitBeforeStarting 7
+            TotalCurrency 200
+
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Soldier_Spammer
+                    ClassIcon soldier_spammer_scallops_red
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    ClassIcon medic_uber_scallops_mix
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    ClassIcon medic_uber_scallops_mix
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickUber
+                    ClassIcon medic_uber_scallops_mix
+                }
+            }
+        }
+    }
+
+    ////////////////////////////////
+    // Wave 2 ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////
+    Wave
+    {
+        InitWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param
+			"
+				EntFire(`wave_init_relay`, `Trigger`)
+                EntFire(`gamerules`, `RunScriptFile`, `bomb_backtrack_scallops.nut`)
+			"
+		}
+        StartWaveOutput
+        {
+            Target wave_start_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+
+        WaveSpawn
+        {
+            Name "2a_heavyB"
+            Where spawnbot_b
+            MaxActive 6
+            SpawnCount 3
+            TotalCount 27
+            WaitBetweenSpawns 6
+            WaitBeforeStarting 0
+            TotalCurrency 50
+            
+            TFBot
+            {
+                Template T_TFBot_Heavyweapons_Heavyweight_Champ_Fast
+                ClassIcon heavy_gru_scallops_blue
+                Attributes AlwaysCrit
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "2a_demoB"
+            Where spawnbot_b
+            MaxActive 4
+            SpawnCount 2
+            TotalCount 12
+            WaitBetweenSpawns 6
+            WaitBeforeStarting 0
+            TotalCurrency 50
+            
+            TFBot
+            {
+                Template T_TFBot_Demo_Burst
+                ClassIcon demo_burst_scallops_blue
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "2a_giantsoldierB"
+            Where spawnbot_b
+            MaxActive 1
+            SpawnCount 1
+            TotalCount 1
+            WaitBeforeStarting 20
+            TotalCurrency 300
+
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Soldier_Extended_Battalion
+                    ClassIcon soldier_backup_scallops_blue
+                }
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "2a_pyroA"
+            Where spawnbot_a
+            MaxActive 6
+            SpawnCount 2
+            TotalCount 20
+            WaitBetweenSpawns 4
+            WaitBeforeStarting 0
+            TotalCurrency 200
+            
+            Squad
+            {
+                TFBot
+                {
+                    Class Pyro
+                    Skill Normal
+                    ClassIcon pyro_scallops_red
+                    ItemAttributes
+                    {
+                        ItemName "TF_WEAPON_FLAMETHROWER"
+                        "airblast disabled" 1
+                    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Pyro_Flare_Fast
+                    ClassIcon pyro_flare_scallops_red
+                }
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "2a_giantheavyA"
+            Where spawnbot_a
+            MaxActive 4
+            SpawnCount 4
+            TotalCount 8
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 30
+            TotalCurrency 300
+
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Heavyweapons_Heater
+                    Name "Giant Huo Long Heater Heavy"
+                    MaxVisionRange 1200
+                    ClassIcon heavy_heater_scallops_red
+                }
+                TFBot
+                {
+                    Template T_TFBot_Sniper_Bow_Milk_Armored
+                    ClassIcon sniper_bow_milk_armored_scallops_red
+                }
+                TFBot
+                {
+                    Template T_TFBot_Sniper_Bow_Milk_Armored
+                    ClassIcon sniper_bow_milk_armored_scallops_red
+                }
+                TFBot
+                {
+                    Template T_TFBot_Sniper_Bow_Milk_Armored
+                    ClassIcon sniper_bow_milk_armored_scallops_red
+                }
+            }
+        }
+
+        WaveSpawn
+        {
+            Support Limited
+            Where spawnbot_b
+            MaxActive 3
+            SpawnCount 1
+            TotalCount 12
+            WaitForAllSpawned "2a_heavyB"
+            WaitBetweenSpawns 3
+            WaitBeforeStarting 3
+            TotalCurrency 50
+            
+            TFBot
+            {
+                Template T_TFBot_Demo_Burst
+                ClassIcon demo_burst_scallops_blue
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "2b_giantsoldierAB"
+            Where spawnbot_a
+            Where spawnbot_b
+            MaxActive 2
+            SpawnCount 1
+            TotalCount 2
+            WaitForAllSpawned "2a_giantheavyA"
+            WaitForAllDead "2a_giantsoldierB"
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 0
+            TotalCurrency 200
+            
+            TFBot
+            {
+                Template T_TFBot_Giant_Soldier_Extended_Concheror
+                ClassIcon soldier_conch_scallops_mix
+            }
+        }
+        
+        // Support soldiers
+        WaveSpawn
+        {
+            Support 1
+            Where spawnbot_b
+            MaxActive 6
+            SpawnCount 3
+            TotalCount 20
+            WaitForAllSpawned "2a_demoB"
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 8
+            TotalCurrency 100
+            
+            TFBot
+            {
+                Class Soldier
+                Skill Normal
+                ClassIcon soldier_scallops_blue
+            }
+        }
+
+        // Support heavies
+        WaveSpawn
+        {
+            Support 1
+            Where spawnbot_a
+            MaxActive 6
+            SpawnCount 3
+            TotalCount 20
+            WaitForAllSpawned "2a_pyroA"
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 8
+            TotalCurrency 100
+
+            TFBot
+            {
+                Class Heavy
+                Skill Easy
+                MaxVisionRange 1200
+                ClassIcon heavy_scallops_red
+            }
+        }
+    }
+
+    ////////////////////////////////
+    // Wave 3 ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////
+    Wave
+    {
+        InitWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param
+			"
+				EntFire(`wave_init_relay`, `Trigger`)
+                EntFire(`gamerules`, `RunScriptFile`, `bomb_backtrack_scallops.nut`)
+			"
+		}
+        StartWaveOutput
+        {
+            Target wave_start_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+        
+        WaveSpawn
+        {
+            Name "3a_giantsoldierA"
+            Where spawnbot_a
+            MaxActive 4
+            SpawnCount 2
+            TotalCount 4
+            WaitBetweenSpawns 16
+            WaitBeforeStarting 0
+            TotalCurrency 100
+            
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Soldier_Crit
+                    ClassIcon soldier_crit_scallops_red
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_BigHeal_Armored
+                    ClassIcon medic_armored_scallops_red
+                }
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "3a_pyroA"
+            Where spawnbot_a
+            MaxActive 5
+            SpawnCount 1
+            TotalCount 20
+            WaitBetweenSpawns 2
+            WaitBeforeStarting 5
+            TotalCurrency 100
+
+            TFBot
+            {
+                Class Pyro
+                Skill Easy
+                Attributes AlwaysFireWeapon
+                ClassIcon pyro_scallops_red
+            }
+        }
+
+        WaveSpawn
+		{
+            Name "3a_tankB"
+			TotalCount 1
+			WaitBeforeStarting 0
+            TotalCurrency 150
+
+			Tank
+			{
+				Health 18000
+				Speed 75
+				Name "tankboss_b"
+				StartingPathTrackNode "boss_path_b_1"
+                ClassIcon tank_scallops_mix  
+
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+        
+        WaveSpawn
+        {
+            Name "3a_giantpyroB"
+            Where spawnbot_b
+            MaxActive 4
+            SpawnCount 4
+            TotalCount 12
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 20
+            TotalCurrency 100
+            
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Pyro
+                    ClassIcon pyro_scallops_blue
+                    Attributes AlwaysFireWeapon
+                    Attributes DisableDodge
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Extended_Concheror
+                    ClassIcon soldier_conch_scallops_blue
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Extended_Concheror
+                    ClassIcon soldier_conch_scallops_blue
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Extended_Concheror
+                    ClassIcon soldier_conch_scallops_blue
+                }
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "3b_giantsoldierB"
+            Where spawnbot_b
+            MaxActive 1
+            SpawnCount 1
+            TotalCount 2
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 20
+            WaitForAllSpawned "3a_giantpyroB"
+            WaitForAllDead "3a_tankB"
+            TotalCurrency 100
+
+            TFBot
+            {
+                Template T_TFBot_Giant_Soldier_Spammer_Reload
+                ClassIcon soldier_burstfire_scallops_blue
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "3b_steelfistB"
+            Where spawnbot_b
+            MaxActive 3
+            SpawnCount 1
+            TotalCount 8
+            WaitBeforeStarting 4
+            WaitBetweenSpawns 6
+            WaitForAllSpawned "3a_giantpyroB"
+            WaitForAllDead "3a_tankB"
+            TotalCurrency 50
+
+            TFBot
+            {
+                Template T_TFBot_Heavyweapons_Fist
+                ClassIcon heavy_steelfist_scallops_blue
+            }
+        }
+
+        WaveSpawn
+        {
+            Support 1
+            Where spawnbot_b
+            MaxActive 2
+            SpawnCount 2
+            TotalCount 13
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 8
+            WaitForAllSpawned "3a_giantpyroB"
+            WaitForAllDead "3a_tankB"
+            TotalCurrency 50
+
+            TFBot
+            {
+                Template T_TFBot_Scout_FanOWar
+                ClassIcon scout_fanowar_scallops_blue
+            }
+        }
+
+        WaveSpawn
+        {
+            Support 1
+            Where spawnbot_b
+            MaxActive 2
+            SpawnCount 2
+            TotalCount 13
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 8
+            WaitForAllSpawned "3a_giantpyroB"
+            WaitForAllDead "3a_tankB"
+            TotalCurrency 50
+
+            TFBot
+            {
+                Class Demoman
+                ClassIcon demo_scallops_blue
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "3b_giantdemoA"
+            Where spawnbot_a
+            MaxActive 2
+            SpawnCount 2
+            TotalCount 4
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 25
+            WaitForAllDead "3a_giantsoldierA"
+            TotalCurrency 50
+            
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Demo_Burst
+                    ClassIcon demo_burst_scallops_red
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_BigHeal_Armored
+                    ClassIcon medic_armored_scallops_red
+                }
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "3b_giantdemoA"
+            Where spawnbot_a
+            MaxActive 2
+            SpawnCount 2
+            TotalCount 4
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 25
+            WaitForAllDead "3a_giantsoldierA"
+            TotalCurrency 50
+            
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Demo_Burst
+                    ClassIcon demo_burst_scallops_red
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_BigHeal_Armored
+                    ClassIcon medic_armored_scallops_red
+                }
+            }
+        }
+
+        WaveSpawn
+		{
+            Name "3b_tankA"
+			TotalCount 1
+			WaitBeforeStarting 6
+            WaitForAllDead "3a_giantsoldierA"
+            TotalCurrency 150
+
+			Tank
+			{
+				Health 18000
+				Speed 75
+				Name "tankboss_a"
+				StartingPathTrackNode "boss_path_a_1"
+                ClassIcon tank_scallops_mix  
+
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+
+        WaveSpawn
+        {
+            Support Limited
+            Where spawnbot_a
+            MaxActive 8
+            SpawnCount 8
+            TotalCount 24
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 25
+            WaitForAllDead "3a_giantsoldierA"
+            TotalCurrency 50
+            
+            TFBot
+            {
+                Template T_TFBot_Scout_BackScatter
+                ClassIcon scout_backscatter_lite_scallops_red
+            }
+        }
+    }
+
+    ////////////////////////////////
+    // Wave 4 ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////
+    Wave
+    {
+        InitWaveOutput
+		{
+            Target gamerules
+            Action RunScriptCode
+            Param
+            "
+                EntFire(`wave_init_relay_dont_adjust_engi_nests`, `Trigger`)
+                EntFire(`gamerules`, `RunScriptFile`, `bomb_backtrack_scallops.nut`)
+                IncludeScript(`scallops_crab_engineer`, getroottable());
+            "
+		}
+        StartWaveOutput
+        {
+            Target wave_start_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+
+        WaveSpawn
+        {
+            Name "4a_giantbonkscoutAB"
+            Where spawnbot_a
+            Where spawnbot_b
+            MaxActive 2
+            SpawnCount 1
+            TotalCount 2
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 0
+            TotalCurrency 50
+
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Scout_Bonk
+                    Name "Giant Bonk Scout"
+                    ClassIcon scout_bonk_nys_scallops_mix
+                }
+            }
+        }
+
+        WaveSpawn
+        {
+            Support Limited
+            Where spawnbot_a
+            MaxActive 6
+            SpawnCount 3
+            TotalCount 45
+            WaitBetweenSpawns 5
+            WaitBeforeStarting 5
+            TotalCurrency 150
+            
+            TFBot
+            {
+                Class Soldier
+                Skill Normal
+                ClassIcon soldier_scallops_red
+            }
+        }
+
+        WaveSpawn
+        {
+            Support Limited
+            Where spawnbot_b
+            MaxActive 3
+            SpawnCount 1
+            TotalCount 30
+            WaitBetweenSpawns 2.5
+            WaitBeforeStarting 4
+            TotalCurrency 100
+
+            TFBot
+            {
+                Class Demoman
+                Skill Hard
+                ClassIcon demo_scallops_blue
+            }
+        }
+        
+        WaveSpawn
+        {
+            Support Limited
+            Where spawnbot_b
+            MaxActive 3
+            SpawnCount 1
+            TotalCount 30
+            WaitBetweenSpawns 2.5
+            WaitBeforeStarting 4
+            TotalCurrency 100
+            
+            TFBot
+            {
+                Template T_TFBot_Scout_Cola
+                ClassIcon scout_cola_scallops_blue
+            }
+        }
+        
+        WaveSpawn
+        {
+            Support Limited
+            Where spawnbot_b
+            WaitBeforeStarting 20
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            TotalCurrency 25
+            
+            TFBot
+            {
+                Template T_TFBot_Engineer_Sentry_Teleporter
+                TeleportWhere spawnbot_b
+                Attributes IgnoreFlag
+                Tag crab_engineer
+            }
+        }
+
+        WaveSpawn
+        {
+            Support Limited
+            Where spawnbot_a
+            WaitBeforeStarting 60
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            TotalCurrency 25
+            
+            TFBot
+            {
+                Template T_TFBot_Engineer_Sentry_Teleporter
+                TeleportWhere spawnbot_a
+                Attributes IgnoreFlag
+                Tag crab_engineer
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "4a_giants"
+            Where spawnbot_a
+            MaxActive 2
+            SpawnCount 1
+            TotalCount 4
+            WaitBeforeStarting 20
+            WaitBetweenSpawns 15
+            TotalCurrency 200
+
+            TFBot
+            {
+                Template T_TFBot_Giant_Demo_Burst
+                ClassIcon demo_burst_scallops_red
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "4a_giants"
+            Where spawnbot_b
+            MaxActive 2
+            SpawnCount 1
+            TotalCount 4
+            WaitBeforeStarting 20
+            WaitBetweenSpawns 15
+            TotalCurrency 200
+            
+            TFBot
+            {
+                Template T_TFBot_Giant_Pyro
+                ClassIcon pyro_reflect_scallops_blue
+                Item "Traffic Cone"
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "4a_giantheavyAB"
+            Where spawnbot_a
+            Where spawnbot_b
+            MaxActive 8
+            SpawnCount 4
+            TotalCount 8
+            WaitForAllSpawned "4a_giants"
+            WaitBeforeStarting 25
+            WaitBetweenSpawns 20
+            TotalCurrency 150
+            
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Heavyweapons
+                    ClassIcon heavy_scallops_mix
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_Shield
+                    ClassIcon medic_shield_lite_scallops_mix
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_BigHeal
+                    ClassIcon medic_scallops_mix
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_BigHeal
+                    ClassIcon medic_scallops_mix
+                }
+            }
+        }
+    }
+
+    ////////////////////////////////
+    // Wave 5 ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////
+    Wave
+    {
+        InitWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param
+			"
+				EntFire(`wave_init_relay`, `Trigger`)
+                EntFire(`gamerules`, `RunScriptFile`, `bomb_backtrack_scallops.nut`)
+			"
+		}
+        StartWaveOutput
+        {
+            Target wave_start_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+        
+        WaveSpawn
+        {
+            Name "5a_tankB"
+            TotalCount 1
+			WaitBeforeStarting 0
+            TotalCurrency 200
+
+			Tank
+			{
+				Health 21500
+				Speed 75
+                ClassIcon tank_scallops_mix  
+				StartingPathTrackNode "boss_path_b_1"
+
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+        }
+
+        WaveSpawn
+        {
+            Name "5a_giantpyro"
+            Where spawnbot_b
+            MaxActive 2
+            TotalCount 5
+            SpawnCount 1
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 20
+            TotalCurrency 200
+
+            TFBot
+            {
+                Template T_TFBot_Giant_Pyro_DragonsFury
+                ClassIcon pyro_dragon_fury_swordstone_scallops_blue
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "5a_scoutB"
+            Where spawnbot_b
+            MaxActive 3
+            TotalCount 14
+            SpawnCount 1
+            WaitBeforeStarting 1
+            WaitBetweenSpawns 4
+            TotalCurrency 50
+            
+            TFBot
+            {
+                Template T_TFBot_Scout_Sandman_Armored
+                ClassIcon scout_stun_armored_scallops_blue
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "5a_soldierB"
+            Where spawnbot_b
+            MaxActive 4
+            TotalCount 12
+            SpawnCount 2
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 8
+            TotalCurrency 50
+            
+            TFBot
+            {
+                Class Soldier
+                ClassIcon soldier_scallops_blue
+                Attributes AlwaysCrit
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "5a_giantheavy1A"
+            Where spawnbot_a
+            MaxActive 2
+            TotalCount 2
+            SpawnCount 2
+            WaitBeforeStarting 0
+            TotalCurrency 100
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Heavyweapons
+                    ClassIcon heavy_scallops_red
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Soldier_Extended_Concheror
+                    ClassIcon soldier_conch_scallops_red
+                }
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "5a_giantheavy2A"
+            Where spawnbot_a
+            MaxActive 1
+            TotalCount 1
+            SpawnCount 1
+            WaitBeforeStarting 8
+            WaitForAllDead "5a_giantheavy1A"
+            TotalCurrency 100
+            
+            TFBot
+            {
+                Template T_TFBot_Giant_Heavyweapons_Deflector
+                ClassIcon heavy_deflector_scallops_red
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "5a_tankA"
+            TotalCount 1
+			WaitBeforeStarting 4
+            WaitForAllSpawned "5a_giantheavy2A"
+            TotalCurrency 200
+			
+			Tank
+			{
+				Health 21500
+				Speed 75
+                ClassIcon tank_scallops_mix  
+				StartingPathTrackNode "boss_path_a_1"
+				
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+        }
+        
+        WaveSpawn
+        {
+            Name "5a_giantsoldierA"
+            Where spawnbot_a
+            MaxActive 4
+            TotalCount 4
+            SpawnCount 2
+            WaitBeforeStarting 26
+            WaitBetweenSpawns 26
+            TotalCurrency 150
+            WaitForAllSpawned "5a_giantheavy2A"
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Soldier_Spammer
+                    ClassIcon soldier_spammer_scallops_red
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Medic_Regen
+                    ClassIcon medic_regen_scallops_red
+                }
+            }
+        }
+        
+        WaveSpawn
+        {
+            Support 1
+            Where spawnbot_b
+            MaxActive 2
+            TotalCount 20
+            SpawnCount 1
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 6
+            TotalCurrency 50
+            
+            TFBot
+            {
+                Template T_TFBot_Pyro_Fast
+                ClassIcon pyro_fast_scallops_blue
+            }
+        }
+        
+        WaveSpawn
+        {
+            Support 1
+            Where spawnbot_a
+            MaxActive 6
+            TotalCount 10
+            SpawnCount 2
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 7
+            TotalCurrency 50
+            
+            TFBot
+            {
+                Class Soldier
+                Skill Normal
+                ClassIcon soldier_scallops_mix
+            }
+        }
+
+        WaveSpawn
+        {
+            Support 1
+            Where spawnbot_b
+            MaxActive 3
+            TotalCount 10
+            SpawnCount 1
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 3
+            TotalCurrency 50
+            WaitForAllSpawned "5a_soldierB"
+            
+            TFBot
+            {
+                Class Soldier
+                Skill Normal
+                ClassIcon soldier_scallops_mix
+            }
+        }
+    }
+
+    ////////////////////////////////
+    // Wave 6 - Final ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////
+    Wave
+    {
+        InitWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param
+			"
+				EntFire(`wave_init_relay`, `Trigger`);
+                EntFire(`gamerules`, `RunScriptFile`, `bomb_backtrack_scallops.nut`)
+                IncludeScript(`pyro_boss_special`, getroottable());
+                IncludeScript(`medic_buff_remove_shield`, getroottable());
+                IncludeScript(`tankextensions_main`, getroottable());
+                IncludeScript(`tankextensions/teletank`, getroottable());
+			"
+		}
+        StartWaveOutput
+        {
+            Target wave_start_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+
+        WaveSpawn
+        {
+            Name "6a_smallbotsA"
+            Where spawnbot_a
+            MaxActive 4
+            SpawnCount 2
+            TotalCount 10
+            WaitBeforeStarting 3
+            WaitBetweenSpawns 5
+            TotalCurrency 50
+            
+            TFBot
+            {
+                Template T_TFBot_Pyro_DragonsFury
+                ClassIcon pyro_dragon_fury_swordstone_scallops_red
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "6a_smallbotsA"
+            Where spawnbot_a
+            MaxActive 3
+            SpawnCount 1
+            TotalCount 8
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 2.5
+            TotalCurrency 50
+            
+            TFBot
+            {
+                Template T_TFBot_Pyro_Fast
+                Skill Easy
+                Attributes AlwaysFireWeapon
+                ClassIcon pyro_fast_scallops_red
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "6a_soldierB"
+            Where spawnbot_b
+            TotalCount 44
+            SpawnCount 4
+            MaxActive 8
+            WaitBeforeStarting 4
+            WaitBetweenSpawns 6
+            TotalCurrency 50
+            
+            TFBot
+            {
+                Template T_TFBot_Soldier_Bazooka
+                ClassIcon soldier_bazooka_scallops_blue
+                Tag bot_teletank
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "6a_pyrobossA"
+            Where spawnbot_a
+            MaxActive 2
+            SpawnCount 1
+            TotalCount 2
+            WaitBeforeStarting 0
+            TotalCurrency 200
+            
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Pyro_Phlog_Boss
+                    ClassIcon pyro_phlog_skull_scallops_red
+                    Tag pyro_boss
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Medic_Shield
+                    ClassIcon medic_shield_lite_scallops_red
+                    Tag boss_pocket_medic
+                }
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "6a_giantscoutB"
+            Where spawnbot_b
+            TotalCount 1
+            SpawnCount 1
+            MaxActive 1
+            TotalCurrency 50
+            WaitBeforeStarting 0
+            
+            TFBot
+            {
+                Template T_TFBot_Giant_Scout_Baseball_Armored
+                ClassIcon scout_stun_armored_scallops_blue
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "6a_teletankB"
+            TotalCount 1
+			WaitBeforeStarting 0
+            TotalCurrency 100
+
+			Tank
+			{
+				Health 25000
+				Speed 75
+                Skin 1
+				Name "teletank"
+                ClassIcon tank_tele_scallops_blue  
+				StartingPathTrackNode "boss_path_b_1"
+
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+        }
+
+        WaveSpawn
+        {
+            Name "6a_dummy_bossdead"
+            WaitForAllDead "6a_pyrobossA"
+        }
+
+        WaveSpawn
+        {
+            Name "6a_dummy_bossdead"
+            WaitForAllDead "6a_teletankB"
+        }
+
+        WaveSpawn
+        {
+            Name "6a_superscoutB"
+            Where spawnbot_b
+            TotalCount 4
+            SpawnCount 1
+            MaxActive 2
+            TotalCurrency 100
+            WaitForAllDead "6a_giantscoutB"
+            WaitBeforeStarting 6
+            WaitBetweenSpawns 12
+            
+            TFBot
+            {
+                Template T_TFBot_Giant_Scout_Fast
+                ClassIcon scout_fast_scallops_blue
+                Tag bot_teletank
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "6b_giantsoldierB"
+            Where spawnbot_b
+            TotalCount 6
+            SpawnCount 3
+            MaxActive 3
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 0
+            WaitForAllDead "6a_dummy_bossdead"
+            TotalCurrency 100
+            
+            Squad
+            {
+                FormationSize 300
+                
+                TFBot
+                {
+                    Template T_TFBot_Giant_Soldier_SlowBarrage
+                    ClassIcon soldier_barrage_scallops_blue
+                    Attributes AlwaysCrit
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Demoman
+                    ClassIcon demo_infinite_scallops_blue
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Demoman
+                    ClassIcon demo_infinite_scallops_blue
+                }
+            }
+        }
+        
+        WaveSpawn
+        {
+            Name "6b_giantheavyA"
+            Where spawnbot_a
+            TotalCount 6
+            SpawnCount 3
+            MaxActive 3
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 0
+            WaitForAllDead "6a_dummy_bossdead"
+            TotalCurrency 100
+            
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Heavy_BrassBeast
+                    ClassIcon heavy_brass_nys_scallops_red
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Medic_BuffBanner
+                    ClassIcon medic_buff_lite_scallops_red
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Pyro
+                    ClassIcon pyro_reflect_scallops_red
+                    Item "Traffic Cone"
+                }
+            }
+        }
+        
+        WaveSpawn
+        {
+            Support 1
+            Where spawnbot_b
+            MaxActive 4
+            SpawnCount 2
+            TotalCount 25
+            WaitBeforeStarting 16
+            WaitBetweenSpawns 6
+            TotalCurrency 25
+            WaitForAllSpawned "6a_soldierB"
+            
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Heavyweapons_Deflector
+                    ClassIcon heavy_deflector_scallops_blue
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickFix_NoUber
+                    ClassIcon medic_scallops_mix
+                }
+            }
+        }
+        
+        WaveSpawn
+        {
+            Support 1
+            Where spawnbot_a
+            TotalCount 25
+            SpawnCount 2
+            MaxActive 4
+            WaitBeforeStarting 16
+            WaitBetweenSpawns 6
+            TotalCurrency 25
+            WaitForAllSpawned "6a_smallbotsA"
+            
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Spammer
+                    ClassIcon soldier_spammer_scallops_red
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickFix_NoUber
+                    ClassIcon medic_scallops_mix
+                }
+            }
+        }
+    }
+}

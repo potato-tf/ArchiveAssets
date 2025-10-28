@@ -1,8 +1,15 @@
 --Used rejuvenator_hit_logic as a base
 function directHitHESH(damage, activator, caller)
 	
-		--stop shrapnel from proccing on rocket jump or weird hits with teammates
-		if activator.m_iTeamNum == caller.m_iTeamNum then
+		--stop shrapnel from proccing on rocket jump or weird hits with teammates, or other dynamic entities
+		if activator.m_iTeamNum == caller.m_iTeamNum or caller.m_iTeamNum == nil then
+			return
+		end
+		
+		--If we got here, we already know that the thing we just hit is not on our team
+		--If we just hit a projectile, parry (delete) it
+		if caller.m_iClassName == "baseprojectile" then
+			caller:Remove()
 			return
 		end
 	
@@ -24,17 +31,10 @@ function directHitHESH(damage, activator, caller)
 			
 			local activatorHealOnKill = activator:GetPlayerItemBySlot(0):GetAttributeValue("heal on kill", true) or 0
 
-			if activator:GetPlayerItemBySlot(0):GetAttributeValue("rocket specialist", true) == 1 then
-			shrapnelMimic = ents.CreateWithKeys("tf_point_weapon_mimic", {
-				teamnum = activator.m_iTeamNum,
-				["$weaponname"] = "SHRAPNEL_GUN_ROCKETSPEC",
-			})
-			else
 			shrapnelMimic = ents.CreateWithKeys("tf_point_weapon_mimic", {
 				teamnum = activator.m_iTeamNum,
 				["$weaponname"] = "SHRAPNEL_GUN",
 			})		
-			end
 			shrapnelMimic["$SetOwner"](shrapnelMimic, activator)
 			shrapnelMimic["$AddWeaponAttribute"](shrapnelMimic, "heal on kill|" .. activatorHealOnKill)
 

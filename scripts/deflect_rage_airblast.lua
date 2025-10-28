@@ -1,4 +1,4 @@
-local AMMO_COST = 0
+local AMMO_COST = 25
 local COOLDOWN = 1
 local RAGE_GAIN_PER_PROJECTILE = 10
 
@@ -6,7 +6,7 @@ local DEFLECT_PARTICLE = "ExplosionCore_sapperdestroyed"
 local DEFLECT_AUDIO = "sound/weapons/barret_arm_zap.wav"
 local AIRBLAST_AUDIO = "sound/weapons/barret_arm_zap.wav"
 
-local AIRBLAST_RANGE = 150
+local AIRBLAST_RANGE = 100
 
 local DEFLECTABLE_PROJECTILES = {"tf_projectile_pipe", "tf_projectile_pipe_remote", "tf_projectile_rocket"
 , "tf_projectile_sentryrocket"}
@@ -136,7 +136,7 @@ function DR_Purchased(_, activator)
 	-- 	activator:GetPlayerItemBySlot(i):SetAttributeValue("mod rage on hit penalty", 0)
 	-- end
 
-	local rage = 1
+	local rage = 0
 
 	local held = false
 

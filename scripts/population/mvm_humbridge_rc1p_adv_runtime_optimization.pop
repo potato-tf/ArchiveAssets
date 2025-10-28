@@ -1,0 +1,7815 @@
+//Perennial Optimization Protocol
+//JS OptimizatioN
+//Runtime Optimization
+//Optimized Runtime
+//Runtime Optimization
+
+//A silly Advanced mission on Humbridge, consisting of nothing but Scout bots! Surely this will go well.
+
+////////////////////////////////////////////////////////////////////////////////////
+//Map info:
+
+//vvvv Bot spawn locations vvvv
+//spawnbot (main), spawnbot_tank (tank door), spawnbot_invasion (from main and flankers), flankers (left cliff),
+//spawnbot_chief (flankers)
+//spawnbot_mission_sniper (flankers), spawnbot_mission_sentry_buster (main), 
+//spawnbot_mission_spy (main)
+
+//vvvv Relays vvvv
+//wave_start_relay			- Regular wave relay.
+//wave_start_ironman_relay	- Timed bomb relay.
+//reset_wave_relay 			- ?
+//bombpath_choose_relay		- Picks a bomb path, probably done in init.
+//bombpath_arrows_clear_relay	- Clears bombpath arrows.
+//wave_a_init 				- Forces "A" bombpath, over the bridge.
+//wave_b_init				- Forces "B" bombpath, under the bridge.
+//bombpath_a 				- Sets "A" bombpath, but does not reset anything.
+//bombpath_b 				- Sets "B" bombpath, but does not reset anything.
+
+////////////////////////////////////////////////////////////////////////////////////
+
+// Initial wave plans that HOPEFULLY won't keep changing:
+// Shorter waves might be best to keep focus on customs clean and concise.
+// Some simple thoughts:
+// **Wave 1**
+// Vanilla bots. Start off simplistic with just regular Scouts, maybe an Armored Sandman or Bat as a good early bulk bot.
+// Regular old swarms will do the trick for most of it.
+
+// **Wave 2**
+// Dip into simple customs. Other weapons to mix it up: Sodas, Milkers, Cola, maybe Burst Fire Shortstop.
+
+// **Wave 3**
+// Deeper customs. Flare-Scatter Scouts + Sun-on-a-Sticks fit here, early enough that they're still threatening.
+// 2nd subwave: 3 bosses with CAPPERs - each distinct laser type (Mangler/Pomson/Bison)
+
+// **Wave 4**
+// Teleporter Scout time. Start with one, end wave with a rush of them.
+// In addition, Sentry-Slinger Scouts (Giant) and Dispenser-Carrying Scouts (giant)
+// haha yes. the engineer-scout wave.
+
+// **Wave 5**
+// THE BEES!!! Because Bee Scouts, of course!
+// Beehemoth minibosses, Beekeeper flamers...and a Queen Bee who teleports in new bots!
+
+// **Wave 6**
+// Soda-focused wave.
+// Sweaty Scouts arrive. Human mobbers that hunt down players while Soda-based Supers rush for bomb.
+// Get jiggy with it.
+
+// **Wave 7**
+// "ENCORE", ft. Chief Scout, general mobber boss with distinct phases:
+	// Phase 1:
+// generally shooty. Maybe swap between rapid fire with shortstop and bursts with FaN/Soda?
+
+	// Phase 2:
+// burn everything! Flare-Scatter reprise, uses Sun-Stick to single out players and chase 'm.
+
+	// Phase 3:
+// get away from me oh god oh fuck. Spams Milk/Pocket Pistol to try and regain health while keeping distance from players.
+
+	// Phase 4:
+// fuck it we ball. Uses up to 3 Uber Canteens (with pauses!!) plus Bonk! as it rushes for the bomb with its remaining health, using BFB to try and gain speed. (It loses its inherent move speed penalty at this point)
+
+////////////////////////////////////////////////////////////////////////////////////
+
+// TEST NOTES Test Notes test notes!
+////// SESSION 1
+//COMP: Scout - Seelpit W1-2, Unsaken W3, Pyro - World of Bob, Heavy - Mentrillium, Soldier - Skin King, Engineer - Sntr
+
+////// SESSION 2
+//COMP: Scout, Heavy, Pyro, Engineer, Sniper - W1 PUSHED TO HATCH AND LOST
+//COMP: Scout, Soldier, Pyro, Engineer, Demo - W1 WON, W2 LOST TO POCKET PISTOLS
+//COMP: Scout, Heavy, Pyro, Engineer, Demo - W2 WON, with slowness near finale still and some straggling Milk/Markers
+
+////// SESSION 3
+//COMP: Spy, Heavy, Engineer, Demo, Soldier - W1 PUSHED TO HATCH til last subwave (FaNs), then held from there. Kind of straggly as a result!
+
+////// SESSION 3
+//COMP: Sniper, Pyro, Engineer, Scout, Soldier
+
+////// SESSION 4
+//COMP: Pyro, Engineer, Scout, Demoman, Demoman - W1-2 WON, W3 LOST TO OVERWHELMING BOMBS
+//COMP: Demoman, Engineer, Scout, Demoman, Spy - W3 LOST ONCE AT START TO OVERWHELMING FIRE
+//COMP: Engineer, Engineer, Scout, Demoman, Spy - W3 LOST ONCE AT START TO OVERWHELMING FIRE, WON AFTER.
+
+////// SESSION 5
+//COMP: Pyro, Engineer, Soldier, Demoman, Spy - W1 LOST TO FINAL SUBWAVE AFTER BIG PUSH FIRST SUB.
+//COMP: Pyro, Engineer, Soldier, Demoman, Spy - W1 WON.
+
+////// SESSION 6 - FINAL WAVE ONLY
+//COMP: Pyro, Engineer, Soldier, Demoman, Sniper (Huntsman) - Acceptably pushed
+//COMP: Spy, Engineer, Soldier, Demoman, Scout - Acceptably pushed
+
+//- maybe give the busters Batter's Helmet for flavor? head scale 2.2, torso scale 0.3
+//- Whurr commented on the notable amount of swarms overall, encouraging CC classes a bit too much.
+//	 Could be good to keep an eye on notable "swarm" subwaves, notably:
+//		W1 sub A and B and debatably C
+//		W2's MilkMark
+//		W3's Melters and Bomber Leagues - Bomber Leagues are excellent candidates for slightly medium bots with 250 health and slower movespeed. 
+//		W4's Pomsons;
+//		W5's Killer Bees (though I'd like to keep the 111's...)
+//		W6's Cola Poppers - prime candidates for the 250 HP treatment
+
+//General
+//- reconsider health and speed change? Try health back but keep speed.
+
+//W1:
+//- 
+
+//W2:
+//- 
+
+//W3:
+//- 
+
+//W4:
+//- Kind of empty now that everything waits forever. Can be sped up a bit, have a bit more bots.
+
+//W5:
+//- 
+
+//W6:
+//- 
+
+//Judge notes!
+
+//General
+// ************************************************************************ 
+// ****************************** IMPORTANT *******************************
+// ************************************************************************
+
+//						TYPES OF SCOUTS MUST BE MADE MORE CLEAR.
+//							LEGIBILITY IS OF THE ESSENCE.
+//								PRIORITY NUMBER ONE.
+
+// ************************************************************************ 
+// ****************************** IMPORTANT *******************************
+// ************************************************************************
+
+//W1
+//- 
+
+//W2
+//- Second and third Giant Shortstops are also VERY close to eachother. Maybe put them a little further apart so it's less Shortstop-Pocket-Shortstop,
+//  and more Shortstop-Pocket---Shortstop. You know?
+
+//W3
+//- Implement a slightly more proper intro to the humans! Giant -wfad-> humans -wfad-> rest.
+
+//W4
+//- Add particle to Sentry-Slinger Scout's projectile! And nerf the sentries while giving them a tad more health. make them very easy to spot.
+//- Also make the sentries not spawn in walls >.<
+
+//W5
+//- Give the Nursing Beehemoth a big ol' healing particle to indicate THIS IS THE HEALER! Plus a medic hat! (Naggenvatcher?)
+
+//W6
+//- 
+
+//W7
+//- 
+
+
+////////////////////////////////////////////////////////////////////////////////////
+// CHANGELOG VERSION 7, POST-JUDGE
+////////////////////////////////////////////////////////////////////////////////////
+
+	
+//W1
+//- 
+
+//W2
+// - Reduced Super Pocket Pistol Scout speed to 350 HU/s (from 400 HU/s). Limited vision range to 900, reducing the chance that it will try to "snipe" a target, resulting in an unfair amount of healing.
+// - Re-divided Milk & Mark Scouts. The 15/15/15 post-Soda Popper Scouts, 9/9/9 post-Burst Fire Scouts are now 16/10/8. The two 20/20/10 spawns after the first two and last two Captain Hermes squads have spawned, are both reduced to 16/12/8. This should overall reduce the amount of spam while hopefully retaining the wave's continuous pace of bots.
+
+//W3
+//- 
+
+//W4
+//- Lengthened arrow hit kill time on Sentry-Slinger Scouts to 0.1, hopefully preventing cases where the code runs faultily. 
+//Also gave their projectile collision group 23 ("COMBATOBJECT"), which makes it solid to all but players - hopefully improving its placement.
+
+//W5
+//- 
+
+//W6
+//- Lowered Super Scout MaxActive to 7 (from 9); WaveSpawn now has 15/7/3. Two spawns are guaranteed at the start (instead of three),
+// with the third only coming once at least one Super Scout is killed.
+// Increased WaitBetweenSpawns by an extra second, further spacing the squad. This reduces the initial push force paired with the Super Pocket Pistol nerf and teleported bots not picking up the bomb while ubered.
+//- Added UseMeleeThreatPrioritization 1 to the bosses, slightly reducing their bodyblockability.
+//- Added an additional x/4/1 Support WaveSpawn of Competitive Scouts after the last Teleporter Scout dies, increasing pressure later in the waves.
+
+//W7
+//- 
+
+
+#base robot_standard.pop
+#base robot_giant.pop
+
+RunFastEatAss,OrSomething
+{
+	StartingCurrency 1200
+	RespawnWaveTime 2
+	FixedRespawnWaveTime 1
+	CanBotsAttackWhileInSpawnRoom No
+	CustomNavFile "mvm_humbridge_fixed_nav"
+	
+	AllowBotExtraSlots 1
+	RobotLimit 42 //There's a LOT of them.
+	
+	BotTeleportUberDuration 1.2 //Makes Teleporter Scouts less infuriating.
+	
+	ForceHoliday 2 //For cosmetics :3
+	NoThrillerTaunt 1 //Doesn't fit and is just a bit annoying.
+	NoHolidayPickups 1
+	
+	//I'm not foregoing class naming conventions even though they're all Scouts.
+	Templates
+	{
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////				Common bots				//////////////////
+		//////////////////////////////////////////////////////////////////////////
+		
+		//////////	Wave 1	//////////
+		
+		//Default Scattergun scouts with slightly less good aim than Normal and slower fire rate.
+		T_TFBot_Scout_Scatter
+		{
+			Class Scout
+			Skill Normal
+			AimTrackingInterval 0.4
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"fire rate penalty" 1.15
+			}
+		}
+		//Regular ol' Bat Scout. Normal skill.
+		T_TFBot_Scout_Bat
+		{
+			Class Scout
+			Skill Normal
+			WeaponRestrictions MeleeOnly
+			ClassIcon scout_bat_nys
+		}
+		//A Force-a-Nature Scout with no extra gun stats.
+		T_TFBot_Scout_FaN_Norm
+		{
+			Class Scout
+			Skill Normal
+			AimTrackingInterval 0.4
+			ClassIcon scout_fan
+			Name "Force-a-Nature Scout"
+			Item "The Bolt Boy"
+			Item "The Force-a-Nature"
+			MaxVisionRange 750
+		}
+		
+		//////////	Wave 2	//////////
+		
+		//A bulky, slower Scattergun Scout that fires in quick bursts.
+		//...so a Soda Popper with more clip size!
+		T_TFBot_Scout_Burst_Armored
+		{
+			Name "Armored Burst Scout"
+			Class Scout
+			Skill Normal
+			AimTrackingInterval 0.35
+			Health 650
+			Scale 1.3
+			Item "Fortunate Son"
+			Item "Flak Jack"
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			ClassIcon scout_burst_armored
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"fire rate bonus" 0.35
+				"scattergun no reload single" 1
+				"reload time increased" 4
+				"clip size penalty" 0.66
+				"damage penalty" 0.6
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.7
+				"damage force reduction" 0.75
+			}
+		}
+		//A Scout with a powerful Soda Popper!
+		//Attempts to get in close. Has reduced max vis range.
+		T_TFBot_Scout_SodaPopper
+		{
+			Name "Soda Popper Scout"
+			Class Scout
+			Skill Normal
+			AimTrackingInterval 0.35 //Neuter deadliness a little.
+			Item "The Soda Popper"
+			Item "Bonk Leadwear"
+			WeaponRestrictions PrimaryOnly
+			MaxVisionRange 900
+			DesiredAttackRange 150
+			ClassIcon scout_popper
+			ItemAttributes
+			{
+				ItemName "Bonk Leadwear"
+				"set item tint rgb" 8208497
+			}
+		}
+		//A Scout with a powerful Soda Popper, paired with Crit-a-Cola!
+		//Attempts to get in close. Has reduced max vis range and no self-minicrit.
+		//Slightly bulkier, slightly slower.
+		T_TFBot_Scout_SodaPopper_Cola
+		{
+			Name "Cola Popper Scout"
+			Health 250
+			Scale 1.15
+			Class Scout
+			Skill Normal
+			Item "The Soda Popper"
+			Item "Crit-a-Cola"
+			Item "The Cola Cooler" //Item style override be damned, I want my fancy bots
+			Item "Bonk Leadwear"
+			WeaponRestrictions PrimaryOnly
+			MaxVisionRange 900
+			DesiredAttackRange 150
+			ClassIcon scout_popper_cola
+			ItemAttributes
+			{
+				ItemName "Crit-a-Cola"
+				"mod_mark_attacker_for_death" 0
+				"mult effect duration" 1.5
+			}
+			ItemAttributes
+			{
+				ItemName "Bonk Leadwear"
+				"set item tint rgb" 8208497
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.8
+			}
+		}
+		//A Force-a-Nature Scout with a Conch, and unchanged stats.
+		//Very speedy!
+		T_TFBot_Scout_FaN_Conch
+		{
+			Name "Force-a-Conch Scout"
+			Class Scout
+			Skill Normal
+			ClassIcon scout_fan_conch_lite
+			Item "The Bolt Boy"
+			Item "The Force-a-Nature"
+			Item "The Concheror"
+			Attributes SpawnWithFullCharge
+			MaxVisionRange 600
+			CharacterAttributes
+			{
+				"increase buff duration" 6
+			}
+		}
+		//Fan O' War scout. Useful for support!
+		T_TFBot_Scout_Marker
+		{
+			Name "Marker Scout"
+			Class Scout
+			Skill Hard
+			Item "The Fan O'War"
+			WeaponRestrictions MeleeOnly
+			ClassIcon scout_fanowar
+		}
+		//A stereotypical Two Cities scout that LITERALLY CANNOT use its Scattergun :^3
+		T_TFBot_Scout_MilkMark
+		{
+			Name "Milk 'n Mark Scout"
+			Class Scout
+			Skill Hard
+			Item "Mad Milk"
+			Item "The Fan O'War"
+			ClassIcon scout_fanowar_milk
+			StripItemSlot 0 //removes primary
+			ItemAttributes
+			{
+				ItemName "Mad Milk"
+				"effect bar recharge rate increased" 0.6
+			}
+			CharacterAttributes
+			{
+				"never gib" 1 // Humbridge is an expensive map, which means gibs can crash people. With these amounts. Apparently. glubshrug.
+			}
+		}
+		//A Scout wielding the Homewrecker. Powerful versus sentries!
+		T_TFBot_Scout_Homewrecker
+		{
+			Name "Armored Homewrecker Scout"
+			Health 650
+			Scale 1.3
+			Class Scout
+			Skill Expert
+			ClassIcon pyro_homewrecker_lite_armored
+			Item "The Mantreads"
+			Item "The Homewrecker"
+			Item "Engineer Welding Mask"
+			Item "The Trash Toter"
+			Item "The Tools of the Trade"
+			WeaponRestrictions MeleeOnly
+			Attributes DisableDodge
+			CharacterAttributes
+			{
+				"move speed penalty" 0.7
+			}
+			InterruptAction
+			{
+				Target "obj_sentrygun"
+				AimTarget "obj_sentrygun"
+				KillAimTarget 1
+				Delay 3
+				Duration 6
+				Cooldown 5
+				Distance 48
+			}
+		}
+		
+		//////////	Wave 3	//////////
+		
+		//A Scout that fires single Flares. Can crit.
+		T_TFBot_Scout_Flare
+		{
+			Name "Flarestop Scout"
+			Class Scout
+			Skill Normal
+			Item "The Shortstop"
+			ClassIcon pyro_flare //scout_flarestop
+			ItemAttributes
+			{
+				ItemName "The Shortstop"
+				"paintkit_proto_def_index" 293 //Searing Souls, for fire
+				"set_item_texture_wear" 0.4
+				"override projectile type" 6
+				"damage bonus" 2.5 //30 base damage
+				"mod max primary clip override" -1
+				"fire rate penalty" 2.25 //every 0.9s
+				
+				"custom kill icon" "flaregun"
+			}
+		}
+		//A Scout that fires small bursts of Flares that don't crit.
+		T_TFBot_Scout_FlareScatter
+		{
+			Name "Flare-Scatter Scout"
+			Class Scout
+			Skill Normal
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			ClassIcon pyro_flare_burst_nys
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"paintkit_proto_def_index" 293 //Searing Souls, for fire
+				"set_item_texture_wear" 0.4
+				"override projectile type" 6
+				"crits_become_minicrits" 1 //Prevents full crits
+				"mult projectile count" 3 //Tops out at 90 damage
+				"projectile spread angle penalty" 4.5
+				"projectile speed decreased" 0.3 //600 HU/s
+				
+				"custom kill icon" "flaregun"
+			}
+		}
+		
+		//A Scout that fires Manmelter projectiles quickly!
+		T_TFBot_Scout_Manmelter
+		{
+			Name "Rapid Melter Scout"
+			Class Scout
+			Skill Normal
+			Item "The Shortstop"
+			Item "Feathered Fiend"
+			WeaponRestrictions PrimaryOnly
+			ClassIcon pyro_manmelter_spammer
+			MaxVisionRange 1200
+			ItemAttributes
+			{
+				ItemName "The Shortstop"
+				"custom item model" "models/workshop/weapons/c_models/c_drg_manmelter/c_drg_manmelter.mdl"
+				// "paintkit_proto_def_index" 293 //Used to be a Searing Souls Shortstop, for fire
+				// "set_item_texture_wear" 0.2
+				
+				"set damagetype ignite" 1
+				"override projectile type" 6
+				"projectile speed decreased" 0.5 //1000 HU/s
+				"projectile trail particle" "~drg_manmelter_projectile"
+				
+				"mod max primary clip override" -1
+				"fire rate bonus" 1.5 //0.54s
+				
+				"weapon burn dmg reduced" 0.5
+				"flare no crit burning" 1
+				"damage bonus" 2.5 //30 base damage
+				
+				"custom kill icon" "manmelter"
+			}
+		}
+		//Sun-on-a-Stick Scout. Supposedly deadly, but rarely gets things done.
+		T_TFBot_Scout_Sun
+		{
+			Name "Sun Stick Scout"
+			Class Scout
+			Skill Hard
+			Item "Sun-on-a-Stick"
+			Item "Blazing Bull"
+			WeaponRestrictions MeleeOnly
+			ClassIcon scout_sunstick_swordstone
+		}
+		//A Scout that tosses Sun-on-a-Sticks! They should deal melee damage.
+		T_TFBot_Scout_Sun_Tosser
+		{
+			Name "Sun Stick-Tossing Scout"
+			Class Scout
+			WeaponRestrictions PrimaryOnly
+			ClassIcon scout_sunstick_swordstone
+			Item "Fire Fighter"
+			Item "Sun Stick Tosser"
+			Item "Sun-on-a-Stick"
+			Attributes SuppressFire
+			ItemAttributes
+			{
+				ItemName "Sun-on-a-Stick"
+				"is_passive_weapon" 1
+				"dmg taken from fire reduced" 1
+			}
+            ShootTemplate
+            {
+                Name "PT_RotatingSunStick"
+				ItemName "Sun Stick Tosser"
+                AttachToProjectile 1
+            }
+			FireWeapon
+			{
+				Type "Primary"
+				Cooldown 0.75
+				Duration 0.1
+				Delay 4
+				IfSeeTarget 1
+			}
+		}
+		
+		//A minigiant Scout that casts Fireball Spells while wielding a Spellbook!
+		//...as a weapon. Like. To smack you with.
+		T_TFBot_Scout_Spell
+		{
+			Name "Spellcaster Scout"
+			Health 650
+			Scale 1.3
+			Class Scout
+			Skill Expert
+			StripItemSlot 0
+			StripItemSlot 1
+			ClassIcon pyro_dragon_fury_spell
+			UseHumanModel 2
+			Action Mobber
+			Attributes DisableDodge
+			DesiredAttackRange 500
+			
+			Item "Mage Hat"
+			Item "Mage Shirt"
+			Item "The Bat Outta Hell"
+			ItemAttributes
+			{
+				ItemName "The Bat Outta Hell"
+				"custom item model" "models/player/items/all_class/hwn_spellbook_complete.mdl"
+				"attachment name" "effect_hand_R"
+				"attachment angles" "-12 0 40"
+				"attachment offset" "-2 4 0" //change!!!
+				"custom kill icon" "taunt_scout"
+			}
+			Item "TF_WEAPON_SPELLBOOK"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SPELLBOOK"
+				"projectile speed decreased" 0.5 //~1020 * 0.5 = 510
+				
+				"mod projectile heat seek power" 10
+				"mod projectile heat aim time" 2
+				"mod projectile heat no predict target speed" 1
+				
+				"weapon burn dmg reduced" 0.5
+				"dmg penalty vs players" 0.5
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.7
+			}
+			Spell
+			{
+				Delay 5
+				Cooldown 3
+				Type "Fireball"
+			}
+			AddAttribute
+			{
+				Item "The Bat Outta Hell"
+				Name "attachment offset"
+				Value "-3 4 0"
+				Delay 0.1
+				Repeats 1
+			}
+		}
+		
+		//A Scout that tosses grenades instead of Sandman balls!
+		//Grenades deal less damage and no self-damage.
+		//Might change to reduced self-damage if particles are too lackluster.
+		T_TFBot_Scout_BomberLeague
+		{
+			Name "Bomber League Scout"
+			Class Scout
+			Skill Normal
+			Item "The Sandman"
+			Item "Head Banger"
+			Item "EOTL_demo_dynamite"
+			Tag "ballbomber"
+			WeaponRestrictions MeleeOnly
+			ClassIcon demo //I mean, it's what they do?
+			MaxVisionRange 900
+			DesiredAttackRange 400 //Further away instead of up close.
+			UseMeleeThreatPrioritization 0
+			ItemAttributes
+			{
+				ItemName "The Sandman"
+				"effect bar recharge rate increased" 0.12 //Every 1.2 seconds
+			}
+			SpawnTemplate
+			{
+				Name "PT_GrenadeMimic"
+				Origin "0 0 65" //approx. from eyes
+			}
+		}
+		//A Scout that tosses grenades instead of Sandman balls! ...and is bulkier!
+		//Grenades deal less damage and no self-damage.
+		T_TFBot_Scout_BomberLeague_Armored
+		{
+			Name "Demolition League Scout"
+			Health 650
+			Scale 1.3
+			Class Scout
+			Skill Expert
+			Item "The Ullapool Caber"
+			Item "Head Banger"
+			Item "EOTL_demo_dynamite"
+			Item "The Scrap Sack"
+			// Tag "ballbomber"
+			WeaponRestrictions MeleeOnly
+			ClassIcon demo_caber_nys_armored
+			CharacterAttributes
+			{
+				"move speed penalty" 0.7
+			}
+			// SpawnTemplate
+			// {
+				// Name "PT_GrenadeMimic"
+				// Origin "0 0 85" //approx. from eyes
+			// }
+		}
+		//Funkier new Batsaber Scout. Hard skill (makes virtually NO difference).
+		//Focuses players!
+		T_TFBot_Scout_Batsaber_Mobber
+		{
+			Name "Laserbat Scout"
+			Class Scout
+			Skill Hard
+			WeaponRestrictions MeleeOnly
+			ClassIcon scout_batsaber_nys
+			UseHumanModel 2
+			Action Mobber
+			Attributes DisableDodge
+			Item "Phononaut"
+			Item "Cadet Visor"
+			Item "Speedster's Spandex"
+			Item "Batsaber"
+			CharacterAttributes
+			{
+				"never gib" 1
+			}
+		}
+		
+		//A Pistol Scout that inflicts Jarate on hit.
+		//*deep sigh* yeah.
+		T_TFBot_Scout_Pisstol
+		{
+			Name "Pisstol Scout"
+			Class Scout
+			Skill Normal
+			ClassIcon scout_pisstol
+			Item "Upgradeable TF_WEAPON_PISTOL"
+			Item "Ol' Snaggletooth"
+			Item "The Jarmaments"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_PISTOL"
+				"paintkit_proto_def_index" 302 //Mannana Peeled, for the yellowness
+				"set_item_texture_wear" 0
+				
+				"fire rate penalty" 3
+				"add cond on hit" 24
+			}
+		}
+		//A Scout...with a knife. He shanks you.
+		//It *is* England after all.
+		T_TFBot_Scout_Knife
+		{
+			Name "Shanker Scout"
+			Class Scout
+			Skill Hard
+			Item "Upgradeable TF_WEAPON_KNIFE"
+			Item "Shanker Hat"
+			Item "Shanker Shirt"
+			Item "The Argyle Ace"
+			WeaponRestrictions MeleeOnly
+			Attributes DisableDodge
+			UseHumanModel 2
+			Action Mobber
+			MoveBehindEnemy 1
+			ClassIcon spy
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_KNIFE"
+				"item style override" 1
+				"fire rate bonus" 0.75
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.8
+			}
+		}
+		
+		//////////	Wave 4	//////////
+		
+		//A Scout that fires a Pomson 6000. Very shrimple.
+		//Instant reload, no fire rate bonus, deals full damage to buildings.
+		T_TFBot_Scout_Pomson
+		{
+			Class Scout
+			Name "Pomson Scout"
+			Skill Normal
+			ClassIcon engineer_pomson_v2
+			Item "The Pomson 6000"
+			Item "The Tin-1000"
+			ItemAttributes
+			{
+				ItemName "The Pomson 6000"
+				"faster reload rate" 0
+				"dmg bonus vs buildings" 5
+				"penetrate teammates" 1
+			}
+		}
+		//A Scout that fires a Pomson 6000 with multiple shots! Just like the Particle Pulverizer!
+		//Normal reload to reduce spamminess, slightly less damage per shot to equal ~1.5x power per meatshot.
+		T_TFBot_Scout_Pomson_Multishot
+		{
+			Class Scout
+			Name "Pomson Scout"
+			Health 250
+			Scale 1.15
+			Skill Normal
+			ClassIcon engineer_pomson_v2
+			Item "The Pomson 6000"
+			Item "The Tin-1000"
+			AimAt Head //Should slightly correct aiming
+			ItemAttributes
+			{
+				ItemName "The Pomson 6000"
+				"dmg bonus vs buildings" 5
+				"dmg penalty vs players" 0.5 //32-72 -> 16-36 * 3
+				
+				"mult projectile count" 3
+				"fire rate penalty" 2
+				"projectile speed decreased" 0.6 //720 HU/s
+				"projectile spread angle penalty" 4
+				
+				"subtract victim medigun charge on hit" 3 //Don't suck all of it away!!
+				"subtract victim cloak on hit" 5 //Don't suck all of it away!!
+				"penetrate teammates" 1
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.9
+			}
+		}
+		//A Scattergun Scout that fires in quick bursts.
+		//...so a Soda Popper with more clip size!
+		T_TFBot_Scout_Burst
+		{
+			Name "Burst Fire Scout"
+			Class Scout
+			Skill Normal
+			AimTrackingInterval 0.35
+			Item "Fortunate Son"
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			ClassIcon scout_burst
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"fire rate bonus" 0.35
+				"scattergun no reload single" 1
+				"reload time increased" 4
+				"clip size penalty" 0.66
+				"damage penalty" 0.6 //Base damage 3.6, 175% rampup 6.3, tops out at 63 damage per meatshot.
+			}
+		}
+		
+		//A Scout that shoots (sentry) rockets. Damage is the same as a normal rocket.
+		T_TFBot_Scout_RocketStop
+		{
+			Name "Rocketstop Scout"
+			Health 650
+			Scale 1.3
+			Class Scout
+			Skill Expert
+			ClassIcon soldier_armored
+			Item "The Shortstop"
+			Item "Cranium Cooler"
+			ItemAttributes
+			{
+				ItemName "The Shortstop"
+				"paintkit_proto_def_index" 414 //Bomb Carrier
+				"set_item_texture_wear" 0
+				
+				"override projectile type" 2
+				"fire rate penalty" 2.2 //~0.8s
+				"reload time increased" 2 //~3s, regular ol' reload
+				
+				"damage bonus" 6.75 //12 base dmg * 6.75 = 81, 10% dmg penalty basically.
+				
+				"projectile speed decreased" 0.75 //Slower to make their move speed more tolerable.
+				"custom projectile model" "models/buildables/sentry3_rockets.mdl"
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.7
+			}
+		}
+		
+		//////////	Wave 5	//////////
+		
+		//A slightly-faster-moving scout that fires a fast Scattergun!
+		T_TFBot_Scout_KillerBee
+		{
+			Class Scout
+			Name "Fast Killer Bee"
+			Skill Normal
+			Item "warbird_scattergun_killerbee"
+			Item "The Flight of the Monarch"
+			Item "Bumble Beenie"
+			ClassIcon scout_killerbee_nys
+			Attributes HoldFireUntilFullReload
+			MaxVisionRange 750
+			ItemAttributes
+			{
+				ItemName "warbird_scattergun_killerbee"
+				"fire rate bonus" 0.6
+				"move speed bonus" 1.125 //450 HU/s
+				"hold fire until full reload" 1 //Scatterguns behave a bit weird with the TFBot attribute
+			}
+			CharacterAttributes
+			{
+				"health from healers increased" 7
+			}
+		}
+		T_TFBot_Scout_HoneyBomb
+		{
+			Class Scout
+			Name "Honeybomb Bee"
+			Skill Normal
+			Item "Upgradeable TF_WEAPON_PIPEBOMBLAUNCHER"
+			Item "The Flight of the Monarch"
+			Item "Bombee Bothead"
+			Item "Bumble Beenie"
+			WeaponRestrictions SecondaryOnly
+			ClassIcon demo_sticky_daan
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_PIPEBOMBLAUNCHER"
+				"item style override" 1
+				"stickybomb charge rate" 0.01
+				"projectile range decreased" 0.33
+				"faster reload rate" 0.2
+			}
+			ItemAttributes
+			{
+				ItemName "Bumble Beenie"
+				"attachment name" "head"
+				"attachment offset" "0 0 -100"
+			}
+			AddAttribute 
+			{						
+				Item "Bumble Beenie"
+				Name "attachment scale"
+				Value "1.25"
+				Delay 0.1
+				Repeats 1
+			}
+		}
+		//A Scout that throws milk with the Shortstop!
+		//The milk is mixed with Honey. This does not slow you down.
+		T_TFBot_Scout_HoneyBee
+		{
+			Class Scout
+			Name "Honey Bee"
+			Skill Normal
+			Item "The Shortstop"
+			Item "Mad Milk"
+			Item "The Flight of the Monarch"
+			Item "Bumble Beenie"
+			WeaponRestrictions SecondaryOnly
+			StripItemSlot 2
+			ClassIcon scout_shortstop_milky_alt
+			ItemAttributes
+			{
+				ItemName "Mad Milk"
+				"effect bar recharge rate increased" 0.6
+			}
+			ItemAttributes
+			{
+				ItemName "Bumble Beenie"
+				"set item tint rgb" "15132390" //An Extraordinary Abundance of Tinge (aka "white")
+				"attachment name" "head"
+				"attachment offset" "0 0 -100"
+			}
+			AddAttribute 
+			{						
+				Item "Bumble Beenie"
+				Name "attachment scale"
+				Value "1.25"
+				Delay 0.1
+				Repeats 1
+			}
+			CharacterAttributes
+			{
+				"health from healers increased" 7
+			}
+		}
+		
+		T_TFBot_Scout_HoneyBomb_Armored
+		{
+			Class Scout
+			Name "Armored Honeybomb Bee"
+			Health 650
+			Scale 1.3
+			Skill Normal
+			Item "Upgradeable TF_WEAPON_PIPEBOMBLAUNCHER"
+			Item "The Flight of the Monarch"
+			Item "Bombee Bothead"
+			Item "Bumble Beenie"
+			WeaponRestrictions SecondaryOnly
+			ClassIcon demo_sticky_daan
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_PIPEBOMBLAUNCHER"
+				"item style override" 1
+				"stickybomb charge rate" 0.01
+				"projectile range decreased" 0.33
+				"faster reload rate" 0.2
+			}
+			ItemAttributes
+			{
+				ItemName "Bumble Beenie"
+				"attachment name" "head"
+				"attachment offset" "1 0 -128"
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.7
+				"health from healers increased" 1.4
+			}
+			AddAttribute 
+			{						
+				Item "Bumble Beenie"
+				Name "attachment scale"
+				Value "1.6"
+				Delay 0.1
+				Repeats 1
+			}
+		}
+		T_TFBot_Scout_Beekeeper
+		{
+			Class Scout
+			Name "Beekeeper"
+			Health 650 
+			Scale 1.3
+			Skill Normal
+			UseHumanModel 2
+			Action Mobber
+			Item "The Hive Minder"
+			Item "Airtight Arsonist"
+			Item "powerhouse_FLAMETHROWER_turbinetorcher" //capitals for searching
+			ClassIcon pyro_armored2
+			ItemAttributes
+			{
+				ItemName "powerhouse_FLAMETHROWER_turbinetorcher"
+				"airblast disabled" 1
+				"attach particle effect" 701
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.7
+				"health from healers increased" 1.4
+			}
+		}
+		
+		//////////	Wave 6	//////////
+		
+		//A Scout that rapidly tosses grenades instead of Sandman balls!
+		//Grenades deal no self-damage.
+		//Bulky!
+		T_TFBot_Scout_BomberLeague_Spammer
+		{
+			Name "Rapid Bomber League Scout"
+			Health 650
+			Scale 1.3
+			Class Scout
+			Skill Expert
+			Item "The Sandman"
+			Item "Head Banger"
+			Item "EOTL_demo_dynamite"
+			Tag "ballbomber"
+			WeaponRestrictions MeleeOnly
+			ClassIcon demo_spammer_armored
+			MaxVisionRange 900
+			DesiredAttackRange 400 //Further away instead of up close.
+			UseMeleeThreatPrioritization 0
+			ItemAttributes
+			{
+				ItemName "The Sandman"
+				"effect bar recharge rate increased" 0.045 //Every 0.45 seconds
+			}
+			SpawnTemplate
+			{
+				Name "PT_GrenadeMimic"
+				Origin "0 0 65" //approx. from eyes
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.7
+			}
+		}
+		//A Scout that buffs itself with the Concheror effect for self-healing and faster move speed.
+		//Uses a Shortstop, though without more healing received.
+		T_TFBot_Scout_Bonch
+		{
+			Name "Bonch! Scout"
+			Class Scout
+			Health 250
+			Scale 1.15
+			Skill Normal
+			AimTrackingInterval 0.4 //Nerfed since they come in hefty swarms
+			Item "The Shortstop"
+			Item "Bonch!"
+			Item "The Fan O'War"
+			Item "Benefactor's Kanmuri" //You do not have this hat, do you? 
+			Item "Employee Badge A"
+			ClassIcon scout_bonch
+			
+			UseHumanModel 2
+			Action Mobber
+			
+			ItemAttributes
+			{
+				ItemName "Employee Badge A"
+				"custom item model" "models/weapons/c_models/c_shogun_warbanner/c_shogun_warbanner.mdl"
+				"attachment name" "prop_bone"
+				"attachment scale" 0
+				"attachment angles" "120 -90 -30"
+				"attachment offset" "-45 40 10"
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.9
+			}
+		}
+		
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////				Giant bots				//////////////////
+		//////////////////////////////////////////////////////////////////////////
+		
+		//////////	Wave 2	//////////
+		
+		//A burst fire Shortstop Scout, firing very fast in bursts.
+		//Slower with good bulk.
+		T_TFBot_Giant_Scout_Shortstop_Burst
+		{
+			Name "Giant Shortstop Scout"
+			Health 4500
+			Class Scout
+			Skill Normal
+			Attributes MiniBoss
+			Item "The Shortstop"
+			ClassIcon scout_shortstop_armored2
+			ItemAttributes
+			{
+				ItemName "The Shortstop"
+				"fire rate bonus" 0.35
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35 //160 HU/s
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+			FireWeapon
+			{
+				Type "Secondary"
+				Cooldown 6
+				Delay 0
+				IfSeeTarget 1
+				MaxTargetRange 96 //A little more than 1.75x 48 (melee range)
+			}
+		}
+		//A Pretty Boy's Pocket Pistol Scout, capable of healing a dangerous amount from stray hits.
+		//Fast with low bulk.
+		T_TFBot_Giant_Scout_PocketPistol
+		{
+			Name "Super Pocket Pistol Scout"
+			Health 1200
+			Class Scout
+			Skill Normal //Do NOT make these aim good.
+			Attributes MiniBoss
+			WeaponRestrictions SecondaryOnly
+			Item "Pretty Boy's Pocket Pistol"
+			Item "The Fed-Fightin' Fedora"
+			ClassIcon scout_pocketpistol_heal_lite
+			MaxVisionRange 900
+			ItemAttributes
+			{
+				ItemName "Pretty Boy's Pocket Pistol"
+				"reload time increased" 2
+				"heal on hit for rapidfire" 100 //Up to 900 health recovered
+				"weapon spread bonus" 0.25
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.875 //350 HU/s
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+			}
+		}
+		//A Pretty Boy's Pocket Pistol Scout, capable of healing a dangerous amount from stray hits.
+		//Slower with good bulk.
+		T_TFBot_Giant_Scout_PocketPistol_Armored
+		{
+			Name "Giant Pocket Pistol Scout"
+			Health 4500
+			Class Scout
+			Skill Normal //Do NOT make these aim good.
+			Attributes MiniBoss
+			WeaponRestrictions SecondaryOnly
+			Item "Pretty Boy's Pocket Pistol"
+			Item "The Fed-Fightin' Fedora"
+			ClassIcon scout_pocketpistol_heal_lite
+			ItemAttributes
+			{
+				ItemName "Pretty Boy's Pocket Pistol"
+				"reload time increased" 1.5
+				"fire rate bonus" 0.55
+				"heal on hit for rapidfire" 200
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35 //160 HU/s
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+		}
+		//A Winger Scout, capable of dealing a dangerous amount of damage per shot, but fires slowly.
+		//Slower with good bulk.
+		T_TFBot_Giant_Scout_Winger
+		{
+			Name "Captain Hermes"
+			Health 4500
+			Class Scout
+			Skill Normal
+			Attributes MiniBoss
+			WeaponRestrictions SecondaryOnly
+			Item "The Winger"
+			Item "The Patriot Peak"
+			Item "Airborne Attire"
+			ClassIcon scout_winger_lite_armored
+			ItemAttributes
+			{
+				ItemName "The Winger"
+				"paintkit_proto_def_index" 241 //Electroshocked
+				"set_item_texture_wear" 0
+				"attach particle effect" 703 //Cool
+				"damage bonus" 4 //60 base damage (rampup: 90)
+				"reload time increased" 1.5
+				"fire rate penalty" 4 //0.6s between shots
+				"weapon spread bonus" 0.6
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35 //160 HU/s
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+		}
+		
+		//////////	Wave 3	//////////
+		
+		//A Scout that fires bundles of flares! Deals mini-crits vs burning.
+		//Slower with good bulk.
+		T_TFBot_Giant_Scout_Flare
+		{
+			Name "Giant Flare-Scatter Scout"
+			Health 4500
+			Class Scout
+			Skill Expert
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			Item "Deity's Dress"
+			Item "The Aztec Aggressor"
+			MaxVisionRange 1200
+			Attributes MiniBoss
+			ClassIcon pyro_flare_burst_nys
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"paintkit_proto_def_index" 293 //Searing Souls, for fire
+				"set_item_texture_wear" 0.2
+				
+				"set damagetype ignite" 1
+				"override projectile type" 6
+				"projectile spread angle penalty" 4.5
+				"projectile speed decreased" 0.35 //700 HU/s
+				
+				"damage bonus" 5 //24 base damage
+				"crits_become_minicrits" 1 //Prevents full crits
+				"mult projectile count" 3 //Tops out at 30+40+40 = 110 damage, or about 1.1x dmg from normal scatter 8)
+				
+				"custom kill icon" "flaregun"
+			}
+			ItemAttributes
+			{
+				ItemName "The Aztec Aggressor"
+				"attach particle effect" 2 //Burning Flames, red!
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35 //160 HU/s
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+		}
+		//A Scout that fires a concentrated beam of Manmelter projectiles!
+		//Slower with good bulk.
+		T_TFBot_Giant_Scout_Manmelter
+		{
+			Name "Giant Solar Beam Scout"
+			Health 4500
+			Class Scout
+			Skill Expert
+			Item "The Shortstop"
+			Item "Deity's Dress"
+			Item "Feathered Fiend"
+			Attributes MiniBoss
+			ClassIcon pyro_manmelter_spammer
+			ItemAttributes
+			{
+				ItemName "The Shortstop"
+				"paintkit_proto_def_index" 293 //Searing Souls, for fire
+				"set_item_texture_wear" 0.2
+				
+				"set damagetype ignite" 1
+				"override projectile type" 6
+				"projectile speed decreased" 0.3 //600 HU/s
+				"projectile trail particle" "~drg_manmelter_projectile"
+				
+				"flare no crit burning" 1
+				"faster reload rate" 0
+				"fire rate bonus" 0.25 //0.09s
+				"damage bonus" 2.5 //30 base damage
+				
+				"custom kill icon" "manmelter"
+			}
+			ItemAttributes
+			{
+				ItemName "Feathered Fiend"
+				"attach particle effect" 14 //Scorching Flames, red!
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35 //160 HU/s
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+		}
+		//A Scout that tosses Sun-on-a-Sticks! They should deal melee damage.
+		T_TFBot_Giant_Scout_Sun_Tosser
+		{
+			Name "Giant Sun-Tossing Scout"
+			Health 4500
+			Class Scout
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			ClassIcon scout_sunstick_swordstone
+			Item "Fire Fighter"
+			Item "Sun Stick Tosser"
+			Item "Sun-on-a-Stick"
+			MaxVisionRange 1200
+			Attributes SuppressFire
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "Sun Stick Tosser"
+				"custom kill icon" "lava_bat"
+			}
+			ItemAttributes
+			{
+				ItemName "Sun-on-a-Stick"
+				"is_passive_weapon" 1
+				"dmg taken from fire reduced" 1
+			}
+            ShootTemplate
+            {
+                Name "PT_RotatingSunStick"
+				ItemName "Sun Stick Tosser"
+                AttachToProjectile 1
+            }
+			FireWeapon
+			{
+				Type "Primary"
+				Cooldown 0.7
+				Duration 0.1
+				Delay 4
+				IfSeeTarget 1
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35 //160 HU/s
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+		}
+		
+		//A Scout that rapidly tosses grenades instead of Sandman balls!
+		//Grenades deal less damage and no self-damage.
+		//Slower with good bulk.
+		T_TFBot_Giant_Scout_BomberLeague
+		{
+			Name "Major Bomber League Scout"
+			Health 4500
+			Class Scout
+			Skill Expert
+			Tag "ballbomber"
+			
+			Item "The Sandman"
+			Item "Head Banger"
+			Item "EOTL_demo_dynamite"
+			Item "Blast Blocker"
+			
+			ClassIcon demo_burst
+			Attributes MiniBoss
+			Attributes SuppressFire
+			WeaponRestrictions MeleeOnly
+			
+			MaxVisionRange 1200
+			DesiredAttackRange 400 //Further away instead of up close.
+			UseMeleeThreatPrioritization 0
+			ItemAttributes
+			{
+				ItemName "The Sandman"
+				"maxammo grenades1 increased" 10
+				"effect bar recharge rate increased" 0.01
+				"fire rate bonus" 0.3
+			}
+			SpawnTemplate
+			{
+				Name "PT_GrenadeMimic"
+				Origin "0 0 113" //approx. from eyes
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35 //160 HU/s
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+			FireInput
+			{
+				Target "!self"
+				Action "RunScriptCode"
+				Param "
+				local hWep = GetPropEntityArray(self, `m_hMyWeapons`, 2)
+				function ForceSecondaryAttack()
+				{
+					if ( ! ( self.IsValid() ) || ! (hWep) || ! ( hWep.IsValid() ) ) return;
+					SetPropFloat(hWep, `m_flNextSecondaryAttack`, 0)
+					hWep.SecondaryAttack()
+				}
+				EntFireByHandle(self,`CallScriptFunction`,`ForceSecondaryAttack`,0,self,self)
+				EntFireByHandle(self,`CallScriptFunction`,`ForceSecondaryAttack`,0.1,self,self)
+				EntFireByHandle(self,`CallScriptFunction`,`ForceSecondaryAttack`,0.2,self,self)
+				EntFireByHandle(self,`CallScriptFunction`,`ForceSecondaryAttack`,0.3,self,self)
+				EntFireByHandle(self,`CallScriptFunction`,`ForceSecondaryAttack`,0.4,self,self)
+				EntFireByHandle(self,`CallScriptFunction`,`ForceSecondaryAttack`,0.5,self,self)
+				EntFireByHandle(self,`CallScriptFunction`,`ForceSecondaryAttack`,0.6,self,self)
+				EntFireByHandle(self,`CallScriptFunction`,`ForceSecondaryAttack`,0.7,self,self)
+				EntFireByHandle(self,`CallScriptFunction`,`ForceSecondaryAttack`,0.8,self,self)
+				"
+				Cooldown 2.8
+				Delay 2
+				IfSeeTarget 1
+			}
+		}
+		
+		//////////	Wave 4	//////////
+		
+		//A Giant Scout that fires a Pomson, rapidly. Fairly spammy!
+		T_TFBot_Giant_Scout_Pomson
+		{
+			Name "Giant Rapid Pomson Scout"
+			Health 4500
+			Class Scout
+			Skill Expert
+			Item "The Pomson 6000"
+			Item "Rocket Operator"
+			Item "The Tin-1000"
+			Attributes MiniBoss
+			ClassIcon engineer_pomson_v2_spammer
+			ItemAttributes
+			{
+				ItemName "The Pomson 6000"
+				"dmg bonus vs buildings" 5
+				
+				"fire rate bonus" 0.25
+				"faster reload rate" 0
+				"projectile speed decreased" 0.6 //720, slightly faster than rocket.
+				
+				"penetrate teammates" 1
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+		}
+		//A Giant Scout, dressed up like an Engineer, that shoots instantly-deploying sentries!
+		T_TFBot_Giant_Scout_Sentry_Spawner
+		{
+			Name "Giant Sentry-Slinger Scout"
+			Health 4500
+			Class Scout
+			ClassIcon sentry_gun_lvl3_lite
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Item "The Rescue Ranger"
+			Item "Cargo Constructor"
+			Item "Texas Tin-Gallon"
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "The Rescue Ranger"
+				"paintkit_proto_def_index" 414 //Bomb Carrier
+				"set_item_texture_wear" 0
+				"fire rate penalty"	7.5
+				"mod max primary clip override" -1
+				
+				"projectile penetration" 1
+				"penetrate teammates" 1
+				
+				"projectile gravity" 300
+				"projectile lifetime" 9
+				"Projectile speed decreased" 0.2
+				
+				"mult projectile scale" 0.001
+				"arrow hit kill time" 0.1
+				"projectile trail particle" "dxhr_lightningball_parent_blue"
+			}
+			ItemAttributes
+			{
+				ItemName "Texas Tin-Gallon"
+				"attachment scale" 1.2
+				"set item tint rgb" 12091445 //Cream Spirit
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.4
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+			ShootTemplate
+			{
+				Name PT_SentrySpawner
+				AttachToProjectile 1
+			}
+		}
+		//A Giant Scout, dressed up like an Engineer, that carries a handy-dandy dispenser!
+		//Also uses a large slow-fire Winger like Captain Hermes.
+		T_TFBot_Giant_Scout_Dispenser
+		{
+			Name "Giant Dispenser Ranger Scout"
+			Health 4500
+			Class Scout
+			ClassIcon dispenser_lite
+			Skill Expert
+			WeaponRestrictions SecondaryOnly
+			Item "The Winger"
+			Item "Packable Provisions"
+			Item "Provisions Cap"
+			Item "Battery Canteens"
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			// ItemAttributes
+			// {
+				// ItemName "The Rescue Ranger"
+				// "paintkit_proto_def_index" 406 //Health and Hell
+				// "set_item_texture_wear" 0
+				
+				// "mult projectile count" 4
+				// "fire rate penalty" 1.4
+				// "projectile spread angle penalty" 4
+				// "projectile speed decreased" 0.4
+				
+				// "mod max primary clip override" -1
+			// }
+			ItemAttributes
+			{
+				ItemName "The Winger"
+				"paintkit_proto_def_index" 241 //Electroshocked
+				"set_item_texture_wear" 0
+				"attach particle effect" 703 //Cool
+				"damage bonus" 4 //60 base damage (rampup: 90)
+				"reload time increased" 1.5
+				"fire rate penalty" 4 //0.6s between shots
+				"weapon spread bonus" 0.6
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.4
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"health from healers reduced" 0.2
+			}
+			
+			SpawnTemplate
+			{
+				Name "PT_DispenserBackpack"
+				Bone "bip_spine_0"
+				Delay 5
+			}
+		}
+		//A Giant Scout, dressed up like an Engineer, that drops a teleporter on death!
+		//Uses a VScript trace to find proper ground. Wields a rather weak but fast Jag, making it largely unthreatening.
+		T_TFBot_Giant_Scout_Teleporter
+		{
+			Template T_TFBot_Giant_Scout
+			Name "Giant Teleporter Scout"
+			ClassIcon teleporter_seel //scout_ambush as alternative
+			WeaponRestrictions MeleeOnly
+			Item "The Pomson 6000"
+			Item "The Jag"
+			Item "Lucky No. 42" //Blueprint
+			Item "EOTL_Insulated_innovator" //Insulated Inventor
+			Item "Telefragger Toque"
+			DeathSound "mvm/mvm_tele_activate.wav"
+			ItemAttributes
+			{
+				ItemName "The Pomson 6000"
+				"dmg bonus vs buildings" 5
+				"dmg penalty vs players" 0.5 //32-72 -> 16-36 * 3
+				
+				"mult projectile count" 3
+				"fire rate penalty" 1.5 //Stronker
+				"faster reload rate" 0.75 //Faster
+				"projectile speed decreased" 0.6 //720 HU/s
+				"projectile spread angle penalty" 3 //The giants are more stable...or something.
+				
+				"subtract victim medigun charge on hit" 3 //Don't suck all of it away!!
+				"subtract victim cloak on hit" 5 //Don't suck all of it away!!
+				"penetrate teammates" 1
+			}
+			ItemAttributes
+			{
+				ItemName "The Jag"
+				"fire rate bonus" 0.625 //every .5s 
+			}
+			ItemAttributes
+			{
+				ItemName "Telefragger Toque"
+				"attach particle effect" 178 //Aggradation
+			}
+			
+			ItemAttributes
+			{
+				ItemName "Lucky No. 42"
+			}
+			ItemModel
+			{
+				ItemName "Lucky No. 42"
+				Model "models/buildables/teleporter_blueprint_exit.mdl"
+			}
+			AddAttribute 
+			{						
+				Item "Lucky No. 42"
+				Name "attachment name"
+				Value "doublejumpfx"
+				Delay 0.1
+				Repeats 1
+			}
+			AddAttribute 
+			{						
+				Item "Lucky No. 42"
+				Name "attachment angles"
+				Value "0 0 110" // X rotates its looking sideways; Y rotates tilting it like right-mouse click; Z rotates its looking up/down
+				Delay 0.1
+				Repeats 1
+			}
+			SpawnTemplate "PT_PortableTeleport"
+		}
+		
+		//////////	Wave 5	//////////
+
+		//A Super Scout with the Boston Basher. Simple stuff.
+		T_TFBot_Giant_Scout_FastBee
+		{
+			Class Scout
+			Name "Super Stinger Bee"
+			Health 1200
+			Skill Expert
+			Attributes MiniBoss
+			WeaponRestrictions MeleeOnly
+			ClassIcon scout_giant_fast
+			Item "Bumble Beenie"
+			Item "The Flight of the Monarch"
+			Item "The Boston Basher"
+			ItemAttributes
+			{
+				ItemName "The Boston Basher"
+				"hit self on miss" 0
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 1.3
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 5
+			}
+		}
+		//A super-accurate Scout that fires concentrated pellets!
+		T_TFBot_Giant_Scout_Accurate
+		{
+			Class Scout
+			Name "Giant Accurate Killer Bee"
+			Health 4500
+			ClassIcon scout_accurate_lite
+			Skill Normal
+			
+			Item "warbird_scattergun_killerbee"
+			Item "Bumble Beenie"
+			Item "Flight of the Monarch"
+			Attributes HoldFireUntilFullReload
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "warbird_scattergun_killerbee"
+				"fire rate penalty" 2
+				"weapon spread bonus" 0.35
+				"faster reload rate" 0.2 //faster, but not instant!
+				"hold fire until full reload" 1 //Scatterguns behave a bit weird with the TFBot attribute
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+		}
+		// Nursing Beehemoth == Medic
+		// Giant Scout template, bulky+slow
+		T_TFBot_Giant_Scout_Crossbow_Amputator
+		{
+			Class Scout
+			Name "Nursing Beehemoth"
+			Health 4500 
+			Skill Expert
+			ClassIcon medic_crossbow_amputator
+			Attributes MiniBoss
+			Item "The Crusader's Crossbow"
+			Item "The Surgeon's Stahlhelm"
+			Item "Wings of Purity"
+			AddCond 55 //Amputator Healing. Should also heal bots around itself!
+			SpawnTemplate PT_HealParticle //Giant heal particle to indicate THIS IS THE HEALER.
+			ItemAttributes
+			{
+				ItemName "The Crusader's Crossbow"
+				"paintkit_proto_def_index" 120 //Iron Wood (Mk.II)
+				"set_item_texture_wear" 0
+				"use original class weapon animations" 1
+				"faster reload rate" 0.75 //try diff values to balance
+			}
+			ItemAttributes
+			{
+				ItemName "Wings of Purity"
+				"attachment name" "flag"
+				"attachment offset" "0 90 -35"
+				"attachment angles" "80 -90 0"
+			}
+			AddAttribute 
+			{						
+				Item "Wings of Purity"
+				Name "attachment scale"
+				Value "1.5"
+				Delay 0.1
+				Repeats 1
+			}
+			AddAttribute 
+			{						
+				Item "The Surgeon's Stahlhelm"
+				Name "attachment name"
+				Value "head"
+				Delay 0.1
+				Repeats 1
+			}
+			AddAttribute 
+			{						
+				Item "The Surgeon's Stahlhelm"
+				Name "attachment scale"
+				Value "1.4"
+				Delay 0.1
+				Repeats 1
+			}
+			AddAttribute 
+			{						
+				Item "The Surgeon's Stahlhelm"
+				Name "attachment offset"
+				Value "-5 0 -16"
+				Delay 0.1
+				Repeats 1
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"health from healers increased" 0.5
+			}
+		}
+
+		// Burning Beehemoth == Pyro (flare rain)
+		T_TFBot_Giant_Scout_FlareRain
+		{
+			Class Scout
+			Name "Burning Beehemoth"
+			Health 4500
+			Skill Hard
+			ClassIcon pyro_flare_rain_nys
+			Attributes MiniBoss
+			AimTrackingInterval 0.1
+			MaxVisionRange 1200
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			Item "Bumble Beenie"
+			Item "Fallen Angel"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"paintkit_proto_def_index" 293 //Searing Souls, for fire
+				"set_item_texture_wear" 0.2
+				
+				"set damagetype ignite" 1
+				"override projectile type" 6
+				"mult projectile count" 2
+				"projectile spread angle penalty" 5
+				"projectile speed decreased" 0.25
+				
+				"damage bonus" 5
+				"fire rate bonus" 0.2 //0.125s 
+				"faster reload rate" 0
+				
+				"custom kill icon" "flaregun"
+			}
+			ItemAttributes
+			{
+				ItemName "Fallen Angel"
+				"attachment name" "flag"
+				"attachment offset" "0 45 -85"
+				"attachment angles" "40 -90 0"
+			}
+			AddAttribute 
+			{						
+				Item "Fallen Angel"
+				Name "attachment scale"
+				Value "1.4"
+				Delay 0.1
+				Repeats 1
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"health from healers increased" 2
+			}
+		}
+
+		// "Stinging" Beehemoth == Soldier (burst dh)
+		T_TFBot_Giant_Scout_DH_Burst
+		{
+			Class Scout
+			Name "Stinging Beehemoth"
+			Health 4500
+			Skill Expert
+			ClassIcon soldier_burstfire_directhit_yoovy
+			Attributes HoldFireUntilFullReload
+			Attributes MiniBoss
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			Item "The Space Bracers"
+			Item "The Jupiter Jumpers"
+			Item "Tyrantium Helmet"
+			AimAt Head
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"paintkit_proto_def_index" 413 //Sky Stallion the Homestuck reference
+				"set_item_texture_wear" 0.2
+				
+				"hold fire until full reload" 1 //Scatterguns behave a bit weird with the TFBot attribute
+				"override projectile type" 2 //rockets
+				"damage bonus" 18.5 //~111 base damage. it'll do.
+				"no reduced damage rampup" 1 //Sets dmg rampup to 50% instead of 75%!
+				"fire rate bonus" 0.12 //0.075s =~ 0.08
+				//Reload time: 0.7 + 4 = 4.7 | 0.92*0.6 + 7.2 * 0.6 = 0.552 + 4.32 = 4.872
+				"clip size bonus" 1.5 //9 rockets total
+				
+				"projectile speed increased" 1.8
+				"blast radius decreased" 0.3
+				
+				"custom kill icon" "rocketlauncher_directhit"
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"health from healers increased" 2
+			}
+			ItemAttributes
+			{
+				ItemName "Tyrantium Helmet"
+				"set item tint rgb" 15185211 //Australium Gold
+				"attachment name" "head"
+				"attachment offset" "-3 0 -8"
+				"attachment angles" "90 0 0"
+			}
+			AddAttribute
+			{
+				Item "Tyrantium Helmet"
+				Name "attachment scale"
+				Value 1.3
+				Delay 0.1
+				Repeats 1
+			}
+		}
+
+		
+		//////////	Wave 6	//////////
+		
+		// A giant scout with just a flamethrower. How foul!
+		T_TFBot_Giant_Scout_Flamer
+		{
+            Class Scout
+            Name "Giant Flamethrower Scout"
+			Health 4500
+            ClassIcon pyro_armored2
+            Skill Expert
+			Attributes MiniBoss
+            WeaponRestrictions PrimaryOnly
+			Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+			Item "Firewall Helmet"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_FLAMETHROWER"
+				"set_item_texture_wear" 0
+				"paintkit_proto_def_index" 207
+				"airblast disabled" 1 //stop that!
+			}
+			ItemAttributes
+			{
+				ItemName "Firewall Helmet"
+				"attachment name" "head"
+				"attachment offset" "-8 0 -20"
+				"attachment angles" "10 0 0"
+            }
+			AddAttribute 
+			{						
+				Item "Firewall Helmet"
+				Name "attachment scale"
+				Value "1.35"
+				Delay 0.1
+				Repeats 1
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"move speed penalty" 0.35
+			}
+		}
+		//A Giant Bonk! Scout with...a flamethrower?! Who gave it that?
+		T_TFBot_Giant_Scout_Bonk_Flamer
+		{
+            Class Scout
+            Name "Super Burning Bonk! Scout"
+			Health 1600
+            ClassIcon scout_bonk_nys_fire //Not be confused with "fire_nys", which is a Vaccinator resistance scout.
+            Skill Expert
+			Attributes MiniBoss
+            WeaponRestrictions PrimaryOnly
+			Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+            Item "Bonk! Atomic Punch"
+			Item "Firewall Helmet"
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_FLAMETHROWER"
+				"set_item_texture_wear" 0
+				"paintkit_proto_def_index" 207
+				"airblast disabled" 1 //stop that!
+			}
+			ItemAttributes
+			{
+				ItemName "Firewall Helmet"
+				"attachment name" "head"
+				"attachment offset" "-8 0 -20"
+				"attachment angles" "10 0 0"
+            }
+			AddAttribute 
+			{						
+				Item "Firewall Helmet"
+				Name "attachment scale"
+				Value "1.35"
+				Delay 0.1
+				Repeats 1
+			}
+			FireWeapon
+			{
+				Type "Secondary"
+				Cooldown 3
+				Duration 0.1
+				Delay 1
+				IfSeeTarget 1
+				MaxTargetRange 150
+			}
+		}
+		//A Giant Bonk! Scout with uber instead of Bonk! Atomic Punch, allowing it to fight back!
+		//Original by scroob. It's...not a very complicated template, though, let's be real.
+		T_TFBot_Giant_Scout_Bonk_Uber
+		{
+            Class Scout
+            Name "Giant Uber-Pop Scout"
+			Health 1600
+            ClassIcon scout_bonk_uber_nys
+            Skill Expert
+			Attributes MiniBoss
+            WeaponRestrictions MeleeOnly
+            Item "Uber-Pop"
+			Item "The Amputator"
+            Item "The Byte'd Beak"
+			Item "Titanium Tyrolean"
+			ItemAttributes
+			{
+				ItemName "The Amputator"
+				"set_item_texture_wear" 0
+				"paintkit_proto_def_index" 224 //Dovetailed
+			}
+            ItemAttributes
+            {
+				ItemName "Titanium Tyrolean"
+				"set item tint rgb" 8626083 //Waterlogged Lab Coat (BLU), to match Amputator.
+				"attachment name" "head"
+				"attachment offset" "-5 0 -13"
+				"attachment angles" "95 0 0"
+            }
+			AddAttribute 
+			{						
+				Item "Titanium Tyrolean"
+				Name "attachment scale"
+				Value "1.4"
+				Delay 0.1
+				Repeats 1
+			}
+		}
+		
+		//Giant Regen Bonk! Scouts, who sometimes sip some Bonk to make 'em regenerate big health!
+		//Courtesy of our beloved Riles.
+		T_TFBot_Giant_Scout_RegenBonk
+		{
+			Name "Giant Regen Bonk Scout"
+			Health 1600
+			Class Scout
+			Skill Normal
+			ClassIcon scout_regenbonk_nys_temp1
+			WeaponRestrictions MeleeOnly
+			Item "Bonk! Atomic Punch"
+			Item "Batsaber"
+			Item "Bonk Helm"
+			Attributes MiniBoss
+			
+			// Tag bot_regenscout / No longer necessary thanks to rafmod attribute, wahoo
+			SpawnTemplate "PT_PowerupLogic"
+			
+			ItemAttributes
+			{
+				ItemName "Bonk! Atomic Punch"
+				"effect cond override" 92
+				"effect add attributes" "health regen|128"
+				"effect bar recharge rate increased" 0.55
+			}
+			ItemAttributes 
+			{
+				ItemName "Batsaber"
+				"set item tint rgb" 6901050
+			}
+			ItemColor
+			{
+				ItemName "Bonk! Atomic Punch"
+				Red 202
+				Green 100
+				Blue 0
+			}
+			ItemColor
+			{
+				ItemName "Bonk Helm"
+				Red 255
+				Green 120
+				Blue 0
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+			}
+		}
+		// A Giant Regen Bonk Scout with more health, less speed, and a stock Force-a-Nature!
+		T_TFBot_Giant_Scout_RegenBonk_Armored
+		{
+			Name "Giant Regen Bonk Scout"
+			Health 4500
+			Class Scout
+			Skill Normal
+			ClassIcon scout_regenbonk_nys_temp1 //_armored //doesn't exist yet!! but...not really necessary if only variant in the wave.
+			WeaponRestrictions PrimaryOnly
+			Item "The Force-a-Nature"
+			Item "Bonk! Atomic Punch"
+			Item "Bonk Helm"
+			Attributes MiniBoss
+			
+			// Tag bot_regenscout / No longer necessary thanks to rafmod attribute, wahoo
+			SpawnTemplate "PT_PowerupLogic"
+			
+			ItemAttributes
+			{
+				ItemName "Bonk! Atomic Punch"
+				"effect cond override" 92
+				"effect add attributes" "health regen|128"
+				"effect bar recharge rate increased" 0.55
+			}
+			ItemAttributes 
+			{
+				ItemName "Batsaber"
+				"set item tint rgb" 6901050
+			}
+			ItemColor
+			{
+				ItemName "Bonk! Atomic Punch"
+				Red 202
+				Green 100
+				Blue 0
+			}
+			ItemColor
+			{
+				ItemName "Bonk Helm"
+				Red 255
+				Green 120
+				Blue 0
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"move speed penalty" 0.35
+			}
+		}
+		// A Giant Haste Fizz Scout with more health, less speed, and a Shortstop!
+		T_TFBot_Giant_Scout_HasteFizz_Armored
+		{
+			Name "Giant Haste Fizz Scout"
+			Health 4500
+			Class Scout
+			Skill Normal
+			ClassIcon scout_hastefizz_armored_v1
+			WeaponRestrictions PrimaryOnly
+			Item "The Shortstop"
+			Item "Haste Fizz"
+			Item "Bonk Helm"
+			Attributes MiniBoss
+			
+			SpawnTemplate "PT_PowerupLogic"
+			
+			ItemColor
+			{
+				ItemName "Haste Fizz"
+				Red 90
+				Green 165
+				Blue 100
+			}
+			ItemColor
+			{
+				ItemName "Bonk Helm"
+				Red 110
+				Green 215
+				Blue 120
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"move speed penalty" 0.35
+			}
+		}
+		T_TFBot_Giant_Scout_ShieldShake_Armored
+		{
+			Name "Giant Haste Fizz Scout"
+			Health 4500
+			Class Scout
+			Skill Normal
+			ClassIcon scout_shieldshake_v1
+			WeaponRestrictions PrimaryOnly
+			Item "The Force-a-Nature"
+			Item "Shield Shake"
+			Item "Bonk Helm"
+			Attributes MiniBoss
+			
+			SpawnTemplate "PT_PowerupLogic"
+			
+			ItemAttributes
+			{
+				ItemName "Haste Fizz"
+			}
+			ItemColor
+			{
+				ItemName "Haste Fizz"
+				Red 90
+				Green 165
+				Blue 100
+			}
+			ItemColor
+			{
+				ItemName "Bonk Helm"
+				Red 110
+				Green 215
+				Blue 120
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"move speed penalty" 0.35
+			}
+		}
+		
+		//////////	Wave 6	//////////
+		
+		
+		//A spammy Shortstop Scout, firing slightly faster continuously like a minigun.
+		//Slower with good bulk.
+		T_TFBot_Giant_Scout_Shortstop_Spammer
+		{
+			Name "Giant Rapid Shortstop Scout"
+			Health 4500
+			Class Scout
+			Skill Normal
+			Attributes MiniBoss
+			Item "The Shortstop"
+			ClassIcon scout_shortstop_spammer_armored
+			ItemAttributes
+			{
+				ItemName "The Shortstop"
+				"fire rate bonus" 0.5 //0.18s between shots
+				"faster reload rate" 0
+				"clip size bonus" 5
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.35 //160 HU/s
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+			}
+			FireWeapon
+			{
+				Type "Secondary"
+				Cooldown 6
+				Delay 0
+				IfSeeTarget 1
+				Duration 0.5
+				MaxTargetRange 96 //2x 48 (melee range)
+			}
+		}
+		
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////				Chief bots				//////////////////
+		//////////////////////////////////////////////////////////////////////////
+		
+		Chief_Resists
+		{
+			//Attributes: highly specific vulnerability values, courtesy of Bazooks.
+			WeaponResist   //Multiplies damage received from weapons listed below
+			{
+				"TF_WEAPON_SCATTERGUN" 1.449
+				"TF_WEAPON_SODA_POPPER" 1.412
+				"TF_WEAPON_HANDGUN_SCOUT_PRIMARY" 1.63
+				"TF_WEAPON_PEP_BRAWLER_BLASTER" 1.875
+				"TF_WEAPON_ROCKETLAUNCHER" 1.7
+				"TF_WEAPON_PARTICLE_CANNON" 1.7
+				"TF_WEAPON_FLAMETHROWER" 1.5
+				"TF_WEAPON_GRENADELAUNCHER" 1.616
+				"TF_WEAPON_CANNON" 1.54
+				"TF_WEAPON_PIPEBOMBLAUNCHER" 1.5767
+				"TF_WEAPON_SWORD" 2
+				"TF_WEAPON_KNIFE" 1.25 //TODO: tiger suggests removing this.
+				// "TF_WEAPON_MINIGUN" 0.85
+				"TF_WEAPON_SHOTGUN_PYRO" 2.5
+				"TF_WEAPON_SHOTGUN_HWG" 2.5
+				"TF_WEAPON_SHOTGUN_SOLDIER" 2.5
+				"TF_WEAPON_SHOTGUN_PRIMARY" 2.5
+				"TF_WEAPON_SENTRY_REVENGE" 2.5
+				"TF_WEAPON_SNIPERRIFLE" 2
+				"TF_WEAPON_COMPOUND_BOW" 2
+			}
+		}
+		
+		//////////	Wave 3	//////////
+		
+		//Chief Bison Scout. Fires a constant stream of Bison shots!
+		T_TFBot_Chief_Scout_Laser_Bison
+		{
+			Name "Chief Atomic Annihilator"
+			Health 7500
+			Class Scout
+			Skill Hard
+			ClassIcon scout_capper_trio_lite_nys_tind
+			WeaponRestrictions SecondaryOnly
+			Item "The C.A.P.P.E.R"
+			Item "Starduster"
+			Item "Phobos Filter"
+			Attributes UseBossHealthBar
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "Phobos Filter"
+				"attach particle effect" 3129
+				"set item tint rgb" 5801378 //Team Spirit, BLU
+			}
+			ItemAttributes
+			{
+				ItemName "The C.A.P.P.E.R"
+				"override projectile type" 13
+				"energy weapon penetration" 1
+				"dmg bonus vs buildings" 2 //Sheer spam
+				
+				"faster reload rate" 0
+				"fire rate bonus" 0.6
+				"projectile spread angle penalty" 1
+				
+				"custom kill icon" "righteous_bison"
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.3 //120 HU/s, Soldier speed
+				"damage force reduction" 0.1
+				"airblast vulnerability multiplier" 0.1
+				"rage giving scale" 0.34
+			}
+			FireInput
+			{
+				Target "!self"
+				Action "RunScriptCode"
+				Param "SINS.ChangeClassIcon(self,`soldier_bison_spammer`)"
+				Repeats 1
+				Delay 0
+			}
+		}
+		//Chief Mangler Scout. Fires bursts of Mangler rockets!
+		T_TFBot_Chief_Scout_Laser_Mangler
+		{
+			Name "Chief Molecular Mangler"
+			Health 7500
+			Class Scout
+			Skill Expert
+			ClassIcon scout_capper_trio_lite_nys_tind
+			WeaponRestrictions SecondaryOnly
+			Item "The Surgeon's Space Suit"
+			Item "The C.A.P.P.E.R"
+			Item "Lord Cockswain's Pith Helmet"
+			Attributes UseBossHealthBar
+			Attributes MiniBoss
+			
+			Tag chief_mangler //Ensures damage is blast type.
+			
+			ItemAttributes
+			{
+				ItemName "Lord Cockswain's Pith Helmet"
+				"attach particle effect" 3141
+			}
+			ItemAttributes
+			{
+				ItemName "The C.A.P.P.E.R"
+				"override projectile type" 2 //rockets, to make them adhere projspeed
+				"custom projectile model" "models/empty.mdl"
+				"explosion particle" "drg_cow_explosioncore_normal_blue"
+				"projectile trail particle" "drg_cow_rockettrail_normal_blue"
+				"dmg bonus vs buildings" 5
+				
+				"fire rate bonus" 0.6 //0.09s between shots
+				"reload time increased" 3.8 //~3.8s
+				"clip size penalty" 0.75
+				"projectile speed decreased" 0.65
+				"damage bonus" 5 //75 base damage but higher rampup, maybe apply lower rampup
+				
+				"penetrate teammates" 1
+				"custom kill icon" "cow_mangler"
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.3 //120 HU/s, Soldier speed
+				"damage force reduction" 0.1
+				"airblast vulnerability multiplier" 0.1
+				"rage giving scale" 0.34
+			}
+			FireInput
+			{
+				Target "!self"
+				Action "RunScriptCode"
+				Param "SINS.ChangeClassIcon(self,`soldier_mangler_burst`)"
+				Repeats 1
+				Delay 0
+			}
+		}
+		//Chief Pomson Scout. Fires spreads of Pomson shots!
+		T_TFBot_Chief_Scout_Laser_Pomson
+		{
+			Name "Chief Particle Pulverizer"
+			Health 7500
+			Class Scout
+			Skill Expert
+			ClassIcon scout_capper_trio_lite_nys_tind
+			WeaponRestrictions SecondaryOnly
+			Item "The C.A.P.P.E.R"
+			Item "Rocket Operator"
+			Item "Defragmenting Hard Hat 17%"
+			Attributes UseBossHealthBar
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "Defragmenting Hard Hat 17%"
+				"attach particle effect" 3044
+			}
+			ItemAttributes
+			{
+				ItemName "The C.A.P.P.E.R"
+				"override projectile type" 13
+				"energy weapon penetration" 0
+				"dmg bonus vs buildings" 1.5 //Sheer spam
+				
+				"fire rate penalty" 4
+				"dmg penalty vs players" 0.5 //32-72 -> 16-36 * 5
+				"mult projectile count" 5
+				"clip size penalty" 0.34
+				"projectile speed decreased" 0.6 //720, slightly faster than rocket.
+				"projectile spread angle penalty" 5
+				
+				"penetrate teammates" 1
+				"custom kill icon" "pomson"
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.3 //120 HU/s, Soldier speed
+				"damage force reduction" 0.1
+				"airblast vulnerability multiplier" 0.1
+				"rage giving scale" 0.34
+			}
+			FireInput
+			{
+				Target "!self"
+				Action "RunScriptCode"
+				Param "SINS.ChangeClassIcon(self,`engineer_pomson_v2`)"
+				Repeats 1
+				Delay 0
+			}
+		}
+		
+		//////////	Wave 5	//////////
+		
+		// The majestic queen bee herself!
+		T_TFBot_Chief_Scout_QueenBee
+		{
+			Class Scout
+			Name "Killer Bee Queen"
+			Health 42500 //30k when accounting for vulns; 1.7x desired health = actual health with vulns
+			Skill Expert
+			AimTrackingInterval 0.35 //She's not THAT strong on her own, that's why she's the queen!
+			ClassIcon scout_kingbee_nys
+			Item "warbird_scattergun_killerbee"
+			Item "The King of Scotland Cape"
+			Item "Bumble Beenie"
+			Item "Employee Badge A"
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			UseMeleeThreatPrioritization 1
+			MaxVisionRange 1200
+			SpawnTemplate PT_Teleporter
+			SpawnTemplate PT_Text_QueenBee
+			ItemAttributes
+			{
+				ItemName "warbird_scattergun_killerbee"
+				"set_item_texture_wear" 0
+				"fire rate bonus" 0.25
+				"faster reload rate" 0.8 //VERY slightly faster - possibly overtuned! Watch carefully!
+				"bullets per shot bonus" 1.5 //Scary!
+			}
+			ItemAttributes
+			{
+				ItemName "Employee Badge A"
+				"attach particle effect" 151
+				"attach particle effect static" 151
+				"custom item model" "models/player/items/demo/crown.mdl"
+				"attachment name" "head"
+				"attachment offset" "-3 0 -10"
+			}
+			AddAttribute
+			{
+				Item "Employee Badge A"
+				Name "attachment scale"
+				Value 1.25
+				Delay 0.1
+				Repeats 1
+			}
+			AddAttribute
+			{
+				Item "Player"
+				Name "move speed penalty"
+				Value 0.25
+				IfHealthBelow 14000
+				Delay 0
+				Repeats 1
+			}
+			CharacterAttributes
+			{
+				"move speed penalty" 0.3
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"cannot pick up intelligence" 1 // EXPERIMENTAL change.
+			}
+	
+			FireInput //Start the thinkin' for health thresholds.
+			{
+				Target "!self"
+				Action "RunScriptCode"
+				Param "SeelRuntime.EnableQueenThink(self)"
+				Repeats 1
+				Delay 0.03
+			}
+		}
+		
+		//////////	Wave 6	//////////
+		
+		// DEPRECATED: Multi-Pop: +2 projectiles per shot
+		
+		// Chief Soda Scout, AKA Jeremessiah's second coming. Uses rocket launcher [scattergun], gradually drinks more buffs
+		
+		// 95%: Crit-a-Cola (+DAMAGE)			Deals mini-crits.
+		// 80%: Haste Fizz (+DAMAGE, +SPEED)	Shoots, reloads, and moves faster
+		// 65%: Kritz-a-Cola (+DAMAGE)			Deals full crits.
+		// 50%: Shield Shake (+DEFENSE, TEMP)	Gains a small shield. Can fade, can re-drink.
+		// 25%: Uber-Pop (+DEFENSE, TEMP)		Gains invulnerability. Can fade, cannot re-drink.
+		// 1 HP: Water (+DEATH)					This kills him.
+		
+		T_TFBot_Chief_Scout_Soda
+		{
+			Name "Jeremessiah, Carbonated Doom"
+			Health 42500 //30k when accounting for vulns; 1.7x desired health = actual health with vulns
+			Class Scout
+			Skill Expert
+			Tag chief_soda //Ensures damage dealt is blast damage.
+			
+			ClassIcon tf2_lite_crit
+			Scale 1
+			UseHumanModel 2
+			AlwaysGlow 1
+			NoIdleSound 1
+			StripItemSlot 2 // Might grab his bat otherwise, the dastard. Don't do that, eejit.
+			UseMeleeThreatPrioritization 1
+			
+			Item "Twat's Scattergun"
+			Item "Bastard's Hat"
+			Item "Prick's Shirt"
+			Item "Jerk's Boots"
+			Item "Employee Badge A"
+			Attributes MiniBoss
+			//Healthbar triggered at start of fight, as is scale
+			
+			SpawnTemplate "PT_PowerupLogic"
+			SpawnTemplate "PT_SodaBossStuff_Hidden"
+			AddTemplate Chief_Resists
+			
+			CharacterAttributes
+			{
+				"always allow taunt" 1
+			}
+			EventChangeAttributes
+			{
+				Default
+				{
+					InterruptAction // Stop current bot ai and force the bot to move to a location
+					{
+						Target "360 3270 220" // Frontmost rock of spawnbot
+						AimTarget "128 3000 256" // Diagonally "forward" plus a little up
+						
+						Delay 1
+						Repeats 1
+						Cooldown 3
+						Duration 0.5 // How long should the ai be interrupted
+
+						WaitUntilDone 1 // Duration timer starts when he moves to the target location
+						OnDoneChangeAttributes "Fighting" // Once done, switch to this EventChangeAttributes
+						
+						Distance 25 
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.6
+					}
+				}
+				Fighting
+				{
+					Taunt //Taunts once @ start
+					{
+						Delay 0.01
+						Repeats 1
+						Name "Taunt: Cheers!"
+					}
+					FireInput //Enlarge thine self.
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "SeelRuntime.ChangeScaleToGiant(self); EntFire(`soda_upper_text`,`Display`)"
+						Repeats 1
+						Delay 2.8
+					}
+					FireInput //And get a fancy boss health bar when you crush the can.
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "self.SetUseBossHealthBar(true); EntFire(`soda_lower_text`,`Display`)"
+						Repeats 1
+						Delay 5.25
+					}
+					
+					FireInput //Start the thinkin' for health thresholds.
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "SeelRuntime.EnableBossThink(self)"
+						Repeats 1
+						Delay 0.03
+					}
+					VoiceCommand //What a gamer.
+					{
+						Type "Battle cry"
+						Delay 20
+						Cooldown 12
+						Repeats 4
+						IfHealthAbove 7500
+					}
+					
+					Taunt //Taunts once @ death
+					{
+						Delay 0.01
+						Repeats 1
+						Name "Taunt: Cheers!"
+						IfHealthBelow 100
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.3
+						"damage force reduction" 0.5
+						"airblast vulnerability multiplier" 0.5
+					}
+				}
+			}
+		}
+		
+		// Chief Golden Scout
+		// Burst Scattergun -> Flamethrower -> Black Box (modest healing)
+		T_TFBot_Chief_Scout_GOLD
+		{
+			Name "Australium Assailant Jeremy"
+			Health 42500
+			Class Scout
+			Skill Expert
+			
+			Scale 1
+			Attributes MiniBoss
+			ClassIcon tf2_lite
+			
+			Item "The El Jefe"
+			Item "Aloha Apparel"
+			Item "Lucky No. 42"
+			Item "Scout Flip-Flops"
+			Item "Power Up Canteen (MvM)" //These are reskinned Summer Shades >:3
+			ItemAttributes
+			{
+				ItemName "Power Up Canteen (MvM)"
+				"custom item model" "models/player/items/scout/summer_shades.mdl"
+			}
+			
+			Template Chief_Resists
+			UseHumanModel 2
+			AlwaysGlow 1
+			FastUpdate 1 //Moves fast
+			NoPushaway 1 //For the start
+			DeathSound "=25|mvm/mvm_player_died.wav"
+			UseMeleeThreatPrioritization 1
+			
+			EventChangeAttributes
+			{
+				Default
+				{
+					InterruptAction
+					{
+						Target "360 3270 220" // Behind the rock of spawnbot
+						AimTarget "465 3160 256" // Towards Jeremix
+						
+						Delay 0.15
+						Repeats 1
+						Cooldown 3
+						Duration 0.5
+
+						WaitUntilDone 1
+						OnDoneChangeAttributes "Phase1"
+						
+						Distance 25 
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.6
+					}
+				}
+				Phase1
+				{
+					Taunt //Taunts once @ start
+					{
+						Delay 0.01
+						Repeats 1
+						Name "Taunt: Cheers!"
+					}
+					FireInput //Enlarge thine self.
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "SeelRuntime.ChangeScaleToGiant(self); EntFire(`gf_upper_text`,`Display`)"
+						Repeats 1
+						Delay 2.8
+					}
+					FireInput //And get a fancy boss health bar when you crush the can.
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "self.SetUseBossHealthBar(true); EntFire(`gf_middle_text`,`Display`)"
+						Repeats 1
+						Delay 5.25
+					}
+					VoiceCommand //What a gamer.
+					{
+						Type "Battle cry"
+						Delay 20
+						Cooldown 12
+						Repeats 4
+						IfHealthAbove 7500
+					}
+					
+					AimTrackingInterval 0.3 //Bit worse than Normal Skill to balance it out.
+					Item "Upgradeable TF_WEAPON_SCATTERGUN"
+					ItemAttributes
+					{
+						ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+						"item style override" 1
+						"hold fire until full reload" 1 //thank you raf :3
+						"damage bonus" 1.5 //150 gets resisted down to about 38 per meatshot, max 228 when all connect.
+						"fire rate bonus" 0.4
+						"faster reload rate" 0.8 //0.7*0.8 + 5*0.5*0.8 = 0.56 + 5*0.4 = 2.56
+						"weapon spread bonus" 0.75 //Less likely to get chipped, more likely to get meated.
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.8 //320 HU/s == normal Medic speed - you can outrun them as many classes.
+					}
+			
+					// Starts off SCARILY fast! But slows down once you've done some chip damage (1000).
+					AddAttribute
+					{
+						Item "Player"
+						Name "move speed penalty"
+						Value "0.3" //120 HU/s == Giant Soldier speed
+						Delay 0.1
+						Repeats 1
+						IfHealthBelow 41500
+					}
+					FireInput
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "SINS.ChangeClassIcon(self,`scout_golden_lite`)"
+						Repeats 1
+						Delay 0
+					}
+				}
+				Phase2
+				{
+					Item "Upgradeable TF_WEAPON_FLAMETHROWER"
+					Item "TF_WEAPON_SPELLBOOK"
+					ItemAttributes
+					{
+						ItemName "Upgradeable TF_WEAPON_FLAMETHROWER"
+						"item style override" 1
+						"damage bonus" 1.5 //BEEG damage
+						//No increased flame range, that would be mean to pyro and knight.
+					}
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_SPELLBOOK"
+						"projectile speed decreased" 0.5 //~1020 * 0.5 = 510
+						
+						"mod projectile heat seek power" 10
+						"mod projectile heat aim time" 2
+						"mod projectile heat no predict target speed" 1
+						
+						// "damage penalty" 0.6 Surely you have fire resistance by now.
+					}
+					Spell
+					{
+						Delay 4
+						Cooldown 6
+						Type "Fireball"
+					}
+					FireInput
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "SINS.ChangeClassIcon(self,`pyro_dragon_fury_spell`)"
+						Repeats 1
+						Delay 0
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.3
+					}
+				}
+				Phase3
+				{
+					Attributes HoldFireUntilFullReload
+					Item "The Black Box"
+					ItemAttributes
+					{
+						ItemName "The Black Box"
+						"use original class weapon animations" 1
+						"item style override" 1
+						"fire rate bonus" 0.3
+						"faster reload rate" 0.75
+						"clip size upgrade atomic" 3 //6 total
+						"projectile spread angle penalty" 1
+						"projectile speed decreased" 0.65
+						
+						"damage bonus" 1.5
+						"health on radius damage" 300 //90 damage = 300 health, max 1800 per clip
+					}
+					FireInput
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "SINS.ChangeClassIcon(self,`soldier_blackbox`)"
+						Repeats 1
+						Delay 0
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.3
+					}
+				}
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.1
+				"airblast vulnerability multiplier" 0.1
+				"rage giving scale" 0.34
+				"always allow taunt" 1
+			}
+			// Both chiefs change phase when either reaches 66% or 30% hp.
+			// Done thru VScript in order to ensure they do it synchronously.
+			FireInput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "SeelRuntime.SetChiefPhase(2)"
+				Repeats 1
+				Delay 0
+				IfHealthBelow 28000 //about 66% hp
+			}
+			FireInput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "SeelRuntime.SetChiefPhase(3)"
+				Repeats 1
+				Delay 0
+				IfHealthBelow 13000 //about 30% hp
+			}
+		}
+		// Chief Festive Scout
+		// Sandman Grenades -> SoaS (Festive Axtinguisher?) -> Milk + Crossbow
+		T_TFBot_Chief_Scout_FESTIVE
+		{
+			Name "Festive Fiend Jeremix"
+			Health 42500
+			Class Scout
+			Skill Expert
+			
+			Scale 1
+			Attributes MiniBoss
+			ClassIcon tf2_lite
+			
+			Item "Jeremix's Hat"
+			Item "Jeremix's Shirt"
+			Item "Blizzard Britches"
+			
+			Template Chief_Resists
+			UseHumanModel 2
+			AlwaysGlow 1
+			FastUpdate 1 //Moves fast
+			NoPushaway 1 //For the start
+			DeathSound "=25|mvm/mvm_player_died.wav"
+			UseMeleeThreatPrioritization 1
+			
+			Tag ballbomber
+			SpawnTemplate
+			{
+				Name "PT_GrenadeMimic"
+				Origin "0 0 85" //approx. from eyes
+			}
+			EventChangeAttributes
+			{
+				Default
+				{
+					InterruptAction
+					{
+						Target "465 3160 210" // To Jeremy's right
+						AimTarget "320 3150 256" // Towards Jeremy
+						
+						Delay 0.15
+						Repeats 1
+						Cooldown 3
+						Duration 0.5 
+
+						WaitUntilDone 1
+						OnDoneChangeAttributes "Phase1"
+						
+						Distance 25 
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.6
+					}
+				}
+				Phase1
+				{
+					Taunt //Taunts once @ start
+					{
+						Delay 0.01
+						Repeats 1
+						Name "Taunt: Cheers!"
+					}
+					FireInput //Become GIANT.
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "SeelRuntime.ChangeScaleToGiant(self,`tf2_lite`)"
+						Repeats 1
+						Delay 2.8
+					}
+					FireInput //And get a fancy boss health bar when you crush the can.
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "self.SetUseBossHealthBar(true); EntFire(`gf_lower_text`,`Display`)"
+						Repeats 1
+						Delay 5.25
+					}
+					
+					VoiceCommand //What a gamer.
+					{
+						Type "Battle cry"
+						Delay 20
+						Cooldown 12
+						Repeats 4
+						IfHealthAbove 7500
+					}
+					WeaponRestrictions MeleeOnly
+					DesiredAttackRange 500
+					ExtAttr "AlwaysFireWeaponAlt"
+					Item "The Sandman"
+					ItemAttributes
+					{
+						ItemName "The Sandman"
+						"is_festivized" 1
+						"effect bar recharge rate increased" 0.06 //Every 0.6 seconds
+					}
+					FireInput
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "SINS.ChangeClassIcon(self,`demo_spammer`)"
+						Repeats 1
+						Delay 0
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.8 //320 HU/s == normal Medic speed - you can outrun them as many classes.
+					}
+			
+					// Starts off SCARILY fast! But slows down once you've done some chip damage (1000).
+					AddAttribute
+					{
+						Item "Player"
+						Name "move speed penalty"
+						Value "0.3" //120 HU/s == Giant Soldier speed
+						Delay 0.1
+						Repeats 1
+						IfHealthBelow 41500
+					}
+				}
+				Phase2
+				{
+					WeaponRestrictions PrimaryOnly
+					Item "Sun Stick Tosser"
+					Item "Sun-on-a-Stick"
+					Attributes SuppressFire
+					ItemAttributes
+					{
+						ItemName "Sun-on-a-Stick"
+						"is_passive_weapon" 1
+						"dmg taken from fire reduced" 1
+					}
+					ShootTemplate
+					{
+						Name "PT_RotatingSunStick"
+						ItemName "Sun Stick Tosser"
+						AttachToProjectile 1
+					}
+					FireWeapon
+					{
+						Type "Primary"
+						Cooldown 0.6
+						Duration 0.1
+						Delay 0.5
+						IfSeeTarget 1
+					}
+					FireInput
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "SINS.ChangeClassIcon(self,`scout_sunstick_swordstone`)"
+						Repeats 1
+						Delay 0
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.3
+					}
+				}
+				Phase3
+				{
+					Item "Festive Crusader's Crossbow"
+					Item "Mad Milk"
+					AimAt Head
+					StripItemSlot 2
+					ItemAttributes
+					{
+						ItemName "Festive Crusader's Crossbow"
+						"use original class weapon animations" 1
+						"clip size upgrade atomic" 9
+						"fire rate bonus" 0.85 //Once every 6 ticks
+						"faster reload rate" 1.5
+						"reload full clip at once" 1
+						"damage bonus" 2
+						
+						"projectile penetration" 1
+						
+						"projectile spread angle penalty" 1
+						"projectile speed decreased" 0.5 //1200 HU/s
+					}
+					ItemAttributes
+					{
+						ItemName "Mad Milk"
+						"effect bar recharge rate increased" 0.6
+					}
+					FireInput
+					{
+						Target "!self"
+						Action "RunScriptCode"
+						Param "SINS.ChangeClassIcon(self,`medic_crossbow_burst_penetration`)"
+						Repeats 1
+						Delay 0
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.3
+					}
+				}
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.1
+				"airblast vulnerability multiplier" 0.1
+				"rage giving scale" 0.34
+				"always allow taunt" 1
+			}
+			// Both chiefs change phase when either reaches 66% or 30% hp.
+			// Done thru VScript in order to ensure they do it synchronously.
+			FireInput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "SeelRuntime.SetChiefPhase(2)"
+				Repeats 1
+				Delay 0
+				IfHealthBelow 28000 //about 66% hp
+			}
+			FireInput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "SeelRuntime.SetChiefPhase(3)"
+				Repeats 1
+				Delay 0
+				IfHealthBelow 13000 //about 30% hp
+			}
+		}
+		
+		
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////				Special bots			//////////////////
+		//////////////////////////////////////////////////////////////////////////
+		
+		//////////	Wave 6	//////////
+		
+		T_TFBot_Player
+		{
+			ClassIcon tf2_lite //fuck it this is a standard now
+			UseHumanModel 1
+			AlwaysGlow 1
+			FastUpdate 1 //Moves fast
+			NoPushaway 1 //For the start
+			DeathSound "=25|mvm/mvm_player_died.wav"
+			Tag "playerbot" //Used for backstab resistance.
+			Action Mobber //Do NOT pick up bomb.
+			CharacterAttributes
+			{
+				"dmg taken increased" 0.25
+				"dmg taken from crit reduced" 0.1
+				"health regen" 8
+				"damage force reduction" 0.5
+			}
+		}
+		
+		//Jeremy, Arrogant Attacker. Leader of the bunch.
+		//Scout with sig upgrades. (damage boost, reload rate, resists, regen)
+		T_TFBot_Player_Scout_Jeremy
+		{
+			Template T_TFBot_Player
+			Class Scout
+			Name "Jeremy, Arrogant Attacker"
+			Skill Expert
+			
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			Item "Batsaber"
+			Item "The El Jefe"
+			Item "Aloha Apparel"
+			Item "Lucky No. 42"
+			Item "Scout Flip-Flops"
+			Item "Power Up Canteen (MvM)" //Doesn't actually use these, these are reskinned Summer Shades >:3
+			
+			Attributes HoldFireUntilFullReload
+			DesiredAttackRange 90 //he gets in deep
+			ItemAttributes
+			{
+				ItemName "Power Up Canteen (MvM)"
+				"custom item model" "models/player/items/scout/summer_shades.mdl"
+			}
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"item style override" 1
+				"killstreak tier" 2
+				"killstreak idleeffect" 4 //mean green, cause he's a meanie >8)
+				"damage bonus" 2
+				"fire rate bonus" 0.6
+				"faster reload rate" 0.4
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 1.3
+			}
+			
+			EventChangeAttributes
+			{
+				Default
+				{
+					// FireInput //TEMP bandaid until nav-related bugs get fixed :<
+					// {
+						// Target "!self"
+						// Action "$SetLocalOrigin"
+						// Param "320 3150 210"
+						// Delay 0.1
+						// Repeats 1
+					// }
+					InterruptAction // Stop current bot ai and force the bot to move to a location
+					{
+						Target "320 3150 210" // Frontmost rock of spawnbot
+						AimTarget "128 3000 256" // Diagonally "forward" plus a little up
+						
+						Delay 0.1
+						Repeats 1
+						Cooldown 3
+						Duration 0.5 // How long should the ai be interrupted
+
+						WaitUntilDone 1 // Duration timer starts when he moves to the target location
+						OnDoneChangeAttributes "Fighting" // Once done, switch to this EventChangeAttributes
+						
+						Distance 25 
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.6
+					}
+				}
+				Fighting
+				{
+					Taunt //Taunts once @ start
+					{
+						Delay 0.01
+						Repeats 1
+						Name "Battin' a Thousand Taunt"
+					}
+					VoiceCommand
+					{
+						Type "Battle cry"
+						Delay 6
+						Cooldown 10
+						Repeats 4
+						IfHealthAbove 120
+					}
+					VoiceCommand
+					{
+						Type "Medic"
+						Delay 0
+						Cooldown 15
+						Repeats 4
+						IfHealthBelow 119 //he's a WUSS
+					}
+				}
+			}
+		}
+		//KING JEREMIAH. Flare and burn enthusiast.
+		//Flare-Scatter user with Axtinguisher.
+		T_TFBot_Player_Scout_Flare
+		{
+			Class Scout
+			Name "KING JEREMIAH"
+			Skill Expert
+			Template T_TFBot_Player
+			
+			Item "Upgradeable TF_WEAPON_SCATTERGUN"
+			Item "JEREMIAH's Hat"
+			Item "JEREMIAH's Shirt"
+			Item "JEREMIAH's Boots"
+			
+			Attributes HoldFireUntilFullReload
+			DesiredAttackRange 320 //stays at a moderate distance
+			KeepAway "Target"
+			KeepAwayRadius 220
+			ItemAttributes
+			{
+				ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+				"killstreak tier" 2
+				"killstreak idleeffect" 4 //mean green, cause he's a meanie >8)
+				"paintkit_proto_def_index" 293 //Searing Souls, for fire
+				"set_item_texture_wear" 0.2
+				
+				"override projectile type" 6
+				
+				"mult projectile count" 5
+				"projectile spread angle penalty" 4.5
+				"projectile speed decreased" 0.3 //600 HU/s
+				
+				"fire rate bonus" 0.8
+				"faster reload rate" 0.25
+				
+				"custom kill icon" "flaregun"
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.5
+			}
+			
+			EventChangeAttributes
+			{
+				Default
+				{
+					// FireInput //TEMP bandaid until nav-related bugs get fixed :<
+					// {
+						// Target "!self"
+						// Action "$SetLocalOrigin"
+						// Param "290 3360 210"
+						// Delay 0.1
+						// Repeats 1
+					// }
+					InterruptAction // Stop current bot ai and force the bot to move to a location
+					{
+						Target "290 3360 210" // To Jeremy's left
+						AimTarget "128 3000 256" // Diagonally "forward" plus a little up
+						
+						Delay 0.1
+						Repeats 1
+						Cooldown 3 //Time between each task (Default: 10)
+						Duration 0.5 // How long should the ai be interrupted
+
+						WaitUntilDone 1 // Duration timer starts when he moves to the target location
+						OnDoneChangeAttributes "Fighting" // Once done, switch to this EventChangeAttributes
+						
+						Distance 25 
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.8
+					}
+				}
+				Fighting
+				{
+					Taunt //Taunts once @ start
+					{
+						Delay 0.01
+						Repeats 1
+						Name "Deep Fried Desire Taunt"
+					}
+					VoiceCommand
+					{
+						Type "Battle cry"
+						Delay 5
+						Cooldown 10
+						Repeats 4
+					}
+					
+					Item "TF_WEAPON_SPELLBOOK"
+					ItemAttributes
+					{
+						ItemName "TF_WEAPON_SPELLBOOK"
+						"projectile speed decreased" 0.7 //~1020 * 0.7 = 714
+						
+						"mod projectile heat seek power" 10
+						"mod projectile heat aim time" 2
+						"mod projectile heat no predict target speed" 1
+						
+						"dmg penalty vs players" 0.6
+					}
+					Spell
+					{
+						Delay 5
+						Cooldown 6
+						Type "Fireball"
+					}
+				}
+			}
+		}
+		
+		//Jeremius, Blood-oath Lord. Maximum edgelord with bleed spam.
+		//Throws cleavers, Shortstops you while running away like a bastard.
+		T_TFBot_Player_Scout_ShortstopCleaver
+		{
+			Class Scout
+			Name "Jeremius the Blood-oath Lord"
+			Skill Expert
+			Template T_TFBot_Player
+			
+			Item "The Shortstop"
+			Item "The Flying Guillotine"
+			Item "Zombie Scout"
+			Item "Head Hunter"
+			Item "Claws and Infect"
+			Item "Deadbeats"
+			
+			DesiredAttackRange 400
+			KeepAway "Target"
+			KeepAwayRadius 350 //stays at a moderate distance, like a coward.
+			ItemAttributes
+			{
+				ItemName "The Shortstop"
+				"killstreak tier" 2
+				"killstreak idleeffect" 6 //Villainous Violet, cause he's edgy
+				"paintkit_proto_def_index" 204 //Kill Covered
+				"set_item_texture_wear" 0.2
+				
+				"fire rate bonus" 0.6
+				"damage bonus" 2
+				"clip size bonus" 1.5
+			}
+			
+			EventChangeAttributes
+			{
+				Default
+				{
+					// FireInput //TEMP bandaid until nav-related bugs get fixed :<
+					// {
+						// Target "!self"
+						// Action "$SetLocalOrigin"
+						// Param "465 3160 210"
+						// Delay 0.1
+						// Repeats 1
+					// }
+					InterruptAction // Stop current bot ai and force the bot to move to a location
+					{
+						Target "465 3160 210" // To Jeremy's right
+						AimTarget "128 3000 256" // Diagonally "forward" plus a little up
+						
+						Delay 0.1
+						Repeats 1
+						Cooldown 3 //Time between each task (Default: 10)
+						Duration 0.5 // How long should the ai be interrupted
+
+						WaitUntilDone 1 // Duration timer starts when he moves to the target location
+						OnDoneChangeAttributes "Fighting" // Once done, switch to this EventChangeAttributes
+						
+						Distance 25 
+					}
+				}
+				Fighting
+				{
+					Taunt //Taunts once @ start
+					{
+						Delay 0.01
+						Repeats 1
+						Name "Taunt: Burstchester"
+					}
+					VoiceCommand
+					{
+						Type "Jeers"
+						Delay 6
+						Cooldown 10
+						Repeats 4
+					}
+					
+				}
+			}
+		}
+		
+		//Jester Jerome. A tricky fellow that teleports around the map.
+		//Sneaks around with the Back Scatter, tries to strafe around you.
+		//TODO: add "teleports around the map" functionality.
+		T_TFBot_Player_Scout_BackScatter
+		{
+			Class Scout
+			Name "Jester Jerome"
+			Skill Expert
+			Template T_TFBot_Player
+			
+			Item "The Back Scatter"
+			Item "Jerome's Hat"
+			Item "Jerome's Shirt"
+			Item "Jerome's Boots"
+			
+			Attributes HoldFireUntilFullReload
+			MoveBehindEnemy 1
+			DesiredAttackRange 150
+			ItemAttributes
+			{
+				ItemName "The Back Scatter"
+				"killstreak tier" 2
+				"killstreak idleeffect" 1 //Team Shine, cause he's actually kinda okay
+				"paintkit_proto_def_index" 204 //Kill Covered
+				"set_item_texture_wear" 0.2
+				
+				"fire rate bonus" 0.8
+				"damage bonus" 2
+				"faster reload rate" 0.4
+				"projectile penetration" 1
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 1.2
+				"increased jump height" 1.2 //In case he gets stuck, I suppose.
+			}
+			
+			EventChangeAttributes
+			{
+				Default
+				{
+					// FireInput //TEMP bandaid until nav-related bugs get fixed :<
+					// {
+						// Target "!self"
+						// Action "$SetLocalOrigin"
+						// Param "475 3400 245"
+						// Delay 0.1
+						// Repeats 1
+					// }
+					InterruptAction // Stop current bot ai and force the bot to move to a location
+					{
+						Target "475 3400 245" // Behind Jeremy
+						AimTarget "128 3000 256" // Diagonally "forward" plus a little up
+						
+						Delay 0.1
+						Repeats 1
+						Cooldown 3 //Time between each task (Default: 10)
+						Duration 0.5 // How long should the ai be interrupted
+
+						WaitUntilDone 1 // Duration timer starts when he moves to the target location
+						OnDoneChangeAttributes "Fighting" // Once done, switch to this EventChangeAttributes
+						
+						Distance 25 
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.55
+					}
+				}
+				Fighting
+				{
+					Taunt //Taunts once @ start
+					{
+						Delay 0.01
+						Repeats 1
+						Name "Taunt: Peace Out"
+					}
+					VoiceCommand
+					{
+						Type "Positive"
+						Delay 6
+						Cooldown 10
+						Repeats 4
+					}
+					
+				}
+			}
+		}
+		//The Festive Jeremix. A feisty fellow that is just a little guy!
+		//Runs around with the Force-a-Nature and Bonk!, getting in your way while invulnerable.
+		T_TFBot_Player_Scout_FAN_Bonk
+		{
+			Class Scout
+			Name "The Festive Jeremix"
+			Skill Expert
+			Template T_TFBot_Player
+			
+			Item "Festive Force-a-Nature"
+			Item "Festive Bonk 2014"
+			Item "Jeremix's Hat"
+			Item "Jeremix's Shirt"
+			Item "Blizzard Britches"
+			
+			MoveBehindEnemy 300
+			DesiredAttackRange 150
+			ItemAttributes
+			{
+				ItemName "Festive Force-a-Nature"
+				"killstreak tier" 2
+				"killstreak idleeffect" 1 //Team Shine, cause he's actually kinda okay
+				"paintkit_proto_def_index" 204 //Kill Covered
+				"set_item_texture_wear" 0.2
+				
+				"damage bonus" 2
+				"clip size bonus" 2
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 1.2
+				"increased jump height" 1.2 //In case he gets stuck, I suppose.
+			}
+			EventChangeAttributes
+			{
+				Default
+				{
+					// FireInput //TEMP bandaid until nav-related bugs get fixed :<
+					// {
+						// Target "!self"
+						// Action "$SetLocalOrigin"
+						// Param "375 3480 225"
+						// Delay 0.1
+						// Repeats 1
+					// }
+					InterruptAction // Stop current bot ai and force the bot to move to a location
+					{
+						Target "375 3480 225" // Behind Jeremy's right
+						AimTarget "128 3000 256" // Diagonally "forward" plus a little up
+						
+						Delay 0.1
+						Repeats 1
+						Cooldown 3 //Time between each task (Default: 10)
+						Duration 0.5 // How long should the ai be interrupted
+
+						WaitUntilDone 1 // Duration timer starts when he moves to the target location
+						OnDoneChangeAttributes "Fighting" // Once done, switch to this EventChangeAttributes
+						
+						Distance 25 
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.7
+					}
+				}
+				Fighting
+				{
+					Taunt //Taunts once @ start
+					{
+						Delay 0.01
+						Repeats 1
+						Name "Taunt: The Boston Breakdance"
+					}
+					VoiceCommand
+					{
+						Type "Positive"
+						Delay 6
+						Cooldown 10
+						Repeats 4
+					}
+					
+				}
+			}
+		}
+		//Jeremessiah. The bastard.
+		//Uses a Soda Popper, tosses Milk (with minor slow?), and tries to Mark you sometimes.
+		//What an ass.
+		T_TFBot_Player_Scout_TheBastard
+		{
+			Class Scout
+			Name "Your Savior: Jeremessiah"
+			Skill Expert
+			Template T_TFBot_Player
+			
+			Item "The Soda Popper"
+			Item "Mad Milk"
+			Item "The Fan O' War"
+			Item "Bastard's Hat"
+			Item "Prick's Shirt"
+			Item "Jerk's Boots"
+			
+			MoveBehindEnemy 1
+			DesiredAttackRange 150
+			ItemAttributes
+			{
+				ItemName "The Soda Popper"
+				"killstreak tier" 2
+				"killstreak idleeffect" 5 //Agonizing Emerald, because it just barely doesn't fit. fuck you
+				"paintkit_proto_def_index" 407 //Health and Hell. but green. GREEN.
+				"set_item_texture_wear" 0
+				"attach particle effect" 702 //Isotope. of course you have this. bastard.
+				
+				"fire rate bonus" 0.4 //of course you abuse ghost upgrades
+				"damage bonus" 2
+				"clip size bonus" 2
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 1.3
+				"increased jump height" 1.6 //WHY WOULD YOU NEED THIS MUCH JUMP HEIGHT
+			}
+			EventChangeAttributes
+			{
+				Default
+				{
+					// FireInput //TEMP bandaid until nav-related bugs get fixed :<
+					// {
+						// Target "!self"
+						// Action "$SetLocalOrigin"
+						// Param "590 3270 235"
+						// Delay 0.1
+						// Repeats 1
+					// }
+					InterruptAction // Stop current bot ai and force the bot to move to a location
+					{
+						Target "590 3270 235" // Behind Jeremy's left
+						AimTarget "128 3000 256" // Diagonally "forward" plus a little up
+						
+						Delay 0.1
+						Repeats 1
+						Cooldown 3 //Time between each task (Default: 10)
+						Duration 0.5 // How long should the ai be interrupted
+
+						WaitUntilDone 1 // Duration timer starts when he moves to the target location
+						OnDoneChangeAttributes "Fighting" // Once done, switch to this EventChangeAttributes
+						
+						Distance 25 
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.5
+					}
+				}
+				Fighting
+				{
+					Taunt //Taunts once @ start
+					{
+						Delay 0.01
+						Repeats 1
+						Name "Laugh Taunt"
+					}
+					VoiceCommand
+					{
+						Type "Positive"
+						Delay 6
+						Cooldown 10
+						Repeats 4
+					}
+					
+				}
+			}
+		}
+		
+		// RED version of Jerome when he's helping out!
+		T_TFBot_Player_Scout_BackScatter_Ally
+		{
+			Class Scout
+			Name "Jolly Jester Jerome"
+			Skill Expert
+			Template T_TFBot_Player
+			
+			ClassIcon red_lite
+			AddCond { Name "TF_COND_REPROGRAMMED" }
+			
+			Item "The Back Scatter"
+			Item "Mad Milk"
+			Item "Jerome's Hat"
+			Item "Jerome's Shirt"
+			Item "Jerome's Boots"
+			Item "Battery Canteens"
+			
+			ExtAttr SuppressCanteenUse
+			
+			Attributes HoldFireUntilFullReload
+			MoveBehindEnemy 1
+			DesiredAttackRange 150
+			ItemAttributes
+			{
+				ItemName "The Back Scatter"
+				"killstreak tier" 2
+				"killstreak idleeffect" 1 //Team Shine, cause he's actually kinda okay
+				"paintkit_proto_def_index" 204 //Kill Covered
+				"set_item_texture_wear" 0.2
+				
+				"fire rate bonus" 0.6
+				"damage bonus" 2
+				"faster reload rate" 0.4
+				"projectile penetration" 1
+				"heal on kill" 50
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 1.2
+				"increased jump height" 1.2 //In case he gets stuck, I suppose.
+			}
+			
+			ItemAttributes
+			{
+				ItemName "Battery Canteens"
+				"ubercharge" 1
+				"powerup charges" 1
+				"powerup duration" 5
+			}
+			FireWeapon
+			{
+				Type "Action"
+				Repeats 1
+				IfHealthBelow 45
+				IfSeeTarget 1
+				Delay 0.03
+				Cooldown 1
+			}
+			
+			VoiceCommand
+			{
+				Type "Positive"
+				Delay 6
+				Cooldown 10
+				Repeats 4
+			}
+		}
+	}
+	
+	PointTemplates
+	{
+		CallFuncOnSelf
+		{
+			OnSpawnOutput
+			{
+				Target "!self"
+				Action "RunScriptCode"
+				Param "TankToBeCarried(self)"
+			}
+		}
+		
+		PT_RotatingSunStick
+		{
+            OnSpawnOutput
+            {
+                Target "!activator"
+                Action "AddOutput"
+                Param "rendermode 10"
+                Delay 0.01
+            }
+            prop_dynamic
+            {
+                "targetname" "sunstick"
+                "parentname" "rot"
+                "model" "models/workshop/weapons/c_models/c_rift_fire_mace/c_rift_fire_mace.mdl"
+                "origin" "0 0 -20"
+				"angles" "0 0 0"
+				"solid" "0"
+            }
+            func_rotating
+            {
+                "targetname" "rot"
+                "spawnflags" 73 //not solid, spin on Y, start active
+                "fanfriction" 100
+                "maxspeed" 400
+            }
+		}
+		PT_GrenadeMimic
+		{
+            OnSpawnOutput
+            {
+                Target "grenade_mimic"
+                Action "$SetOwner"
+                Param "!activator"
+                Delay 0
+            }
+			OnSpawnOutput
+			{
+				Target "grenade_mimic"
+				Action "$RotateTowards"
+				Param "!activator"
+				Delay 0.01
+			}
+            tf_point_weapon_mimic
+            {
+                "targetname" "grenade_mimic"
+                "$weaponname" "Ball Bomber"
+				"$modules" "rotator"
+				"$lookat" "aim"
+				"$rotationspeedx" "350"
+				"$rotationspeedy" "350"
+            }
+		}
+		PT_Text_HumanMobbers
+		{
+			training_annotation
+			{
+				"targetname" "mobber_infotext"
+				"display_text" "HUMAN enemies IGNORE the BOMB, but will relentlessly HUNT PLAYERS down!"
+				"lifetime" "8"
+				"origin" "320 3150 210"
+			}
+		}
+		PT_Text_LaserChiefs
+		{
+			game_text
+			{
+				"targetname" "laserchiefs_text_1"
+				"message" "MOLECULAR MANGLER"
+				"color" "214 2 112"
+				"color2" "255 137 255"
+				"x" "-1"
+				"y" "0.4"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "2"
+				"fxtime" "0.2"
+				"fadein" "0.02"
+				"fadeout" "1"
+				"holdtime" "6"
+				"origin" "-800 -3200 101"
+			}
+			game_text
+			{
+				"targetname" "laserchiefs_text_2"
+				"message" "PARTICLE PULVERIZER"
+				"color" "155 79 150"
+				"color2" "255 137 255"
+				"x" "-1"
+				"y" "0.45"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "3"
+				"fxtime" "0.2"
+				"fadein" "0.02"
+				"fadeout" "1"
+				"holdtime" "5"
+				"origin" "-800 -3200 101"
+			}
+			game_text
+			{
+				"targetname" "laserchiefs_text_3"
+				"message" "ATOMIC ANNIHILATOR"
+				"color" "0 56 168"
+				"color2" "255 137 255"
+				"x" "-1"
+				"y" "0.5"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "4"
+				"fxtime" "0.2"
+				"fadein" "0.04"
+				"fadeout" "1"
+				"holdtime" "4"
+				"origin" "-800 -3200 101"
+			}
+		}
+		
+		PT_SentrySpawner
+		{
+			KeepAlive 1
+			
+			OnSpawnOutput
+			{
+				Target "sentry_obj"
+				Action "$SetProp$m_hBuilder"
+				Param "@e@m_hOwnerEntity@!activator"
+				Delay 0.03
+			}
+			OnSpawnOutput
+			{
+				Target "sentry_obj"
+				Action "$SetOwner"
+				Param "@e@m_hOwnerEntity@!activator"	
+				Delay 0.03
+			}
+			
+			OnSpawnOutput
+			{
+				Target "sentry_box"
+				Action "RunScriptCode"
+				Param "
+//PrecacheEntityFromTable({ classname = `info_particle_system`, effect_name = `flaregun_energyfield_blue` })
+local hProj = self.GetMoveParent();
+if (hProj != null)
+{
+hProj.SetCollisionGroup(23)
+for (local hChild = hProj.FirstMoveChild(); hChild != null; hChild = hChild.NextMovePeer())
+{
+	if(hChild.GetClassname() == `obj_sentrygun`)
+	{
+		self.ValidateScriptScope();
+		self.GetScriptScope().hSentry <- hChild;
+		break;
+	}
+}
+}
+else
+{
+	self.ValidateScriptScope();
+	self.GetScriptScope().hSentry <- null;
+}"
+				Delay 0.015
+			}
+
+			OnSpawnOutput
+			{
+				Target "sentrymodel_relay"
+				Action "FireUser1"
+			}
+			OnParentKilledOutput
+			{
+				Target "sentrymodel_relay"
+				Action "Trigger"
+			}
+
+			OnParentKilledOutput
+			{
+				Target "sentrymodel_relay"
+				Action "Kill"
+				Delay 0.045
+			}
+
+			logic_relay 
+			{
+				"targetname" "sentrymodel_relay"
+
+				"OnUser1" "sentry_obj,Hide,,0,-1"
+				"OnUser1" "sentry_obj,SetHealth,5000,0,-1" 
+				"OnUser1" "sentry_obj,$SetProp$m_bDisabled,1,0.015,-1" //The sentry is actually hittable for a bit while flying, undesirably so. Bit of a bandaid fix, though.
+				// "OnUser1" "!activator,RunScriptCode,printl(self.GetCollisionGroup()),0,-1" //ROCKET_BUT_NOT_WITH_OTHER_ROCKETS: solid to hitscan (egh), physics, world
+				"OnUser1" "sentry_obj,RunScriptCode,self.SetCollisionGroup(23),0,-1" //COMBATOBJECT: solid to everything but players!
+				
+				"OnTrigger" "sentry_box,SetModel,models/buildables/sentry1_heavy.mdl,0,-1"
+				"OnTrigger" "sentry_box,SetAnimation,build,0.015,-1"
+				"OnTrigger" "sentry_box,SetPlaybackRate,3,0.03,-1"
+				"OnTrigger" "sentry_box,RunScriptCode,SeelRuntime.CheckSentryStuck(self),0.03,-1"
+				"OnTrigger" "sentry_obj,RunScriptCode,SeelRuntime.CheckSentryStuck(self),0.03,-1"
+			}
+			prop_dynamic
+			{
+				"targetname" "sentry_box"
+				"model" "models/weapons/w_models/w_toolbox.mdl"
+				"solid" "0"
+				"skin" "1"
+				"renderfx" "15"
+				"OnAnimationDone" "!caller,RunScriptCode,SeelRuntime.NextAnimation(self),0,-1"
+			}
+			obj_sentrygun
+			{
+				"targetname" "sentry_obj"
+				"teamnum" "3"
+				"defaultupgrade" "2"
+				"SolidToPlayer" "0"
+				"spawnflags" "8" // inf ammo
+				"skin" "1"
+				"$cannotbesapped" 1
+				"$OnKilled" "@p@sentry_obj,Kill,,-1,-1"
+			}
+		}
+		PT_DispenserBackpack
+		{
+			OnSpawnOutput
+			{
+				Target "dispenser_relay"
+				Action "Trigger"
+				Delay 0.1
+			}
+			logic_relay
+			{
+				"targetname" "dispenser_relay"
+				"OnTrigger" "dispenserbp,$SetOwner,!activator,0,-1"
+				"OnTrigger" "dispenserbp,SetBuilder,!activator,0,-1"
+				"OnTrigger" "dispenserbp,RunScriptCode,self.SetSolid(0),0,-1"
+				"OnTrigger" "dispenserbp,RunScriptCode,SeelRuntime.FindTouchTrigger(self),0,-1"
+				"OnTrigger" "dispenserbp,SetModelScale,1,0,-1"
+				"OnTrigger" "dispenserbp,$SetLocalOrigin,0 20 30,0,-1"
+			}
+			obj_dispenser
+			{
+				"targetname" "dispenserbp"
+				"angles" "-90 90 0" //X = flat against back, Y = perpendicular to scout facing direction
+				"origin" "0 200 30" //Y = up/down, Z = move back out of torso
+				"teamnum" 3 //blu
+				"defaultupgrade" 2
+				
+				// "$modules" "fakeparent"
+				// "$fakeparentoffset" "0 20 35"
+				// "$fakeparentrotation" "-90 90 0"
+				// "$bone" "bip_spine_0"
+				
+				"$attributeoverride" 1 //Since attributes don't want to play nice...
+				"$radiusmult" 5
+				"$ratemult" 5
+			}
+		}
+		PT_PortableTeleport
+		{
+			OnParentKilledOutput
+			{
+				Target "!activator"
+				Action "RunScriptCode"
+				Param "SeelRuntime.SpawnTele(self)"
+				Delay -1
+			}
+			info_teleport_destination
+			{
+				"targetname" "_teleporterscoutchecker"
+			}
+		}
+		
+		PT_HealParticle
+		{
+			OnSpawnOutput
+			{
+				Target "nurse_relay"
+				Action "Trigger"
+			}
+			info_particle_system
+			{
+				"targetname" "nurse_particle"
+				"start_active" 1
+				"effect_name" "healthgained_blu_giant"
+				"origin" "0 0 95"
+			}
+			logic_relay
+			{
+				"targetname" "nurse_relay"
+				"spawnflags" 2
+				
+				"OnTrigger" "nurse_particle,Start,,0,-1"
+				"OnTrigger" "nurse_particle,Stop,,1,-1"
+				"OnTrigger" "nurse_relay,FireUser1,,2,-1"
+				
+				"OnUser1" "nurse_particle,Start,,0,-1"
+				"OnUser1" "nurse_particle,Stop,,1,-1"
+				"OnUser1" "nurse_relay,Trigger,,2,-1"
+			}
+		}
+		PT_Text_QueenBee
+		{
+			game_text
+			{
+				"targetname" "queenbee_text_1"
+				"message" "MURDEROUS MOTHERLY MONARCH"
+				"color" "255 159 25"
+				"color2" "204 92 12"
+				"x" "-1"
+				"y" "0.4"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "2"
+				"fxtime" "0.2"
+				"fadein" "0.02"
+				"fadeout" "1"
+				"holdtime" "4.84"
+				"origin" "-800 -3200 101"
+			}
+			game_text
+			{
+				"targetname" "queenbee_text_2"
+				"message" "KILLER BEE QUEEN"
+				"color" "255 0 64"
+				"color2" "204 92 12"
+				"x" "-1"
+				"y" "0.5"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "4"
+				"fxtime" "0.2"
+				"fadein" "0.04"
+				"fadeout" "1"
+				"holdtime" "4"
+				"origin" "-800 -3200 101"
+			}
+		}
+		// Queen Bee logic.
+		PT_QueenBeeLogic
+		{
+			logic_relay
+			{
+				"targetname" "queenbee_spawn_relay"
+				
+				// Show cool and awesome titles.
+				"OnTrigger" "queenbee_text_1,Display,,0,-1"
+				"OnTrigger" "queenbee_text_2,Display,,0.84,-1"
+				
+				// Pause all support wavespawns.
+				"OnTrigger" "pop_interface,$PauseWavespawn,Support90,0,-1"
+				"OnTrigger" "pop_interface,$PauseWavespawn,Support80,0,-1"
+				"OnTrigger" "pop_interface,$PauseWavespawn,Support70,0,-1"
+				"OnTrigger" "pop_interface,$PauseWavespawn,Support60,0,-1"
+				"OnTrigger" "pop_interface,$PauseWavespawn,Support50,0,-1"
+				"OnTrigger" "pop_interface,$PauseWavespawn,Support40,0,-1"
+				"OnTrigger" "pop_interface,$PauseWavespawn,Support30,0,-1"
+				"OnTrigger" "pop_interface,$PauseWavespawn,Support20,0,-1"
+				"OnTrigger" "pop_interface,$PauseWavespawn,Support10,0,-1"
+			}
+		}
+		//Dummy entities used to bar bots from spawning til phase swap.
+		PT_QueenBeeDummy
+		{
+			info_teleport_destination
+			{
+				"targetname" "queenbee_tele_next"
+			}
+		}
+		PT_Teleporter
+		{
+			NoFixup 1
+			OnSpawnOutput
+			{
+				Target "tp"
+				Action "AddOutput"
+				Param "effects 32"
+				Delay 0
+			}
+			OnSpawnOutput
+			{
+				Target "tp"
+				Action "RunScriptCode"
+				Param "self.SetSolid(0)"
+				Delay 0.1
+			}
+			obj_teleporter
+			{
+				"targetname" "tp"
+				"spawnflags" "2"
+				"teamnum" "3"
+				"origin" "0 0 125"
+				"solid" "0"
+				"teleportertype" "2"
+				"$TeleportWhere" "spawnbot_chief"
+			}
+		}
+		PT_SecondBomb
+		{
+			filter_tf_bot_has_tag
+			{
+				"targetname" "filter_chief"
+				"tags" "chief_soda"
+				"require_all_tags" "1"
+			}
+			item_teamflag
+			{
+				"targetname" "intel2"
+				"origin" "-1750 4089 248"
+				"trail_effect" "3"
+				"TeamNum" "3"
+				"tags" "bomb_carrier"
+				"ReturnTime" "60000"
+				"ReturnBetweenWaves" "1"
+				"GameType" "1"
+				"StartDisabled" "0"
+				"flag_trail" "flagtrail"
+				"flag_paper" "player_intel_papertrail"
+				"flag_model" "models/props_td/atom_bomb.mdl"
+				"flag_icon" "../hud/objectives_flagpanel_carried"
+				
+				"$filter" "filter_chief"
+				
+				"OnPickupTeam2" "!self,SetTeam,0,0,-1" //Enables some nice colors.
+				"OnDrop" "!self,SetTeam,3,0,-1"
+			}
+		}
+		PT_PowerupLogic
+		{
+            OnSpawnOutput
+			{
+				Target "powerup_haver_target"
+				Action "SetParent"
+				Param "!activator"
+				Delay 0.01
+			}
+            OnParentKilledOutput
+            {
+                Target "item_powerup_rune"
+                Action "Kill"
+                Delay 0
+            }
+            info_target
+            {
+                "targetname" "powerup_haver_target"
+            }
+		}
+		PT_ProjShield
+		{
+			NoFixup 1
+			OnSpawnOutput
+			{
+				Target "projshield"
+				Action "$SetOwner"
+				Param "!activator"
+				Delay 0.05
+			}
+			entity_medigun_shield
+			{
+				"targetname" "projshield"
+				"origin" "150 0 0"
+				"spawnflags" "1" //No expire, no blocking line-of-sight
+				"teamnum" "3"
+				"skin" "1"
+			}
+		}
+		
+		PT_Text_SweatyScoutSquad
+		{
+			logic_relay
+			{
+				"targetname" "wcq_text_relay"
+				"OnTrigger" "random_upper_text,PickRandom,,0,-1"
+				"OnTrigger" "wcq_lower_text,Display,,0.84,-1"
+			}
+			logic_case
+			{
+				"targetname" "random_upper_text"
+				"OnCase01" "wcq_upper_text_1,Display,,0,-1"
+				"OnCase02" "wcq_upper_text_2,Display,,0,-1"
+			}
+			game_text
+			{
+				"targetname" "wcq_upper_text_1"
+				"message" "STRAIGHT FROM COMPETITIVE 6s"
+				"color" "255 235 200"
+				"color2" "0 0 0"
+				"x" "-1"
+				"y" "0.42"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "2"
+				"fxtime" "0.2"
+				"fadein" "0.02"
+				"fadeout" "1"
+				"holdtime" "4.84"
+				"origin" "-800 -3200 101"
+			}
+			game_text
+			{
+				"targetname" "wcq_upper_text_2"
+				"message" "THE PROFESSIONAL PUBSTOMPERS"
+				"color" "255 235 200"
+				"color2" "0 0 0"
+				"x" "-1"
+				"y" "0.42"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "2"
+				"fxtime" "0.2"
+				"fadein" "0.02"
+				"fadeout" "1"
+				"holdtime" "4.84"
+				"origin" "-800 -3200 101"
+			}
+			game_text
+			{
+				"targetname" "wcq_lower_text"
+				"message" "SWEATY SCOUT S.Q.U.A.D."
+				"color" "250 200 80"
+				"color2" "250 80 60"
+				"x" "-1"
+				"y" "0.55"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "4"
+				"fxtime" "0.2"
+				"fadein" "0.04"
+				"fadeout" "1"
+				"holdtime" "4"
+				"origin" "-800 -3200 101"
+			}
+		}
+		//Silly way of making a "sudden" projectile shield work.
+		//This PT spawns it invisibly and high in the air; when the related bot drinks its Shield Shake,
+		//it's set to become visible once more and block attacks.
+		PT_SodaBossStuff_Hidden
+		{
+			NoFixup 1
+			OnSpawnOutput
+			{
+				Target "projshield"
+				Action "$SetOwner"
+				Param "!activator"
+				Delay 0.015
+			}
+			OnSpawnOutput
+			{
+				Target "projshield"
+				Action "SetModel"
+				Param "models/empty.mdl"
+				Delay 0.03
+			}
+			entity_medigun_shield
+			{
+				"targetname" "projshield"
+				"origin" "150 0 0"
+				"spawnflags" "1" //No expire, no blocking line-of-sight
+				"teamnum" "3"
+				"skin" "1"
+				
+				"rendermode" "1" //Render with transparent alpha.
+				"renderamt" "150" //Default transparency.
+			}
+			
+			logic_relay
+			{
+				"targetname" "soda_relay"
+				//Bonch!, can be used by any bot.
+				"spawnflags" 2 //Ensures multiple bots can do this.
+				"OnUser1" "!activator,$AddCond,29,1.2,-1"
+				"OnUser1" "!activator,$AddItemAttribute,attachment scale|1.25|8,1.2,-1"
+				"OnUser1" "!activator,$PlaySound,=80|items/samurai/tf_conch.wav,0.2,-1"
+				
+				// TEMPORARILY REMOVED, for testing.
+				//Multi-Pop, for multiple attributes being added.
+				"OnUser2" "!activator,$AddItemAttribute,mult projectile count|3|0"
+				"OnUser2" "!activator,$AddItemAttribute,ignores other projectiles|1|0"
+				"OnUser2" "!activator,$AddItemAttribute,projectile spread angle penalty|3.5|0"
+				"OnUser2" "!activator,$AddItemAttribute,damage penalty|0.75|0" //idk if this balances it out at all :crab:
+				
+				//I'm doing this bc EntFire() doesn't want to cooperate.
+				"OnUser4" "!activator,SetModelScale,1,0.05,-1"
+				"OnUser4" "!activator,RunScriptCode,SeelRuntime.RemoveBuddha(self),0.075,-1"
+				"OnUser4" "!activator,$Suicide,,0.1,-1"
+				
+				//Shield Shake
+				"OnTrigger" "projshield,SetModel,models/props_mvm/mvm_player_shield.mdl,1.2,-1"
+				
+				//This is a little bleh, but it works, dunnit?
+				"OnTrigger" "projshield,$PlaySound,weapons/medi_shield_retract.wav,6,-1"
+				"OnTrigger" "projshield,Alpha,50,6.4,-1" // Normally the alpha swaps from 150 to 100, but that's a bit too vague for my liking.
+				"OnTrigger" "projshield,Alpha,150,6.8,-1"
+				"OnTrigger" "projshield,Alpha,50,7.2,-1"
+				"OnTrigger" "projshield,Alpha,150,7.6,-1"
+				"OnTrigger" "projshield,Alpha,50,7.95,-1"
+				"OnTrigger" "projshield,Alpha,150,8.1,-1"
+				
+				"OnTrigger" "projshield,SetModel,models/empty.mdl,8,-1"
+			}
+			
+			game_text
+			{
+				"targetname" "soda_upper_text"
+				"message" "HIS GLORIOUS RETURN"
+				"color" "220 175 235"
+				"color2" "255 255 255"
+				"x" "-1"
+				"y" "0.42"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "2"
+				"fxtime" "0.2"
+				"fadein" "0.02"
+				"fadeout" "1"
+				"holdtime" "6.45"
+				"origin" "-800 -3200 101"
+			}
+			game_text
+			{
+				"targetname" "soda_lower_text"
+				"message" "JEREMESSIAH, CARBONATED DOOM"
+				"color" "200 75 200"
+				"color2" "180 100 195"
+				"x" "-1"
+				"y" "0.55"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "4"
+				"fxtime" "0.2"
+				"fadein" "0.02"
+				"fadeout" "1"
+				"holdtime" "4"
+				"origin" "-800 -3200 101"
+			}
+		}
+		PT_Bonch
+		{
+			logic_relay
+			{
+				"targetname" "bonch_relay"
+				//Bonch! can be used by any bot.
+				"spawnflags" 2 //Ensures multiple bots can do this.
+				"OnUser1" "!activator,$AddCond,29,1.2,-1"
+				"OnUser1" "!activator,$AddItemAttribute,attachment scale|0.95|8,1.2,-1"
+				"OnUser1" "!activator,$PlaySound,=80|items/samurai/tf_conch.wav,0.2,-1"
+			}
+		}
+		PT_Text_GOLD_FESTIVE
+		{
+			game_text
+			{
+				"targetname" "gf_upper_text"
+				"message" "SHINY DUO, GRAND FINALE"
+				"color" "215 128 60"
+				"color2" "0 0 0"
+				"x" "-1"
+				"y" "0.42"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "2"
+				"fxtime" "0.2"
+				"fadein" "0.02"
+				"fadeout" "1"
+				"holdtime" "6.45"
+				"origin" "-800 -3200 101"
+			}
+			game_text
+			{
+				"targetname" "gf_middle_text"
+				"message" "JEREMY: AUSTRALIUM ASSAILANT"
+				"color" "225 170 0"
+				"color2" "145 115 0"
+				"x" "-1"
+				"y" "0.485"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "3"
+				"fxtime" "0.2"
+				"fadein" "0.02"
+				"fadeout" "1"
+				"holdtime" "5"
+				"origin" "-800 -3200 101"
+			}
+			game_text
+			{
+				"targetname" "gf_lower_text"
+				"message" "JEREMIX: FESTIVE FIEND"
+				"color" "255 235 200"
+				"color2" "0 0 0"
+				"x" "-1"
+				"y" "0.55"
+				"spawnflags" "1"
+				"effect" "2"
+				"channel" "4"
+				"fxtime" "0.2"
+				"fadein" "0.02"
+				"fadeout" "1"
+				"holdtime" "5"
+				"origin" "-800 -3200 101"
+			}
+		}
+	}
+	
+	ExtraSpawnPoint
+	{
+		Name "spawnbot_final"
+		StartDisabled 1
+		TeamNum 3
+		X "912"
+		Y "3850"
+		Z "302"
+	}
+	ExtraSpawnPoint
+	{
+		Name "spawnbot_hatch"
+		TeamNum 3
+		X "3800"
+		Y "-720"
+		Z "25"
+	}
+	
+	CustomWeapon
+	{
+		"Sun Stick Tosser"
+		{
+			OriginalItemName "The Rescue Ranger"
+			"projectile gravity" -1
+			"projectile speed decreased" 0.35 //840, about 80% of a rocket's speed
+			
+			"penetrate teammates" 1
+			"projectile penetration" 1
+			"arrow hit kill time" 0.1
+			// "projectile lifetime" 10
+			// "grenade bounce speed" 0.3
+			
+			"no damage falloff" 1
+			"damage penalty" 0.7 //28
+			"crit vs burning players" 1
+			"remove damage type" 536870912 //DMG_BUCKSHOT, the bullet damage it deals.
+			"add damage type" 128 //DMG_CLUB, melee damage.
+			
+			"fire rate bonus" 0.6 //0.375
+			"mod max primary clip override" -1
+			
+			"custom projectile model" "models/weapons/w_models/w_drg_ball.mdl"
+			"custom item model" "models/workshop/weapons/c_models/c_rift_fire_mace/c_rift_fire_mace.mdl"
+			"custom weapon fire sound" "common/null.wav"
+			"projectile trail particle" "~player_intel_trail_blue"
+		}
+		"Ball Bomber"
+		{
+			OriginalItemName "The Iron Bomber"
+			"damage penalty" 1
+			"projectile trail particle" "stunballtrail_blue"
+			"no self blast dmg" 2
+			"custom kill icon" "iron_bomber"
+		}
+		"Twat's Scattergun"
+		{
+			OriginalItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+			"killstreak tier" 2
+			"killstreak idleeffect" 1 //Team Shine cause he IS the team.
+			"paintkit_proto_def_index" 414 //Bomb Carrier, because now we're mixing in BLUE.
+			"set_item_texture_wear" 0
+			"attach particle effect" 246 //Startrance for fanciness. Doesn't even exist smh my head.
+			
+			"override projectile type" 2
+			"projectile speed decreased" 0.65
+			"fire rate bonus" 0.6
+			"damage bonus" 15 //Base damage: 6 * 15 = 90.
+			"hold fire until full reload" 1
+		}
+		
+		"Etern-a-Cola"
+		{
+			OriginalItemName "Crit-a-Cola"
+			"effect cond override" 23 //"Overheal", does nothing.
+			"effect bar recharge rate increased" 200
+			"mod_mark_attacker_for_death" 0
+			
+			"fire input on taunt" "!activator^$AddCond^16" //Buff Banner minicrits effect, since Crit-a-Cola is hardcoded to run out on Scout.
+		}
+		"Kritz-a-Cola"
+		{
+			OriginalItemName "Crit-a-Cola"
+			"effect cond override" 23 //"Overheal", does nothing.
+			"effect bar recharge rate increased" 200
+			"mod_mark_attacker_for_death" 0
+			
+			"fire input on taunt" "!activator^$AddCond^34" //Buff Banner minicrits effect, since Crit-a-Cola is hardcoded to run out on Scout.
+		}
+		"Haste Fizz"
+		{
+			OriginalItemName "Bonk! Atomic Punch"
+			"effect cond override" 91
+			"effect bar recharge rate increased" 0.6 //12 seconds
+			"mult effect duration" 1.25 //10 seconds
+			"item color rgb" 16776083 //Very light yellow --> should turn into green
+		}
+		"Haste Fizz NOCHARGE"
+		{
+			OriginalItemName "Crit-a-Cola"
+			"effect cond override" 23 //"Overheal", does nothing.
+			"effect bar recharge rate increased" 1
+			"mod_mark_attacker_for_death" 0
+		
+			"fire input on taunt" "!activator^$AddCond^91"
+		}
+		"Shield Shake"
+		{
+			OriginalItemName "Crit-a-Cola"
+			"effect cond override" 23 //"Overheal", does nothing.
+			"effect bar recharge rate increased" 1 //No recharge rate penalty!
+			"mod_mark_attacker_for_death" 0
+		
+			"fire input on taunt" "soda_relay^Trigger^" //"Creates" a projshield. Actually just calls it down.
+		}
+		"Uber-Pop"
+		{
+			OriginalItemName "Bonk! Atomic Punch"
+			"effect cond override" 52 //Canteen Ubercharge.
+			"effect bar recharge rate increased" 1 //No recharge rate penalty!
+			"mult effect duration" 0.625 //5 seconds
+		}
+		"Bonch!"
+		{
+			OriginalItemName "Crit-a-Cola"
+			"effect cond override" 23 //"Overheal", does nothing.
+			"effect bar recharge rate increased" 200
+			"mod_mark_attacker_for_death" 0
+		
+			"fire input on taunt" "bonch_relay^FireUser1^" //Concheror effect + flag. TODO: does this affect radials?
+			
+			"item color rgb" "14930623"
+		}
+		// UNUSED
+		"Multi-Pop"
+		{
+			OriginalItemName "Crit-a-Cola"
+			"effect cond override" 23 //"Overheal", does nothing.
+			"effect bar recharge rate increased" 200
+			"mod_mark_attacker_for_death" 0
+		
+			"fire input on taunt" "soda_relay^FireUser2^"
+		}
+		
+		"The Cola Cooler"
+		{
+			OriginalItemName "The Caffeine Cooler"
+			"item style override" 2
+		}
+		"Mage Hat"
+		{
+			OriginalItemName "Starlight Sorcerer"
+			"set item tint rgb" 13595446 //Mann Co Orange
+		}
+		"Mage Shirt"
+		{
+			OriginalItemName "The Triple Jumper"
+			"set item tint rgb" 13595446
+		}
+		"Shanker Hat"
+		{
+			OriginalItemName "The Executioner"
+			"set item tint rgb" 1581885 //Balaclavas Are Forever (BLU)
+		}
+		"Shanker Shirt"
+		{
+			OriginalItemName "The Frenchman's Formals"
+			"set item tint rgb" 1581885 //Balaclavas Are Forever (BLU)
+		}
+		"Bombee Bothead"
+		{
+			OriginalItemName "Alcoholic Automaton"
+			"item style override" 1
+			"set item tint rgb" 13595446 //Mann Co Orange
+		}
+		"JEREMIAH's Hat"
+		{
+			OriginalItemName "Bedouin Bandana"
+			"set item tint rgb" 15185211 //Australium Gold
+		}
+		"JEREMIAH's Shirt"
+		{
+			OriginalItemName "Jumping Jester"
+			"set item tint rgb" 15185211
+		}
+		"JEREMIAH's Boots"
+		{
+			OriginalItemName "EOTL_hiphunter_boots" //Flashdance Footies
+			"set item tint rgb" 15185211
+		}
+		"Jerome's Hat"
+		{
+			OriginalItemName "dec2014 Marauders Mask" //Mountebank's Masque
+			"set item tint rgb" 15185211
+		}
+		"Jerome's Shirt"
+		{
+			OriginalItemName "Jumping Jester"
+			"set item tint rgb" 15185211
+		}
+		"Jerome's Boots"
+		{
+			OriginalItemName "dec2014 Fools Footwear" //Harlequin's Hooves
+			"set item tint rgb" 5801378 //Team Spirit, BLU
+		}
+		"Jeremix's Hat"
+		{
+			OriginalItemName "Bonk Beanie"
+			"set item tint rgb" 5801378
+		}
+		"Jeremix's Shirt"
+		{
+			OriginalItemName "Isotopic Insulator"
+			"set item tint rgb" 5801378
+		}
+		"Bastard's Hat"
+		{
+			OriginalItemName "Scout Beanie"
+			"set item tint rgb" 3329330 //Lime Green,
+			"item style override" 3 //Oldest school.
+		}
+		"Prick's Shirt"
+		{
+			OriginalItemName "The Fast Learner"
+			"set item tint rgb" 3329330 //Lime Green,
+		}
+		"Jerk's Boots"
+		{
+			OriginalItemName "MNC Mascot Outfit"
+			"set item tint rgb" 16738740 //and L- PINK?!
+		}
+	}
+	
+	//Busters will be plentiful.
+	Mission
+	{
+		Objective DestroySentries
+		Where spawnbot
+		CooldownTime 40 //this might be TOO short though
+		InitialCooldown 6
+		DesiredCount 1
+		BeginAtWave 1
+		RunForThisManyWaves 7
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Attributes IgnoreEnemies
+			Attributes DisableDodge
+			CharacterAttributes
+			{
+				"damage force reduction" 0
+			}
+		}
+	}
+	//SHAMK 
+	//a bit rewd to put that knoife in me chest innit bruv?
+	//oi oi oi yeaouh wanka, wots ol this then? Ye got a loicense for gettin' stabbed?
+	//I got me a loicense fer stabbin' right 'ere,
+	//~ B Y  T H E  Q U E E N ~
+	//Well, a loicense is a loicense. Sorry mate, can't interfeah.
+	//Bloody Hell.
+	//Bit sad, innit?
+	Mission
+	{
+		Objective Spy
+		Where spawnbot_mission_spy
+		CooldownTime 45
+		InitialCooldown 30
+		DesiredCount 3
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		TFBot
+		{
+			Template T_TFBot_Scout_Knife
+			Action Spy
+			AddCond
+			{
+				Index 64
+				Delay 0.5
+				Duration 3
+			}
+		}
+	}
+	
+	//Wave 1 - Vanilla bots swarming you!
+	
+	//Subwave 1: Stock
+	//- Super Scout + Super Bonk! Scout
+	//- Scattergun Scout
+	//- Bat Scout (crits; single spawn from tank spawn)
+	
+	//Subwave 2: Sandman
+	//- Giant Armor League Scout + Major League Scout
+	//- Hyper League Scout (crits)
+	//- FaN Scout
+	
+	//Subwave 3: Jumping Sandman & Shortstop
+	//- Giant Jumper League Scout (no damage bonus)
+	//- Shortstop Scouts
+	
+	//Support: Force-a-Nature Scouts (no extra stats. vanilla enough.)
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target "bignet"
+			Action "RunScriptCode"
+			Param "
+for (local ent; ent = Entities.FindByModel(ent, `models/bots/boss_bot/carrier_parts.mdl`); )
+	ent.AcceptInput(`DisableShadow`,``,null,null)"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaveSpawn
+		{
+			Name "wave1a1"
+			Where spawnbot_tank
+			WaitBetweenSpawnsAfterDeath 1
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 60
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Fast
+			}
+		}
+		// WaveSpawn
+		// {
+			// Name "wave1a1b"
+			// WaitForAllDead "wave1a1"
+			// Where flankers
+			// TotalCount 1
+			// MaxActive 1
+			// SpawnCount 1
+			// TotalCurrency 50
+			// TFBot
+			// {
+				// Template T_TFBot_Giant_Scout_Bonk
+				// Name "Giant Bonk! Scout" //WHY do they not have this name by DEFAULT
+				// ClassIcon scout_bonk_nys
+			// }
+		// }
+		WaveSpawn
+		{
+			Name "wave1a"
+			WaitForAllDead "wave1a1"
+			Where spawnbot
+			WaitBeforeStarting 1
+			WaitBetweenSpawnsAfterDeath 3
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 120
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Fast
+			}
+		}
+		// WaveSpawn
+		// {
+			// Name "wave1a1b"
+			// WaitForAllSpawned "wave1a"
+			// Where flankers
+			// TotalCount 1
+			// MaxActive 1
+			// SpawnCount 1
+			// TotalCurrency 50
+			// TFBot
+			// {
+				// Template T_TFBot_Giant_Scout_Bonk
+				// Name "Giant Bonk! Scout"
+				// ClassIcon scout_bonk_nys
+			// }
+		// }
+		WaveSpawn
+		{
+			Name "wave1a2"
+			Where spawnbot
+			WaitBeforeStarting 0.5
+			WaitBetweenSpawns 3
+			TotalCount 48
+			MaxActive 12
+			SpawnCount 4
+			TotalCurrency 48
+			TFBot
+			{
+				Template T_TFBot_Scout_Scatter
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1a2"
+			Where spawnbot_tank
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 2
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 8
+			TotalCurrency 8
+			TFBot
+			{
+				Template T_TFBot_Scout_Bat
+				// Attributes AlwaysCrit
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1a2"
+			Where spawnbot
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 2
+			TotalCount 40
+			MaxActive 12
+			SpawnCount 4
+			TotalCurrency 40
+			TFBot
+			{
+				Template T_TFBot_Scout_Bat
+				// Attributes AlwaysCrit
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1a2_allspawn"
+			WaitForAllSpawned "wave1a2"
+			FirstSpawnOutput
+			{
+				Target bignet
+				Action "RunScriptCode"
+				Param "EntFire(`spawnbot`,`Disable`)
+				EntFire(`spawnbot`,`Enable`,``,10)"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1a2_alldead"
+			WaitForAllDead "wave1a2"
+			DoneOutput
+			{
+				Target bignet
+				Action "RunScriptCode"
+				Param "EntFire(`spawnbot`,`Enable`)"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1b"
+			WaitForAllDead "wave1a"
+			WaitForAllSpawned "wave1a2"
+			Where spawnbot
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 10
+			TotalCount 4
+			MaxActive 3
+			SpawnCount 2
+			TotalCurrency 160
+			Squad
+			{
+				NoFormation 1
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Baseball_Armored
+					Name "Armored Major League Scout"
+					Item "Courtly Cuirass"
+					Item "Squire's Sabatons"
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Baseball
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1b2"
+			WaitForAllSpawned "wave1a2"
+			Where spawnbot_tank
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 0.4
+			TotalCount 48
+			MaxActive 16
+			SpawnCount 1
+			TotalCurrency 48
+			TFBot
+			{
+				Template T_TFBot_Scout_Sandman_FastCharge
+				// Attributes AlwaysCrit
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1b3"
+			WaitForAllSpawned "wave1b2"
+			Where spawnbot
+			Where flankers
+			WaitBetweenSpawns 3
+			TotalCount 64
+			MaxActive 20
+			SpawnCount 4
+			TotalCurrency 96
+			Squad
+			{
+				NoFormation 1
+				TFBot
+				{
+					Template T_TFBot_Scout_Shortstop
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Norm
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Norm
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Norm
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1c"
+			WaitForAllDead "wave1b"
+			Where spawnbot
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 14
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 90
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Jumping_Sandman
+				Name "Giant Jumper League Scout"
+				AutoJumpMin 7
+				AutoJumpMax 7
+				ItemAttributes
+				{
+					ItemName "The Sandman"
+					"damage bonus" 1
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave1c"
+			WaitForAllSpawned "wave1b3"
+			Where spawnbot_tank
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 30
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Jumping_Sandman
+				Name "Giant Jumper League Scout"
+				AutoJumpMin 7
+				AutoJumpMax 7
+				ItemAttributes
+				{
+					ItemName "The Sandman"
+					"damage bonus" 1
+				}
+			}
+		}
+	}
+	
+	
+	// Wave 2 - Basic Custom bots ftw
+	
+	//Subwave 1: MvM DPS Experts - threat
+	//- Giant Shortstop Scout (armored)
+	//- Cola Popper Scouts
+	
+	//Subwave 2: Mann Up + Comp - support & bomb pressure, low threat
+	//- Super Pocket Pistol Scout
+	//- Milk 'n Mark Scout
+	//- Armored Burst Fire Scout (SLOW!)
+	
+	//Subwave 3: 
+	//- Giant Winger Scout (armored+crit, SLOW fire rate) + Conch FaN Scout
+	
+	//Support: Homewrecker Scouts (hyperfocus sentries)
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target "bignet"
+			Action "RunScriptCode"
+			Param "IncludeScript(`seel_runtime.nut`,getroottable())
+for (local ent; ent = Entities.FindByModel(ent, `models/bots/boss_bot/carrier_parts.mdl`); )
+	ent.AcceptInput(`DisableShadow`,``,null,null)"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaveSpawn
+		{
+			Name "wave2a"
+			Where spawnbot_tank
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 90
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Shortstop_Burst
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a3"
+			Where spawnbot
+			WaitBeforeStarting 12
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 90
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Shortstop_Burst
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a4"
+			WaitForAllDead "wave2a"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 90
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Shortstop_Burst
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2a2"
+			Where spawnbot
+			WaitBeforeStarting 4
+			WaitBetweenSpawns 2
+			TotalCount 45
+			MaxActive 15
+			SpawnCount 5
+			TotalCurrency 90
+			TFBot
+			{
+				Template T_TFBot_Scout_SodaPopper
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b"
+			WaitForAllDead "wave2a"
+			WaitForAllSpawned "wave2a3"
+			Where spawnbot
+			WaitBeforeStarting 10
+			WaitBetweenSpawnsAfterDeath 6
+			TotalCount 3
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 90
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_PocketPistol
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b3"
+			WaitForAllSpawned "wave2a2"
+			Where spawnbot
+			WaitBeforeStarting 4
+			WaitBetweenSpawns 6
+			TotalCount 18
+			MaxActive 9
+			SpawnCount 3
+			TotalCurrency 90
+			TFBot
+			{
+				Template T_TFBot_Scout_Burst_Armored
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2b2"
+			WaitForAllDead "wave2a" //Spawns after the initial Giant Shortstop Scout is dead
+			Where flankers
+			WaitBetweenSpawns 1
+			TotalCount 36
+			MaxActive 12
+			SpawnCount 2
+			TotalCurrency 36
+			TFBot
+			{
+				Template T_TFBot_Scout_MilkMark
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c1"
+			WaitForAllDead "wave2a2" //Spawns when all Soda Poppers have died
+			Where flankers
+			WaitBetweenSpawns 4
+			TotalCount 16
+			MaxActive 10
+			SpawnCount 8
+			TotalCurrency 16
+			TFBot
+			{
+				Template T_TFBot_Scout_MilkMark
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c1"
+			WaitForAllDead "wave2b3" //Spawns when all Burst Fire Scouts have died
+			Where flankers
+			WaitBetweenSpawns 4
+			TotalCount 16
+			MaxActive 10
+			SpawnCount 8
+			TotalCurrency 16
+			TFBot
+			{
+				Template T_TFBot_Scout_MilkMark
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c1"
+			WaitForAllSpawned "wave2c" //Spawns when the first two Captain Hermes squads have spawned
+			Where flankers
+			WaitBetweenSpawns 8
+			TotalCount 16
+			MaxActive 12
+			SpawnCount 8
+			TotalCurrency 16
+			TFBot
+			{
+				Template T_TFBot_Scout_MilkMark
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c1"
+			WaitForAllSpawned "wave2c2" //Spawns when the last two Captain Hermes Squads have spawned
+			Where flankers
+			WaitBetweenSpawns 8
+			TotalCount 16
+			MaxActive 12
+			SpawnCount 8
+			TotalCurrency 16
+			TFBot
+			{
+				Template T_TFBot_Scout_MilkMark
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c"
+			WaitForAllSpawned "wave2b"
+			Where flankers
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 40
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Winger
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Conch
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Conch
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Conch
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c"
+			WaitForAllSpawned "wave2b3"
+			Where flankers
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 40
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Winger
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Conch
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Conch
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Conch
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c2"
+			WaitForAllDead "wave2b"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 40
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Winger
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Conch
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Conch
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Conch
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave2c2"
+			WaitForAllDead "wave2b3"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 40
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Winger
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Conch
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Conch
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_FaN_Conch
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			Where flankers
+			WaitBeforeStarting 10
+			WaitBetweenSpawnsAfterDeath 1
+			TotalCount 10
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 0
+			Support 1
+			TFBot
+			{
+				Template T_TFBot_Scout_Homewrecker
+			}
+		}
+	}
+	
+	
+	// Wave 3 - Deeper customs, first boss(es)!
+	
+	//Subwave 1: Fire, fire, fire
+	//- Giant Sun-Tossing Scout
+	//- Melting Laser Scout (Manmelter spammer)
+	//- Spellcaster Scout (Fireball) [Mobber]
+	
+	//Subwave 2: Bombs! I want it!
+	//- Major Bomber League Scout (burst demo)
+	//- Demolition League Scout (caber)
+	//- Bomber League Scout (demo)
+
+	//Subwave 2: Lasery Bosses
+	//- Chief Molecular Mangler (Mangler)
+	//- Chief Particle Pulverizer (Pomson)
+	//- Chief Atomic Annihilator (Bison)
+	
+	//Support:
+	//- Batsaber Scout [Mobber]
+	SpawnTemplate PT_Text_HumanMobbers
+	SpawnTemplate PT_Text_LaserChiefs
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target "bignet"
+			Action "RunScriptCode"
+			Param "IncludeScript(`seel_ins.nut`,getroottable())
+			IncludeScript(`seel_runtime.nut`,getroottable())
+for (local ent; ent = Entities.FindByModel(ent, `models/bots/boss_bot/carrier_parts.mdl`); )
+	ent.AcceptInput(`DisableShadow`,``,null,null)
+			
+//Cleanup existing thinkent
+for (local ent; ent = Entities.FindByName(ent,`_thinkent_bomballs`);)
+	ent.Kill()
+
+SeelRuntime.hBombTF <- SpawnEntityFromTable(`logic_script`,{ targetname = `_thinkent_bomballs` })
+SeelRuntime.hBombTF.ValidateScriptScope()
+SeelRuntime.hBombTF.GetScriptScope().Balls2BombsThink <- SeelRuntime.BallsToBombsThink
+AddThinkToEnt(SeelRuntime.hBombTF, `Balls2BombsThink`)
+
+EntFire(`wave_a_init`,`Trigger`)
+			"
+		}
+		StartWaveOutput
+		{
+			Target "wave_start_relay"
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target "wave_finished_relay"
+			Action Trigger
+		}
+		WaveSpawn
+		{
+			Name "wave3a1"
+			Where spawnbot
+			WaitBeforeStarting 5.5
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 50
+			StartWaveOutput
+			{
+				Target "mobber_infotext"
+				Action Show
+				Delay 0.1
+			}
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Sun_Tosser
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a1b" //3
+			WaitForAllDead "wave3a1"
+			Where spawnbot
+			WaitBeforeStarting 1
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 10
+			TFBot
+			{
+				Template T_TFBot_Scout_Spell
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a1b" //3
+			WaitForAllDead "wave3a1"
+			Where flankers
+			WaitBeforeStarting 1
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 10
+			TFBot
+			{
+				Template T_TFBot_Scout_Spell
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a1b" //3
+			WaitForAllDead "wave3a1"
+			Where spawnbot_tank
+			WaitBeforeStarting 1
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 10
+			TFBot
+			{
+				Template T_TFBot_Scout_Spell
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a"
+			WaitForAllDead "wave3a1b"
+			Where spawnbot
+			WaitBetweenSpawns 15
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			TotalCurrency 150
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Sun_Tosser
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a2"
+			WaitForAllDead "wave3a1b"
+			Where spawnbot
+			WaitBeforeStarting 4
+			WaitBetweenSpawns 4
+			TotalCount 60
+			MaxActive 15
+			SpawnCount 6
+			TotalCurrency 120
+			TFBot
+			{
+				Template T_TFBot_Scout_Manmelter
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3a3" //3
+			WaitForAllDead "wave3a1b"
+			Where flankers
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 6
+			TotalCount 5
+			MaxActive 3
+			SpawnCount 1
+			TotalCurrency 50
+			TFBot
+			{
+				Template T_TFBot_Scout_Spell
+			}
+		}
+		WaveSpawn //Little initial WaveSpawn addition to ensure smalls are the first ones red can see.
+		{
+			Name "wave3b1"
+			WaitForAllDead "wave3a"
+			WaitForAllSpawned "wave3a2"
+			WaitBeforeStarting 6
+			Where spawnbot
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 6
+			TotalCurrency 6
+			TFBot
+			{
+				Template T_TFBot_Scout_BomberLeague
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b"
+			WaitForAllDead "wave3a2"
+			WaitForAllSpawned "wave3b1"
+			Where flankers
+			WaitBetweenSpawns 14
+			TotalCount 4
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 64
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_BomberLeague
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b2"
+			WaitForAllDead "wave3a2"
+			Where spawnbot_tank
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 6
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 2
+			TotalCurrency 72
+			TFBot
+			{
+				Template T_TFBot_Scout_BomberLeague_Armored
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3b2"
+			WaitForAllDead "wave3a2"
+			Where spawnbot
+			WaitBeforeStarting 2
+			WaitBetweenSpawns 4
+			TotalCount 36
+			MaxActive 9
+			SpawnCount 3
+			TotalCurrency 36
+			TFBot
+			{
+				Template T_TFBot_Scout_BomberLeague
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3c"
+			WaitForAllSpawned "wave3b2"
+			Where spawnbot
+			WaitBeforeStarting 2
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 104
+			FirstSpawnOutput
+			{
+				Target "laserchiefs_text_1"
+				Action Display
+			}
+			TFBot
+			{
+				Template T_TFBot_Chief_Scout_Laser_Mangler
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3c"
+			WaitForAllSpawned "wave3b2"
+			Where flankers
+			WaitBeforeStarting 3
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 104
+			FirstSpawnOutput
+			{
+				Target "laserchiefs_text_2"
+				Action Display
+			}
+			TFBot
+			{
+				Template T_TFBot_Chief_Scout_Laser_Pomson
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave3c"
+			WaitForAllSpawned "wave3b2"
+			Where spawnbot
+			WaitBeforeStarting 4
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 104
+			FirstSpawnOutput
+			{
+				Target "laserchiefs_text_3"
+				Action Display
+			}
+			TFBot
+			{
+				Template T_TFBot_Chief_Scout_Laser_Bison
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllSpawned "wave3b2"
+			Where spawnbot_invasion
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 5
+			TotalCount 10
+			MaxActive 12
+			SpawnCount 5
+			TotalCurrency 10
+			Support 1
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Scout_Batsaber_Mobber
+					ItemAttributes
+					{
+						ItemName "Batsaber"
+						"set item tint rgb" 6016762 //blue
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_Batsaber_Mobber
+					ItemAttributes
+					{
+						ItemName "Batsaber"
+						"set item tint rgb" 16017797 //pink
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_Batsaber_Mobber
+					ItemAttributes
+					{
+						ItemName "Batsaber"
+						"set item tint rgb" 6016762 //white
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "Icon For Precaching So It Gets Downloaded Properly"
+			WaitForAllDead "wave3c"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			HideIcon 1
+			Support Limited
+			Squad
+			{
+				TFBot
+				{
+					Class Scout
+					Health 5
+					ClassIcon engineer_pomson_v2
+				}
+				TFBot
+				{
+					Class Scout
+					Health 5
+					ClassIcon soldier_bison_spammer
+				}
+				TFBot
+				{
+					Class Scout
+					Health 5
+					ClassIcon soldier_mangler_burst
+				}
+			}
+		}
+	}
+	
+	// Wave 4 - The Engineer Wave(tm), with extras!
+	
+	//Subwave 1: Teleporter & Sentry intro
+	//- Giant Teleporter Scout
+	//Telein:
+		//- Pomson Scouts
+	//- Giant Teleporter Scout 			spawns in wfas the Pomsons after a slight delay
+	//Telein:
+		//- Giant Sentry-Slinger Scout
+	
+	//- Giant Sentry-Slinger Scout		spawns in wfas the previous one with a notable delay
+	//- Pomson Scout						spawns in *after* the regular-spawn one has spawned
+
+	//Subwave 2: Dispenser & Rocketstop intro
+	//- Rocketstop Scouts (walk-in, notable spawns)
+	//- Giant Teleporter Scout
+		//- Giant Teleporter Scout
+		//Telein:
+			//- Rocketstop Scouts
+	//- Giant Dispenser Scout (after teleporter scout)
+	//- Burst Fire Scouts (not armored!)
+	
+	//Subwave 3: Stacked Builders
+	//- Giant Rapid Pomson Scout x2 + Giant Sentry-Slinger Scout + Giant Dispenser Scout
+	
+	//Support:
+	//- Shanker Scout (spy spawns)
+	
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target "bignet"
+			Action "RunScriptCode"
+			Param "
+			IncludeScript(`seel_runtime.nut`,getroottable())
+for (local ent; ent = Entities.FindByModel(ent, `models/bots/boss_bot/carrier_parts.mdl`); )
+	ent.AcceptInput(`DisableShadow`,``,null,null)
+			"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaveSpawn
+		{
+			Name "wave4a1a"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 0
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Teleporter
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a2a"
+			WaitForAllDead "wave4a1a"
+			Where spawnbot_chief
+			WaitBeforeStarting 2.5
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 40
+			TFBot
+			{
+				Template T_TFBot_Scout_Pomson_Multishot
+				Tag telebot
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a1b"
+			WaitForAllSpawned "wave4a2a"
+			WaitBeforeStarting 1
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 0
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Teleporter
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a2b"
+			Where spawnbot_chief
+			WaitForAllDead "wave4a1b"
+			WaitBeforeStarting 2.5
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 30
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Sentry_Spawner
+				Tag telebot
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a3"
+			WaitForAllSpawned "wave4a2b"
+			WaitBetweenSpawns 12
+			Where spawnbot
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			TotalCurrency 120
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Sentry_Spawner
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4a2"
+			WaitForAllSpawned "wave4a2b"
+			WaitBeforeStarting 8
+			Where spawnbot_invasion
+			WaitBetweenSpawns 4
+			TotalCount 40
+			MaxActive 12
+			SpawnCount 4
+			TotalCurrency 40
+			TFBot
+			{
+				Template T_TFBot_Scout_Pomson_Multishot
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b1"
+			WaitForAllDead "wave4a3"
+			WaitForAllSpawned "wave4a2"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 0
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Teleporter
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b2"
+			WaitForAllDead "wave4b1"
+			WaitBeforeStarting 2.5
+			Where spawnbot_chief
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 40
+			TFBot
+			{
+				Template T_TFBot_Scout_RocketStop
+				Tag telebot
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b2"
+			WaitForAllDead "wave4b1"
+			WaitBetweenSpawns 6
+			Where flankers
+			TotalCount 8
+			MaxActive 8
+			SpawnCount 4
+			TotalCurrency 80
+			TFBot
+			{
+				Template T_TFBot_Scout_RocketStop
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b"
+			WaitForAllDead "wave4b1"
+			WaitBeforeStarting 2
+			Where spawnbot
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			TotalCurrency 90
+			Squad
+			{
+				NoWaitForFormation 1
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Dispenser
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_RocketStop
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_RocketStop
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b"
+			WaitForAllDead "wave4b1"
+			WaitBeforeStarting 14
+			Where spawnbot_tank
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 120
+			Squad
+			{
+				NoWaitForFormation 1
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Dispenser
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_RocketStop
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_RocketStop
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_RocketStop
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4b"
+			WaitForAllDead "wave4b1"
+			WaitBeforeStarting 24
+			Where flankers
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 6
+			TotalCurrency 180
+			Squad
+			{
+				NoWaitForFormation 1
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Dispenser
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_RocketStop
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_RocketStop
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_RocketStop
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_RocketStop
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_RocketStop
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave4c"
+			WaitForAllSpawned "wave4b"
+			WaitBeforeStarting 18
+			Where spawnbot_tank
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 160
+			Squad
+			{
+				ShouldPreserveSquad 1
+				NoWaitForFormation 1
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Dispenser
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Pomson
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Pomson
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Sentry_Spawner
+				}
+			}
+		}
+	}
+	
+	// Wave 5 - BEEEEEE Wave!!
+
+	// Subwave 1: The Swarm
+	// Super Stinger Bee (Super Scout)
+	// Fast Killer Bee (swarms; initial followed by streamy swarms)
+	// Beekeepers (singles)
+	
+	// Subwave 2: The Great Explosions
+	// Stinging Beehemoth (accurate dhit burst)
+	// Honeybomb Bee (armored)
+	// Beekeepers (singles)
+	
+	//Subwave 3: The Healer And Its Keepers
+	// Nursing Beehemoth (aoe heal, crossbow)
+	// Honey Bee Scout
+	// Beekeepers (singles)
+	
+	// Subwave 4: The Queen
+	// Queen Bee (tele-inning bee: based on health perc)
+	//	 90%: Killer Bee Scouts
+	//	  80%: Honeybomb Scouts
+	//	   70%: Stinging Beehemoth
+	//	    60%: Killer Bee Scouts
+	//	     50%: Honey Bee Scouts
+	//	      40%: Nursing Beehemoth
+	//	       30%: Honeybomb Scouts
+	//	        20%: Honey Bee Scouts
+	//	         10%: Stinging Beehemoth (Queen Bee also loses speed here!!)
+	Wave
+	{
+		SpawnTemplate PT_QueenBeeLogic
+		InitWaveOutput
+		{
+			Target "bignet"
+			Action "RunScriptCode"
+			Param "IncludeScript(`seel_runtime.nut`,getroottable())
+for (local ent; ent = Entities.FindByModel(ent, `models/bots/boss_bot/carrier_parts.mdl`); )
+	ent.AcceptInput(`DisableShadow`,``,null,null)"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		
+		WaveSpawn
+		{
+			Name "wave5a1a"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 0
+			TFBot
+			{
+				Template T_TFBot_Scout_KillerBee
+				Name "Scouting Bee"
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a1"
+			Where spawnbot
+			WaitForAllDead "wave5a1a"
+			WaitBetweenSpawns 2
+			TotalCount 20
+			MaxActive 16
+			SpawnCount 5
+			TotalCurrency 20
+			TFBot
+			{
+				Template T_TFBot_Scout_KillerBee
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a_main"
+			WaitForAllDead "wave5a1a"
+			WaitBeforeStarting 7
+			Where spawnbot
+			WaitBetweenSpawnsAfterDeath 8
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 40
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_FastBee
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a_tank"
+			WaitForAllDead "wave5a1a"
+			WaitBeforeStarting 15
+			Where spawnbot_tank
+			WaitBetweenSpawnsAfterDeath 8
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 40
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_FastBee
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a_flank"
+			WaitForAllDead "wave5a1a"
+			WaitBeforeStarting 17
+			Where flankers
+			WaitBetweenSpawnsAfterDeath 8
+			TotalCount 2
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 40
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_FastBee
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5a2"
+			WaitForAllDead "wave5a1"
+			Where spawnbot
+			Where flankers
+			WaitBetweenSpawns 2
+			TotalCount 36
+			MaxActive 18
+			SpawnCount 6
+			TotalCurrency 36
+			TFBot
+			{
+				Template T_TFBot_Scout_KillerBee
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave5bc"
+			WaitForAllSpawned "wave5a2"
+			Where spawnbot_tank
+			WaitBeforeStarting 6
+			WaitBetweenSpawnsAfterDeath 6
+			TotalCount 3
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 45
+			TFBot
+			{
+				Template T_TFBot_Scout_Beekeeper
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5bc"
+			WaitForAllSpawned "wave5a2"
+			Where spawnbot_tank
+			WaitBeforeStarting 12
+			WaitBetweenSpawnsAfterDeath 6
+			TotalCount 3
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 45
+			TFBot
+			{
+				Template T_TFBot_Scout_Beekeeper
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b1"
+			WaitForAllSpawned "wave5a2"
+			WaitBeforeStarting 5
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 25
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_DH_Burst
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b"
+			WaitForAllSpawned "wave5b1"
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 12
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 50
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_DH_Burst
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b2a"
+			WaitForAllDead "wave5a2"
+			WaitForAllSpawned "wave5b1"
+			WaitBeforeStarting 8
+			Where flankers
+			WaitBetweenSpawns 4
+			TotalCount 10
+			MaxActive 6
+			SpawnCount 2
+			TotalCurrency 10
+			TFBot
+			{
+				Template T_TFBot_Scout_HoneyBomb_Armored
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5b2"
+			WaitForAllDead "wave5a2"
+			WaitForAllSpawned "wave5b2a"
+			Where flankers
+			WaitBetweenSpawns 4.5
+			TotalCount 24
+			MaxActive 16
+			SpawnCount 4
+			TotalCurrency 48
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Scout_HoneyBomb_Armored
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_KillerBee
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_KillerBee
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_KillerBee
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5c1"
+			WaitForAllSpawned "wave5b"
+			WaitBeforeStarting 18
+			Where flankers
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 25
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Crossbow_Amputator
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5c"
+			WaitForAllDead "wave5b"
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 15
+			Where spawnbot
+			TotalCount 8
+			MaxActive 5
+			SpawnCount 4
+			TotalCurrency 160
+			Squad
+			{
+				NoWaitForFormation 1
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Crossbow_Amputator
+				}
+				TFBot { Template T_TFBot_Scout_HoneyBomb_Armored }
+				TFBot { Template T_TFBot_Scout_HoneyBomb_Armored }
+				TFBot { Template T_TFBot_Scout_HoneyBomb_Armored }
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5c2"
+			WaitForAllDead "wave5b2"
+			Where spawnbot
+			WaitBetweenSpawns 2
+			TotalCount 30
+			MaxActive 9
+			SpawnCount 3
+			TotalCurrency 30
+			TFBot
+			{
+				Template T_TFBot_Scout_HoneyBee
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave5d"
+			WaitForAllDead "wave5c"
+			WaitBeforeStarting 0.5
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 183 //beeeeee. Also fits the payout to be 1000$ exactly.
+			FirstSpawnOutput
+			{
+				Target "queenbee_spawn_relay"
+				Action Trigger
+				Delay 0.1
+			}
+			DoneOutput
+			{
+				Target "queenbee_spawn_relay"
+				Action FireUser1
+				Delay 0.02
+			}
+			TFBot
+			{
+				Template T_TFBot_Chief_Scout_QueenBee
+			}
+		}
+		
+		//	 90%: Killer Bee Scouts
+		//	  80%: Honeybomb Scouts
+		//	   70%: Stinging Beehemoth
+		//	    60%: Killer Bee Scouts
+		//	     50%: Honey Bee Scouts
+		//	      40%: Nursing Beehemoth
+		//	       30%: Honeybomb Scouts
+		//	        20%: Honey Bee Scouts
+		//	         10%: Stinging Beehemoth
+		WaveSpawn
+		{
+			Name "Support90"
+			WaitForAllSpawned "wave5d"
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 3
+			Where spawnbot_chief
+			TotalCount 20
+			MaxActive 10
+			SpawnCount 5
+			TotalCurrency 20
+			DoneOutput //Sort of required. pop interface inputs are a bit finicky.
+			{
+				Target "pop_interface"
+				Action "$FinishWavespawn"
+				Param "Support90"
+			}
+			TFBot
+			{
+				Template T_TFBot_Scout_KillerBee
+				Tag telebot
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support80"
+			WaitForAllSpawned "wave5d"
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 3
+			Where spawnbot_chief
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 30
+			DoneOutput
+			{
+				Target "pop_interface"
+				Action "$FinishWavespawn"
+				Param "Support80"
+			}
+			TFBot
+			{
+				Template T_TFBot_Scout_HoneyBomb_Armored
+				Tag telebot
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support70"
+			WaitForAllSpawned "wave5d"
+			WaitBeforeStarting 9
+			Where spawnbot_chief
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 20
+			DoneOutput
+			{
+				Target "pop_interface"
+				Action "$FinishWavespawn"
+				Param "Support70"
+			}
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_DH_Burst
+				Tag telebot
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support60"
+			WaitForAllSpawned "wave5d"
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 4
+			Where spawnbot_chief
+			TotalCount 16
+			MaxActive 10 //Third set spawns after at least 2 have died.
+			SpawnCount 4
+			TotalCurrency 16
+			DoneOutput
+			{
+				Target "pop_interface"
+				Action "$FinishWavespawn"
+				Param "Support60"
+			}
+			TFBot
+			{
+				Template T_TFBot_Scout_KillerBee
+				Tag telebot
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support50"
+			WaitForAllSpawned "wave5d"
+			WaitBeforeStarting 12
+			WaitBetweenSpawns 3
+			Where spawnbot_chief
+			TotalCount 12
+			MaxActive 7
+			SpawnCount 3
+			TotalCurrency 12
+			DoneOutput
+			{
+				Target "pop_interface"
+				Action "$FinishWavespawn"
+				Param "Support50"
+			}
+			TFBot
+			{
+				Template T_TFBot_Scout_HoneyBee
+				Tag telebot
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support40"
+			WaitForAllSpawned "wave5d"
+			WaitBeforeStarting 15
+			Where spawnbot_chief
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 20
+			DoneOutput
+			{
+				Target "pop_interface"
+				Action "$FinishWavespawn"
+				Param "Support40"
+			}
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Crossbow_Amputator
+				Tag telebot
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support30"
+			WaitForAllSpawned "wave5d"
+			WaitBeforeStarting 18
+			Where spawnbot_chief
+			TotalCount 5
+			MaxActive 5
+			SpawnCount 5
+			TotalCurrency 25
+			DoneOutput
+			{
+				Target "pop_interface"
+				Action "$FinishWavespawn"
+				Param "Support30"
+			}
+			TFBot
+			{
+				Template T_TFBot_Scout_HoneyBomb_Armored
+				Tag telebot
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support20"
+			WaitForAllSpawned "wave5d"
+			WaitBeforeStarting 18
+			WaitBetweenSpawns 3
+			Where spawnbot_chief
+			TotalCount 12
+			MaxActive 8
+			SpawnCount 6
+			TotalCurrency 20
+			DoneOutput
+			{
+				Target "pop_interface"
+				Action "$FinishWavespawn"
+				Param "Support20"
+			}
+			TFBot
+			{
+				Template T_TFBot_Scout_HoneyBee
+				Tag telebot
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support10"
+			WaitForAllSpawned "wave5d"
+			WaitBeforeStarting 21
+			WaitBetweenSpawns 6
+			Where spawnbot_chief
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 1
+			TotalCurrency 40
+			DoneOutput //Sort of required. pop interface inputs are a bit finicky.
+			{
+				Target "pop_interface"
+				Action "$FinishWavespawn"
+				Param "Support10"
+			}
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_DH_Burst
+				Tag telebot
+			}
+		}
+	}
+
+	// Wave 7: ENCORE! ...or, something.
+	// During each subwave, supporting scouts are present that change loadout based on the current subwave, using gatebot attrs!
+	// Types: Milk & fan (lower power, great support) | burst-y rockets (higher power) | spellbook
+	
+	// SubA, wave 1: big spawn of super scouts
+	// Initial set of scatters. Nothing special.
+
+	// SubB, wave 2: rapid pocket pistol, slower+armored perhaps to shake up the speedy rush.
+	// Supports: Milk, Fan O'War.
+	
+	// When defeated, bomb resets? - TO CONSIDER.
+	
+	// SubC, wave 3: return of CAPPER Trio in some way. Maybe divided over two - mangler+bison, pomson+bison. And/or very very firey Sun-on-a-Stick shooter.
+	// Supports: Spellbook.
+
+	// SubD, wave 4: tele -> disp+tele -> tele -> disp+disp. Yes.
+	// Supports: Rocket spammers.
+
+	// SubE, wave 5: Beehemoth return but fused perhaps?
+	// Supports: Scatters.
+
+	// SubF, wave 6: Uber-Bonk with Fan O'War, pseudo-player mimics (weaker variations of the OGs)
+	
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target "bignet"
+			Action "RunScriptCode"
+			Param "
+			IncludeScript(`seel_runtime.nut`,getroottable())
+for (local ent; ent = Entities.FindByModel(ent, `models/bots/boss_bot/carrier_parts.mdl`); )
+	ent.AcceptInput(`DisableShadow`,``,null,null)
+EntFire(`spawnbot_final`,`Disable`)
+EntFire(`spawnbot_final`,`Disable`,``,25)
+
+//Cleanup existing thinkent
+for (local ent; ent = Entities.FindByName(ent,`_thinkent_bomballs`);)
+	ent.Kill()
+
+SeelRuntime.hBombTF <- SpawnEntityFromTable(`logic_script`,{ targetname = `_thinkent_bomballs` })
+SeelRuntime.hBombTF.ValidateScriptScope()
+SeelRuntime.hBombTF.GetScriptScope().Balls2BombsThink <- SeelRuntime.BallsToBombsThink
+AddThinkToEnt(SeelRuntime.hBombTF, `Balls2BombsThink`)
+			"
+			
+			// If switching from wfad the bees to an OR condition (wfad bees OR wfas bees 25 secs)...
+			// ABSOLUTELY ENSURE that spawnbot_final stays disabled!!!
+			// Use it for the spawnbot of the final bosses!
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		
+		WaveSpawn
+		{
+			Name "wave6a"
+			WaitBetweenSpawns 4
+			RandomSpawn 1
+			Where spawnbot
+			Where flankers
+			TotalCount 15
+			MaxActive 7
+			SpawnCount 3
+			TotalCurrency 150
+			FirstSpawnOutput
+			{
+				Target pop_interface
+				Action ChangeDefaultEventAttributes
+				Param "Default"
+			}
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Fast
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a2"
+			Where spawnbot
+			WaitBeforeStarting 3
+			TotalCount 12
+			MaxActive 7
+			SpawnCount 6
+			TotalCurrency 12
+			TFBot
+			{
+				Class Scout
+				Skill Normal
+				Attributes AlwaysCrit
+				MaxVisionRange 950
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6a2"
+			Where flankers
+			WaitBeforeStarting 3
+			TotalCount 12
+			MaxActive 7
+			SpawnCount 6
+			TotalCurrency 12
+			TFBot
+			{
+				Class Scout
+				Skill Normal
+				Attributes AlwaysCrit
+				MaxVisionRange 950
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6b2"
+			WaitForAllSpawned "wave6a"
+			Where flankers
+			WaitBeforeStarting 8
+			TotalCount 3
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 60
+			FirstSpawnOutput
+			{
+				Target pop_interface
+				Action ChangeDefaultEventAttributes
+				Param "MilkMark"
+			}
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_PocketPistol
+				ClassIcon scout_pocketpistol_heal_spammer_lite
+				ItemAttributes
+				{
+					ItemName "Pretty Boy's Pocket Pistol"
+					"reload time decreased" 0 //I'm a little mean.
+					"fire rate bonus" 0.7 //Overrides existing 15% fire rate bonus. It's just +30%.
+					"heal on hit for rapidfire" 100 //I'm not *wholly* mean!!
+					"weapon spread bonus" 0.25
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6b2"
+			WaitForAllSpawned "wave6a"
+			Where spawnbot
+			WaitBeforeStarting 14
+			TotalCount 3
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 60
+			FirstSpawnOutput
+			{
+				Target pop_interface
+				Action ChangeDefaultEventAttributes
+				Param "MilkMark"
+			}
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_PocketPistol
+				ClassIcon scout_pocketpistol_heal_spammer_lite
+				ItemAttributes
+				{
+					ItemName "Pretty Boy's Pocket Pistol"
+					"reload time decreased" 0
+					"fire rate bonus" 0.7 //Overrides existing 15% fire rate bonus. It's just +30%.
+					"heal on hit for rapidfire" 100 //I'm not *wholly* mean!!
+					"weapon spread bonus" 0.25
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6b"
+			WaitForAllSpawned "wave6a"
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 18
+			Where spawnbot
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			TotalCurrency 66
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Shortstop_Spammer
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6c"
+			WaitForAllDead "wave6a"
+			WaitForAllSpawned "wave6b"
+			WaitBeforeStarting 12
+			Where spawnbot
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			TotalCurrency 210
+			FirstSpawnOutput
+			{
+				Target pop_interface
+				Action ChangeDefaultEventAttributes
+				Param "Spellbook"
+			}
+			DoneOutput
+			{
+				Target bignet
+				Action RunScriptCode
+				Param "EntFire(`spawnbot_final`,`Enable`)"
+			}
+			Squad
+			{
+				NoWaitForFormation 1
+				TFBot
+				{
+					Template T_TFBot_Chief_Scout_Laser_Bison
+					Health 12000
+					ClassIcon soldier_bison_spammer_incendiary
+					Name "Ionized Incinerator"
+					UseMeleeThreatPrioritization 1
+					ItemAttributes
+					{
+						ItemName "Phobos Filter"
+						"attach particle effect" 3042 //Pyrophoric Personality
+						"set item tint rgb" 13595446 //Mann Co Orange
+					}
+					ItemAttributes
+					{
+						ItemName "The C.A.P.P.E.R"
+						"set damagetype ignite" 1
+						"set item tint rgb" 13595446
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Sun_Tosser
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Sun_Tosser
+				}
+			}
+		}
+		WaveSpawn { Name "wave6a_b" WaitForAllDead "wave6a" Support Limited }
+		WaveSpawn { Name "wave6a_b" WaitForAllDead "wave6b" Support Limited }
+		// Initial teleporter scout, spawns after Supers and Shortstops are dead.
+		WaveSpawn
+		{
+			Name "wave6d1"
+			WaitForAllDead "wave6a_b"
+			Where flankers
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Teleporter
+				WeaponRestrictions PrimaryOnly
+			}
+		}
+		// Second teleporter scout is joined by a dispenser scout.
+		WaveSpawn
+		{
+			Name "wave6d2"
+			WaitForAllDead "wave6d1"
+			WaitBeforeStarting 2.5
+			Where spawnbot_chief
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Teleporter
+				WeaponRestrictions PrimaryOnly
+				Tag telebot
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave6d4"
+			WaitForAllDead "wave6d1"
+			WaitBeforeStarting 2.5
+			Where spawnbot_chief
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 50
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Dispenser
+				Tag telebot
+			}
+		}
+		// Third teleporter scout is alone again.
+		WaveSpawn
+		{
+			Name "wave6d3"
+			WaitForAllDead "wave6d2"
+			WaitBeforeStarting 2.5
+			Where spawnbot_chief
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Teleporter
+				WeaponRestrictions PrimaryOnly
+				Tag telebot
+			}
+		}
+		// And after third teleporter, two dispensers spawn in.
+		WaveSpawn
+		{
+			Name "wave6d4"
+			WaitForAllDead "wave6d3"
+			WaitBeforeStarting 2.5
+			Where spawnbot_chief
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			TotalCurrency 100
+			FirstSpawnOutput
+			{
+				Target pop_interface
+				Action ChangeDefaultEventAttributes
+				Param "RocketSpammer"
+			}
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Dispenser
+				Tag telebot
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave6d4_spawned"
+			WaitForAllSpawned "wave6d4"
+			
+			FirstSpawnOutput
+			{
+				Target bignet
+				Action RunScriptCode
+				Param "EntFire(`spawnbot_final`,`Enable`,``,25)"
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave6e"
+			WaitForAllSpawned "wave6d4"
+			WaitBeforeStarting 3
+			Where spawnbot_final
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			TotalCurrency 240
+			FirstSpawnOutput
+			{
+				Target pop_interface
+				Action ChangeDefaultEventAttributes
+				Param "MilkMark"
+			}
+			Squad
+			{
+				NoWaitForFormation 1
+				FormationSize 250
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_Crossbow_Amputator
+					Health 12000
+					Name "Princess Beehemoth"
+					Attributes UseBossHealthBar
+					UseMeleeThreatPrioritization 1
+					ClassIcon medic_crossbow_burst_penetration //The amputator might not fit here as well still...but it's still there.
+					ItemAttributes
+					{
+						ItemName "The Crusader's Crossbow"
+						"clip size upgrade atomic" 9
+						"fire rate bonus" 0.85 //Once every 6 ticks
+						"faster reload rate" 1.5
+						"reload full clip at once" 1
+						
+						"projectile penetration" 1
+						
+						"projectile spread angle penalty" 4
+						"projectile speed decreased" 0.5 //1200 HU/s
+					}
+					CharacterAttributes
+					{
+						"move speed penalty" 0.32 //To make her not outrun her royal guard too much
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_DH_Burst
+					ClassIcon soldier_rocketshotgun_dh_lite
+					ItemAttributes
+					{
+						ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+						"fire rate bonus" 0.12 //0.075s =~ 0.08
+						//Reload time: 0.7*0.8 + 3*0.5*0.8 = 1.76 | 0.92*0.6 + 3*0.8 * 0.6 = 0.552 + 1.24 = 1.792
+						"faster reload rate" 0.8
+						"clip size bonus" 0.5 //3 rockets total
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Giant_Scout_DH_Burst
+					ClassIcon soldier_rocketshotgun_dh_lite
+					ItemAttributes
+					{
+						ItemName "Upgradeable TF_WEAPON_SCATTERGUN"
+						"fire rate bonus" 0.12 //0.075s =~ 0.08
+						//Reload time: 0.7*0.8 + 3*0.5*0.8 = 1.76 | 0.92*0.6 + 3*0.8 * 0.6 = 0.552 + 1.24 = 1.792
+						"faster reload rate" 0.8
+						"clip size bonus" 0.5 //3 rockets total
+					}
+				}
+			}
+		}
+		// Player scouts (mobber) that change loadout based on the subwave.
+		// Variants: stock scatter + pistol | milk + Fan O'War | Rocket Spammer | Fireball Spell.
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave6a2"
+			WaitBeforeStarting 3
+			WaitBetweenSpawns 6
+			Where spawnbot
+			TotalCount 8 //Only the first 8.
+			MaxActive 8
+			SpawnCount 2
+			TotalCurrency 40
+			Support 1
+			TFBot
+			{
+				Class Scout
+				Name "Competitive Scout"
+				Health 250
+				Scale 1.15
+				Skill Expert
+				Action Mobber
+				UseHumanModel 2
+				Action Mobber //Do NOT pick up bomb.
+				CharacterAttributes
+				{
+					"damage force reduction" 0.75
+					"move speed penalty" 0.9
+				}
+				EventChangeAttributes
+				{
+					Default
+					{
+						MoveBehindEnemy 200
+						DesiredAttackRange 180
+						Item "Upgradeable TF_WEAPON_SCATTERGUN"
+						Item "Upgradeable TF_WEAPON_PISTOL"
+						Item "The Front Runner"
+						UseBestWeapon 1
+					}
+					MilkMark
+					{
+						Item "Mad Milk"
+						Item "The Fan O'War"
+						Item "The Milkman"
+						StripItemSlot 0 //removes primary
+						DesiredAttackRange 48 //melee range
+						ItemAttributes
+						{
+							ItemName "Mad Milk"
+							"effect bar recharge rate increased" 0.6
+						}
+					}
+					RocketSpammer
+					{
+						Item "The Shortstop"
+						Item "Cranium Cooler"
+						WeaponRestrictions PrimaryOnly
+						ItemAttributes
+						{
+							ItemName "The Shortstop"
+							"paintkit_proto_def_index" 414 //Bomb Carrier
+							"set_item_texture_wear" 0
+
+							"override projectile type" 2
+							"fire rate penalty" 1.5 //0.54s, ~40% faster fire rate
+							"reload time increased" 0
+							"damage bonus" 6.75 //12 base dmg * 6.75 = 81 | 10% damage penalty
+							"projectile speed decreased" 0.5 //Slower to make their move speed more tolerable.
+							"custom projectile model" "models/buildables/sentry3_rockets.mdl"
+						}
+					}
+					Spellbook
+					{
+						StripItemSlot 0
+						StripItemSlot 1
+						Attributes DisableDodge
+						DesiredAttackRange 500
+						
+						Item "Mage Hat"
+						Item "Mage Shirt"
+						Item "Sun-on-a-Stick" //Instead of a book, they whack you with this.
+						Item "TF_WEAPON_SPELLBOOK"
+						ItemAttributes
+						{
+							ItemName "TF_WEAPON_SPELLBOOK"
+							"projectile speed decreased" 0.5 //~1020 * 0.5 = 510
+							
+							"mod projectile heat seek power" 10
+							"mod projectile heat aim time" 2
+							"mod projectile heat no predict target speed" 1
+							
+							"weapon burn dmg reduced" 0.5
+							"dmg penalty vs players" 0.5
+						}
+						Spell
+						{
+							Delay 5
+							Cooldown 10
+							Type "Fireball"
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllDead "wave6d3"
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 5
+			Where flankers
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 1
+			TotalCurrency 0
+			Support 1
+			TFBot
+			{
+				Class Scout
+				Name "Competitive Scout"
+				Health 250
+				Scale 1.15
+				Skill Expert
+				Action Mobber
+				UseHumanModel 2
+				Action Mobber //Do NOT pick up bomb.
+				CharacterAttributes
+				{
+					"damage force reduction" 0.75
+					"move speed penalty" 0.9
+				}
+				EventChangeAttributes
+				{
+					Default
+					{
+						MoveBehindEnemy 200
+						DesiredAttackRange 180
+						Item "Upgradeable TF_WEAPON_SCATTERGUN"
+						Item "Upgradeable TF_WEAPON_PISTOL"
+						Item "The Front Runner"
+						UseBestWeapon 1
+					}
+					MilkMark
+					{
+						Item "Mad Milk"
+						Item "The Fan O'War"
+						Item "The Milkman"
+						StripItemSlot 0 //removes primary
+						DesiredAttackRange 48 //melee range
+						ItemAttributes
+						{
+							ItemName "Mad Milk"
+							"effect bar recharge rate increased" 0.6
+						}
+					}
+					RocketSpammer
+					{
+						Item "The Shortstop"
+						Item "Cranium Cooler"
+						WeaponRestrictions PrimaryOnly
+						ItemAttributes
+						{
+							ItemName "The Shortstop"
+							"paintkit_proto_def_index" 414 //Bomb Carrier
+							"set_item_texture_wear" 0
+
+							"override projectile type" 2
+							"fire rate penalty" 1.5 //0.54s, ~40% faster fire rate
+							"reload time increased" 0
+							"damage bonus" 6.75 //12 base dmg * 6.75 = 81 | 10% damage penalty
+							"projectile speed decreased" 0.5 //Slower to make their move speed more tolerable.
+							"custom projectile model" "models/buildables/sentry3_rockets.mdl"
+						}
+					}
+					Spellbook
+					{
+						StripItemSlot 0
+						StripItemSlot 1
+						Attributes DisableDodge
+						DesiredAttackRange 500
+						
+						Item "Mage Hat"
+						Item "Mage Shirt"
+						Item "Sun-on-a-Stick" //Instead of a book, they whack you with this.
+						Item "TF_WEAPON_SPELLBOOK"
+						ItemAttributes
+						{
+							ItemName "TF_WEAPON_SPELLBOOK"
+							"projectile speed decreased" 0.5 //~1020 * 0.5 = 510
+							
+							"mod projectile heat seek power" 10
+							"mod projectile heat aim time" 2
+							"mod projectile heat no predict target speed" 1
+							
+							"weapon burn dmg reduced" 0.5
+							"dmg penalty vs players" 0.5
+						}
+						Spell
+						{
+							Delay 5
+							Cooldown 10
+							Type "Fireball"
+						}
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "Icon For Supports So They Actually Show Up"
+			WaitForAllDead "Support"
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 3
+			Support Limited
+			Squad
+			{
+				TFBot
+				{
+					Class Scout
+					Health 5
+					ClassIcon scout_fanowar_milk
+				}
+				TFBot
+				{
+					Class Scout
+					Health 5
+					ClassIcon soldier_spammer
+				}
+				TFBot
+				{
+					Class Scout
+					Health 5
+					ClassIcon pyro_dragon_fury_spell
+				}
+			}
+		}
+	}
+	// Wave 7 - Sweaty Scout Squad's Great Finale
+	//Subwave 1: The Lads (bulky support for bomb pressure)
+	//- Sweaty Scout Squad
+	//- Giant 
+	
+	//Subwave 2: HIS GLORIOUS SECOND COMING
+	//- Jeremessiah 2.0
+	//Support: Bonch! Scouts
+
+	//Subwave 3: Friendly Fiends, Aggressive Adversaries
+	//- Jeremy, Australium Assailant
+	//- Festive Fiend Jeremix
+	//Support: RED Jolly Jester Jerome
+	
+	Wave
+	{
+		SpawnTemplate "PT_Text_SweatyScoutSquad"
+		SpawnTemplate "PT_Bonch"
+		SpawnTemplate "PT_Text_GOLD_FESTIVE"
+		InitWaveOutput
+		{
+			Target "bignet"
+			Action "RunScriptCode"
+			Param "IncludeScript(`seel_runtime.nut`,getroottable())
+for (local ent; ent = Entities.FindByModel(ent, `models/bots/boss_bot/carrier_parts.mdl`); )
+	ent.AcceptInput(`DisableShadow`,``,null,null)
+
+//Cleanup existing thinkent
+for (local ent; ent = Entities.FindByName(ent,`_thinkent_bomballs`);)
+	ent.Kill()
+
+SeelRuntime.hBombTF <- SpawnEntityFromTable(`logic_script`,{ targetname = `_thinkent_bomballs` })
+SeelRuntime.hBombTF.ValidateScriptScope()
+SeelRuntime.hBombTF.GetScriptScope().Balls2BombsThink <- SeelRuntime.BallsToBombsThink
+AddThinkToEnt(SeelRuntime.hBombTF, `Balls2BombsThink`)
+
+SINS.ChangeIconFlags(`tf2_lite`,1)
+SINS.ChangeIconFlags(`tf2_lite_crit`,17)"
+		}
+		StartWaveOutput
+		{
+			Target wave_start_relay
+			Action Trigger
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		WaveSpawn
+		{
+			Name "wave7a3_Jeremy"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 25
+			FirstSpawnOutput
+			{
+				Target "wcq_text_relay"
+				Action Trigger
+				Delay 0.5
+			}
+			DoneOutput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "
+				local iRandom = RandomInt(1,3)
+				if (iRandom == 1)
+				{
+					EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_1()`,1,self)
+					SeelRuntime.DeathPrint_1 <- function() {
+						ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFJeremy, Arrogant Attacker \x07FCECCB:  Oh my god, you all suck`)
+					}
+				}"
+			}
+			TFBot
+			{
+				Template T_TFBot_Player_Scout_Jeremy
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a3_Jeremiah"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 25
+			DoneOutput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "
+				local iRandom = RandomInt(1,3)
+				if (iRandom == 1)
+				{
+					EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_2()`,1,self)
+					EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_2b()`,1,self)
+					SeelRuntime.DeathPrint_2 <- function() {
+						ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFKING JEREMIAH \x07FCECCB:  INVADER BANISHED`)
+					}
+					SeelRuntime.DeathPrint_2b <- function() {
+						ClientPrint(null,3,`\x07FCECCBKING JEREMIAH left the game (Returned to their world.)`)
+					}
+				}"
+			}
+			TFBot
+			{
+				Template T_TFBot_Player_Scout_Flare
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a3_Jeremius"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 25
+			DoneOutput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "
+				local iRandom = RandomInt(1,3)
+				if (iRandom == 1)
+				{
+					EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_3()`,1,self)
+					EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_3b()`,2.7,self)
+					EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_3c()`,3.7,self)
+					SeelRuntime.DeathPrint_3 <- function() {
+						ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFJeremius the Blood-oath Lord \x07FCECCB:  FUCK OFF!!!!!!`)
+					}
+					SeelRuntime.DeathPrint_3b <- function() {
+						ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFJeremius the Blood-oath Lord \x07FCECCB:  ugh whtvr i;m not wasting any time on thsi trash`)
+					}
+					SeelRuntime.DeathPrint_3c <- function() {
+						ClientPrint(null,3,`\x07FCECCBJeremius the Blood-oath Lord left the game (Disconnect by user.)`)
+					}
+				}"
+			}
+			TFBot
+			{
+				Template T_TFBot_Player_Scout_ShortstopCleaver
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a3_Jerome"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 25
+			DoneOutput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "
+				local iRandom = RandomInt(1,3)
+				if (iRandom == 1)
+				{
+					EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_4()`,1,self)
+					SeelRuntime.DeathPrint_4 <- function() {
+						ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFJester Jerome \x07FCECCB:  n1`)
+					}
+				}"
+			}
+			TFBot
+			{
+				Template T_TFBot_Player_Scout_BackScatter
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a3_Jeremix"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 25
+			DoneOutput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "
+				local iRandom = RandomInt(1,3)
+				if (iRandom == 1)
+				{
+					EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_5()`,1,self)
+					EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_5b()`,2.5,self)
+					SeelRuntime.DeathPrint_5 <- function() {
+						ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFThe Festive Jeremix \x07FCECCB:  hehe`)
+					}
+					SeelRuntime.DeathPrint_5b <- function() {
+						ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFThe Festive Jeremix \x07FCECCB:  fan+bonk go brrrr`)
+					}
+				}"
+			}
+			TFBot
+			{
+				Template T_TFBot_Player_Scout_FAN_Bonk
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a3_Jeremessiah"
+			Where spawnbot
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 25
+			DoneOutput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "
+				local iRandom = RandomInt(1,3)
+				if (iRandom == 1)
+				{
+					EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_6()`,0.75,self)
+					EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_6b()`,2.5,self)
+					SeelRuntime.DeathPrint_6 <- function() {
+						ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFYour Savior: Jeremessiah \x07FCECCB:  idiots`)
+					}
+					SeelRuntime.DeathPrint_6b <- function() {
+						ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFYour Savior: Jeremessiah \x07FCECCB:  im literally carrying you`)
+					}
+				}"
+			}
+			TFBot
+			{
+				Template T_TFBot_Player_Scout_TheBastard
+			}
+		}
+		// Specific WaveSpawn names kept in case I want to do something with them later, so this hacky solution will have to do.
+		WaveSpawn { Name "wave7a3" WaitForAllDead "wave7a3_Jeremessiah" Support Limited 	}
+		WaveSpawn { Name "wave7a3" WaitForAllDead "wave7a3_Jeremiah" 	Support Limited 	}
+		WaveSpawn { Name "wave7a3" WaitForAllDead "wave7a3_Jeremius" 	Support Limited 	}
+		WaveSpawn { Name "wave7a3" WaitForAllDead "wave7a3_Jeremix" 		Support Limited 	}
+		WaveSpawn { Name "wave7a3" WaitForAllDead "wave7a3_Jeremy" 		Support Limited 	}
+		WaveSpawn { Name "wave7a3" WaitForAllDead "wave7a3_Jerome" 		Support Limited 	}
+		
+		WaveSpawn
+		{
+			Name "wave7a"
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 10
+			Where flankers
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 30
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Flamer
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a"
+			WaitForAllDead "wave7a3_Jeremessiah"
+			Where flankers
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 30
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Flamer
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a"
+			WaitForAllDead "wave7a3_Jeremiah"
+			Where flankers
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 30
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Flamer
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a"
+			WaitForAllDead "wave7a3_Jeremius"
+			Where flankers
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 30
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Flamer
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave7a"
+			WaitForAllDead "wave7a3_Jeremix"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 20
+			TFBot
+			{
+				Template T_TFBot_Scout_BomberLeague_Spammer
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a"
+			WaitForAllDead "wave7a3_Jeremy"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 20
+			TFBot
+			{
+				Template T_TFBot_Scout_BomberLeague_Spammer
+			}
+		}
+		WaveSpawn
+		{
+			Name "wave7a"
+			WaitForAllDead "wave7a3_Jerome"
+			Where spawnbot
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 4
+			TotalCurrency 20
+			TFBot
+			{
+				Template T_TFBot_Scout_BomberLeague_Spammer
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave7_all"
+			WaitForAllDead "wave7a3"
+		}
+		WaveSpawn
+		{
+			Name "wave7_all"
+			WaitForAllDead "wave7a"
+		}
+		
+		WaveSpawn
+		{
+			Name "wave7d"
+			WaitForAllDead "wave7_all"
+			Where spawnbot
+			WaitBeforeStarting 5
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			TotalCurrency 150
+			StartWaveOutput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "
+				EntFire(`player`,`$PlaySoundToSelf`,`mvm/mvm_bought_in.wav`,5)
+				
+				EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_7()`,3.25,self)
+				EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_7b()`,4.75,self)
+				EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_7c()`,5,self)
+				SeelRuntime.DeathPrint_7 <- function() {
+					ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFYour Savior: Jeremessiah \x07FCECCB:  thats it`)
+				}
+				SeelRuntime.DeathPrint_7b <- function() {
+					ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFYour Savior: Jeremessiah \x07FCECCB:  watch n learn slowpokes`)
+				}
+				SeelRuntime.DeathPrint_7c <- function() {
+					ClientPrint(null,3,`\x0799CCFFYour Savior: Jeremessiah \x07FCECCBhas bought back in for '0' credits!`)
+				}"
+			}
+			DoneOutput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "
+				EntFire(`!activator`,`RunScriptCode`,`DeathPrint_7d()`,1,self)
+				EntFire(`!activator`,`RunScriptCode`,`DeathPrint_7e()`,4,self)
+				::DeathPrint_7d <- function() {
+					ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFJeremessiah, Carbonated Doom \x07FCECCB:  ...no`)
+				}
+				::DeathPrint_7e <- function() {
+					ClientPrint(null,3,`\x07FCECCBJeremessiah, Carbonated Doom left the game (Drank too much.)`)
+				}"
+			}
+			
+			TFBot
+			{
+				Template T_TFBot_Chief_Scout_Soda
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "wave7e"
+			WaitForAllDead "wave7d"
+			WaitBeforeStarting 6
+			Where spawnbot
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			TotalCurrency 240
+			StartWaveOutput
+			{
+				Target "bignet"
+				Action "RunScriptCode"
+				Param "
+				EntFire(`player`,`$PlaySoundToSelf`,`mvm/mvm_bought_in.wav`,6)
+				
+				EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_8()`,4,self)
+				EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_8b()`,5,self)
+				EntFire(`!activator`,`RunScriptCode`,`SeelRuntime.DeathPrint_8c()`,6,self)
+				SeelRuntime.DeathPrint_8 <- function() {
+					ClientPrint(null,3,`\x07FCECCBJester Jerome has joined team DEFENDERS`)
+					ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFJeremy, Arrogant Attacker \x07FCECCB:  Alright, Jeremix`)
+				}
+				SeelRuntime.DeathPrint_8b <- function() {
+					ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFJeremy, Arrogant Attacker \x07FCECCB:  We're up, show'm what we got`)
+				}
+				SeelRuntime.DeathPrint_8c <- function() {
+					ClientPrint(null,3,`\x0799CCFFJeremy, Arrogant Attacker \x07FCECCBhas bought back in for '0' credits!`)
+					ClientPrint(null,3,`\x0799CCFFThe Festive Jeremix \x07FCECCBhas bought back in for '0' credits!`)
+					ClientPrint(null,3,`\x07FF3F3FJester Jerome \x07FCECCBhas bought back in for '0' credits!`)
+					ClientPrint(null,3,`\x07FF3F3FJester Jerome \x07FCECCB:  me 2 :)`)
+				}
+				"
+			}
+			DoneOutput
+			{
+				Target "bignet"
+				Action "RunScriptCode" // It's not pretty but this is the cleanest way to do post-win dialogue that I know of .n.
+				Param "
+				EntFire(`!activator`,`RunScriptCode`,`DeathPrint_9()`,1.5,self)
+				EntFire(`!activator`,`RunScriptCode`,`DeathPrint_9b()`,2.2,self)
+				EntFire(`!activator`,`RunScriptCode`,`DeathPrint_9c()`,2.9,self)
+				::DeathPrint_9 <- function() {
+					ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFAustralium Assailant Jeremy \x07FCECCB:  Dangit, so close. gg though!`)
+				}
+				::DeathPrint_9b <- function() {
+					ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFFestive Fiend Jeremix \x07FCECCB:  noooo 8( i thought we had it...`)
+				}
+				::DeathPrint_9c <- function() {
+					ClientPrint(null,3,`\x07FF3F3FJester Jerome \x07FCECCB:  gg, close ^-^`)
+					ClientPrint(null,3,`\x07FCECCB*DEAD* \x0799CCFFFestive Fiend Jeremix \x07FCECCB:  next time forsure!!!`)
+				}
+				"
+			}
+			Squad
+			{
+				NoWaitForFormation 1
+				FormationSize 250
+				TFBot
+				{
+					Template T_TFBot_Chief_Scout_GOLD
+				}
+				TFBot
+				{
+					Template T_TFBot_Chief_Scout_FESTIVE
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "RED Support"
+			WaitForAllSpawned "wave7e"
+			Where spawnbot_hatch
+			WaitBetweenSpawnsAfterDeath 5
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			HideIcon 1
+			Support 1
+			FirstSpawnOutput
+			{
+				Target bignet
+				Action RunScriptCode
+				Param "SINS.ChangeIconFlags(`red_lite`,2)"
+			}
+			TFBot
+			{
+				Template T_TFBot_Player_Scout_BackScatter_Ally
+			}
+		}
+		WaveSpawn
+		{
+			Name "Support"
+			WaitForAllSpawned "wave7d"
+			Where flankers
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 14
+			TotalCount 30
+			MaxActive 7
+			SpawnCount 5
+			TotalCurrency 30 //Little bit of money for Scout to get during this section, but not so much that you'd need to hunt it for too long.
+			Support 1
+			RandomChoice //60% Shortstop, 40% Fan O' War
+			{
+				TFBot
+				{
+					Template T_TFBot_Scout_Bonch
+					WeaponRestrictions PrimaryOnly
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_Bonch
+					WeaponRestrictions PrimaryOnly
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_Bonch
+					WeaponRestrictions PrimaryOnly
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_Bonch
+					WeaponRestrictions MeleeOnly
+				}
+				TFBot
+				{
+					Template T_TFBot_Scout_Bonch
+					WeaponRestrictions MeleeOnly
+				}
+			}
+		}
+		
+		WaveSpawn
+		{
+			Name "Icon For Precaching So It Gets Downloaded Properly"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			HideIcon 1
+			Support Limited
+			Squad
+			{
+				TFBot
+				{
+					Class Scout
+					Health 5
+					ClassIcon scout_golden_lite
+				}
+				TFBot
+				{
+					Class Scout
+					Health 5
+					ClassIcon scout_shieldshake_v1
+				}
+				TFBot
+				{
+					Class Scout
+					Health 5
+					ClassIcon scout_hastefizz_v1
+				}
+				TFBot
+				{
+					Class Scout
+					Health 5
+					ClassIcon scout_kritzcola_v1
+				}
+			}
+		}
+	}
+}

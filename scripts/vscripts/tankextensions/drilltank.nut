@@ -1,114 +1,164 @@
 local DRILLTANK_VALUES_TABLE = {
 	DRILLTANK_MODEL_DRILL            = "models/bots/boss_bot/tank_drill.mdl"
-	DRILLTANK_DAMAGE                 = 50
-	DRILLTANK_DAMAGE_DELAY           = 0.33
-	DRILLTANK_DAMAGE_SPEED_PENALTY   = 0.25
+	DRILLTANK_DAMAGE                 = 10
+	DRILLTANK_DAMAGE_DELAY           = 0.05
+	DRILLTANK_DAMAGE_SPEED_PENALTY   = 0.3
 	DRILLTANK_DAMAGE_DEBUFF_DURATION = 1
-	DRILLTANK_FRIENDLY_FIRE          = false
+	DRILLTANK_FRIENDLY_FIRE          = true
 	DRILLTANK_SOUND_SPIN             = ")ambient/sawblade.wav"
-	DRILLTANK_FUNCTION_SOUND_HURT    = function()
-	{
-		local sSound = format(")ambient/sawblade_impact%i.wav", RandomInt(1, 2))
-		TankExt.PrecacheSound(sSound)
-		EmitSoundEx({
-			sound_name = sSound
-			sound_level = 85
-			pitch = 90
-			entity = self
-			filter_type = RECIPIENT_FILTER_GLOBAL
-		})
-	}
 }
 foreach(k,v in DRILLTANK_VALUES_TABLE)
 	if(!(k in TankExt.ValueOverrides))
 		ROOT[k] <- v
 
+PrecacheModel(DRILLTANK_MODEL_DRILL)
 TankExt.PrecacheSound(DRILLTANK_SOUND_SPIN)
+PrecacheSound(")physics/metal/canister_scrape_smooth_loop1.wav")
 
 ::DrillTankEvents <- {
-	OnGameEvent_recalculate_holidays = function(_) { if(GetRoundState() == 3) delete ::DrillTankEvents }
-	OnScriptHook_OnTakeDamage = function(params)
+	function OnGameEvent_recalculate_holidays(_) { if(GetRoundState() == 3) delete ::DrillTankEvents }
+	function OnScriptHook_OnTakeDamage(params)
 	{
-		local hVictim = params.const_entity
+		local hVictim   = params.const_entity
 		local hAttacker = params.attacker
-		if(hVictim && hAttacker && hAttacker.GetClassname() == "tank_boss" && "DrillThink" in hAttacker.GetScriptScope())
-			params.force_friendly_fire = DRILLTANK_FRIENDLY_FIRE
+		if(hVictim && hAttacker && hAttacker.GetClassname() == "tank_boss")
+		{
+			local DrillScope = TankExt.GetMultiScopeTable(hAttacker.GetScriptScope(), "drilltank")
+			if(DrillScope) params.force_friendly_fire = DRILLTANK_FRIENDLY_FIRE
+		}
 	}
 }
 __CollectGameEventCallbacks(DrillTankEvents)
 
-TankExt.NewTankScript("drilltank", {
-	OnSpawn = function(hTank, sName, hPath)
+TankExt.NewTankType("drilltank", {
+	function OnSpawn()
 	{
 		EmitSoundEx({
-			sound_name = DRILLTANK_SOUND_SPIN
+			sound_name  = DRILLTANK_SOUND_SPIN
 			sound_level = 80
-			pitch = 85
-			entity = hTank
+			pitch       = 90
+			entity      = self
 			filter_type = RECIPIENT_FILTER_GLOBAL
 		})
 
-		local hTank_scope = hTank.GetScriptScope()
-		hTank_scope.hBomb <- null
-		for(local hChild = hTank.FirstMoveChild(); hChild; hChild = hChild.NextMovePeer())
-		{
-			local sChildModel = hChild.GetModelName().tolower()
-			if(sChildModel.find("bomb_mechanism"))
-				hTank_scope.hBomb = hChild
-		}
-
-		local bFinalSkin = hTank.GetSkin() & 1
-		local bBlueTeam = hTank.GetTeam() == 3
-		hTank_scope.hModel <- SpawnEntityFromTable("prop_dynamic", { model = DRILLTANK_MODEL_DRILL, skin = (bBlueTeam ? 0 : 4) + (bFinalSkin ? 2 : 0)})
-		hTank_scope.hModel.AcceptInput("SetAnimation", "drill_spin", null, null)
-		hTank_scope.hDrillHurt <- SpawnEntityFromTable("trigger_multiple", {
-			origin = "162 0 97"
-			spawnflags = 64
-			OnStartTouch = "!selfRunScriptCodeself.GetRootMoveParent().GetScriptScope().Drill(activator)0-1"
+		local bFinalSkin = self.GetSkin() == 1
+		local bBlueTeam  = self.GetTeam() == TF_TEAM_BLUE
+		local iSkin      = bBlueTeam ? bFinalSkin ? 2 : 0 : bFinalSkin ? 6 : 4
+		local hModel     = SpawnEntityFromTableSafe("prop_dynamic", { model = DRILLTANK_MODEL_DRILL, skin = iSkin })
+		hModel.AcceptInput("SetAnimation", "drill_spin", null, null)
+		local hDrillHurt = SpawnEntityFromTableSafe("trigger_multiple", {
+			origin       = "162 0 97"
+			spawnflags   = 1
 		})
-		hTank_scope.hDrillHurt.SetSize(Vector(-46, -40, -40), Vector(46, 40, 40))
-		hTank_scope.hDrillHurt.SetSolid(SOLID_BBOX)
-		TankExt.SetParentArray([hTank_scope.hModel, hTank_scope.hDrillHurt], hTank)
+		hDrillHurt.SetSize(Vector(-46, -40, -40), Vector(46, 40, 40))
+		hDrillHurt.SetSolid(SOLID_OBB)
+		hDrillHurt.ConnectOutput("OnStartTouch", "StartTouch")
+		hDrillHurt.ConnectOutput("OnEndTouch", "EndTouch")
+		TankExt.SetParentArray([hModel, hDrillHurt], self)
 
-		hTank_scope.bDeploying <- false
-		hTank_scope.Drill <- function(hEnt)
+		local hTank     = self
+		local hTouching = {}
+		hDrillHurt.ValidateScriptScope()
+		hDrillHurt.GetScriptScope().StartTouch <- function()
 		{
-			if((hEnt.GetClassname() == "player" && (DRILLTANK_FRIENDLY_FIRE || hEnt.GetTeam() != self.GetTeam())))
+			local iPlayerTeamNum = activator.GetTeam()
+			if(DRILLTANK_FRIENDLY_FIRE || iPlayerTeamNum != hTank.GetTeam())
 			{
-				hDrillHurt.AcceptInput("Disable", null, null, null)
-				EntFireByHandle(hDrillHurt, "Enable", null, DRILLTANK_DAMAGE_DELAY, null, null)
-				hEnt.TakeDamageEx(self, self, null, Vector(), Vector(), DRILLTANK_DAMAGE, DMG_CLUB)
-				hEnt.SetAbsVelocity(Vector())
-				hEnt.BleedPlayer(DRILLTANK_DAMAGE_DEBUFF_DURATION)
-				hEnt.StunPlayer(DRILLTANK_DAMAGE_DEBUFF_DURATION, 1 - DRILLTANK_DAMAGE_SPEED_PENALTY, 1, self)
-				DRILLTANK_FUNCTION_SOUND_HURT()
+				if(hTouching.len() == 0)
+				{
+					EmitSoundEx({
+						sound_name  = DRILLTANK_SOUND_SPIN
+						sound_level = 80
+						pitch       = 80
+						entity      = hTank
+						filter_type = RECIPIENT_FILTER_GLOBAL
+						flags       = SND_CHANGE_PITCH
+					})
+					EmitSoundEx({
+						sound_name  = ")physics/metal/canister_scrape_smooth_loop1.wav"
+						sound_level = 85
+						entity      = hTank
+						filter_type = RECIPIENT_FILTER_GLOBAL
+					})
+				}
+				hTouching[activator] <- iPlayerTeamNum
 			}
 		}
-		hTank_scope.DrillThink <- function()
+		hDrillHurt.GetScriptScope().EndTouch <- function()
 		{
-			if(!bDeploying && hBomb.GetSequenceName(hBomb.GetSequence()) == "deploy")
+			if(activator in hTouching)
 			{
-				bDeploying = true
-				hModel.AcceptInput("SetAnimation", "drill_deploy", null, null)
-				hDrillHurt.Kill()
-				EmitSoundEx({
-					sound_name = DRILLTANK_SOUND_SPIN
-					entity = self
-					filter_type = RECIPIENT_FILTER_GLOBAL
-					flags = 4
-				})
+				delete hTouching[activator]
+				if(hTouching.len() == 0)
+				{
+					EmitSoundEx({
+						sound_name  = DRILLTANK_SOUND_SPIN
+						sound_level = 80
+						pitch       = 90
+						entity      = hTank
+						filter_type = RECIPIENT_FILTER_GLOBAL
+						flags       = SND_CHANGE_PITCH
+					})
+					EmitSoundEx({
+						sound_name  = ")physics/metal/canister_scrape_smooth_loop1.wav"
+						entity      = hTank
+						filter_type = RECIPIENT_FILTER_GLOBAL
+						flags       = SND_STOP
+					})
+				}
 			}
-			return -1
 		}
-		TankExt.AddThinkToEnt(hTank, "DrillThink")
-		SetDestroyCallback(hTank, function()
+
+		local flTimeDrillLast = 0
+		function Think()
 		{
+			local iDrillSkin = hModel.GetSkin()
+			if(iHealth / iMaxHealth.tofloat() <= 0.5) { if(iDrillSkin != iSkin + 1) hModel.SetSkin(iSkin + 1) }
+			else if(iDrillSkin != iSkin) hModel.SetSkin(iSkin)
+
+			if(flTime >= flTimeDrillLast)
+			{
+				flTimeDrillLast = flTime + DRILLTANK_DAMAGE_DELAY
+				local bPlayDrillSound = false
+
+				foreach(hPlayer, iPlayerTeamNum in hTouching)
+					if(hPlayer.IsValid())
+					{
+						bPlayDrillSound = true
+						hPlayer.TakeDamageEx(self, self, null, Vector(), Vector(), DRILLTANK_DAMAGE, DMG_CRUSH)
+						hPlayer.SetAbsVelocity(hPlayer.GetAbsVelocity() * 0.75)
+						hPlayer.BleedPlayer(DRILLTANK_DAMAGE_DEBUFF_DURATION)
+						hPlayer.StunPlayer(DRILLTANK_DAMAGE_DEBUFF_DURATION, 1 - DRILLTANK_DAMAGE_SPEED_PENALTY, 1, null)
+					}
+					else delete hTouching[hPlayer]
+			}
+		}
+		function OnStartDeploy()
+		{
+			hModel.AcceptInput("SetAnimation", "drill_deploy", null, null)
+			hDrillHurt.Kill()
+			hTouching.clear()
 			EmitSoundEx({
-				sound_name = DRILLTANK_SOUND_SPIN
-				entity = self
+				sound_name  = DRILLTANK_SOUND_SPIN
+				entity      = self
 				filter_type = RECIPIENT_FILTER_GLOBAL
-				flags = 4
+				flags       = SND_STOP
 			})
+			EmitSoundEx({
+				sound_name  = ")physics/metal/canister_scrape_smooth_loop1.wav"
+				entity      = self
+				filter_type = RECIPIENT_FILTER_GLOBAL
+				flags       = SND_STOP
+			})
+		}
+	}
+	function OnDeath()
+	{
+		EmitSoundEx({
+			sound_name  = "misc/null.wav"
+			entity      = self
+			filter_type = RECIPIENT_FILTER_GLOBAL
+			flags       = SND_STOP | SND_IGNORE_NAME
 		})
 	}
 })

@@ -1,0 +1,231 @@
+"VertexlitGeneric"
+{
+	"$baseTexture" "models/weapons/c_items/c_boxing_gloves_gray"
+	"$bumpmap" "models/weapons/c_items/c_boxing_gloves_normal"
+
+
+
+	"$phong" "1"
+	"$phongexponent" "30"
+	"$phongboost" "4"	
+//	"$lightwarptexture" "models/player/pyro/pyro_lightwarp"
+	"$phongfresnelranges"	"[.25 .55 3]"
+	"$halflambert" "0"
+//	"$basemapalphaphongmask" "1"
+
+	"$rimlight" "1"
+	"$rimlightexponent" "3"
+	"$rimlightboost" ".2"
+	"$rimmask" "1"
+
+
+	"$glowcolor" "[1 1 1]"
+
+	// Cloaking
+	"$cloakPassEnabled" "1"
+	"$sheenPassEnabled" "1"
+
+	"$sheenmap" 		"cubemaps/cubemap_sheen001"
+	"$sheenmapmask" 		"Effects/AnimatedSheen/animatedsheen0"
+	"$sheenmaptint" 		"[ 1 1 1 ]"
+	"$sheenmapmaskframe" 	"0"
+	"$sheenindex" 		"0"
+
+	"$yellow" "0"
+
+	"$bluMiniCritGlow" "[29 202 135]"
+	"$redMiniCritGlow" "[29 202 135]"
+	"$redCritGlow" "[100 100 100]"
+    "$bluCritGlow" "[100 100 100]"
+	"$originalCritGlow" "[0 0 0]"
+	"$originalCritGlow2" .0
+	$bluMiniCrit 0
+	$bluCrit 0
+	$redMiniCrit 0
+	$redCrit 0
+	$hypeBoost 0
+
+	$onethirtyfive 135
+	$eighty 80
+	$sixtytwo 62
+	$fourtyeight 48
+	$five 5
+
+	$zero 0.0
+	$one 1.0
+	"Proxies"
+	{
+		"ModelGlowColor"
+		{
+			"resultVar" "$originalCritGlow"
+		}
+		// split 
+        
+		Clamp
+		{
+			srcVar1                      $zero
+			min                         "$originalCritGlow[2]"
+			max                         "$originalCritGlow[2]"
+			resultVar                    $originalCritGlow2
+		}
+
+		// if its 135 its a blue mini crit
+		Subtract
+		{
+			srcVar1						$originalCritGlow2
+			srcVar2						$onethirtyfive
+			resultVar					$bluMiniCrit
+		}
+
+		// if its 80 its a blue crit
+		Subtract
+		{
+			srcVar1						$originalCritGlow2
+			srcVar2						$eighty
+			resultVar					$bluCrit
+		}
+		
+		// if its 48 its a blue crit
+		// hardcode this to avoid resetting it
+		Subtract
+		{
+			srcVar1						$originalCritGlow2
+			srcVar2						$fourtyeight
+			resultVar					$hypeBoost
+		}
+
+		// if its 62 its a red minicrit
+		Subtract
+		{
+			srcVar1						$originalCritGlow2
+			srcVar2						$sixtytwo
+			resultVar					$redMiniCrit
+		}
+
+		// if its 5 its a red crit
+		Subtract
+		{
+			srcVar1						$originalCritGlow2
+			srcVar2						$five
+			resultVar					$redCrit
+		}
+
+		Abs
+		{
+			srcVar1						$bluMiniCrit
+			resultVar					$bluMiniCrit
+		}
+		Abs
+		{
+			srcVar1						$bluCrit
+			resultVar					$bluCrit
+		}
+		Abs
+		{
+			srcVar1						$hypeBoost
+			resultVar					$hypeBoost
+		}
+		Abs
+		{
+			srcVar1						$redMiniCrit
+			resultVar					$redMiniCrit
+		}
+		Abs
+		{
+			srcVar1						$redCrit
+			resultVar					$redCrit
+		}
+		Abs
+		{
+			srcVar1						$redCrit
+			resultVar					$redCrit
+		}
+
+		// this is essentially just a bunch of == operators for both color2 and selfillumtint
+		LessOrEqual
+		{
+			lessEqualVar $bluMiniCritGlow
+			greaterVar $glowcolor
+			srcVar1 $bluMiniCrit
+			srcVar2 $zero
+			resultVar $glowcolor
+		}
+		
+		LessOrEqual
+		{
+			lessEqualVar $bluCritGlow
+			greaterVar $glowcolor
+			srcVar1 $bluCrit
+			srcVar2 $zero
+			resultVar $glowcolor
+		}
+		
+		LessOrEqual
+		{
+			lessEqualVar $originalCritGlow
+			greaterVar $glowcolor
+			srcVar1 $hypeBoost
+			srcVar2 $zero
+			resultVar $glowcolor
+		}
+
+		LessOrEqual
+		{
+			lessEqualVar $redMiniCritGlow
+			greaterVar $glowcolor
+			srcVar1 $redMiniCrit
+			srcVar2 $zero
+			resultVar $glowcolor
+		}
+		
+		LessOrEqual
+		{
+			lessEqualVar $redCritGlow
+			greaterVar $glowcolor
+			srcVar1 $redCrit
+			srcVar2 $zero
+			resultVar $glowcolor
+		}
+
+		////////////// Reset 
+		
+		LessOrEqual
+		{
+			lessEqualVar $one
+			greaterVar $glowcolor
+			srcVar1 $originalCritGlow2
+			srcVar2 $one
+			resultVar $glowcolor
+		}
+		"AnimatedWeaponSheen"
+		{
+			"animatedtexturevar" 		"$sheenmapmask"
+			"animatedtextureframenumvar" 	"$sheenmapmaskframe"
+			"animatedtextureframerate" 		"40"
+		}
+		"invis"
+		{
+		}
+		
+		"Equals"
+		{
+			"srcVar1"  "$glowcolor"
+			"resultVar" "$selfillumtint"
+		}
+		"Equals"
+		{
+			"srcVar1"  "$glowcolor"
+			"resultVar" "$color2"
+		}
+		"YellowLevel"
+		{
+			"resultVar" "$yellow"
+		}
+		"Multiply"
+		{
+			"srcVar1" "$color2"
+			"srcVar2" "$yellow"
+			"resultVar" "$color2"
+		}
+	}
+}

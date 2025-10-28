@@ -1,416 +1,387 @@
-////////////////////////////////////////////////////////////////////////////////////////////
-// example tank name : "combattank|rocketpod|minigun"
-// add _red to combattank for a red teamed tank
-// second argument, rocketpod, places it on the tank's left side
-// third argument, minigun, places it on the tank's right side
-// intended to be put onto a LOOPING path
-////////////////////////////////////////////////////////////////////////////////////////////
-// look at scripts inside of the combattank_weapons folder for weapon names
-////////////////////////////////////////////////////////////////////////////////////////////
-// popfile example can be found at https://testing.potato.tf/tf/scripts/population/mvm_slick_v4_combattank.pop
-////////////////////////////////////////////////////////////////////////////////////////////
-
 local COMBATTANK_VALUES_TABLE = {
 	COMBATTANK_SND_ROTATE           = ")plats/tram_move.wav"
+	COMBATTANK_SND_UBER             = "player/invulnerable_on.wav"
+	COMBATTANK_SND_UBER_OFF         = "player/invulnerable_off.wav"
 	COMBATTANK_ROTATE_SPEED_DEFAULT = 0.8
 	COMBATTANK_POSE_YAW             = 2
 	COMBATTANK_POSE_PITCH           = 1
-	COMBATTANK_MODEL                = "models/bots/boss_bot/combat_tank/combat_tank.mdl"
-	COMBATTANK_TRACK_L_BLUE         = "models/bots/boss_bot/tank_track_l.mdl"
-	COMBATTANK_TRACK_R_BLUE         = "models/bots/boss_bot/tank_track_r.mdl"
+	COMBATTANK_MODEL                = "models/bots/boss_bot/combat_tank_mk2/mk2_combat_tank_chassis.mdl"
+	COMBATTANK_MODEL_UBERED_TRACK_L = "models/bots/boss_bot/ubertank/tank_uber_track_l.mdl"
+	COMBATTANK_MODEL_UBERED_TRACK_R = "models/bots/boss_bot/ubertank/tank_uber_track_r.mdl"
 	COMBATTANK_TRACK_L_RED          = "models/bots/boss_bot/tankred_track_l.mdl"
 	COMBATTANK_TRACK_R_RED          = "models/bots/boss_bot/tankred_track_r.mdl"
-	COMBATTANK_MAX_RANGE            = 1400
+	COMBATTANK_MAX_RANGE            = 1800
 }
 foreach(k,v in COMBATTANK_VALUES_TABLE)
 	if(!(k in TankExt.ValueOverrides))
 		ROOT[k] <- v
 
 PrecacheModel(COMBATTANK_MODEL)
-PrecacheModel(COMBATTANK_TRACK_L_BLUE)
-PrecacheModel(COMBATTANK_TRACK_R_BLUE)
 PrecacheModel(COMBATTANK_TRACK_L_RED)
 PrecacheModel(COMBATTANK_TRACK_R_RED)
+PrecacheModel(COMBATTANK_MODEL_UBERED_TRACK_L)
+PrecacheModel(COMBATTANK_MODEL_UBERED_TRACK_R)
 TankExt.PrecacheSound(COMBATTANK_SND_ROTATE)
+TankExt.PrecacheSound(COMBATTANK_SND_UBER)
+TankExt.PrecacheSound(COMBATTANK_SND_UBER_OFF)
 
-::CombatTankWeapons <- {}
-
-function TankExt::IsPlayerStealthedOrDisguised(player)
-{
-	return (player.IsStealthed() || player.InCond(TF_COND_DISGUISED)) &&
-		!player.InCond(TF_COND_BURNING) &&
-		!player.InCond(TF_COND_URINE) &&
-		!player.InCond(TF_COND_STEALTHED_BLINK) &&
-		!player.InCond(TF_COND_BLEEDING)
-}
-function TankExt::CombatTankRefreshSkin(hTank)
-{
-	local hTank_scope = hTank.GetScriptScope()
-	if(hTank_scope == null) return
-	local bBlueTeam = hTank.GetTeam() == 3
-
-	local iSkin = bBlueTeam ? hTank_scope.bUbered ? 5 : 2 + hTank_scope.iSkinLast : hTank_scope.bUbered ? 4 : hTank_scope.iSkinLast
-	local iSkinWeapon = bBlueTeam ? hTank_scope.bUbered ? 3 : 1 : hTank_scope.bUbered ? 2 : 0
-
-	TankExt.SetTankModel(hTank, {
-		LeftTrack = bBlueTeam ? COMBATTANK_TRACK_L_BLUE : COMBATTANK_TRACK_L_RED
-		RightTrack = bBlueTeam ? COMBATTANK_TRACK_R_BLUE : COMBATTANK_TRACK_R_RED
-	})
-
-	hTank.SetSkin(iSkin)
-	for(local hChild = hTank.FirstMoveChild(); hChild != null; hChild = hChild.NextMovePeer())
-		if(HasProp(hChild, "m_nSkin")) hChild.SetSkin(iSkinWeapon)
-	
-	if(TankExt.ExistsInScope(hTank_scope, "hBeam"))
-		TankExt.SetEntityColor(hTank_scope.hBeam, bBlueTeam ? 0 : 255, 0, bBlueTeam ? 255 : 0, 255)
-	if(TankExt.ExistsInScope(hTank_scope, "hBeamEnd"))
-		TankExt.SetEntityColor(hTank_scope.hBeamEnd, bBlueTeam ? 0 : 255, 0, bBlueTeam ? 255 : 0, 255)
-}
-function TankExt::CombatTankPlaySound(SoundTable, bLooping = false)
-{
-	local hTank_scope = SoundTable.entity.GetScriptScope()
-	local SoundPlaying = hTank_scope.SoundPlaying
-	local sSoundName = SoundTable.sound_name
-
-	if(bLooping)
+::CombatTankEvents <- {
+	function OnGameEvent_recalculate_holidays(_) { if(GetRoundState() == 3) delete ::CombatTankEvents }
+	function OnScriptHook_OnTakeDamage(params)
 	{
-		sSoundName += "_LOOPING"
-		if(sSoundName in SoundPlaying)
-			return
+		local hAttacker = params.attacker
+		local hVictim   = params.const_entity
+		if(hAttacker && hVictim && hVictim.GetClassname() == "tank_boss" && hAttacker.GetTeam() != hVictim.GetTeam())
+		{
+			local CombatScope = TankExt.GetMultiScopeTable(hVictim.GetScriptScope(), "combattank")
+			if(CombatScope && CombatScope.bUbered)
+			{
+				params.damage = 0
+				EmitSoundOn("FX_RicochetSound.Ricochet", hVictim)
+			}
+		}
 	}
-	
-	hTank_scope.SoundQueue[sSoundName] <- SoundTable
 }
-function TankExt::CombatTankStopSound(SoundTable)
-{
-	local hTank_scope = SoundTable.entity.GetScriptScope()
-	local SoundPlaying = hTank_scope.SoundPlaying
-	local sSoundName = SoundTable.sound_name
+__CollectGameEventCallbacks(CombatTankEvents)
 
-	if(sSoundName in SoundPlaying)
-		delete SoundPlaying[sSoundName]
-	if(sSoundName + "_LOOPING" in SoundPlaying)
-		delete SoundPlaying[sSoundName + "_LOOPING"]
-	
-	EmitSoundEx(SoundTable)
-}
+TankExt.CombatTankWeapons <- {}
 
-TankExt.NewTankScript("combattank*", {
-	Model = {
-		Default = COMBATTANK_MODEL
-	}
+TankExt.NewTankType("combattank*", {
+	Model       = COMBATTANK_MODEL
 	DisableBomb = 1
-	OnSpawn = function(hTank, sName, hPath)
+	function OnSpawn()
 	{
-		local hTank_scope = hTank.GetScriptScope()
+		local SoundQueue = {}
+		function AddToSoundQueue(Table)
+		{
+			local TableStop = clone Table
+			TableStop.flags <- SND_STOP
+			EmitSoundEx(TableStop)
+			SoundQueue[Table.sound_name] <- Table
+		}
 
-		hTank_scope.SoundPlaying <- {}
-		hTank_scope.SoundQueue <- {}
+		local angCurrent    = QAngle()
+		local angGoalIdle   = QAngle()
+		local angGoal       = QAngle()
+		local hTargetLast   = null
+		local flRotateSpeed = COMBATTANK_ROTATE_SPEED_DEFAULT
+		local iLaser        = self.LookupAttachment("laser_origin")
+		vecMount   <- null
+		vecTarget  <- null
+		hTarget    <- null
+		flDist     <- COMBATTANK_MAX_RANGE
+		flAngleDot <- -1
 
-		hTank_scope.LaserTrace <- {}
-	
-		hTank_scope.angCurrent <- QAngle()
-		hTank_scope.angGoalIdle <- QAngle()
-		hTank_scope.angGoal <- QAngle()
+		LaserTrace <- {}
 
-		hTank_scope.hEnemy <- null
-		hTank_scope.hEnemyLast <- null
-		hTank_scope.vecEnemyTarget <- null
-		hTank_scope.vecMount <- null
-		hTank_scope.flRotateSpeed <- COMBATTANK_ROTATE_SPEED_DEFAULT
-		hTank_scope.flAngleDist <- 360.0
-		hTank_scope.iDirIdle <- 1
-		hTank_scope.iTeamNumLast <- hTank.GetTeam()
-		hTank_scope.bMovingLast <- false
-
-		hTank_scope.bUbered <- false
-
-		TankExt.CombatTankPlaySound({
-			sound_name = COMBATTANK_SND_ROTATE
+		EmitSoundEx({
+			sound_name  = COMBATTANK_SND_ROTATE
 			sound_level = 85
-			entity = hTank
+			entity      = self
 			filter_type = RECIPIENT_FILTER_GLOBAL
-			pitch = 90
-		}, true)
+			pitch       = 90
+		})
 
-		local sParams = split(sName, "|")
-		if(sParams.len() == 3)
+		local sParams = split(sTankName, "|")
+		local iParamsLength = sParams.len()
+		if(iParamsLength < 2) sParams.append("minigun")
+		if(iParamsLength < 3) sParams.append(sParams[1])
+
+		if(sParams[0].find("_red")) self.SetTeam(TF_TEAM_RED) // legacy, can append $teamnum|2 to the tank name instead
+		self.SetBodygroup(self.FindBodygroupByName("bomb"), sParams[0].find("_bomb") ? 0 : 1)
+
+		hBeam    <- null
+		hBeamEnd <- null
+		local bBlueTeam  = self.GetTeam() == TF_TEAM_BLUE
+		local bFinalSkin = self.GetSkin() == 1
+		if(sParams[0].find("_nolaser") == null)
 		{
-			if(sParams[0].find("_red"))
-				hTank.SetTeam(2)
-			
-			if(sParams[0].find("_nolaser") == null)
-			{
-				local iTankIndex = hTank.entindex()
-				local sLaserStart = "laserstart_" + iTankIndex
-				local sLaserEnd = "laserend_" + iTankIndex
-				local hBeamEnd = SpawnEntityFromTable("env_sprite", { targetname = sLaserEnd, model = "sprites/glow1.vmt", spawnflags = 1, rendermode = 5 })
-				SetPropBool(hBeamEnd, "m_bForcePurgeFixedupStrings", true)
-				local hBeam = SpawnEntityFromTable("env_beam", { targetname = sLaserStart, lightningstart = sLaserStart, lightningend = sLaserEnd, boltwidth = 0.75, spawnflags = 1, texture = "sprites/laserbeam.vmt" })
-				SetPropBool(hBeam, "m_bForcePurgeFixedupStrings", true)
-				hTank_scope.hBeam <- hBeam
-				hTank_scope.hBeamEnd <- hBeamEnd
-			}
+			hBeam = SpawnEntityFromTableSafe("env_beam", { lightningstart = "bignet", lightningend = "bignet", boltwidth = 0.75, texture = "sprites/laserbeam.vmt", rendercolor = bBlueTeam ? "20 70 120" : "135 10 10" })
+			hBeamEnd = SpawnEntityFromTableSafe("env_sprite", { model = "sprites/glow1.vmt", rendermode = 5, rendercolor = bBlueTeam ? "20 70 120" : "135 10 10" })
+			SetPropEntityArray(hBeam, "m_hAttachEntity", hBeam, 0)
+			SetPropEntityArray(hBeam, "m_hAttachEntity", hBeamEnd, 1)
+		}
 
-			for(local i = 1; i <= 2; i++)
-				if(sParams[i] in CombatTankWeapons)
+		if(!bBlueTeam) TankExt.SetTankModel(self, {
+			LeftTrack  = COMBATTANK_TRACK_L_RED
+			RightTrack = COMBATTANK_TRACK_R_RED
+		})
+		self.SetSkin(bBlueTeam ? bFinalSkin ? 3 : 2 : bFinalSkin ? 1 : 0)
+		for(local i = 1; i <= 2; i++)
+			if(sParams[i] in TankExt.CombatTankWeapons)
+			{
+				local WeaponTable = TankExt.CombatTankWeapons[sParams[i]]
+				local hWeapon
+
+				if("Model" in WeaponTable)
 				{
-					local WeaponTable = CombatTankWeapons[sParams[i]]
-					local hWeapon
-					if("Spawn" in WeaponTable)
-					{
-						hWeapon = WeaponTable.Spawn(hTank)
-						TankExt.SetParentArray([hWeapon], hTank, i == 1 ? "weapon_r" : "weapon_l")
-					}
-					if("OnDeath" in WeaponTable)
-						TankExt.SetDestroyCallback(hWeapon, WeaponTable.OnDeath)
+					hWeapon = SpawnEntityFromTableSafe("prop_dynamic", { model = WeaponTable.Model, angles = "0 90 0", defaultanim = ("DefaultAnim" in WeaponTable) ? WeaponTable.DefaultAnim : "" })
+					hWeapon.SetSkin(bBlueTeam ? 1 : 0)
+					TankExt.SetParentArray([hWeapon], self, i == 1 ? "weapon_r" : "weapon_l")
 				}
-		}
-		else
-		{
-			ClientPrint(null, 3, format("\x07ffb2b2[ERROR] Wrong number of CombatTank parameters (%i passed, 3 required)", sParams.len()))
-			return
-		}
-		
-		hTank_scope.iSkinLast <- hTank.GetSkin() & 1
-		TankExt.CombatTankRefreshSkin(hTank)
-
-		hTank_scope.ToggleUber <- function()
-		{
-			if(!bUbered)
-			{
-				bUbered = true
-				local sndUber = {
-					sound_name = "player/invulnerable_on.wav"
-					filter_type = RECIPIENT_FILTER_GLOBAL
-				}
-				TankExt.PrecacheSound(sndUber.sound_name)
-				EmitSoundEx(sndUber)
-				SetPropInt(self, "m_takedamage", 1)
-				TankExt.CombatTankRefreshSkin(self)
-			}
-			else
-			{
-				bUbered = false
-				local sndUberOff = {
-					sound_name = "player/invulnerable_off.wav"
-					filter_type = RECIPIENT_FILTER_GLOBAL
-				}
-				TankExt.PrecacheSound(sndUberOff.sound_name)
-				EmitSoundEx(sndUberOff)
-				EntFireByHandle(self, "RunScriptCode", "SetPropInt(self, `m_takedamage`, 2)", 1, null, null)
-				EntFireByHandle(self, "RunScriptCode", "TankExt.CombatTankRefreshSkin(self)", 1, null, null)
-			}
-		}
-
-		hTank_scope.CombatThink <- function()
-		{
-			local iTeamNum = self.GetTeam()
-			if(iTeamNum != iTeamNumLast)
-			{
-				iTeamNumLast = iTeamNum
-				TankExt.CombatTankRefreshSkin(self)
-			}
-			
-			if(!GetPropBool(self, "m_bGlowEnabled")) // this entfire is here because sometimes the glow doesnt realize its team has been changed
-			{
-				EntFireByHandle(self, "RunScriptCode", "SetPropBool(self, `m_bGlowEnabled`, true)", 0.066, null, null)
-				EntFireByHandle(self, "RunScriptCode", "SetPropBool(self, `m_bGlowEnabled`, true)", 0.1, null, null)
-			}
-					
-			local vecOrigin = self.GetOrigin()
-			local angRotation = self.GetAbsAngles()
-			vecMount = self.GetAttachmentOrigin(self.LookupAttachment("weapon_l"))
-
-			foreach(sName, SoundTable in SoundQueue)
-			{
-				delete SoundQueue[sName]
-				if(sName.find("_LOOPING") != null)
+				else if("SpawnModel" in WeaponTable)
 				{
-					if(!(sName in SoundPlaying))
-					{
-						SoundPlaying[sName] <- SoundTable.sound_name
-						EmitSoundEx(SoundTable)
-					}
+					hWeapon = WeaponTable.SpawnModel()
+					hWeapon.SetSkin(bBlueTeam ? 1 : 0)
+					TankExt.SetParentArray([hWeapon], self, i == 1 ? "weapon_r" : "weapon_l")
+				}
+
+				if("OnSpawn" in WeaponTable)
+				{
+					hWeapon.ValidateScriptScope()
+					local hWeapon_scope = hWeapon.GetScriptScope()
+					hWeapon_scope.hTank <- self
+					hWeapon_scope.hTank_scope <- this
+					WeaponTable.OnSpawn.call(hWeapon_scope)
+				}
+
+				if("OnDeath" in WeaponTable)
+					TankExt.SetDestroyCallback(hWeapon, WeaponTable.OnDeath)
+			}
+			else ClientPrint(null, HUD_PRINTTALK, format("\x07FFFF00CombatTank weapon \"%s\" does not exist, weapon is not loaded or does not exist", sParams[i]))
+
+		local hTrackL, hTrackR
+		for(local hChild = self.FirstMoveChild(); hChild; hChild = hChild.NextMovePeer())
+		{
+			local sChildModel = hChild.GetModelName().tolower()
+			if(sChildModel.find("track_l"))
+				hTrackL = hChild
+			else if(sChildModel.find("track_r"))
+				hTrackR = hChild
+		}
+
+		local LastSkins   = {}
+		local bUberFizzle = false
+		bUbered <- false
+		function ToggleUber()
+		{
+			if(!bUberFizzle)
+				if(!bUbered)
+				{
+					bUbered = true
+					EmitSoundEx({
+						sound_name  = COMBATTANK_SND_UBER
+						filter_type = RECIPIENT_FILTER_GLOBAL
+					})
+					LastSkins.clear()
+					LastSkins[self] <- self.GetSkin()
+					self.SetSkin(bBlueTeam ? 5 : 4)
+					for(local hChild = self.FirstMoveChild(); hChild; hChild = hChild.NextMovePeer())
+						if(hChild.GetModelName().tolower().find("/combat_tank_mk2/"))
+						{
+							LastSkins[hChild] <- hChild.GetSkin()
+							hChild.SetSkin(bBlueTeam ? 3 : 2)
+						}
+
+					SetPropIntArray(hTrackL, "m_nModelIndexOverrides", GetModelIndex(COMBATTANK_MODEL_UBERED_TRACK_L), 0)
+					SetPropIntArray(hTrackL, "m_nModelIndexOverrides", GetModelIndex(COMBATTANK_MODEL_UBERED_TRACK_L), 3)
+					SetPropIntArray(hTrackR, "m_nModelIndexOverrides", GetModelIndex(COMBATTANK_MODEL_UBERED_TRACK_R), 0)
+					SetPropIntArray(hTrackR, "m_nModelIndexOverrides", GetModelIndex(COMBATTANK_MODEL_UBERED_TRACK_R), 3)
+					hTrackL.SetSkin(bBlueTeam ? 1 : 0)
+					hTrackR.SetSkin(bBlueTeam ? 1 : 0)
 				}
 				else
-					EmitSoundEx(SoundTable)
-			}
-		
-			hEnemy = null
-			vecEnemyTarget = null
-			local FindValidTarget = function(sClassname)
-			{
-				local flTargetDist = COMBATTANK_MAX_RANGE
-				for(local hEnt; hEnt = FindByClassnameWithin(hEnt, sClassname, vecOrigin, COMBATTANK_MAX_RANGE);)
 				{
-					local vecEntCenter = hEnt.GetCenter()
-					local vecEntEye = "EyePosition" in hEnt ? hEnt.EyePosition() : vecEntCenter
-					local flEntDist = (vecEntCenter - vecMount).Length()
-					local bCenterTrace = TraceLine(vecEntCenter, vecMount, self) == 1
-					local bEyeTrace = TraceLine(vecEntEye, vecMount, self) == 1
-					if(
-						hEnt.GetTeam() != iTeamNum &&
-						hEnt.IsAlive() &&
-						bEyeTrace &&
-						flTargetDist > flEntDist &&
-						(sClassname == "player" ? !TankExt.IsPlayerStealthedOrDisguised(hEnt) : true) &&
-						!(hEnt.GetFlags() & FL_NOTARGET)
-					)
+					bUberFizzle = true
+					EmitSoundEx({
+						sound_name  = COMBATTANK_SND_UBER_OFF
+						filter_type = RECIPIENT_FILTER_GLOBAL
+					})
+					TankExt.DelayFunction(self, this, 1, function()
 					{
-						hEnemy = hEnt
-						vecEnemyTarget = bCenterTrace ? vecEntCenter : vecEntEye
-						flTargetDist = flEntDist
-					}
+						bUbered     = false
+						bUberFizzle = false
+						foreach(hEnt, iSkin in LastSkins)
+							if(hEnt.IsValid())
+							{
+								hEnt.SetSkin(iSkin)
+								hEnt.AcceptInput("Color", "255 255 255", null, null)
+							}
+
+						SetPropIntArray(hTrackL, "m_nModelIndexOverrides", GetPropInt(hTrackL, "m_nModelIndex"), 0)
+						SetPropIntArray(hTrackL, "m_nModelIndexOverrides", GetPropInt(hTrackL, "m_nModelIndex"), 3)
+						SetPropIntArray(hTrackR, "m_nModelIndexOverrides", GetPropInt(hTrackR, "m_nModelIndex"), 0)
+						SetPropIntArray(hTrackR, "m_nModelIndexOverrides", GetPropInt(hTrackR, "m_nModelIndex"), 3)
+						hTrackL.SetSkin(0)
+						hTrackR.SetSkin(0)
+					})
 				}
-			}
-			local EntityPriority = [
-				"player"
-				"obj_sentrygun"
-				"obj_dispenser"
-				"obj_teleporter"
-				"tank_boss"
-				"merasmus"
-				"headless_hatman"
-				"eyeball_boss"
-				"tf_zombie"
-			]
-			foreach(sClassname in EntityPriority)
+		}
+		local CombatScope = this
+		self.GetScriptScope().ToggleUber <- @() CombatScope.ToggleUber()
+
+		// bLock <- false
+		function Think()
+		{
+			foreach(sSound, Table in SoundQueue)
+				EmitSoundEx(Table)
+			SoundQueue.clear()
+
+			if(bUberFizzle)
 			{
-				FindValidTarget(sClassname)
-				if(hEnemy) break
+				local flColor = 127.5 - sin(flTime * 20.95) * 127.5 // 20.95 == PI / 0.3 * 0.5
+				local sColor  = format("%i %i %i", flColor, flColor, flColor)
+				foreach(hEnt, iSkin in LastSkins) if(hEnt.IsValid()) hEnt.AcceptInput("Color", sColor, null, null)
 			}
-					
-			if(hEnemy != hEnemyLast)
-			{
-				hEnemyLast = hEnemy
-				if(hEnemy)
+
+			vecMount = self.GetAttachmentOrigin(self.LookupAttachment("weapon_l"))
+			// if(!bLock)
+			// {
+				hTarget   = null
+				vecTarget = null
+				flDist    = COMBATTANK_MAX_RANGE
+
+				local hForceTarget = FindByNameNearest("combattank_target", vecMount, flDist)
+				if(hForceTarget)
 				{
-					EmitSoundEx({
-						sound_name = "weapons/sentry_spot.wav"
-						entity = self
-						filter_type = RECIPIENT_FILTER_GLOBAL
-						flags = SND_STOP
+					local vecEntCenter = hForceTarget.GetCenter()
+					hTarget   = hForceTarget
+					vecTarget = vecEntCenter
+					flDist    = (vecEntCenter - vecMount).Length()
+				}
+				else foreach(sClassname in [ "player", "obj_sentrygun", "obj_dispenser", "obj_teleporter", "tank_boss", "merasmus", "headless_hatman", "eyeball_boss", "tf_zombie" ])
+				{
+					for(local hEnt; hEnt = FindByClassnameWithin(hEnt, sClassname, vecMount, flDist);)
+					{
+						local vecEntCenter = hEnt.GetCenter()
+						local bHasEyes     = "EyePosition" in hEnt
+						local vecEntEye    = bHasEyes ? hEnt.EyePosition() : vecEntCenter
+						local bCenterTrace = TraceLine(vecEntCenter, vecMount, self) == 1
+						local bEyeTrace    = bHasEyes ? TraceLine(vecEntEye, vecMount, self) == 1 : bCenterTrace
+						if
+						(
+							bEyeTrace &&
+							hEnt.IsAlive() &&
+							hEnt.GetTeam() != iTeamNum &&
+							!(hEnt.GetFlags() & FL_NOTARGET) &&
+							!TankExt.IsPlayerStealthedOrDisguised(hEnt)
+						)
+						{
+							hTarget   = hEnt
+							vecTarget = bCenterTrace ? vecEntCenter : vecEntEye
+							flDist    = (vecEntCenter - vecMount).Length()
+						}
+					}
+					if(hTarget) break
+				}
+			// }
+			// if(hTarget && !hTarget.IsValid()) hTarget = null
+
+			if(hTarget != hTargetLast)
+			{
+				hTargetLast = hTarget
+				if(hTarget)
+				{
+					local Sound = @(hEnt, sSound, iFlags) EmitSoundEx({
+						sound_name  = sSound
+						volume      = hEnt == self ? 1.0 : 0.5
+						sound_level = 88
+						flags       = iFlags
+						pitch       = 95
+						entity      = hEnt
+						filter_type = hEnt == self ? RECIPIENT_FILTER_GLOBAL : RECIPIENT_FILTER_SINGLE_PLAYER
 					})
-					EmitSoundEx({
-						sound_name = "weapons/sentry_spot_client.wav"
-						entity = hEnemy
-						filter_type = RECIPIENT_FILTER_SINGLE_PLAYER
-						flags = SND_STOP
-					})
-					EmitSoundEx({
-						sound_name = "weapons/sentry_spot.wav"
-						sound_level = 80
-						entity = self
-						filter_type = RECIPIENT_FILTER_GLOBAL
-						pitch = 95
-					})
-					EmitSoundEx({
-						sound_name = "weapons/sentry_spot_client.wav"
-						entity = hEnemy
-						filter_type = RECIPIENT_FILTER_SINGLE_PLAYER
-						pitch = 95
-					})
+					Sound(self, "weapons/sentry_spot.wav", SND_STOP)
+					Sound(self, "weapons/sentry_spot.wav", SND_NOFLAGS)
+					Sound(hTarget, "weapons/sentry_spot_client.wav", SND_STOP)
+					Sound(hTarget, "weapons/sentry_spot_client.wav", SND_NOFLAGS)
 				}
 			}
 
-			local iLaser = self.LookupAttachment("laser_origin")
 			local vecLaser = self.GetAttachmentOrigin(iLaser)
-			local angLaser = self.GetAttachmentAngles(iLaser)
 			LaserTrace = {
-				start = vecLaser
-				end = vecLaser + angLaser.Forward() * 8192
-				ignore = hTank
-				mask = MASK_SHOT_HULL
+				start  = vecLaser
+				end    = vecLaser + RotatePosition(Vector(), angRotation, (angCurrent * -1).Forward()) * 8192
+				ignore = self
+				mask   = MASK_SHOT_HULL
 			}
 			TraceLineEx(LaserTrace)
 
-			if(hEnemy)
+			local bBeam    = hBeam && hBeam.IsValid()
+			local bBeamEnd = hBeamEnd && hBeamEnd.IsValid()
+			if(hTarget)
 			{
-				if("enthit" in LaserTrace && LaserTrace.enthit == hEnemy)
-					LaserTrace.endpos = vecEnemyTarget
-
 				flRotateSpeed = COMBATTANK_ROTATE_SPEED_DEFAULT
-				local vecDirToEnemy = vecEnemyTarget - vecMount
-				vecDirToEnemy = RotatePosition(Vector(), angRotation * -1, vecDirToEnemy)
-				local angToTarget = TankExt.VectorToQAngle(vecDirToEnemy)
-		
+				local angToTarget = TankExt.VectorAngles(RotatePosition(Vector(), angRotation * -1, vecTarget - vecMount))
+
 				angToTarget.y = 360.0 - angToTarget.y
-				angToTarget.x = -TankExt.Clamp(angToTarget.x - (angToTarget.x > 180 ? 360 : 0), -14, 14)
+				angToTarget.x = -TankExt.Clamp(angToTarget.x - (angToTarget.x > 180 ? 360 : 0), -55, 35)
 				angGoal = angToTarget
+				if("enthit" in LaserTrace && LaserTrace.enthit == hTarget)
+				{
+					LaserTrace.end = vecTarget
+					TraceLineEx(LaserTrace)
+				}
+				if(bBeam)
+				{
+					hBeam.SetAbsOrigin(vecLaser)
+					hBeam.AcceptInput("TurnOn", null, null, null)
+				}
+				if(bBeamEnd)
+				{
+					hBeamEnd.SetAbsOrigin(LaserTrace.endpos)
+					hBeamEnd.AcceptInput("ShowSprite", null, null, null)
+				}
 			}
-			else if(!bMovingLast)
+			else
 			{
-				flRotateSpeed = COMBATTANK_ROTATE_SPEED_DEFAULT * 0.5
-				iDirIdle = 0 - iDirIdle
-				angGoal = QAngle(RandomFloat(-10, 10), 50 * iDirIdle + (iDirIdle == -1 ? 360 : 0), 0)
+				if(bBeam) hBeam.AcceptInput("TurnOff", null, null, null)
+				if(bBeamEnd) hBeamEnd.AcceptInput("HideSprite", null, null, null)
+				if(angCurrent.x == angGoal.x && angCurrent.y == angGoal.y)
+				{
+					flRotateSpeed = COMBATTANK_ROTATE_SPEED_DEFAULT * 0.5
+					angGoal.x = RandomFloat(-10, 10)
+					angGoal.y = angGoal.y < 180 ? 315 : 45
+				}
 			}
-			
-			if("hBeam" in this)
-			{
-				hBeam.SetAbsOrigin(vecLaser)
-				hBeamEnd.SetAbsOrigin(LaserTrace.endpos)
-			}
-			
+
+
 			////////// RotateMount //////////
-		
-			local bMoving = false
-		
-			if(fabs(angCurrent.x - angGoal.x) > 0.001) // the wonders of floating point imprecision
+
+			if(angCurrent.x != angGoal.x)
 			{
-				local iDir = angGoal.x > angCurrent.x ? 1 : -1
-				angCurrent.x += flRotateSpeed * 0.5 * iDir
-		
+				local iDir = angCurrent.x < angGoal.x ? 1 : -1
+				angCurrent.x += flRotateSpeed * iDir * 0.5
+
 				if(iDir == 1 ? angCurrent.x > angGoal.x : angCurrent.x < angGoal.x)
 					angCurrent.x = angGoal.x
-				bMoving = true
 			}
-			self.SetPoseParameter(COMBATTANK_POSE_PITCH, angCurrent.x)
-		
+			self.SetPoseParameter(COMBATTANK_POSE_PITCH, TankExt.Clamp(angCurrent.x, -14, 14))
+
 			if(angCurrent.y != angGoal.y)
 			{
-				local iDir = angGoal.y > angCurrent.y ? 1 : -1
-				local flDist = fabs(angGoal.y - angCurrent.y)
+				local iDir = angCurrent.y < angGoal.y ? 1 : -1
 				local bReversed = false
-				if(flDist > 180)
+				if(fabs(angGoal.y - angCurrent.y) > 180)
 				{
-					flDist = 360 - flDist
 					iDir = -iDir
 					bReversed = true
 				}
-		
+
 				angCurrent.y += flRotateSpeed * iDir
-		
-				if(iDir == -1 ? bReversed ? angGoal.y < angCurrent.y : angGoal.y > angCurrent.y : bReversed ? angGoal.y > angCurrent.y : angGoal.y < angCurrent.y)
+
+				if(iDir == 1 ? bReversed ? angCurrent.y < angGoal.y : angCurrent.y > angGoal.y : bReversed ? angCurrent.y > angGoal.y : angCurrent.y < angGoal.y)
 					angCurrent.y = angGoal.y
-		
+
 				if(angCurrent.y < 0)
 					angCurrent.y += 360
 				else if(angCurrent.y >= 360)
 					angCurrent.y -= 360
-		
-				bMoving = true
 			}
 			self.SetPoseParameter(COMBATTANK_POSE_YAW, angCurrent.y)
-			
-			// this isnt the exact angle length between the two but its close
-			flAngleDist = hEnemy ? ((angCurrent.Forward() - angGoal.Forward()) * 64).Length() : null
-		
-			bMovingLast = bMoving
-			return -1
+
+			flAngleDot = (hTarget ? angCurrent.Forward().Dot(angGoal.Forward()) : -1)
 		}
-		TankExt.AddThinkToEnt(hTank, "CombatThink")
 	}
-	OnDeath = function()
+	function OnDeath()
 	{
-		foreach(sName, sSoundName in SoundPlaying)
-			EmitSoundEx({
-				sound_name = sSoundName
-				entity = self
-				filter_type = RECIPIENT_FILTER_GLOBAL
-				flags = SND_STOP
-			})
-		if(TankExt.ExistsInScope(this, "hBeam")) hBeam.Destroy()
-		if(TankExt.ExistsInScope(this, "hBeamEnd")) hBeamEnd.Destroy()
+		EmitSoundEx({
+			sound_name  = "misc/null.wav"
+			entity      = self
+			filter_type = RECIPIENT_FILTER_GLOBAL
+			flags       = SND_STOP | SND_IGNORE_NAME
+		})
+		if(hBeam && hBeam.IsValid()) hBeam.Kill()
+		if(hBeamEnd && hBeamEnd.IsValid()) hBeamEnd.Kill()
 	}
 })

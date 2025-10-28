@@ -1,0 +1,58 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/bots/boss_blimp/blimp_eye"
+
+	"$detail"	         "models/bots/boss_blimp/blimp_eye_detail"
+	"$detailscale"	     "1"
+	"$detailblendmode"   "5"
+	"$detailblendfactor" "30"
+
+	"$selfillum" 1
+	"$selfillumtint" "[3 4 3]"
+
+	"$color2"	 "{ 93 135 163 }"
+	$color_red   "{ 173 10 10 }"
+	$color_blue  "{ 50 100 163 }"
+	$color_tmp   "[0 0 0]"
+	$color_white "0"
+	$zero        "0"
+
+	Proxies
+	{
+		// $color_white is 0 for values 0 or 1, 1 for values not 0 or 1
+		ToggleTexture
+		{
+			toggleTextureVar         $basetexture
+			toggleTextureFrameNumVar $color_white
+			toggleShouldWrap         0
+		}
+		// $frame is 0 for red, 1 for blue
+		TeamTexture
+		{
+			resultVar $frame
+		}
+		Multiply
+		{
+			srcVar1   $frame
+			srcVar2   $color_blue
+			resultVar $color_tmp
+		}
+		SelectFirstIfNonZero
+		{
+			srcVar1   $color_tmp
+			srcVar2   $color_red
+			resultVar $color_tmp
+		}
+		SelectFirstIfNonZero
+		{
+			srcVar1   $color_white
+			srcVar2   $color_tmp
+			resultVar $color2
+		}
+		Equals
+		{
+			srcVar1   $zero
+			resultVar $frame
+		}
+	}
+}

@@ -1,34 +1,17 @@
-////////////////////////////////////////////////////////////////////////////////////////////
-// includes:
-//     rocketpod
-//     rocketpod_homing
-////////////////////////////////////////////////////////////////////////////////////////////
-// extra weapons get added to the list by appending to the CombatTankWeapons table
-// then the weapon script will need to have an IncludeScript in the main popfile
-// CombatTankWeapons.rocketpod <- {
-//     Spawn = function(hTank)
-//     {
-//     
-//     }
-//     OnDeath = function()
-//     {
-//
-//     }
-////////////////////////////////////////////////////////////////////////////////////////////
-
 local COMBATTANK_VALUES_TABLE = {
 	COMBATTANK_ROCKETPOD_SND_FIRE              = "MVM.GiantSoldierRocketShoot"
 	COMBATTANK_ROCKETPOD_ROCKET_SPLASH         = 146
 	COMBATTANK_ROCKETPOD_ROCKET_SPEED          = 900
 	COMBATTANK_ROCKETPOD_ROCKET_DAMAGE         = 90
-	COMBATTANK_ROCKETPOD_ROCKET                = "models/bots/boss_bot/combat_tank/combat_tank_rocket.mdl"
+	COMBATTANK_ROCKETPOD_ROCKET                = "models/bots/boss_bot/combat_tank_mk2/mk2_rocket_dumbfire.mdl"
+	COMBATTANK_ROCKETPOD_ROCKET_HOMING         = "models/bots/boss_bot/combat_tank_mk2/mk2_rocket_seeker.mdl"
 	COMBATTANK_ROCKETPOD_RELOAD_DELAY          = 0.3
 	COMBATTANK_ROCKETPOD_PARTICLE_TRAIL        = "rockettrail"
 	COMBATTANK_ROCKETPOD_PARTICLE_TRAIL_HOMING = "eyeboss_projectile"
-	COMBATTANK_ROCKETPOD_MODEL                 = "models/bots/boss_bot/combat_tank/combat_tank_rocketpod.mdl"
+	COMBATTANK_ROCKETPOD_MODEL                 = "models/bots/boss_bot/combat_tank_mk2/mk2_rocket_pod.mdl"
 	COMBATTANK_ROCKETPOD_HOMING_POWER          = 0.05
-	COMBATTANK_ROCKETPOD_HOMING_SPEED          = 500
-	COMBATTANK_ROCKETPOD_HOMING_DURATION       = 1
+	COMBATTANK_ROCKETPOD_HOMING_SPEED_MULT     = 0.75
+	COMBATTANK_ROCKETPOD_HOMING_DURATION       = 1.5
 	COMBATTANK_ROCKETPOD_FIRE_DELAY            = 0.1
 	COMBATTANK_ROCKETPOD_CONE_RADIUS           = 90
 }
@@ -36,169 +19,125 @@ foreach(k,v in COMBATTANK_VALUES_TABLE)
 	if(!(k in TankExt.ValueOverrides))
 		ROOT[k] <- v
 
+PrecacheModel(COMBATTANK_ROCKETPOD_MODEL)
 PrecacheModel(COMBATTANK_ROCKETPOD_ROCKET)
+PrecacheModel(COMBATTANK_ROCKETPOD_ROCKET_HOMING)
 TankExt.PrecacheSound(COMBATTANK_ROCKETPOD_SND_FIRE)
 
-CombatTankWeapons.rocketpod <- {
-	Spawn = function(hTank)
+TankExt.CombatTankWeapons["rocketpod"] <- {
+	Model = COMBATTANK_ROCKETPOD_MODEL
+	function OnSpawn()
 	{
-		local hRocketPod = SpawnEntityFromTable("prop_dynamic", { model = COMBATTANK_ROCKETPOD_MODEL })
-		hRocketPod.ValidateScriptScope()
-		local hRocketPod_scope = hRocketPod.GetScriptScope()
-		hRocketPod_scope.hTank <- hTank
-		hRocketPod_scope.hTank_scope <- hTank.GetScriptScope()
-		hRocketPod_scope.hWeapon <- SpawnEntityFromTable("tf_point_weapon_mimic", {
-			angles = QAngle(0, 2, 0)
-			damage = COMBATTANK_ROCKETPOD_ROCKET_DAMAGE
+		local hWeapon = SpawnEntityFromTableSafe("tf_point_weapon_mimic", {
+			angles        = QAngle(0, -2, 0)
+			damage        = COMBATTANK_ROCKETPOD_ROCKET_DAMAGE
 			modeloverride = COMBATTANK_ROCKETPOD_ROCKET
-			modelscale = 1
-			speedmax = COMBATTANK_ROCKETPOD_ROCKET_SPEED
-			speedmin = COMBATTANK_ROCKETPOD_ROCKET_SPEED
-			splashradius = COMBATTANK_ROCKETPOD_ROCKET_SPLASH
-			weapontype = 0
+			modelscale    = 1
+			speedmax      = COMBATTANK_ROCKETPOD_ROCKET_SPEED
+			speedmin      = COMBATTANK_ROCKETPOD_ROCKET_SPEED
+			splashradius  = COMBATTANK_ROCKETPOD_ROCKET_SPLASH
+			weapontype    = 0
 		})
-		TankExt.SetParentArray([hRocketPod_scope.hWeapon], hRocketPod, "barrel_1")
-		hRocketPod_scope.flNext <- 0.0
-		hRocketPod_scope.iSlots <- [1, 2, 3, 4, 5, 6, 7, 8, 9]
-		hRocketPod_scope.bReloading <- false
-		hRocketPod_scope.bHoming <- "Homing" in this
-		
-		hRocketPod_scope.Think <- function()
+		TankExt.SetParentArray([hWeapon], self, "barrel_1")
+		local flTimeNext = 0.0
+		local iSlots     = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+		local bReloading = false
+		local bClosed    = true
+		bHoming <- false
+
+		function Think()
 		{
 			if(!(self && self.IsValid())) return
-			local flTime = Time()
-			local bEnemyInCone = hTank_scope.flAngleDist != null && hTank_scope.flAngleDist < COMBATTANK_ROCKETPOD_CONE_RADIUS
-			if(flTime >= flNext && bEnemyInCone && !bReloading && iSlots.len() > 0)
+			local flTime       = Time()
+			local bEnemyInCone = hTank_scope.flAngleDot >= cos(COMBATTANK_ROCKETPOD_CONE_RADIUS * DEG2RAD)
+			local bNext        = flTime >= flTimeNext
+			if(bNext && bEnemyInCone && !bReloading && iSlots.len() > 0)
 			{
-				flNext = flTime + COMBATTANK_ROCKETPOD_FIRE_DELAY
+				if(bClosed)
+				{
+					bClosed = false
+					self.AcceptInput("SetAnimation", "open", null, null)
+					flTimeNext = flTime + 0.33
+					return
+				}
+
+				flTimeNext = flTime + COMBATTANK_ROCKETPOD_FIRE_DELAY
 				local iRNG = RandomInt(0, iSlots.len() - 1)
 				local iBarrel = iSlots[iRNG]
 				iSlots.remove(iRNG)
-				
-				SetPropInt(hWeapon, "m_iParentAttachment", iBarrel)
+
+				// SetPropInt(hWeapon, "m_iParentAttachment", iBarrel) // this is slower
+				hWeapon.SetAbsOrigin(self.GetAttachmentOrigin(iBarrel))
 				hWeapon.AcceptInput("FireOnce", null, null, null)
-		
+
 				DispatchParticleEffect("rocketbackblast", self.GetAttachmentOrigin(iBarrel + 9), self.GetAttachmentAngles(iBarrel + 9).Forward())
-				TankExt.CombatTankPlaySound({
-					sound_name = COMBATTANK_ROCKETPOD_SND_FIRE
+				hTank_scope.AddToSoundQueue({
+					sound_name  = COMBATTANK_ROCKETPOD_SND_FIRE
 					sound_level = 90
-					entity = hTank
+					entity      = hTank
 					filter_type = RECIPIENT_FILTER_GLOBAL
 				})
-			}
-			
-			if(hWeapon.IsValid())
-			{
+
 				for(local hRocket; hRocket = FindByClassnameWithin(hRocket, "tf_projectile_rocket", hWeapon.GetOrigin(), 64);)
 				{
 					if(hRocket.GetOwner() != hWeapon || hRocket.GetEFlags() & EFL_NO_MEGAPHYSCANNON_RAGDOLL) continue
-					SetPropBool(hRocket, "m_bForcePurgeFixedupStrings", true)
+					MarkForPurge(hRocket)
+
+					local iTeamNum = hTank.GetTeam()
+					hRocket.SetSize(Vector(), Vector())
+					hRocket.SetSolid(SOLID_BSP)
+					hRocket.SetSequence(1)
+					hRocket.SetSkin(iTeamNum == TF_TEAM_BLUE ? 1 : 0)
+					hRocket.SetTeam(iTeamNum)
+					hRocket.SetOwner(hTank)
+
 					hRocket.ValidateScriptScope()
 					hRocket.AddEFlags(EFL_NO_MEGAPHYSCANNON_RAGDOLL)
+					local bSolid = false
 					local hRocket_scope = hRocket.GetScriptScope()
-					hRocket_scope.bSolid <- false
+					hRocket_scope.hTank <- hTank
 					hRocket_scope.RocketThink <- function()
 					{
-						// apparently if the rocket hits a reanimator then it becomes a null instance for a tick
 						if(!self.IsValid()) return
 						local vecOrigin = self.GetOrigin()
-						if(!bSolid)
-						{
-							local Trace = {
-								start = vecOrigin
-								end = vecOrigin
-								hullmin = self.GetBoundingMins()
-								hullmax = self.GetBoundingMaxs()
-								mask = MASK_PLAYERSOLID
-								ignore = self
-							}
-							TraceHull(Trace)
-							if (!("startsolid" in Trace && Trace.enthit.GetClassname() == "tank_boss"))
-							{
-								bSolid = true
-								self.SetSolid(2)
-							}
-						}
-						if("HomingThink" in this)
-							HomingThink.call(this)
+						if(!bSolid && (!hTank.IsValid() || !TankExt.IntersectionBoxBox(vecOrigin, self.GetBoundingMins(), self.GetBoundingMaxs(), hTank.GetOrigin(), hTank.GetBoundingMins(), hTank.GetBoundingMaxs())))
+							{ bSolid = true; self.SetSolid(SOLID_BBOX) }
+						if("HomingThink" in this) HomingThink()
 						return -1
+					}
+					if(bHoming)
+					{
+						hRocket.SetModel(COMBATTANK_ROCKETPOD_ROCKET_HOMING)
+						hRocket.SetSize(Vector(), Vector())
+						hRocket_scope.HomingParams <- {
+							Target      = hTank_scope.hTarget
+							TurnPower   = COMBATTANK_ROCKETPOD_HOMING_POWER
+							RocketSpeed = COMBATTANK_ROCKETPOD_HOMING_SPEED_MULT
+							AimTime     = COMBATTANK_ROCKETPOD_HOMING_DURATION
+						}
+						IncludeScript("tankextensions/misc/homingrocket", hRocket_scope)
 					}
 					TankExt.AddThinkToEnt(hRocket, "RocketThink")
 
-					if(bHoming)
-					{
-						hRocket_scope.hEnemy <- hTank_scope.hEnemy
-						hRocket_scope.iDeflected <- 0
-						hRocket_scope.flSpeed <- hRocket.GetAbsVelocity().Length()
-						hRocket_scope.flHomingTime <- Time() + COMBATTANK_ROCKETPOD_HOMING_DURATION
-						hRocket_scope.HomingThink <- function()
-						{
-							local iCurrentDeflected = GetPropInt(self, "m_iDeflected")
-							if(iDeflected < iCurrentDeflected)
-							{
-								flHomingTime = Time() + COMBATTANK_ROCKETPOD_HOMING_DURATION
-								iDeflected = iCurrentDeflected
-								hEnemy = null
-								local hLauncherOwner = GetPropEntity(self, "m_hLauncher").GetOwner()
-								local flEnemyDist = COMBATTANK_MAX_RANGE
-								for(local hPlayer; hPlayer = FindByClassnameWithin(hPlayer, "player", vecOrigin, COMBATTANK_MAX_RANGE);)
-								{
-									local flPlayerDist = (hPlayer.GetCenter() - vecOrigin).Length()
-									if(
-										hPlayer.GetTeam() != self.GetTeam()	&&
-										GetPropInt(hPlayer, "m_lifeState") == 0 &&
-										flEnemyDist > flPlayerDist &&
-										!TankExt.IsPlayerStealthedOrDisguised(hPlayer) &&
-										hPlayer != hLauncherOwner
-									)
-									{
-										hEnemy = hPlayer
-										flEnemyDist = flPlayerDist
-									}
-								}
-							}
-							if(Time() <= flHomingTime && hEnemy && GetPropInt(hEnemy, "m_lifeState") == LIFE_ALIVE)
-							{
-								local vecTarget = hEnemy.GetCenter() - self.GetOrigin()
-								vecTarget.Norm()
-								local vecForward = self.GetForwardVector()
-								local vecDirection = vecForward + (vecTarget - vecForward) * COMBATTANK_ROCKETPOD_HOMING_POWER
-								vecDirection.Norm()
-								local vecVelocity = vecDirection * flSpeed
-								self.SetAbsVelocity(vecVelocity)
-								self.SetForwardVector(vecDirection)
-							}
-						}
-					}
-			
 					local sTrail = bHoming ? COMBATTANK_ROCKETPOD_PARTICLE_TRAIL_HOMING : COMBATTANK_ROCKETPOD_PARTICLE_TRAIL
 					if(sTrail != "rockettrail")
 					{
 						hRocket.AcceptInput("DispatchEffect", "ParticleEffectStop", null, null)
-						local hTrail = CreateByClassname("trigger_particle")
-						SetPropBool(hTrail, "m_bForcePurgeFixedupStrings", true)
+						local hTrail = CreateByClassnameSafe("trigger_particle")
 						hTrail.KeyValueFromString("particle_name", sTrail)
-						hTrail.KeyValueFromInt("attachment_type", 1)
+						hTrail.KeyValueFromString("attachment_name", "trail")
+						hTrail.KeyValueFromInt("attachment_type", 4)
 						hTrail.KeyValueFromInt("spawnflags", 64)
 						DispatchSpawn(hTrail)
 						hTrail.AcceptInput("StartTouch", null, hRocket, hRocket)
 						hTrail.Kill()
 					}
-
-					local iTeamNum = hTank.GetTeam()
-					hRocket.SetSolid(0)
-					hRocket.SetSequence(bHoming ? 2 : 1)
-					hRocket.SetSkin(iTeamNum == 3 ? bHoming ? 3 : 1 : bHoming ? 2 : 0)
-					hRocket.SetTeam(iTeamNum)
-					hRocket.SetOwner(hTank)
 				}
 			}
-		
-			if(flTime >= flNext && !bEnemyInCone && iSlots.len() < 9 || iSlots.len() == 0) bReloading = true
-		
-			if(flTime >= flNext && bReloading)
+
+			if(bNext && bReloading)
 			{
-				flNext = flTime + COMBATTANK_ROCKETPOD_RELOAD_DELAY
+				flTimeNext = flTime + COMBATTANK_ROCKETPOD_RELOAD_DELAY
 				for(local i = 1; i <= 9; i++)
 					if(iSlots.find(i) == null)
 					{
@@ -207,12 +146,29 @@ CombatTankWeapons.rocketpod <- {
 					}
 				if(iSlots.len() >= 9) bReloading = false
 			}
+
+			if(bNext && !bEnemyInCone || iSlots.len() == 0)
+			{
+				if(!bClosed)
+				{
+					bClosed = true
+					self.AcceptInput("SetAnimation", "close", null, null)
+					flTimeNext = flTime + 0.66
+				}
+				if(iSlots.len() < 9)
+					bReloading = true
+			}
 			return -1
 		}
-		TankExt.AddThinkToEnt(hRocketPod, "Think")
-		return hRocketPod
+		TankExt.AddThinkToEnt(self, "Think")
 	}
 }
 
-CombatTankWeapons.rocketpod_homing <- clone CombatTankWeapons.rocketpod
-CombatTankWeapons.rocketpod_homing.Homing <- null
+TankExt.CombatTankWeapons["rocketpod_homing"] <- {
+	Model = COMBATTANK_ROCKETPOD_MODEL
+	function OnSpawn()
+	{
+		TankExt.CombatTankWeapons["rocketpod"].OnSpawn.call(this)
+		bHoming = true
+	}
+}

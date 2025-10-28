@@ -1,5 +1,9 @@
 // lite
 
+// BRAINDAWG 9/24/25:
+// encore wave 4 has a vscript error that crashes the server with this
+Convars.SetValue("sig_util_vscript_send_output_to_admins", 0)
+
 ::ROOT <- getroottable()
 ::MAX_CLIENTS <- MaxClients().tointeger()
 
@@ -116,13 +120,14 @@ foreach(k, v in ::Entities.getclass())
 		SetPropInt(hObjectiveResource, "m_nMannVsMachineWaveEnemyCount", 0)
 	}
 
+	IsSigmod = Convars.GetInt("sig_etc_misc") != null
 	function SetWaveCount(iWave, iMaxWaves = null)
 	{
 		local hObjectiveResource = FindByClassname(null, "tf_objective_resource")
 		if(iWave != null)
-			SetPropInt(hObjectiveResource, "m_nMannVsMachineWaveCount", iWave)
+			IsSigmod ? hObjectiveResource.AcceptInput("$SetClientProp$m_nMannVsMachineWaveCount", format("%i", iWave), null, null) : SetPropInt(hObjectiveResource, "m_nMannVsMachineWaveCount", iWave)
 		if(iMaxWaves != null)
-			SetPropInt(hObjectiveResource, "m_nMannVsMachineMaxWaveCount", iMaxWaves)
+			IsSigmod ? hObjectiveResource.AcceptInput("$SetClientProp$m_nMannVsMachineMaxWaveCount", format("%i", iMaxWaves), null, null) : SetPropInt(hObjectiveResource, "m_nMannVsMachineMaxWaveCount", iMaxWaves)
 	}
 }
 __CollectGameEventCallbacks(AlternateWaves)

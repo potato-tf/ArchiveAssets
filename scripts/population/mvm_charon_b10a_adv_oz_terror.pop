@@ -1,0 +1,2599 @@
+// "Oz Terror" for Charon, an advanced mission by Lobotomy
+// Charon by Sntr
+
+// Credits:
+//	lite
+//		homing_projectiles.nut (adapted from TankExtensions)
+//		indicator_circle_long.mdl
+//		various wave bar icons
+//	Seelpit
+//		seel_ins.nut
+//		various wave bar icons
+//	Sntr
+//		map
+
+// Thank you to:
+//	NYS
+//		various wave bar icons
+//	Pealover
+//		overlay references, vscript inspiration
+//	Revan
+//		vscode-vdf
+//	PopExtensionsPlus authors
+//		some vscript functionalities
+//	The people who frequent the #scripting channel in potato.tf
+//		vscript help
+//	Anyone who joined the testing of this mission
+//		valuable feedback
+
+// ===== MAP INFO =====
+
+// initB -- start with both gates capped
+// initA -- start with B capped
+// initMain -- start with RED owning both gates
+// -- the above are used with InitWaveOutput! --
+
+// call_gate_uncap -- When triggered, cancels on-going gate cap stuff and gives RED the latest capture back.
+// Doesn't do anything if RED holds all gates when called
+// Lobo's tests: will always force bombpath_path1 when called from initB
+
+// spawnbot_main0/1/2 -- main spawn
+// spawnbot_flank0/1/2 -- side spawn
+// spawnbot_scattered0/1/2 -- either one of the two
+// 0/1/2 -- front / A / B
+
+#base robot_standard.pop
+#base robot_giant.pop
+#base robot_gatebot.pop
+
+#base overclock_cactus_general.pop
+
+WaveSchedule
+{
+	StartingCurrency 2000
+	RespawnWaveTime 3
+	FixedRespawnWaveTime Yes
+	CanBotsAttackWhileInSpawnRoom No
+
+	Advanced 1
+
+	Templates
+	{
+		T_TFBot_Boss_Carpet_Bomber
+		{
+			Class Demoman
+			Skill Expert
+			Name "Carpet Bomber"
+			ClassIcon heavy_head_nys
+			Health 15000
+			Scale 1.9
+			Item "Scotch Bonnet"
+			Item "The Iron Bomber"
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Attributes SuppressFire
+			WeaponRestrictions PrimaryOnly
+			Tag bot_giant
+			Tag boss1
+			ItemAttributes
+			{
+				ItemName "The Iron Bomber"
+				"damage bonus" 1.15
+				"faster reload rate" 0.27
+				"fire rate bonus" 0.07
+				"clip size upgrade atomic" 21
+				"projectile spread angle penalty" 5
+				"fuse bonus" 1.5
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale" 0.1
+			}
+		}
+
+		T_TFBot_Boss_Divider
+		{
+			Class Soldier
+			Skill Expert
+			Name "Divider"
+			ClassIcon heavy_head_nys
+			Health 27000
+			Scale 1.9
+			Item "The Hardium Helm"
+			Item "The Jupiter Jumpers"
+			Item "The Space Bracers"
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Attributes HoldFireUntilFullReload
+			Tag bot_giant
+			Tag boss2
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"clip size upgrade atomic" 26.0
+				"faster reload rate" 0.22
+				"fire rate bonus" 0.2
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.45
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale" 0.1
+			}
+		}
+
+		T_TFBot_Boss_Component_Blast
+		{
+			Class Soldier
+			Skill Expert
+			Name "Blast Component"
+			ClassIcon soldier_libertylauncher_giant
+			Health 4500
+			Item "The Liberty Launcher"
+			Item "The Hardium Helm"
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Attributes HoldFireUntilFullReload
+			Tag bot_giant
+			Tag boss2components
+			ItemAttributes
+			{
+				ItemName "The Liberty Launcher"
+				"damage causes airblast" 1
+				"damage bonus" 0.75
+				"fire rate bonus" 0.25
+				"clip size upgrade atomic" 5
+				"faster reload rate" 0.2
+				"Blast radius decreased" 1.2
+				"projectile spread angle penalty" 4
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale" 0.1
+				"healing received bonus" 3
+			}
+		}
+
+		T_TFBot_Boss_Component_Bison
+		{
+			Class Soldier
+			Skill Expert
+			Name "Beam Component"
+			ClassIcon soldier_bison_homing_healspell
+			Health 4500
+			Item "The Righteous Bison"
+			Item "The Space Bracers"
+			Item "Basic Spellbook"
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			WeaponRestrictions SecondaryOnly
+			Tag bot_giant
+			Tag boss2components
+			Tag boss2b
+			ItemAttributes
+			{
+				ItemName "The Righteous Bison"
+				"fire rate bonus" 0.7
+				"faster reload rate" -0.8
+				"dmg bonus vs buildings" 2
+				"set item tint RGB" 6238390
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale" 0.1
+				"healing received bonus" 3
+			}
+		}
+
+		T_TFBot_Boss_Component_Escape_Plan
+		{
+			Class Soldier
+			Skill Expert
+			Name "Blunt Component"
+			ClassIcon soldier_escapeplan_lite
+			Health 4500
+			Item "The Escape Plan"
+			Item "The Jupiter Jumpers"
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			WeaponRestrictions MeleeOnly
+			Tag bot_giant
+			Tag boss2components
+			Tag boss2teleportfirst
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale" 0.1
+			}
+		}
+
+		T_TFBot_Boss_Nexus
+		{
+			Class Heavy
+			Skill Expert
+			Name "Nexus"
+			ClassIcon heavy_head_nys
+			Health 54000
+			Scale 1.9
+			Item "The Purity Fist"
+			Item "The Bunsen Brave"
+			Item "The Titanium Towel"
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Tag bot_giant
+			Tag boss3
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_MINIGUN"
+				// these two together makes minigun fires bison proj properly
+				"override projectile type" 13
+				"energy weapon penetration" 1
+				"damage bonus" 1.5
+				"dmg bonus vs buildings" 3
+				"projectile spread angle penalty" 3
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.45
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale" 0.1
+				"healing received bonus" 8 // amputator effect is ~25 hp/s, make it ~200, around 2x rate of qf w/ uber
+			}
+		}
+
+		T_TFBot_Scout_Batsaber
+		{
+			Class Scout
+			Skill Hard
+			WeaponRestrictions MeleeOnly
+			Name "Batsaber Scout"
+			ClassIcon scout_capper_saber_litenys
+			Item "Batsaber"
+			Item "Cadet Visor"
+		}
+
+		T_TFBot_Giant_Engineer_Pomson_Spammer
+		{
+			Class Scout // xd
+			Name "Giant Rapid Pomson Engie"
+			ClassIcon engineer_pomson_v2_spammer_giant
+			Skill Expert
+			Health 3000
+			MaxVisionRange 1200
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Tag bot_giant
+			Tag pomson
+			Tag rapidpomson
+			Tag engimodel
+			Item "The Brainiac Hairpiece"
+			Item "The Brainiac Goggles"
+			CharacterAttributes
+			{
+				"move speed bonus" 0.3
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 5
+				"voice pitch scale"	0 // disables voice responses (guys this is totally an engi)
+			}
+		}
+
+		T_TFBot_Pyro_Nostromo
+		{
+			Class Pyro
+			ClassIcon pyro_phlog_v2
+			Skill Easy
+			WeaponRestrictions PrimaryOnly
+			Item "The Nostromo Napalmer"
+			Item "Jupiter Jetpack"
+		}
+
+		T_TFBot_Medic_Kritz
+		{
+			Class Medic
+			Name "Kritzkrieg Medic"
+			ClassIcon medic_kritz_quickfix_split_liteseel
+			Skill Normal
+			Attributes SpawnWithFullCharge
+			Item "The Kritzkrieg"
+			ItemAttributes
+			{
+				ItemName "The Kritzkrieg"
+				"uber duration bonus" 999
+				"bot medic uber health threshold" 151 // fuck it, *pops on spawn*
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+			CharacterAttributes
+			{
+				"heal rate bonus" 5
+			}
+		}
+
+		T_TFGateBot_Bigger_Scout_Capper
+		{
+			Class Scout
+			Name "Bigger C.A.P.P.E.R Scout"
+			ClassIcon scout_capper_saber_litenys
+			Health 650
+			Scale 1.4
+
+			EventChangeAttributes
+			{
+				Default
+				{
+					BehaviorModifiers Push
+					Attributes IgnoreFlag
+					Tag nav_prefer_gate1_flank
+					Tag bot_gatebot
+					Item "MvM GateBot Light Scout"
+
+					Skill Normal
+					WeaponRestrictions SecondaryOnly
+					Item "MNC Mascot Outfit"
+					Item "The C.A.P.P.E.R"
+					ItemAttributes
+					{
+						ItemName "The C.A.P.P.E.R"
+						"damage penalty" 0.5
+					}
+					CharacterAttributes
+					{
+						"move speed bonus" 0.7
+						"damage force reduction" 0.7
+						"airblast vulnerability multiplier" 0.7
+						"head scale" 0.8
+					}
+				}
+				RevertGateBotsBehavior
+				{
+					Item "MvM GateBot Light Scout"
+					ItemAttributes
+					{
+						ItemName "MvM GateBot Light Scout"
+						"item style override" 1
+					}
+
+					Skill Normal
+					WeaponRestrictions SecondaryOnly
+					Item "MNC Mascot Outfit"
+					Item "The C.A.P.P.E.R"
+					ItemAttributes
+					{
+						ItemName "The C.A.P.P.E.R"
+						"damage penalty" 0.5
+					}
+					CharacterAttributes
+					{
+						"move speed bonus" 0.7
+						"damage force reduction" 0.7
+						"airblast vulnerability multiplier" 0.7
+						"head scale" 0.8
+					}
+				}
+			}
+		}
+
+		T_TFGateBot_Bigger_Pyro_Nostromo
+		{
+			Class Pyro
+			Name "Bigger Pyro"
+			ClassIcon pyro_phlog_v2
+			Health 650
+			Scale 1.4
+
+			EventChangeAttributes
+			{
+				Default
+				{
+					BehaviorModifiers Push
+					Attributes IgnoreFlag
+					Tag nav_prefer_gate1_flank
+					Tag bot_gatebot
+					Item "MvM GateBot Light Pyro"
+
+					Skill Expert
+					WeaponRestrictions PrimaryOnly
+					Item "The Nostromo Napalmer"
+					Item "Jupiter Jetpack"
+					ItemAttributes
+					{
+						ItemName "The Nostromo Napalmer"
+						"airblast disabled" 1
+					}
+					CharacterAttributes
+					{
+						"move speed bonus" 0.85
+						"damage force reduction" 0.7
+						"airblast vulnerability multiplier" 0.7
+						"head scale" 0.8
+					}
+				}
+				RevertGateBotsBehavior
+				{
+					Item "MvM GateBot Light Pyro"
+					ItemAttributes
+					{
+						ItemName "MvM GateBot Light Pyro"
+						"item style override" 1
+					}
+
+					Skill Expert
+					WeaponRestrictions PrimaryOnly
+					Item "The Nostromo Napalmer"
+					Item "Jupiter Jetpack"
+					ItemAttributes
+					{
+						ItemName "The Nostromo Napalmer"
+						"airblast disabled" 1
+					}
+					CharacterAttributes
+					{
+						"move speed bonus" 0.85
+						"damage force reduction" 0.7
+						"airblast vulnerability multiplier" 0.7
+						"head scale" 0.8
+					}
+				}
+			}
+		}
+
+		T_TFGateBot_Bigger_Soldier
+		{
+			Class Soldier
+			Name "Bigger Soldier"
+			ClassIcon soldier_and_demo
+			Health 650
+			Scale 1.4
+
+			EventChangeAttributes
+			{
+				Default
+				{
+					BehaviorModifiers Push
+					Attributes IgnoreFlag
+					Tag nav_prefer_gate1_flank
+					Tag bot_gatebot
+					Item "MvM GateBot Light Soldier"
+
+					CharacterAttributes
+					{
+						"move speed bonus" 0.85
+						"damage force reduction" 0.7
+						"airblast vulnerability multiplier" 0.7
+						"head scale" 0.8
+					}
+				}
+				RevertGateBotsBehavior
+				{
+					Item "MvM GateBot Light Soldier"
+					ItemAttributes
+					{
+						ItemName "MvM GateBot Light Soldier"
+						"item style override" 1
+					}
+
+					CharacterAttributes
+					{
+						"move speed bonus" 0.85
+						"damage force reduction" 0.7
+						"airblast vulnerability multiplier" 0.7
+						"head scale" 0.8
+					}
+				}
+			}
+		}
+
+		T_TFBot_Giant_Soldier_Bison_Spammer
+		{
+			Class Soldier
+			Name "Giant Rapid Bison Soldier"
+			Health 3000
+			ClassIcon soldier_bison_spammer_giant
+			Skill Expert
+			Item "The Righteous Bison"
+			Item "Lord Cockswain's Novelty Mutton Chops and Pipe"
+			Attributes MiniBoss
+			WeaponRestrictions SecondaryOnly
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "The Righteous Bison"
+				"fire rate bonus" 0.4
+				"faster reload rate" -0.8
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+			}
+		}
+
+		T_TFBot_Giant_Soldier_Spammer_Reload_Buff
+		{
+			Class Soldier
+			Name "Giant Buff Burst Soldier"
+			ClassIcon soldier_buff_conch_mangler_giant
+			Health 3800
+			Skill Expert
+			Item "Lord Cockswain's Pith Helmet"
+			Item "Lord Cockswain's Novelty Mutton Chops and Pipe"
+			Item "The Buff Banner"
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Attributes SpawnWithFullCharge
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"move speed bonus"	0.5
+				"faster reload rate" 0.6
+				"fire rate bonus" 0.1
+				"clip size upgrade atomic" 5.0
+				"Projectile speed increased" 0.65
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"increase buff duration" 9
+			}
+		}
+
+		T_TFBot_Giant_Pyro_Phlog
+		{
+			Class Pyro
+			Name "Giant Phlogistinator Pyro"
+			ClassIcon pyro_phlog_v2_giant
+			Skill Expert
+			Health 3000
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes SpawnWithFullCharge
+			Tag bot_giant
+			Item "The Bubble Pipe"
+			Item "The Phlogistinator"
+			ItemAttributes
+			{
+				ItemName "The Phlogistinator"
+				"airblast disabled" 0
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+		}
+
+		T_TFBot_Giant_Soldier_Mangler_Conch
+		{
+			Class Soldier
+			Name "Giant Concheror Mangler Soldier"
+			ClassIcon soldier_buff_conch_mangler_giant
+			Health 3800
+			Item "The Cow Mangler 5000"
+			Item "The Concheror"
+			Tag bot_giant
+			Tag mangler
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes SpawnWithFullCharge
+			Attributes MiniBoss
+			Attributes SuppressFire
+			ItemAttributes
+			{
+				ItemName "The Cow Mangler 5000"
+				"faster reload rate" -0.8
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"increase buff duration" 9
+				"deploy time decreased" 0.5
+			}
+		}
+
+		T_TFBot_Giant_Soldier_SlowBarrage_Conch
+		{
+			Class Soldier
+			Name "Concheror Colonel Barrage"
+			ClassIcon soldier_buff_conch_mangler_giant
+			Health 4000
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Attributes SpawnWithFullCharge
+			Item "The Concheror"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"clip size upgrade atomic" 26.0
+				"faster reload rate" 0.22
+				"fire rate bonus" 0.2
+				"projectile spread angle penalty" 5
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage bonus" 1.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"airblast vertical vulnerability multiplier" 0.1
+				"Projectile speed increased" 0.4
+				"increase buff duration" 9
+				"deploy time decreased" 0.5
+			}
+		}
+
+		T_TFBot_Giant_Demo_Carpetbomber
+		{
+			Class Demoman
+			Name "Lesser Carpet Bomber"
+			ClassIcon demo_ironbomber_lite_giant
+			Health 3300
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Tag bot_giant
+			Item "Scotch Bonnet"
+			Item "The Iron Bomber"
+			ItemAttributes
+			{
+				ItemName "The Iron Bomber"
+				"faster reload rate" 0.27
+				"fire rate bonus" 0.07
+				"clip size upgrade atomic" 11
+				"projectile spread angle penalty" 7
+				"Projectile speed increased"	1.1
+				"fuse bonus" 1.25
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 4
+			}
+		}
+
+		T_TFBot_Pyro_Phlog
+		{
+			Class Pyro
+			Name "Phlogistinator Pyro"
+			ClassIcon pyro_phlog_v2
+			Skill Expert // it's the final part, going ham
+			WeaponRestrictions PrimaryOnly
+			Attributes SpawnWithFullCharge
+			Item "The Bubble Pipe"
+			Item "The Phlogistinator"
+			ItemAttributes
+			{
+				ItemName "The Phlogistinator"
+				"airblast disabled" 0
+			}
+		}
+
+		T_TFBot_Medic_Bigheal_Fixed
+		{
+			Class Medic
+			Name "Bigheal Medic"
+			Skill Normal
+			Item "The Quick-Fix"
+			ClassIcon medic_kritz_quickfix_split_liteseel
+			ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+				"ubercharge rate bonus" 0.1
+				"heal rate bonus" 50
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+		}
+
+		T_TFBot_Soldier_Crit
+		{
+			Class Soldier
+			Name "Charged Soldier"
+			ClassIcon soldier_and_demo
+			Skill Expert
+			Item "The Original"
+			Attributes AlwaysCrit
+			WeaponRestrictions PrimaryOnly
+			ItemAttributes
+			{
+				ItemName "The Original"
+				"faster reload rate" 0.2
+				"fire rate bonus" 2
+				"Projectile speed increased" 0.5
+			}
+		}
+
+		T_TFBot_Heavy_Fist_Light
+		{
+			Class Heavy
+			Name "Mini Gauntlet"
+			Skill Hard
+			ClassIcon heavy_fist_nys
+			WeaponRestrictions MeleeOnly
+			Item "Fists of Steel"
+		}
+
+		T_TFBot_Scout_Capper
+		{
+			Class Scout
+			Name "C.A.P.P.E.R Scout"
+			Skill Easy
+			ClassIcon scout_capper_saber_litenys
+			WeaponRestrictions SecondaryOnly
+			Item "The C.A.P.P.E.R"
+			Item "Cadet Visor"
+		}
+
+		T_TFBot_Bigger_Scout_Capper
+		{
+			Class Scout
+			Name "Bigger C.A.P.P.E.R Scout"
+			Skill Normal
+			ClassIcon scout_capper_saber_litenys
+			WeaponRestrictions SecondaryOnly
+			Item "The C.A.P.P.E.R"
+			Item "Cadet Visor"
+			Health 650
+			Scale 1.4
+			CharacterAttributes
+			{
+				"move speed bonus" 0.7
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"head scale" 0.8
+			}
+		}
+
+		T_TFBot_Engineer_Pomson
+		{
+			Class Scout
+			Name "Pomson Engineer"
+			ClassIcon engineer_pomson_v2
+			Skill Expert
+			MaxVisionRange 1200
+			WeaponRestrictions PrimaryOnly
+			Tag pomson
+			Tag engimodel
+			Item "The Brainiac Hairpiece"
+			Item "The Brainiac Goggles"
+			CharacterAttributes
+			{
+				"move speed bonus" 0.75 // normal engi move speed
+				"voice pitch scale"	0
+			}
+		}
+
+		T_TFBot_Soldier_Bison
+		{
+			Class Soldier
+			Name "Bison Soldier"
+			ClassIcon soldier_bison_daan
+			Skill Expert
+			MaxVisionRange 1200
+			Item "The Righteous Bison"
+			Item "Lord Cockswain's Pith Helmet"
+			WeaponRestrictions SecondaryOnly
+		}
+
+		T_TFBot_Giant_Medic_Uber
+		{
+			Class Medic
+			Name "Giant Uber Medic"
+			ClassIcon medic_uber_giant
+			Skill Expert
+			Health 4500
+			Attributes SpawnWithFullCharge
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_MEDIGUN"
+				"bot medic uber health threshold" 2000
+				"bot medic uber deploy delay duration" 2.5
+				"heal rate bonus" 200
+				"uber duration bonus" -3
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+			}
+		}
+
+		T_TFBot_Soldier_Mangler
+		{
+			Class Soldier
+			Name "Mangler Soldier"
+			Skill Expert
+			ClassIcon soldier_mangler_v2
+			WeaponRestrictions PrimaryOnly
+			Attributes SuppressFire
+			Tag mangler
+			Item "The Cow Mangler 5000"
+			ItemAttributes
+			{
+				ItemName "The Cow Mangler 5000"
+				"faster reload rate" -0.8
+			}
+		}
+
+		T_TFBot_Soldier_Mangler_Bigger
+		{
+			Class Soldier
+			Name "Bigger Mangler Soldier"
+			Skill Expert
+			ClassIcon soldier_mangler_v2
+			Health 650
+			Scale 1.4
+			WeaponRestrictions PrimaryOnly
+			Attributes SuppressFire
+			Tag mangler
+			Item "The Cow Mangler 5000"
+			ItemAttributes
+			{
+				ItemName "The Cow Mangler 5000"
+				"faster reload rate" -0.8
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"head scale" 0.8
+			}
+		}
+
+		T_TFBot_Pyro_Manmelter_Spammer
+		{
+			Class Pyro
+			Skill Expert
+			WeaponRestrictions SecondaryOnly
+			ClassIcon pyro_phlog_v2
+			Name "Rapid Manmelter Pyro"
+			Item "The Manmelter"
+			Item "The Moonman Backpack"
+			ItemAttributes
+			{
+				ItemName "The Manmelter"
+				"fire rate bonus" 0.4
+			}
+		}
+
+		T_TFGateBot_Pyro_Manmelter_Spammer_Crit
+		{
+			Class Pyro
+			Name "Rapid Manmelter Pyro"
+			ClassIcon pyro_phlog_v2
+
+			EventChangeAttributes
+			{
+				Default
+				{
+					BehaviorModifiers Push
+					Attributes IgnoreFlag
+					Tag nav_prefer_gate1_flank
+					Tag bot_gatebot
+					Item "MvM GateBot Light Pyro"
+
+					Skill Expert
+					WeaponRestrictions SecondaryOnly
+					Attributes AlwaysCrit
+					Item "The Manmelter"
+					Item "The Moonman Backpack"
+					ItemAttributes
+					{
+						ItemName "The Manmelter"
+						"fire rate bonus" 0.4
+					}
+				}
+				RevertGateBotsBehavior
+				{
+					Item "MvM GateBot Light Pyro"
+					ItemAttributes
+					{
+						ItemName "MvM GateBot Light Pyro"
+						"item style override" 1
+					}
+
+					Skill Expert
+					WeaponRestrictions SecondaryOnly
+					Attributes AlwaysCrit
+					Item "The Manmelter"
+					Item "The Moonman Backpack"
+					ItemAttributes
+					{
+						ItemName "The Manmelter"
+						"fire rate bonus" 0.4
+					}
+				}
+			}
+		}
+	}
+
+	Mission
+	{
+		Objective DestroySentries
+		Where spawnbot_main0
+		Where spawnbot_main1
+		Where spawnbot_main2
+		DesiredCount 1
+		BeginAtWave 1
+		RunForThisManyWaves 1
+		InitialCooldown 40
+		CooldownTime 40
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Tag bot_giant
+			Tag bot_sentrybuster
+			Attributes IgnoreEnemies
+			Attributes DisableDodge
+		}
+	}
+
+	Mission
+	{
+		Objective Spy
+		Where spawnbot_flank0
+		Where spawnbot_flank1
+		Where spawnbot_flank2
+		BeginAtWave 1
+		RunForThisManyWaves 1
+		DesiredCount 2
+		InitialCooldown 30
+		CooldownTime 50
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Item "Belltower Spec Ops"
+		}
+	}
+
+	Wave
+	{
+		InitWaveOutput
+		{
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				// we start the mission at gate B
+				EntFire( `initB`, `Trigger` )
+
+				IncludeScript( `oz_terror.nut` )
+
+				// bomb attributes
+				EntFire( `intel`, `SetReturnTime`, 35 )
+				EntFire( `enable_bomb_1`, `Kill`, null, 1 ) // bye
+				EntFire( `intel2`, `Kill`, null, 1 )
+			"
+		}
+		StartWaveOutput
+		{
+			Target BigNet
+			Action RunScriptCode
+			Param "
+				EntFire( `wave_start_relay`, `Trigger` )
+
+				SINS.ChangeIconFlags( `engineer_pomson_v2`, 1 )
+
+				SINS.ChangeIconByName( `pyro_phlog_v2`, `pyro_flare_atomic_v2` )
+				SINS.ChangeIconFlags( `pyro_flare_atomic_v2`, 1 )
+
+				SINS.ChangeIconByName( `soldier_and_demo`, `soldier` )
+				SINS.ChangeIconFlags( `soldier`, 1 )
+
+				SINS.ChangeIconByName( `heavy_fist_nys`, `heavy_gru` )
+				SINS.ChangeIconFlags( `heavy_gru`, 1 )
+
+				SINS.ChangeIconByName( `medic_kritz_quickfix_split_liteseel`, `medic` )
+				SINS.ChangeIconByName( `scout_capper_saber_litenys`, `scout_batsaber_nys` )
+				SINS.ChangeIconByName( `soldier_buff_conch_mangler_giant`, `soldier_crit_giant` )
+			"
+		}
+
+		// No need for DoneOutput because wave end logic has been handled by IWO
+
+		////////////////////////////////////////////////////////////////////////////////
+
+		// Part 1 has defenders stuck at gate B. It pays $1000.
+
+		WaveSpawn
+		{
+			Name "1-1"
+			Where spawnbot_main2
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 8
+			TotalCurrency 80
+			Squad
+			{
+				TFBot
+				{
+					Class Pyro
+					Skill Expert
+					ClassIcon pyro_phlog_v2
+					Name "Manmelter Pyro"
+					Item "The Manmelter"
+					WeaponRestrictions SecondaryOnly
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix
+					ClassIcon medic_kritz_quickfix_split_liteseel
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "1-1"
+			Where spawnbot_main2
+			TotalCount 24
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 8
+			TotalCurrency 80
+			Squad
+			{
+				TFBot
+				{
+					Class Soldier
+					Skill Normal
+					ClassIcon soldier_and_demo
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix
+					ClassIcon medic_kritz_quickfix_split_liteseel
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "1-2" // spawns across 1-1 and 1-2
+			Where spawnbot_flank2
+			TotalCount 30
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 10
+			TotalCurrency 64
+			TFBot { Template T_TFBot_Scout_Batsaber }
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "1-2"
+			Where spawnbot_main2
+			WaitForAllSpawned "1-1"
+			TotalCount 8
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 9
+			TotalCurrency 300
+			TFBot { Template T_TFBot_Giant_Engineer_Pomson_Spammer }
+			StartWaveOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					SINS.ChangeIconByName( `pyro_flare_atomic_v2`, `pyro` )
+					SINS.ChangeIconByName( `soldier`, `demo_loch_nys` )
+				"
+				Delay 3.5
+			}
+		}
+		WaveSpawn
+		{
+			Name "1-2"
+			Where spawnbot_main2
+			WaitForAllSpawned "1-1"
+			TotalCount 24
+			MaxActive 12
+			SpawnCount 4
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 7
+			TotalCurrency 76
+			RandomChoice
+			{
+				TFBot { Template T_TFBot_Pyro_Nostromo }
+				TFBot { Template T_TFBot_Pyro_Nostromo }
+				TFBot
+				{
+					Class Demoman
+					Name "Loch-n-Load Demo"
+					ClassIcon soldier_and_demo
+					Skill Normal
+					Item "The Loch-n-Load"
+				}
+			}
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "1-3"
+			Where spawnbot_main2
+			WaitForAllSpawned "1-2"
+			TotalCount 9
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 14
+			TotalCurrency 150
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Crit
+					ClassIcon soldier_buff_conch_mangler_giant
+				}
+				TFBot { Template T_TFBot_Medic_Bigheal_Fixed }
+				TFBot { Template T_TFBot_Medic_Bigheal_Fixed }
+			}
+			StartWaveOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "SINS.ChangeIconByName( `medic`, `medic_quickfix_seel2` )"
+			}
+		}
+		WaveSpawn
+		{
+			Name "1-3"
+			Where spawnbot_main2
+			WaitForAllSpawned "1-2"
+			TotalCount 20
+			MaxActive 10
+			SpawnCount 4
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 8
+			TotalCurrency 64
+			TFBot
+			{
+				Class Heavy
+				Skill Easy
+			}
+		}
+		WaveSpawn
+		{
+			Name "1-3"
+			Where spawnbot_flank2
+			WaitForAllSpawned "1-2"
+			TotalCount 15
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 11
+			WaitBetweenSpawns 12
+			TotalCurrency 36
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Heavyweight_Champ_Fast
+				ClassIcon heavy_fist_nys
+			}
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "1-Boss"
+			Where spawnbot_main2
+			WaitForAllDead "1-3"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 4
+			WaitBetweenSpawns 0
+			TotalCurrency 80
+			TFBot { Template T_TFBot_Boss_Carpet_Bomber }
+			StartWaveOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					ClientPrint( null, 3, `\x079C1010A boss approaches...` )
+					// reset just before boss spawns, makes him carry the bomb
+					EntFire( `intel`, `ForceResetSilent`, null, 3.9, null )
+
+					EntFire( `nav_interface`, `RecomputeBlockers`, null, 1 )
+					EntFire( `nav_interface`, `RecomputeBlockers`, null, 2 )
+
+					SINS.ChangeIconByName( `scout_batsaber_nys`, `scout_capper_lite` )
+					SINS.ChangeIconByName( `pyro`, `pyro_phlog_v2` )
+				"
+			}
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "ClientPrint( null, 3, `\x0799CCFFThe boss is now carrying the bomb.` )"
+				Delay 5
+			}
+			FirstSpawnWarningSound mvm/mvm_tele_deliver.wav
+		}
+		WaveSpawn
+		{
+			Name "1-Boss"
+			Where spawnbot_scattered2
+			WaitForAllDead "1-3"
+			TotalCount 12
+			MaxActive 8
+			SpawnCount 3
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 7
+			TotalCurrency 35
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Scout_Capper
+					Skill Easy
+				}
+				TFBot
+				{
+					Class Heavy
+					Skill Easy
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "1-Boss"
+			Where spawnbot_scattered2
+			WaitForAllDead "1-3"
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 9
+			TotalCurrency 35
+			TFBot { Template T_TFBot_Pyro_Phlog }
+		}
+
+		////////////////////////////////////////////////////////////////////////////////
+
+		// Time for our union-regulated break.
+
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					EntFire( `break1_relay`, `Trigger` )
+					EntFire( `break1_relay`, `Kill` )
+
+					foreach ( player in LOBO.GetAllPlayers( { check_alive = false } ) )
+						player.SetScriptOverlayMaterial( `overlays/break1_announcement` )
+
+					LOBO.KillAllInvaderBots()
+
+					SINS.ChangeIconByName( `demo_loch_nys`, `soldier_and_demo` )
+
+					SINS.ChangeIconByName( `soldier_crit_giant`, `soldier_buff_burstfire_yoovy_giant` )
+					SINS.ChangeIconFlags( `soldier_buff_burstfire_yoovy_giant`, 1 | 8 )
+
+					SINS.ChangeIconByName( `medic_quickfix_seel2`, `medic_kritz_quickfix_split_liteseel` )
+					SINS.ChangeIconByName( `heavy_gru`, `heavy_gauntlet_nys` )
+				"
+			}
+			FirstSpawnWarningSound vo/mvm_get_to_upgrade01.mp3 // Get to an upgrade station before they return.
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 1
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					SendGlobalGameEvent( `show_annotation`,
+					{
+						text = `The front upgrade station is located here.`
+						worldPosX = 1951
+						worldPosY = 108
+						worldPosZ = -320
+						lifetime = -1.0
+						id = 2
+					})
+					EntFire( `wave_start_relay`, `RunScriptCode`, `LOBO.HideAnnotation( 2 )`, 12 )
+				"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 9
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					foreach ( player in LOBO.GetAllPlayers( { check_alive = false } ) )
+						player.SetScriptOverlayMaterial( `overlays/bomb_resets_40_sec` )
+				"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 18
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					foreach ( player in LOBO.GetAllPlayers( { check_alive = false } ) )
+						player.SetScriptOverlayMaterial( null )
+				"
+			}
+		}
+
+		/////////////////////////////////////////////
+
+		// tranquility tutorial time.
+
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 35
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					SendGlobalGameEvent( `show_annotation`,
+					{
+						text = `These dispensers provide a robot with radial healing when activated.`
+						follow_entindex = Entities.FindByName( null, `tranquility2_bp` ).entindex()
+						lifetime = 4.25
+					})
+				"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 39.25
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					SendGlobalGameEvent( `show_annotation`,
+					{
+						text = `These dispensers provide a robot with radial healing when activated.`
+						follow_entindex = Entities.FindByName( null, `tranquility1_bp` ).entindex()
+						lifetime = 4.25
+					})
+				"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 43.5
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					SendGlobalGameEvent( `show_annotation`,
+					{
+						text = `Destroy them to stop the effect.`
+						follow_entindex = Entities.FindByName( null, `tranquility1_bp` ).entindex()
+						lifetime = 7
+					})
+				"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 50.5
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					SendGlobalGameEvent( `show_annotation`,
+					{
+						text = `These particles indicate that a dispenser is about to activate.`
+						follow_entindex = Entities.FindByName( null, `tranquility1_bp` ).entindex()
+						lifetime = 8.5
+					})
+					EntFire( `tranquility1_ready_particles`, `Start` )
+					EntFire( `tranquility2_ready_particles`, `Start` )
+				"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 58.5
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					SendGlobalGameEvent( `show_annotation`,
+					{
+						text = `This sound is played on activation.`
+						follow_entindex = Entities.FindByName( null, `tranquility1_bp` ).entindex()
+						lifetime = 7
+						play_sound = `misc/tranquility.wav`
+					})
+					EntFire( `tranquility1_ready_particles`, `Stop` )
+					EntFire( `tranquility2_ready_particles`, `Stop` )
+				"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 65.5
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					SendGlobalGameEvent( `show_annotation`,
+					{
+						text = `But beware! Some robots resonate with these signals much more strongly than others...`
+						follow_entindex = Entities.FindByName( null, `tranquility1_bp` ).entindex()
+						lifetime = 8.5
+					})
+				"
+			}
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 75
+			FirstSpawnWarningSound vo/announcer_begins_5sec.mp3
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 76
+			FirstSpawnWarningSound vo/announcer_begins_4sec.mp3
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 77
+			FirstSpawnWarningSound vo/announcer_begins_3sec.mp3
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 78
+			FirstSpawnWarningSound vo/announcer_begins_2sec.mp3
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 79
+			FirstSpawnWarningSound vo/announcer_begins_1sec.mp3
+		}
+
+		////////////////////////////////////////////////////////////////////////////////
+
+		// Part 2 opens up the map and RED has gate B reclaimed. It pays $1500.
+
+		WaveSpawn
+		{
+			Name "2-gatehint"
+			WaitForAllDead "1-Boss"
+			WaitBeforeStarting 82
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					SendGlobalGameEvent( `show_annotation`,
+					{
+						text = `Gatebots will flank regularly from here! Watch out!`
+						worldPosX = 3297
+						worldPosY = 462
+						worldPosZ = -355
+						lifetime = -1.0
+						id = 1
+					})
+					EntFire( `wave_start_relay`, `RunScriptCode`, `LOBO.HideAnnotation( 1 )`, 8.5 )
+				"
+			}
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "2-1"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllDead "1-Boss"
+			TotalCount 9
+			MaxActive 4
+			SpawnCount 3
+			WaitBeforeStarting 80
+			WaitBetweenSpawns 14
+			TotalCurrency 100
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier
+					ClassIcon soldier_buff_conch_mangler_giant
+					Tag bot_giant
+					Tag kotg1
+				}
+				TFBot { Template T_TFBot_Medic_Kritz }
+				TFBot { Template T_TFBot_Medic_Kritz }
+			}
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					if ( !LOBO.gateb_captured )
+						EntFire( `tranquility1_ready_particles`, `Start` )
+
+					LOBO.is_first_kotg_spawned = true
+
+					SINS.ChangeIconByName( `medic_kritz_quickfix_split_liteseel`, `medic_kritz_lite` )
+					SINS.ChangeIconByName( `soldier_buff_burstfire_yoovy_giant`, `soldier_giant` )
+					SINS.ChangeIconByName( `pyro_phlog_v2`, `pyro` )
+				"
+				Delay 0.1
+			}
+			DoneOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "LOBO.is_tranquility_on_hold = false; LOBO.is_first_kotg_spawned = false;"
+			}
+		}
+		WaveSpawn
+		{
+			Name "2-1"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllDead "1-Boss"
+			TotalCount 28
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 81
+			WaitBetweenSpawns 8
+			TotalCurrency 75
+			TFBot
+			{
+				Class Demoman
+				Skill Expert
+				ClassIcon soldier_and_demo
+			}
+		}
+
+		//////////////////////////////
+
+		WaveSpawn
+		{
+			Name "2-gate-1"
+			Where spawnbot_flank1
+			Where spawnbot_flank2
+			WaitForAllDead "1-Boss"
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 4
+			WaitBeforeStarting 90
+			WaitBetweenSpawns 10
+			TotalCurrency 50
+			TFBot { Template T_TFGateBot_Scout_Normal }
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "2-2"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "2-1"
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 14
+			WaitBetweenSpawns 15
+			TotalCurrency 150
+			TFBot
+			{
+				Template T_TFBot_Giant_Heavyweapons
+				Tag bot_giant
+				Skill Easy
+				CharacterAttributes
+				{
+					"reduced_healing_from_medics" 0.025
+				}
+			}
+			StartWaveOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					SINS.ChangeIconByName( `medic_kritz_lite`, `medic_quickfix_seel2` )
+					SINS.ChangeIconByName( `soldier_and_demo`, `soldier` )
+					SINS.ChangeIconByName( `soldier_giant`, `soldier_buff_burstfire_yoovy_giant` )
+				"
+				Delay 8
+			}
+		}
+		WaveSpawn
+		{
+			Name "2-2"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "2-1"
+			TotalCount 30
+			MaxActive 14
+			SpawnCount 6
+			WaitBeforeStarting 13
+			WaitBetweenSpawns 10
+			TotalCurrency 125
+			Squad
+			{
+				TFBot { Template T_TFBot_Sniper_Huntsman }
+				TFBot { Template T_TFBot_Medic_Bigheal_Fixed }
+			}
+		}
+
+		//////////////////////////////
+
+		WaveSpawn
+		{
+			Name "2-gate-2" // spawns across the rest of part 2.
+			Where spawnbot_flank1
+			Where spawnbot_flank2
+			WaitForAllSpawned "2-gate-1"
+			TotalCount 20
+			MaxActive 5
+			SpawnCount 2
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 17
+			TotalCurrency 275
+			RandomChoice
+			{
+				TFBot { Template T_TFGateBot_Bigger_Pyro_Nostromo }
+				TFBot { Template T_TFGateBot_Bigger_Scout_Capper }
+				TFBot { Template T_TFGateBot_Bigger_Soldier }
+			}
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "2-3"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "2-2"
+			TotalCount 5
+			MaxActive 3
+			SpawnCount 1
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 9
+			TotalCurrency 200
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Bison_Spammer
+				Tag kotg2
+			}
+			StartWaveOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "if ( !LOBO.gateb_captured ) EntFire( `tranquility2_ready_particles`, `Start`, null, 8 )"
+			}
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "LOBO.is_first_kotg_spawned = true"
+				Delay 0.1
+			}
+			DoneOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "LOBO.is_tranquility_on_hold = false; LOBO.is_first_kotg_spawned = false;"
+			}
+		}
+		WaveSpawn
+		{
+			Name "2-3"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "2-2"
+			TotalCount 28
+			MaxActive 12
+			SpawnCount 4
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 7
+			TotalCurrency 75
+			TFBot { Template T_TFBot_Soldier_RocketShotgun }
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "2-4"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "2-3"
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 13
+			TotalCurrency 125
+			TFBot { Template T_TFBot_Giant_Soldier_Spammer_Reload_Buff }
+			StartWaveOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "SINS.ChangeIconByName( `pyro`, `pyro_flare_atomic_v2` )"
+			}
+		}
+		WaveSpawn
+		{
+			Name "2-4"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "2-3"
+			TotalCount 30
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 8
+			TotalCurrency 75
+			TFBot { Template T_TFBot_Pyro_Manmelter_Spammer }
+		}
+		WaveSpawn
+		{
+			Name "2-4"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "2-2"
+			TotalCount 20
+			MaxActive 5
+			SpawnCount 2
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 8
+			TotalCurrency 50
+			TFBot { Template T_TFBot_Bigger_Scout_Capper }
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "2-Boss0"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllDead "2-4"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 0
+			TotalCurrency 0
+			TFBot { Template T_TFBot_Boss_Divider }
+			StartWaveOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					if ( LOBO.gateb_captured )
+					{
+						EntFire( `boss2_pre_relay`, `Trigger` )
+						ClientPrint( null, 3, `\x079C1010A boss approaches from \x07FFFF66Gate A\x079C1010...` )
+					}
+					else
+					{
+						ClientPrint( null, 3, `\x079C1010A boss approaches...` )
+						EntFire( `pop_interface`, `PauseBotSpawning` )
+						EntFire( `pop_interface`, `UnpauseBotSpawning`, null, 10 )
+					}
+					EntFire( `boss2_pre_relay`, `Kill` )
+					// reset just before boss spawns, makes him carry the bomb
+					EntFire( `intel`, `ForceResetSilent`, null, 9.9 )
+
+					SINS.ChangeIconByName( `pyro_flare_atomic_v2`, `pyro_phlog_v2` )
+				"
+			}
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "ClientPrint( null, 3, `\x0799CCFFThe boss is now carrying the bomb.` )"
+				Delay 5
+			}
+			FirstSpawnWarningSound mvm/mvm_tele_deliver.wav
+		}
+		WaveSpawn
+		{
+			Name "2-Boss"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllDead "2-Boss0"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 40
+			RandomChoice { RandomChoice { TFBot { Template T_TFBot_Boss_Component_Blast } } }
+		}
+		WaveSpawn
+		{
+			Name "2-Boss"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllDead "2-Boss0"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 40
+			RandomChoice { RandomChoice { TFBot { Template T_TFBot_Boss_Component_Bison } } }
+		}
+		WaveSpawn
+		{
+			Name "2-Boss"
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllDead "2-Boss0"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 0
+			TotalCurrency 40
+			RandomChoice { RandomChoice { TFBot { Template T_TFBot_Boss_Component_Escape_Plan } } }
+		}
+		WaveSpawn
+		{
+			Name "2-Boss"
+			Where spawnbot_scattered1
+			Where spawnbot_scattered2
+			WaitForAllDead "2-4"
+			TotalCount 16
+			MaxActive 10
+			SpawnCount 4
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 6
+			TotalCurrency 80
+			RandomChoice
+			{
+				TFBot { Template T_TFBot_Engineer_Pomson }
+				TFBot { Template T_TFBot_Heavy_Fist_Light }
+				TFBot { Template T_TFBot_Pyro_Phlog }
+			}
+		}
+
+		////////////////////////////////////////////////////////////////////////////////
+
+		// Another union-regulated break.
+
+		WaveSpawn
+		{
+			WaitForAllDead "2-Boss"
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					EntFire( `break2_relay`, `Trigger` )
+					EntFire( `break2_relay`, `Kill` )
+
+					LOBO.gateb_captured = false
+
+					foreach ( player in LOBO.GetAllPlayers( { check_alive = false } ) )
+						player.SetScriptOverlayMaterial( `overlays/break2_announcement` )
+
+					LOBO.KillAllInvaderBots()
+
+					LOBO.gatea_captured <- false
+
+					SINS.ChangeIconFlags( `pyro_phlog_v2`, 1 | 16 )
+					SINS.ChangeIconFlags( `engineer_pomson_v2`, 1 | 16 )
+					SINS.ChangeIconFlags( `heavy_gauntlet_nys`, 1 | 16 )
+
+					SINS.ChangeIconByName( `soldier`, `soldier_and_demo` )
+					SINS.ChangeIconFlags( `soldier_and_demo`, 1 | 16 )
+
+					SINS.ChangeIconByName( `soldier_buff_burstfire_yoovy_giant`, `soldier_barrage_conch_atomic_giant` )
+				"
+			}
+			FirstSpawnWarningSound vo/mvm_get_to_upgrade04.mp3 // Get to an upgrade station.
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "2-Boss"
+			WaitBeforeStarting 9
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					foreach ( player in LOBO.GetAllPlayers( { check_alive = false } ) )
+						player.SetScriptOverlayMaterial( `overlays/bomb_resets_45_sec` )
+				"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "2-Boss"
+			WaitBeforeStarting 18
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					foreach ( player in LOBO.GetAllPlayers( { check_alive = false } ) )
+						player.SetScriptOverlayMaterial( null )
+				"
+			}
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "2-Boss"
+			WaitBeforeStarting 40
+			FirstSpawnWarningSound vo/announcer_begins_20sec.mp3
+		}
+		WaveSpawn
+		{
+			WaitForAllDead "2-Boss"
+			WaitBeforeStarting 55
+			FirstSpawnWarningSound vo/mvm_general_wav_start01.mp3
+		}
+
+		////////////////////////////////////////////////////////////////////////////////
+
+		// Part 3 opens the map fully.
+		// For some reason, it pays a peculiar number of 1337.
+
+		WaveSpawn
+		{
+			Name "3-gate"
+			Where spawnbot_flank0
+			Where spawnbot_flank1
+			Where spawnbot_flank2
+			WaitForAllDead "2-Boss"
+			TotalCount 12
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 70
+			WaitBetweenSpawns 60
+			TotalCurrency 55
+			TFBot
+			{
+				Template T_TFGateBot_Scout_FAN
+				ClassIcon scout
+			}
+		}
+		WaveSpawn
+		{
+			Name "3-gate"
+			Where spawnbot_flank0
+			Where spawnbot_flank1
+			Where spawnbot_flank2
+			WaitForAllDead "2-Boss"
+			TotalCount 12
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 90
+			WaitBetweenSpawns 60
+			TotalCurrency 55
+			TFBot { Template T_TFGateBot_Soldier_RocketShotgun_Expert }
+		}
+		WaveSpawn
+		{
+			Name "3-gate"
+			Where spawnbot_flank0
+			Where spawnbot_flank1
+			Where spawnbot_flank2
+			WaitForAllDead "2-Boss"
+			TotalCount 12
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 110
+			WaitBetweenSpawns 60
+			TotalCurrency 56
+			TFBot { Template T_TFGateBot_Pyro_Manmelter_Spammer_Crit }
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "3-1"
+			Where spawnbot_main0
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllDead "2-Boss"
+			TotalCount 6
+			MaxActive 3
+			SpawnCount 2
+			WaitBeforeStarting 60
+			WaitBetweenSpawns 14
+			TotalCurrency 135
+			Squad
+			{
+				TFBot { Template T_TFBot_Giant_Pyro_Phlog }
+				TFBot { Template T_TFBot_Giant_Medic_Uber }
+			}
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					SINS.ChangeIconByName( `scout`, `scout_fan` )
+					SINS.ChangeIconByName( `pyro_phlog_v2`, `pyro_flare_atomic_v2` )
+
+					SINS.ChangeIconByName( `soldier_and_demo`, `demo_burst` )
+					SINS.ChangeIconFlags( `demo_burst`, 1 )
+				"
+			}
+		}
+		WaveSpawn
+		{
+			Name "3-1"
+			Where spawnbot_main0
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllDead "2-Boss"
+			TotalCount 30
+			MaxActive 10
+			SpawnCount 6
+			WaitBeforeStarting 61
+			WaitBetweenSpawns 7
+			TotalCurrency 64
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Demo_Burst
+					ClassIcon soldier_and_demo
+				}
+				TFBot { Template T_TFBot_Soldier_Mangler }
+			}
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "3-2"
+			Where spawnbot_main0
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "3-1"
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 14
+			WaitBetweenSpawns 13
+			TotalCurrency 100
+			TFBot
+			{
+				Template T_TFBot_Giant_Demo_Carpetbomber
+				Tag kotg1
+			}
+			StartWaveOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "if ( !LOBO.gateb_captured ) EntFire( `tranquility1_ready_particles`, `Start`, null, 7 )"
+			}
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "LOBO.is_first_kotg_spawned = true"
+				Delay 0.1
+			}
+			DoneOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "LOBO.is_tranquility_on_hold = false; LOBO.is_first_kotg_spawned = false;"
+			}
+		}
+		WaveSpawn
+		{
+			Name "3-2"
+			Where spawnbot_main0
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "3-1"
+			TotalCount 16
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 7
+			TotalCurrency 50
+			TFBot
+			{
+				Class Heavy
+				Skill Easy
+			}
+		}
+		WaveSpawn
+		{
+			Name "3-2"
+			Where spawnbot_main0
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "3-1"
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 7
+			TotalCurrency 50
+			TFBot { Template T_TFBot_Soldier_Crit }
+			StartWaveOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					SINS.ChangeIconByName( `demo_burst`, `soldier_crit` )
+					SINS.ChangeIconFlags( `soldier_crit`, 1 | 16 )
+				"
+			}
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "3-3"
+			Where spawnbot_main0
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "3-2"
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 16
+			WaitBetweenSpawns 14
+			TotalCurrency 100
+			TFBot
+			{
+				Template T_TFBot_Giant_Heavyweapons
+				Tag bot_giant
+			}
+		}
+		WaveSpawn
+		{
+			Name "3-3"
+			Where spawnbot_main0
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "3-2"
+			TotalCount 24
+			MaxActive 12
+			SpawnCount 6
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 8
+			TotalCurrency 62
+			Squad
+			{
+				TFBot { Template T_TFBot_Pyro_Phlog }
+				TFBot { Template T_TFBot_Medic_Bigheal_Fixed }
+			}
+			StartWaveOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "SINS.ChangeIconByName( `pyro_flare_atomic_v2`, `pyro_phlog_v2` )"
+			}
+		}
+		WaveSpawn
+		{
+			Name "3-3"
+			Where spawnbot_main0
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "3-2"
+			TotalCount 24
+			MaxActive 10
+			SpawnCount 4
+			WaitBeforeStarting 13
+			WaitBetweenSpawns 6
+			TotalCurrency 50
+			RandomChoice
+			{
+				TFBot { Template T_TFBot_Scout_Capper }
+				TFBot { Template T_TFBot_Scout_Capper }
+				TFBot
+				{
+					Template T_TFBot_Scout_Capper
+					Skill Hard
+				}
+			}
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "3-4"
+			Where spawnbot_main0
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "3-3"
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 20
+			TotalCurrency 100
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Mangler_Conch
+				Tag kotg2
+			}
+			StartWaveOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "if ( !LOBO.gateb_captured ) EntFire( `tranquility2_ready_particles`, `Start`, null, 6 )"
+			}
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					LOBO.is_first_kotg_spawned = true
+					SINS.ChangeIconByName( `pyro_phlog_v2`, `pyro_flare_atomic_v2` )
+				"
+				Delay 0.1
+			}
+			DoneOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "LOBO.is_tranquility_on_hold = false; LOBO.is_first_kotg_spawned = false;"
+			}
+		}
+		WaveSpawn
+		{
+			Name "3-4"
+			Where spawnbot_main0
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "3-3"
+			TotalCount 3
+			MaxActive 2
+			SpawnCount 1
+			WaitBeforeStarting 20
+			WaitBetweenSpawns 20
+			TotalCurrency 100
+			TFBot { Template T_TFBot_Giant_Soldier_SlowBarrage_Conch }
+		}
+		WaveSpawn
+		{
+			Name "3-4"
+			Where spawnbot_main0
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllSpawned "3-3"
+			TotalCount 35
+			MaxActive 12
+			SpawnCount 5
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 7
+			TotalCurrency 100
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Engineer_Pomson
+					Attributes AlwaysCrit
+				}
+				TFBot { Template T_TFBot_Soldier_Bison }
+			}
+		}
+		WaveSpawn
+		{
+			Name "3-4"
+			Where spawnbot_flank0
+			Where spawnbot_flank1
+			Where spawnbot_flank2
+			WaitForAllSpawned "3-3"
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 9
+			TotalCurrency 80
+			TFBot
+			{
+				Template T_TFBot_Heavy_Fist_Light
+				Attributes AlwaysCrit
+			}
+		}
+
+		/////////////////////////////////////////////
+
+		WaveSpawn
+		{
+			Name "3-Boss"
+			Where spawnbot_main0
+			Where spawnbot_main1
+			Where spawnbot_main2
+			WaitForAllDead "3-4"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 15
+			WaitBetweenSpawns 0
+			TotalCurrency 25
+			TFBot { Template T_TFBot_Boss_Nexus }
+			StartWaveOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					EntFire( `tranquility1_ready_particles`, `Start`, null, 2 )
+					EntFire( `tranquility2_ready_particles`, `Start`, null, 2 )
+
+					if ( LOBO.gateb_captured )
+					{
+						EntFire( `boss3_pre_double_relay`, `Trigger` )
+						ClientPrint( null, 3, `\x079C1010The source of the terrors approaches from the \x07FFFF66farthest spawn\x079C1010... make your last stand!` )
+					}
+					else if ( LOBO.gatea_captured )
+					{
+						EntFire( `boss3_pre_single_relay`, `Trigger` )
+						ClientPrint( null, 3, `\x079C1010The source of the terrors approaches from the \x07FFFF66farthest spawn\x079C1010... make your last stand!` )
+					}
+					else
+					{
+						EntFire( `pop_interface`, `PauseBotSpawning` )
+						EntFire( `pop_interface`, `UnpauseBotSpawning`, null, 15 )
+						ClientPrint( null, 3, `\x079C1010The source of the terrors approaches... make your last stand!` )
+					}
+					EntFire( `boss3_pre_double_relay`, `Kill` )
+					EntFire( `boss3_pre_single_relay`, `Kill` )
+
+					EntFire( `intel`, `ForceResetSilent`, null, 14.9 )
+
+					SINS.ChangeIconByName( `scout_fan`, `scout` )
+
+					SINS.ChangeIconByName( `soldier_crit`, `soldier_and_demo` )
+					SINS.ChangeIconFlags( `soldier_and_demo`, 1 )
+				"
+			}
+			FirstSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "ClientPrint( null, 3, `\x0799CCFFThe boss is now carrying the bomb.` )"
+				Delay 5
+			}
+			FirstSpawnWarningSound mvm/mvm_tele_deliver.wav
+		}
+		WaveSpawn
+		{
+			Name "3-Boss"
+			Where spawnbot_scattered0
+			Where spawnbot_scattered1
+			Where spawnbot_scattered2
+			WaitForAllDead "3-4"
+			TotalCount 16
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 26
+			WaitBetweenSpawns 8
+			TotalCurrency 48
+			RandomChoice
+			{
+				TFBot
+				{
+					Template T_TFBot_Bigger_Scout_Capper
+					Skill Hard
+					CharacterAttributes
+					{
+						"healing received bonus" 3
+					}
+				}
+				TFBot
+				{
+					Class Scout
+					Skill Hard
+					CharacterAttributes
+					{
+						"healing received bonus" 3 // slightly weaker than qf uber, if under tranquility
+					}
+				}
+				TFBot
+				{
+					Class Scout
+					Skill Hard
+					CharacterAttributes
+					{
+						"healing received bonus" 3 // slightly weaker than qf uber, if under tranquility
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "3-Boss"
+			Where spawnbot_scattered0
+			Where spawnbot_scattered1
+			Where spawnbot_scattered2
+			WaitForAllDead "3-4"
+			TotalCount 12
+			MaxActive 8
+			SpawnCount 3
+			WaitBeforeStarting 30
+			WaitBetweenSpawns 7
+			TotalCurrency 72
+			RandomChoice
+			{
+				TFBot
+				{
+					Class Soldier
+					Skill Expert
+					ClassIcon soldier_and_demo
+					CharacterAttributes
+					{
+						"healing received bonus" 3
+					}
+				}
+				TFBot
+				{
+					Class Demoman
+					Skill Expert
+					ClassIcon soldier_and_demo
+					CharacterAttributes
+					{
+						"healing received bonus" 3
+					}
+				}
+				TFBot
+				{
+					Template T_TFBot_Pyro_Manmelter_Spammer
+					Attributes AlwaysCrit
+					CharacterAttributes
+					{
+						"healing received bonus" 3
+					}
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name "3-Boss"
+			Where spawnbot_scattered0
+			Where spawnbot_scattered1
+			Where spawnbot_scattered2
+			WaitForAllDead "3-4"
+			TotalCount 4
+			MaxActive 3
+			SpawnCount 1
+			WaitBeforeStarting 31
+			WaitBetweenSpawns 7
+			TotalCurrency 35
+			TFBot
+			{
+				Template T_TFBot_Soldier_Mangler_Bigger
+				CharacterAttributes
+				{
+					"healing received bonus" 3
+				}
+			}
+		}
+
+		////////////////////////////////////////////////////////////////////////////////
+
+		// "Precaching" icons for seel_ins.nut
+		// Only needed for potato.tf servers
+
+		WaveSpawn
+		{
+			Support 1
+			Squad
+			{
+				TFBot { ClassIcon demo_ironbomber_hyper_lite }
+				TFBot { ClassIcon soldier_barrage_homing_hyper }
+				TFBot { ClassIcon soldier_bison_spammer_hyper_lite_giant }
+				TFBot { ClassIcon soldier_spammer_hyper_lite }
+
+				// intermediate icons
+				TFBot { ClassIcon pyro_flare_atomic_v2 }
+				TFBot { ClassIcon scout_batsaber_nys }
+				TFBot { ClassIcon soldier_crit_giant }
+				TFBot { ClassIcon demo_loch_nys }
+				TFBot { ClassIcon medic_quickfix_seel2 }
+				TFBot { ClassIcon scout_capper_lite }
+				TFBot { ClassIcon soldier_buff_burstfire_yoovy_giant }
+				TFBot { ClassIcon heavy_gauntlet_nys }
+				TFBot { ClassIcon medic_kritz_lite }
+				TFBot { ClassIcon soldier_barrage_conch_atomic_giant }
+			}
+		}
+	}
+}

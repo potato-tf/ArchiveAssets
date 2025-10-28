@@ -1,0 +1,4143 @@
+// Beautiful Map. btw test my mission writing skill for a standard EXP!
+// by Spectλtor™ : https://steamcommunity.com/id/ImNotSpecNotes/
+// 感谢好时光服务器协助我测试的CNTF2社区成员们。
+// 依旧是个香草任务，但是有一些小的rafmod机器人，以及好玩的战斗坦克。
+
+// Credits:
+// General havana fix by - Flurbury (figured out what needs to be fixed), fellen (vscript fix support), and Whurr (better nav).
+
+#base robot_standard.pop
+#base robot_giant.pop
+
+//#base custom_weapon_spadmin.pop
+//#base custom_robot_spec_redux.pop
+//#base custom_robot_spec_redux_raf.pop
+
+// Havana guide:
+//
+// Spawn: (好消息是havana只有一个方向的重生点)
+//
+// spawnbot - 主要
+// spawnbot_mission_sniper
+// spawnbot_mission_spy
+// spawnbot_mission_sentrybuster
+//
+// Tank:
+// 
+// boss_path_fix1 (靠近升级站一侧)
+// boss_path_altfix1 (靠近后巷一侧)
+//
+// Relay:
+//
+// wave_start_relay
+// wave_finished_relay
+// wave_start_relay_ironman
+// 
+// Bombpath:
+//
+// bombpath_1_upper (从靠近升级站一侧进入大街，直行穿过破碎拱门。到达分叉口后进入上方建筑再到达炸弹坑)
+// bombpath_1 (同上，在分叉口右转走下方远路到达炸弹坑)
+// bombpath_2_upper (从远离升级站一侧的后巷进入大街，直行绕开破碎拱门。到达大街尽头的分叉口后进入上方建筑再到达炸弹坑)
+// bombpath_2 (同上，在分叉口左转走下方远路到达炸弹坑)
+// 
+// Tags:
+// 
+// Nope.
+
+//
+// Starting Currency: 650
+//
+// +----------+----------+----------+
+// | Wave     | Currency | A+       |
+// +----------+----------+----------+
+// | Wave 1   | 600      | 700      |
+// | Wave 2   | 700      | 800      |
+// | Wave 3   | 550      | 650      |
+// | Wave 4   | 600      | 700      |
+// | Wave 5   | 650      | 750      |
+// +----------+----------+----------+
+// | Total    | 3100     | 3600     |
+// +----------+----------+----------+
+//
+
+WaveSchedule // 事实上这里可以是任何内容
+{
+    StartingCurrency 650 // 初始金钱
+    CanBotsAttackWhileInSpawnRoom no // 如果是yes，机器人在重生区内便会开始攻击玩家
+    RespawnWaveTime 4 // 复活波次时间。该值乘以2基本等于每个人的复活时间
+    FixedRespawnWaveTime Yes // 复活时间固定。如果为0，随着回合推移，复活时间会越来越长
+    AddSentryBusterWhenDamageDealtExceeds 3000 // 步哨造成的伤害超过该阈值时，生成步哨毁灭者
+    AddSentryBusterWhenKillCountExceeds 15 // 步哨的击杀数超过该阈值时，生成步哨毁灭者
+    Advanced 1 // 开启高级难度，用于游戏的成绩统计
+
+	// Combat tank precache
+	PrecacheModel "models/bots/boss_bot/combat_tank_mk2/mk2_combat_tank_chassis.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/combat_tank_mk2/mk2_minigun.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/combat_tank_mk2/mk2_railgun.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/combat_tank/railgun_case.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/combat_tank_mk2/mk2_rocket_dumbfire.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/combat_tank_mk2/mk2_rocket_seeker.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/combat_tank_mk2/mk2_rocket_pod.mdl" [$SIGSEGV]
+
+	// Drill tank precache
+	PrecacheModel "models/bots/boss_bot/tank_drill.mdl" [$SIGSEGV]
+
+	// Sticky tank precache
+	PrecacheModel "models/props_mvm/stickytankturret.mdl" [$SIGSEGV]
+
+	// Tele tank precache
+	PrecacheModel "models/bots/boss_bot/boss_tank_building.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_tank_building_damage1.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_tank_building_damage2.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/boss_tank_building_damage3.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/tank_track_l_building.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/tank_track_r_building.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/bomb_mechanism_building.mdl" [$SIGSEGV]
+
+    // JUDGE
+    //WaveStartCountdown 3
+    //MaxRedPlayers 5
+    //ClassLimit
+	//{
+    //    Scout 1
+    //    Soldier 1
+    //    Pyro 1
+    //    Demoman 1
+    //    Heavyweapons 1
+    //    Engineer 1
+	//	Medic 0
+	//    Sniper 0
+    //    Spy 1
+	//}
+    //DisallowUpgrade	"ubercharge"  
+	//DisallowUpgrade	"critboost"  
+    // JUDGE
+
+    Templates // 该任务或许会用到的机器人模板 
+    {
+        T_TFBot_Scout_milk // [custom icon] - 为机器人提供治疗效果。
+        {
+            Name "Milk Scout"
+            Class Scout
+            Skill Hard
+            Health 125
+            ClassIcon scout_milk
+            MaxVisionRange 1500
+
+            WeaponRestrictions SecondaryOnly
+
+            Item "Mad Milk"
+            Item "The Milkman"
+
+            Attributes AlwaysFireWeapon
+
+            ItemAttributes
+            {
+                ItemName "Mad Milk"
+                "effect bar recharge rate increased" 0.1
+            }
+        }
+        T_TFBot_Scout_SG_colapopper // [custom icon] - 小巨型，运输炸弹的同时并造成一定伤害。
+        {
+            Name "Cola-Popper Scout"
+            Class Scout
+            Skill Hard
+            Health 650
+            Scale 1.5
+            ClassIcon scout_popper2_cola
+            MaxVisionRange 1500
+
+            WeaponRestrictions PrimaryOnly
+
+            Item "The Soda Popper"
+            Item "Crit-a-Cola"
+            Item "Bonk Helm"
+            Item "The Caffeine Cooler"
+            ItemAttributes
+            {
+                ItemName "The Caffeine Cooler"
+                "set item tint RGB" "8208497"
+                "Item Style Override" 2 //Soda
+            }
+
+            ItemAttributes
+            {
+                ItemName "Crit-a-Cola"
+                "effect bar recharge rate increased" 0.25
+            }
+        }
+        T_TFBot_Soldier_stock
+        {
+            Name "Soldier"
+            Class Soldier
+            Skill Normal
+            Health 200
+            ClassIcon soldier
+            MaxVisionRange 1500
+        }
+        
+        T_TFBot_Pyro_alwaysfire // - WM1 PYRO，适合清理Spy，比起不会反弹的Pyro来说能造成更多伤害。
+        {
+            Name "Pyro"
+            Class Pyro
+            Skill Normal
+            Health 175
+            ClassIcon pyro
+            MaxVisionRange 1500
+
+            Attributes AlwaysFireWeapon
+        }
+        T_TFBot_Pyro_combo_flarepush // [custom icon] - 连击Pyro。使用脱油剂点燃敌人后，气爆击退，切换至信号枪造成一记爆击。- 气爆的部分是我自己写的。
+        {
+            Name "FlarePush Combo Pyro"
+            Class Pyro
+            Skill Hard
+            Health 175
+            ClassIcon pyro_degreaser_flare
+            MaxVisionRange 1500
+            
+            Item "The Degreaser"
+			Item "The Flare Gun"
+            Item "The Wraith Wrap"
+            Item "Pyromancer's Mask"
+
+            //UseBestWeapon 1 - Royal的这套脚本正是让它在合理的情况下切换武器。
+
+            ItemAttributes
+			{
+				ItemName "The Degreaser"
+				"fire input on hit" "combo_primary_to_secondary^Trigger^"
+			}
+
+            ItemAttributes
+			{
+				ItemName "The Flare Gun"
+				"damage bonus" 0.7 // 似乎一次射出了2发信号弹?以此来模拟1发信号弹的伤害。
+			}
+
+            CharacterAttributes
+            {
+				"deploy time decreased" 0.001
+            }
+
+            EventChangeAttributes
+            {
+                normal
+                {
+                    CharacterAttributes
+                    {
+                        "move speed bonus" 1
+                    }
+                    AimAt Body
+                }
+                airblast
+                {
+                    CharacterAttributes
+                    {
+                        "move speed bonus" 1
+                    }
+                    AimAt Feet
+                    FireWeapon
+                    {
+                        Delay 0
+                        Cooldown 0
+                        Repeats 0
+                        Duration 0.5
+                        Type "Secondary"
+                    }
+                }
+            }
+        }
+        T_TFBot_Demo_loch // [custom icon] - 使用双管，弹速更快，更加致命。
+        {
+            Name "Loch Demoman"
+            Class Demoman
+            Skill Normal
+            Health 175
+            ClassIcon demo_loch_nys
+            MaxVisionRange 2000
+
+            WeaponRestrictions Primaryonly
+
+            Item "The Loch-n-Load"
+            Item "Carouser's Capotain"
+        }
+        
+        T_TFBot_Demo_persian // [custom icon] - 穿鞋子使用辉煌护盾和波斯弯刀。威力较大的爆破骑士。
+        {
+            Name "Persian Demoknight"
+            Class Demoman
+            Skill Hard
+            Health 175
+            ClassIcon demoknight_persian_nys
+            Item "Sultan's Ceremonial"	
+			Item "Ali Baba's Wee Booties"
+			Item "The Persian Persuader"
+			Item "The Splendid Screen"	
+			ItemAttributes
+			{
+				ItemName "The Splendid Screen"
+				"Attack not cancel charge" 1
+			}		
+			WeaponRestrictions MeleeOnly
+			CharacterAttributes
+			{
+				"critboost on kill" 3
+			}
+        }
+        T_TFBot_Demo_stock
+        {
+            Name "Demoman"
+            Class Demoman
+            Skill Normal
+            Health 175
+            ClassIcon demo
+            MaxVisionRange 1500
+        }
+        
+        T_TFBot_Heavy_gnome_deadly // [custom icon] - 击中玩家后立刻执行嘲讽杀。来个人阻止它！
+        {
+            Name "Hyper Mittens"
+            Class Heavyweapons
+            Skill Hard
+            Health 60
+            ClassIcon heavy_mittens_hyper
+            MaxVisionRange 1000
+            Scale 0.65
+
+            WeaponRestrictions MeleeOnly
+            Attributes AlwaysCrit
+
+            Item "The All-Father"
+			Item "Point and Shoot"
+			Item "The Holiday Punch"
+            UseHumanAnimations 1
+            ItemAttributes
+            {
+                ItemName "The Holiday Punch"
+                "fire input on hit" "mittens_taunt^Trigger^"
+            }
+
+            CharacterAttributes
+			{
+				"move speed bonus"	1.3
+			}
+        }
+        T_TFBot_Heavy_shotguner // - 官方模板的优化。
+        {
+            Name "Shotgun Heavy"
+            Class Heavyweapons
+            Skill Normal
+            Health 300
+            ClassIcon heavy_shotgun
+            MaxVisionRange 1500
+
+            WeaponRestrictions SecondaryOnly
+        }
+        T_TFBot_Heavy_stock
+        {
+            Name "Heavy"
+            Class Heavyweapons
+            Skill Normal
+            Health 300
+            ClassIcon heavy
+            MaxVisionRange 1500
+        }
+        T_TFBot_Heavy_SG_shotguner_accurate // [custom icon] - 伤害仅为巨型霰弹枪手的四分之一，但是更加准确，伤害可观。
+        {
+            Name "Accurate Shotgun Heavy"
+            Class Heavyweapons
+            Skill Expert
+            Health 900
+            Scale 1.5
+            ClassIcon heavy_shotgun_accurate_lite
+            MaxVisionRange 1500
+
+            WeaponRestrictions SecondaryOnly
+
+            Item "Commando Elite"
+            Item "Night Vision Gawkers"
+
+            ItemAttributes
+            {
+                ItemName "Night Vision Gawkers"
+                "set item tint RGB" "15185211" //澳元素金
+            }
+
+            ItemAttributes
+            {
+                ItemName "TF_WEAPON_SHOTGUN_HWG"
+                "fire rate bonus" 2.5
+				"bullets per shot bonus" 2.5 // Giant version is 10
+				"damage penalty" 0.5
+				"faster reload rate" 0.1
+                "spread penalty" 0.5 // more accurate
+            }
+        }
+        T_TFBot_Medic_big_heal_pop // [custom icon] - 先解决它，再解决治疗对象。生命值低于50时会触发uber，在几秒钟内具有较高的治疗率。
+        {
+            Name "Popping Bigheal Medic"
+            Class Medic
+            Skill Hard
+            Health 150
+            ClassIcon medic_pop
+
+            Item "The Quick-Fix"
+            Item "Das Naggenvatcher"
+
+            Attributes SpawnWithFullCharge
+
+            ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+				"ubercharge rate bonus" 0.01
+                "heal rate bonus" 10
+			}
+
+            ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage bonus" 0.1
+			}
+        }
+        T_TFBot_Medic_kritz // [custom icon] - 为治疗对象无限制释放爆击。死亡后移除爆击。
+        {
+            Name "Kritzkrieg Medic"
+            Class Medic
+            Skill Hard
+            Health 150
+            ClassIcon medic_kritz2
+
+            Item "The Kritzkrieg"
+            Item "The Virus Doctor"
+            
+            Attributes SpawnWithFullCharge
+            Attributes AlwaysCrit
+
+            ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage bonus" 0.1
+			}
+
+            ItemAttributes
+            {
+                ItemName "The Kritzkrieg"
+                "heal rate bonus" 1
+                "uber duration bonus" 200
+				"ubercharge rate bonus" 100
+            }
+
+            CharacterAttributes
+            {
+                "bot medic uber health threshold" 500
+            }
+        }
+        T_TFBot_Medic_uber_quickfix // [custom icon] - 无限制释放快速Uber，使医生难以被击杀。
+        {
+            Name "Quick-Fix Uber Medic"
+            Class Medic
+            Skill Hard
+            Health 150
+            ClassIcon medic_quickfix_seel2
+
+            Item "The Quick-Fix"
+            Item "Battle Boonie"
+            
+            Attributes SpawnWithFullCharge
+
+            ItemAttributes
+            {
+                ItemName "The Quick-Fix"
+                "heal rate bonus" 1
+                "uber duration bonus" 200
+            }
+
+            ItemAttributes
+			{
+				ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
+				"damage penalty" 0.1
+			}
+
+            CharacterAttributes
+            {
+                "bot medic uber health threshold" 999
+            }
+        }
+        T_TFBot_Sniper_bow_conch // [custom icon] - 提供征服者战旗效果的弓箭手。
+        {
+            Class Sniper
+            Health 125
+			Name "Conch Bowman"
+			Skill Hard
+			ClassIcon sniper_bow_conch
+			WeaponRestrictions PrimaryOnly
+            MaxVisionRange 2000
+            Attributes SpawnWithFullCharge
+			Item "The Huntsman"
+            Item "Larrikin Robin"
+            Item "The Concheror"
+
+            CharacterAttributes
+            {
+                "Increase buff duration" 20
+            }
+        }
+        T_TFBot_Sniper_bow_ignite // [custom icon] - 造成燃烧，可以搭配信号枪，火龙等等。
+        {
+            Class Sniper
+            Health 125
+			Name "Igniting Bowman"
+			Skill Hard
+			ClassIcon sniper_bow_fire_yoovy
+			WeaponRestrictions PrimaryOnly
+            MaxVisionRange 2000
+			Item "The Huntsman"
+            Item "Larrikin Robin"
+
+			ItemAttributes
+			{
+				ItemName "The Huntsman"
+				"damage bonus" 0.5
+                "set damagetype ignite" 1
+                "attach particle effect" 13 // 2=全部是火，13=箭头着火。
+                "projectile trail particle" "flying_flaming_arrow"  
+			}
+        }
+        T_TFBot_Giant_Scout_popper // [custom icon] - 苏打炮手侦察兵的巨型版本。
+        {
+            Name "Giant Soda Popper Scout"
+            Class Scout
+            Skill Expert
+            Health 1600
+            ClassIcon scout_popper2
+            MaxVisionRange 1500
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+            Tag bot_giant
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"override footstep sound set" 5
+			}
+            Item "The Soda Popper"
+            Item "Bonk Helm"
+            Item "The Caffeine Cooler"
+            ItemAttributes
+            {
+                ItemName "The Caffeine Cooler"
+                "set item tint RGB" "8208497"
+                "Item Style Override" 2 //Soda
+            }
+        }
+        T_TFBot_Giant_Soldier_buff_burstfire // [custom icon] - 爆炸开火+战旗。
+		{
+			Class Soldier
+			Name "Giant Buff Burst Soldier"
+			ClassIcon soldier_burstfire_buff
+			Health 3800
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+            Tag bot_giant
+            Attributes SpawnWithFullCharge
+            MaxVisionRange 3000
+            Item "The Buff Banner"
+            Item "The Pithy Professional"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"move speed bonus"	0.5
+				"faster reload rate" 0.6
+				"fire rate bonus" 0.1
+				"clip size upgrade atomic" 5.0
+				"Projectile speed increased" 0.65
+			}
+            ItemAttributes
+			{
+				ItemName "The Buff Banner"
+				"increase buff duration"	20.0
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+			}
+		}
+        T_TFBot_Giant_Pyro_alwaysfire // - WM1 PYRO，适合清理Spy，比起不会反弹的Pyro来说能造成更多伤害。
+        {
+            Class Pyro
+			Name "Giant Pyro"
+			ClassIcon pyro
+			Skill Expert
+			Health 3000
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+            Tag bot_giant
+            Attributes AlwaysFireWeapon
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+        }
+        T_TFBot_Giant_Pyro_fury // [custom icon] - 使用龙之怒焰。
+        {
+            Class Pyro
+			Name "Giant Dragon Fury Pyro"
+			ClassIcon pyro_dragon_fury_swordstone
+			Skill Expert
+			Health 3000
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+            Tag bot_giant
+            Item "The Dragon's Fury"
+            Item "dec2014 2014_pyromancer_hood"
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+        }
+        T_TFBot_Giant_Pyro_flare_spammer_redux // [custom icon] - 货真价实的速射信号枪。
+		{
+			Class Pyro
+			Name "Giant Flare Spammer Pyro"
+			ClassIcon pyro_flare_spammer_yoovy
+			Skill Expert
+			Health 3000
+			Item "The Flare Gun"
+			Item "Brigade Helm"
+			WeaponRestrictions SecondaryOnly
+			Attributes MiniBoss
+            Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "The Flare Gun"
+				"fire rate bonus" 0.3
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+		}
+        T_TFBot_Giant_Demo_scatter // [custom icon] - 一口气射出30发榴弹，造成毁灭性的打击。
+        {
+            Name "Giant Scatter Demoman"
+            Class Demoman
+            ClassIcon demo_scatter
+			Health 3300
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+            Tag bot_giant
+            Item "Spirit of the Bombing Past"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"faster reload rate" 0.35 //65% faster reload
+				"fire rate bonus" 0.1
+				"clip size upgrade atomic" 26.0 // shoots 30 grenades in a row
+				"projectile spread angle penalty" 5
+				"Projectile speed increased"	1.1
+			}
+
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 4
+			}
+        }
+        
+        T_TFBot_Giant_Heavy_booster // [custom icon] - 巨型滚雪球。
+        {
+            Name "Giant Booster Heavy"
+            Class Heavyweapons
+            Skill Expert
+            Health 5000
+            Attributes MiniBoss
+            ClassIcon heavy_booster2
+			MaxVisionRange 2000
+            Tag bot_giant
+            WeaponRestrictions PrimaryOnly
+
+            Item "Commando Elite"
+
+            ItemAttributes
+			{
+				ItemName "TF_WEAPON_MINIGUN"
+				"damage bonus"	1.5
+                "critboost on kill" 10
+			}
+
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+			}
+        }
+        
+        T_TFBot_Giant_Sniper_bow // [custom icon] - 巨型弓箭手-伤害还行，定位类似巨型士兵。
+        {
+            Class Sniper
+			Name "Giant Bowman"
+			ClassIcon sniper_bow
+			Skill Expert
+			Health 3000
+			Tag bot_giant
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			
+			Item "The Huntsman"
+            Item "Larrikin Robin"
+
+            ItemAttributes
+			{
+			    ItemName "The Huntsman"
+				"damage bonus" 1.25
+			}
+			
+			CharacterAttributes
+			{
+                "head scale" 0.7
+				"move speed bonus"	0.5				
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+        }
+        T_TFBot_Chief_Demo_Night_Feast
+		{
+			Name "Balooza Crasher"
+			Class Demoman
+            ClassIcon demo_bomber
+			Health 36000
+			Scale 1.9
+			Skill Expert
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			Attributes HoldFireUntilFullReload
+            Tag bot_giant
+			MaxVisionRange 8000
+			Item "The Buccaneer's Bicorne"
+			Item "Mann of the Seven Sees"
+			Item "The Demo's Dustcatcher"
+            FastUpdate 1
+			CharacterAttributes // Copied from Major Bomber
+			{
+				"move speed bonus"	0.32
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 4
+				"airblast vertical vulnerability multiplier" 0.1
+				"rage giving scale" 0.1
+			}
+			ChangeAttributes
+			{
+				Delay 0
+				Cooldown 0
+				Repeats 1
+				IfHealthBelow 24000
+				Name "lower_20000"
+			}
+			ChangeAttributes
+			{
+				Delay 0
+				Cooldown 0
+				Repeats 1
+				IfHealthBelow 12000
+				Name "lower_10000"
+			}
+			EventChangeAttributes
+			{
+				Default // cannon spammer
+				{
+					Item "The Loose Cannon"
+					ItemAttributes
+            		{
+                		ItemName "The Loose Cannon"
+						"faster reload rate" -0.4
+						"fire rate bonus" 0.6
+                		"grenade launcher mortar mode" 0
+            		}
+					FireInput
+					{
+						Target !self
+						Action $SetProp$m_iszClassIcon
+						Param "demo_cannon"
+						Delay 0.01
+						Cooldown 0
+						Repeats 0
+					}
+					Voicecommand
+					{
+						Delay 0.01
+						Repeats 1
+						Type "Battlecry"
+					}
+				}
+				lower_20000 // mine layer
+				{
+					Item "The Iron Bomber"
+					//AimOffset "0 0 400"
+					ItemAttributes
+					{
+						ItemName "The Iron Bomber"
+						"clip size bonus" 5.0
+                		"damage bonus" 0.5
+						"projectile spread angle penalty" 5.0
+                		"projectile speed increased" 0.75
+						"faster reload rate" 0.15
+						"fire rate bonus" 0.05
+						"fuse bonus" 2.0
+                        "projectile trail particle" "~flaregun_trail_blue" // mine indicator
+					}
+					FireInput
+					{
+						Target !self
+						Action $SetProp$m_iszClassIcon
+						Param "demo_clusterbomb_delay"
+						Delay 0.01
+						Cooldown 0
+						Repeats 0
+					}
+                    FireInput
+					{
+						Target switcher_soundfx
+						Action PlaySound
+						Param ""
+						Delay 0.01
+						Cooldown 0
+						Repeats 0
+					}
+					Voicecommand
+					{
+						Delay 0.01
+						Repeats 1
+						Type "Jeers"
+					}
+				}
+				lower_10000 // grapeshot!
+				{
+					Item "warbird_grenadelauncher_butcherbird"
+					AimOffset "0 0 -100"
+					AddCond {Name TF_COND_SODAPOPPER_HYPE}
+					ItemAttributes
+					{
+						ItemName "warbird_grenadelauncher_butcherbird"
+						"clip size bonus" 1.5 // 6 per shot
+						"projectile spread angle penalty" 10.0
+						"faster reload rate" 0.1
+						"fire rate bonus" 0.001
+						"grenade bounce speed" 0.8
+						"grenade bounce damage" 1
+						"projectile trail particle" eyeboss_projectile
+					}
+					FireInput
+					{
+						Target !self
+						Action $SetProp$m_iszClassIcon
+						Param "demo_burst_spammer_homing_hyper"
+						Delay 0.01
+						Cooldown 0
+						Repeats 0
+					}
+                    FireInput
+					{
+						Target switcher_soundfx
+						Action PlaySound
+						Param ""
+						Delay 0.01
+						Cooldown 0
+						Repeats 0
+					}
+					Voicecommand
+					{
+						Delay 0.01
+						Repeats 1
+						Type "Jeers"
+					}
+				}
+			}
+        }
+        T_TFBot_Giant_Engineer_buff_pistol // 
+        {
+            Class Engineer
+            Name "Giant Buff Pistol Engineer"
+            ClassIcon engineer
+            Skill Expert
+            Health 3000
+            Tag bot_giant
+            Attributes MiniBoss
+			WeaponRestrictions SecondaryOnly
+            Action FetchFlag
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5				
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+			AddTemplate Add_Buff_Banner
+        }
+
+		T_TFBot_Giant_Engineer_gunslinger // 
+        {
+            Class Engineer
+            Name "Giant Gunslinger Engineer"
+            ClassIcon engineer
+            Skill Expert
+            Health 3000
+            Tag bot_giant
+            Attributes MiniBoss
+			Attributes AlwaysFireWeapon
+			WeaponRestrictions MeleeOnly
+			Item "The Gunslinger"
+            Action FetchFlag
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5				
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+        }
+
+		T_TFBot_Giant_Engineer_shortcircuit // [custom icon] - 电击近距离敌人，每隔5秒释放一个消除飞行物的电球。
+        {
+            Class Engineer
+            Name "Giant Short Ciruit Engineer"
+            ClassIcon engineer_shortcircuit_lite
+            Skill Expert
+            Health 3000
+            Tag bot_giant
+            Attributes MiniBoss
+			WeaponRestrictions SecondaryOnly
+            Action FetchFlag
+			Item "The Short Circuit"
+			FireWeapon
+			{
+				Delay 0
+				Cooldown 5
+				Repeats 0
+				IfSeeTarget 1
+				Duration 0.1
+				Type "Secondary"
+			}
+			ItemAttributes
+			{
+				ItemName "The Short Circuit"
+				"fire rate bonus" 0.8
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5				
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+        }
+
+		T_TFBot_Giant_Engineer_widowmaker // 
+        {
+            Class Engineer
+            Name "Giant Widowmaker Engineer"
+            ClassIcon engineer
+            Skill Expert
+            Health 3000
+            Tag bot_giant
+            Attributes MiniBoss
+			Attributes AlwaysFireWeapon
+			WeaponRestrictions PrimaryOnly
+			Item "The Widowmaker"
+            Action FetchFlag
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5				
+				"damage force reduction" 0.6
+				"airblast vulnerability multiplier" 0.6
+				"override footstep sound set" 6
+			}
+        }
+
+        Add_Buff_Banner
+		{
+			Item "The Buff Banner"
+			Attributes SpawnWithFullCharge
+			CharacterAttributes
+			{
+				"Increase buff duration" 9
+				"deploy time increased" 0.5
+			}
+		}
+
+        // Vanilla templates but with decoration
+
+        T_TFBot_Heavyweapons_Fist_nf
+		{
+			Class Heavyweapons
+			Name "Steel Gauntlet"
+			Skill Hard
+			ClassIcon heavy_steelfist
+			//Attributes DefensiveBuffHigh	// Passive damage reduction, replaces high health
+			Health 900
+			Scale 1.5						// Force scale to 1 when "Health" set high
+			WeaponRestrictions MeleeOnly
+			Item "Fists of Steel"
+            Item "Mann-O-War"
+		}
+
+        T_TFBot_Giant_DemoMan_PrinceTavish_nf
+		{
+			Class Demoman
+			ClassIcon demoknight_giant
+			Name "Giant Demoknight"
+			Skill Expert
+			Health 3300
+			Item "The Bolted Bicorne"
+			Item "The Chargin' Targe"
+			Item "The Eyelander"
+			Item "Ali Baba's Wee Booties"
+			WeaponRestrictions MeleeOnly
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "The Eyelander"
+				"critboost on kill" 3
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 0.5
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4
+			}
+		}
+
+        T_TFBot_Giant_Soldier_Spammer_Reload_nf
+		{
+			Class Soldier
+			Name "Giant Burst Fire Soldier"
+			ClassIcon soldier_burstfire
+			Health 3800
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+            Item "Armored Authority"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"move speed bonus"	0.5
+				"faster reload rate" 0.6
+				"fire rate bonus" 0.1
+				"clip size upgrade atomic" 5.0
+				"Projectile speed increased" 0.65
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+			}
+		}
+
+        T_TFBot_Giant_Demo_RapidFire_nf
+		{
+			Class Demoman
+			Name "Giant Demoman"
+			ClassIcon demo_giant
+			Health 3000
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes HoldFireUntilFullReload
+			Attributes MiniBoss
+            Item "Ghostly Gibus" // noob 
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"fire rate bonus" 0.5
+				"damage force reduction" 0.5
+			}
+
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 4
+			}
+		}
+
+        T_TFBot_Giant_Scout_Baseball_nf  // Baseball Giant
+		{
+			Class Scout
+			Name "Major League Scout"
+			ClassIcon scout_stun_giant
+			Skill Expert
+			Health 1600
+			Item "Fleet Commander"
+            ItemAttributes
+            {
+                ItemName "Fleet Commander"
+                "item style override" 0
+            }
+			Item "The Sandman"
+			WeaponRestrictions MeleeOnly
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "The Sandman"
+				"effect bar recharge rate increased" 0.1
+			}
+            
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"override footstep sound set" 5
+			}
+		}
+
+        T_TFBot_Demo_Burst_nf
+		{
+			Class Demoman
+			Name "Burst Fire Demoman"
+			ClassIcon demo_burst
+			Skill Expert
+            Item "EOTL_summerhat"
+			WeaponRestrictions PrimaryOnly
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"faster reload rate" 1.75
+				"fire rate bonus" 0.05
+				"clip size penalty" 0.5
+				"projectile spread angle penalty" 3
+				//"Projectile speed increased"	1.1
+			}
+		}
+
+        T_TFBot_Giant_Soldier_RocketShotgun_nf
+		{
+			Class Soldier
+			ClassIcon soldier_blackbox_giant
+			Name "Giant Black Box Soldier"
+			Health 4200
+
+			Item "The Black Box"
+            Item "The Surgeon's Stahlhelm"
+			Skill Expert
+			Attributes MiniBoss
+			WeaponRestrictions PrimaryOnly
+			Attributes HoldFireUntilFullReload
+			ItemAttributes
+			{
+				ItemName "The Black Box"
+				"damage bonus" 0.45
+				"fire rate bonus" 0.001
+				"clip size upgrade atomic" 0
+				"faster reload rate" 1.6
+				"blast radius increased" 1.25
+				//"Projectile speed increased" 0.4
+				"projectile spread angle penalty" 4
+				"heal on hit for rapidfire" 1000
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"Projectile speed increased" 0.9
+			}
+		}
+
+        T_TFBot_Giant_Scout_Baseball_Armored_nf
+		{
+			Class Scout
+			Name "Armored Sandman Scout"
+			ClassIcon scout_stun_giant_armored
+			Skill Expert
+			Health 3000
+			Item "Fleet Commander"
+            ItemAttributes
+            {
+                ItemName "Fleet Commander"
+                "item style override" 1
+            }
+			Item "The Sandman"
+			WeaponRestrictions MeleeOnly
+			Attributes MiniBoss
+			ItemAttributes
+			{
+				ItemName "The Sandman"
+				"effect bar recharge rate increased" 0.05
+			}
+			CharacterAttributes
+			{
+				"damage force reduction" 0.7
+				"airblast vulnerability multiplier" 0.7
+				"override footstep sound set" 5
+				"move speed penalty" 0.75
+			}
+		}
+
+        T_TFBot_Giant_Soldier_nf
+		{
+			Class Soldier
+			Name "Giant Soldier"
+			ClassIcon soldier_giant
+			Skill Expert
+			Health 3800
+			WeaponRestrictions PrimaryOnly
+			Attributes HoldFireUntilFullReload
+			Attributes MiniBoss
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+			}
+		}
+
+        T_TFBot_Pyro_Flaregun_nf
+		{
+			Class Pyro
+			Name "Flare Pyro"
+			Skill Normal
+			ClassIcon pyro_flare
+			Item "The Flare Gun"
+			WeaponRestrictions SecondaryOnly
+            Item "Brigade Helm"
+		}
+    }
+
+    ExtraSpawnPoint    //Adds spawn points on specified location
+    {
+        Name "spawnbot_w5_reinforce"
+		StartDisabled 1 // If the spawn point starts disabled (Default: 0)
+        TeamNum 3 // 2 - Red team 3 - Robots. If you are adding spawn for reprogrammed robots, use team 3
+        X	"1408"                     
+        Y	"1922"                  
+        Z	"295"        
+    }
+
+    // Combat tanks, drill tanks, tank turrets, spawnpoint indicator.
+    PrecacheModel "models/bots/boss_bot/combat_tank/combat_tank.mdl"
+    PrecacheModel "models/bots/boss_bot/combat_tank/combat_tank_minigun.mdl"
+    PrecacheModel "models/bots/boss_bot/combat_tank/combat_tank_railgun.mdl"
+    PrecacheModel "models/bots/boss_bot/combat_tank/combat_tank_rocket.mdl"
+    PrecacheModel "models/bots/boss_bot/combat_tank/combat_tank_rocketpod.mdl"
+    PrecacheModel "models/bots/boss_bot/combat_tank/railgun_case.mdl"
+    PrecacheModel "models/bots/boss_bot/tank_drill.mdl"
+    PrecacheModel "models/props_frontline/tank_turret.mdl"
+    PrecacheModel "models/props_mvm/robot_spawnpoint.mdl"
+
+    // Boss stage 1 & 2 & 3 icons
+
+    PrecacheGeneric "materials/hud/leaderboard_class_demo_cannon.vtf"
+    PrecacheGeneric "materials/hud/leaderboard_class_demo_cannon.vmt"
+    PrecacheGeneric "materials/hud/leaderboard_class_demo_clusterbomb_delay.vtf"
+    PrecacheGeneric "materials/hud/leaderboard_class_demo_clusterbomb_delay.vmt"
+    PrecacheGeneric "materials/hud/leaderboard_class_demo_burst_spammer_homing_hyper.vtf"
+    PrecacheGeneric "materials/hud/leaderboard_class_demo_burst_spammer_homing_hyper.vmt"
+
+    SpawnTemplate Nav_and_Box_Fix
+    SpawnTemplate TankPathFix
+    SpawnTemplate combo_pyro
+    SpawnTemplate combo_heavy
+
+    CustomNavFile "mvm_havana_b4a_whurr"
+
+    Mission
+    {
+        Where spawnbot_mission_sentrybuster
+        Objective DestroySentries // Engineer,Sniper,Spy,DestroySentries
+        BeginAtWave 1
+        RunForThisManyWaves 5
+        DesiredCount 1
+    
+        InitialCooldown 30
+        CooldownTime 40
+    
+        TFBot
+        {
+            Template T_TFBot_SentryBuster
+            Item "Potassium Bonnett"
+            Name "Banana Pirate"
+            CharacterAttributes
+			{
+			    "head scale" 3.0
+				"torso scale" 0
+			}
+        }
+    }
+
+    Mission // w1 sniper
+    {
+        Where spawnbot_mission_sniper
+        Objective Sniper
+        BeginAtWave 1
+        RunForThisManyWaves 1
+        DesiredCount 2
+    
+        InitialCooldown 30
+        CooldownTime 50
+    
+        TFBot
+        {
+            Template T_TFBot_Sniper
+            Item "Potassium Bonnett"
+            Skill Hard
+        }
+    }
+
+    Mission // w2 spy
+    {
+        Where spawnbot_mission_spy
+        Objective Spy
+        BeginAtWave 2
+        RunForThisManyWaves 1
+        DesiredCount 2
+    
+        InitialCooldown 30
+        CooldownTime 50
+    
+        TFBot
+        {
+            Template T_TFBot_Spy
+            Item "Potassium Bonnett"
+            Skill Expert
+        }
+    }
+
+    Mission // w3 sniper
+    {
+        Where spawnbot_mission_sniper
+        Objective Sniper
+        BeginAtWave 3
+        RunForThisManyWaves 1
+        DesiredCount 2
+    
+        InitialCooldown 30
+        CooldownTime 60
+    
+        TFBot
+        {
+            Template T_TFBot_Sniper_Sydney_Sleeper
+            Item "Potassium Bonnett"
+            Skill Expert
+        }
+    }
+
+    Mission // w4 spy
+    {
+        Where spawnbot_mission_spy
+        Objective Spy
+        BeginAtWave 4
+        RunForThisManyWaves 1
+        DesiredCount 1
+    
+        InitialCooldown 30
+        CooldownTime 30
+    
+        TFBot
+        {
+            Template T_TFBot_Spy
+            Item "Potassium Bonnett"
+            Skill Expert
+        }
+    }
+
+    Mission // w3,4 engi
+    {
+        Where spawnbot_mission_spy
+        Objective Engineer
+        BeginAtWave 3
+        RunForThisManyWaves 2
+        DesiredCount 1
+    
+        InitialCooldown 50
+        CooldownTime 40
+    
+        TFBot
+        {
+            Template T_TFBot_Engineer_Sentry_Battle // 正常入场，放置步哨
+            Item "Potassium Bonnett"
+        }
+    }
+
+    Mission // w5 engi
+    {
+        Where spawnbot_mission_spy
+        Objective Engineer
+        BeginAtWave 5
+        RunForThisManyWaves 1
+        DesiredCount 1
+    
+        InitialCooldown 60
+        CooldownTime 50
+    
+        TFBot
+        {
+            Template T_TFBot_Engineer_Sentry_Battle // 正常入场，放置步哨
+            Item "Potassium Bonnett"
+        }
+    }
+
+    ///////////////////////////////////////////////////
+    // WAVE 1 - $600 //////////////////////////////////
+    ///////////////////////////////////////////////////
+
+    Wave
+    {
+        StartWaveOutput
+        {
+            Target wave_start_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+        Explanation
+        {
+            Line "{ecd452}>Each wave of this mission has a forced bombpath."
+        }
+        InitWaveOutput
+		{
+			Target wave_start_relay
+			Action RunScriptCode
+			Param
+			"
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_1_upper_relay`, `Trigger`) // 设置该回合路线
+				//ClientPrint(null,3,`\x08ecd452FF>Each wave of this mission has a Forced bombpath.`) // 8位颜色代码，最后2位为透明度(FF即不透明) - 在这个任务中，每回合的炸弹路线是固定的。
+                IncludeScript(`havana_minor_fix`, getroottable())
+            "
+        }
+        WaveSpawn
+        {
+            Name "1a"
+            //WaitForAllSpawned ""
+            Where spawnbot
+            TotalCount 14
+            MaxActive 8
+            SpawnCount 2
+            WaitBeforeStarting 1
+            WaitBetweenSpawns 4
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Demo_loch
+            }
+        }
+        WaveSpawn
+        {
+            Name "1a"
+            Where spawnbot
+            TotalCount 6
+            MaxActive 6
+            SpawnCount 1
+            WaitBeforeStarting 1
+            WaitBetweenSpawns 7
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Heavyweapons_Fist_nf
+            }
+        }
+        WaveSpawn
+        {
+            Name "1a-giant"
+            Where spawnbot
+            TotalCount 3
+            MaxActive 3
+            SpawnCount 1
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 16
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Giant_Sniper_bow
+            }
+        }
+        WaveSpawn
+        {
+            Name "1b"
+            Where spawnbot
+            TotalCount 10
+            MaxActive 5
+            SpawnCount 1
+            WaitBeforeStarting 12
+            WaitBetweenSpawns 1.5
+            WaitForAllSpawned "1a"
+        
+            TotalCurrency 50
+
+            TFBot
+            { 
+                Template T_TFBot_Demo_loch
+            }
+        }
+        WaveSpawn
+        {
+            Name "1b"
+            Where spawnbot
+            TotalCount 9
+            MaxActive 6
+            SpawnCount 3
+            WaitBeforeStarting 14
+            WaitBetweenSpawns 9
+            WaitForAllSpawned "1a"
+        
+            TotalCurrency 50
+
+            TFBot
+            { 
+                Template T_TFBot_Demo_persian
+            }
+        }
+        WaveSpawn
+        {
+            Name "1b"
+            Where spawnbot
+            TotalCount 6
+            MaxActive 6
+            SpawnCount 2
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 12
+            WaitForAllSpawned "1a"
+        
+            TotalCurrency 50
+
+            Squad
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Heavyweapons_Fist_nf
+                    Skill Easy
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Medic_big_heal_pop
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "1b-giant"
+            Where spawnbot
+            TotalCount 4
+            MaxActive 4
+            SpawnCount 2
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 24
+            WaitForAllSpawned "1a-giant"
+        
+            TotalCurrency 100
+        
+            Squad
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Giant_DemoMan_PrinceTavish_nf
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Medic_big_heal_pop
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "1c"
+            Where spawnbot
+            TotalCount 12
+            MaxActive 7
+            SpawnCount 1
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 2
+            WaitForAllSpawned "1b"
+        
+            TotalCurrency 50
+
+            TFBot
+            { 
+                Template T_TFBot_Soldier_stock
+            }
+        }
+        WaveSpawn
+        {
+            Name "1c-giant"
+            Where spawnbot
+            TotalCount 6
+            MaxActive 6
+            SpawnCount 3
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 15
+            WaitForAllSpawned "1b-giant"
+        
+            TotalCurrency 100
+
+            Squad
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Giant_Soldier_Spammer_Reload_nf
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Medic_big_heal_pop
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Medic_big_heal_pop
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "1c-support"
+            Where spawnbot
+            TotalCount 40
+            MaxActive 4
+            SpawnCount 1
+            WaitBeforeStarting 14
+            WaitBetweenSpawns 3
+            WaitForAllSpawned "1b"
+
+            Support 1
+        
+            TotalCurrency 50
+
+            RandomChoice
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Demo_loch
+                    ClassIcon demo_loch_nys_giant
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Pyro_alwaysfire
+                }
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////
+    // WAVE 2 - $700 //////////////////////////////////
+    ///////////////////////////////////////////////////
+
+    Wave
+    {
+        StartWaveOutput
+        {
+            Target wave_start_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+        InitWaveOutput
+		{
+			Target wave_start_relay
+			Action RunScriptCode
+			Param
+			"
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_1_relay`, `Trigger`) // 设置该回合路线
+                IncludeScript(`havana_minor_fix`, getroottable())
+            "
+        }
+        WaveSpawn
+        {
+            Name "2a-open-up"
+            Where spawnbot
+            TotalCount 4
+            MaxActive 4
+            SpawnCount 4
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 0
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Scout_SG_colapopper
+            }
+        }
+        WaveSpawn
+        {
+            Name "2a"
+            Where spawnbot
+            TotalCount 15
+            MaxActive 10
+            SpawnCount 5
+            WaitBeforeStarting 2
+            WaitBetweenSpawns 9
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Heavy_stock
+                Skill Easy
+            }
+        }
+        WaveSpawn
+        {
+            Name "2a"
+            Where spawnbot
+            TotalCount 10
+            MaxActive 3
+            SpawnCount 1
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 1
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Scout_milk
+            }
+        }
+        WaveSpawn
+        {
+            Name "2a-giant"
+            Where spawnbot
+            TotalCount 6
+            MaxActive 6
+            SpawnCount 3
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 22
+        
+            TotalCurrency 100
+        
+            Squad
+            {
+                ShouldPreserveSquad 1
+                TFBot
+                { 
+                    Template T_TFBot_Giant_Pyro_flare_spammer_redux
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Giant_Pyro_alwaysfire
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Sniper_bow_conch
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "2b"
+            Where spawnbot
+            TotalCount 6
+            MaxActive 6
+            SpawnCount 1
+            WaitBeforeStarting 13
+            WaitBetweenSpawns 4
+            WaitForAllSpawned "2a"
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Scout_SG_colapopper
+            }
+        }
+        WaveSpawn
+        {
+            Name "2b"
+            Where spawnbot
+            TotalCount 14
+            MaxActive 5
+            SpawnCount 1
+            WaitBeforeStarting 16
+            WaitBetweenSpawns 1
+            WaitForAllSpawned "2a"
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Scout_milk
+            }
+        }
+        WaveSpawn
+        {
+            Name "2b-giant"
+            Where spawnbot
+            TotalCount 4
+            MaxActive 4
+            SpawnCount 2
+            WaitBeforeStarting 25
+            WaitBetweenSpawns 20
+            WaitForAllSpawned "2a"
+        
+            TotalCurrency 50
+        
+            Squad
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Giant_Demo_RapidFire_nf //T_TFBot_Giant_Demo_spammer
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Sniper_bow_conch
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "2b-giant"
+            Where spawnbot
+            TotalCount 4
+            MaxActive 4
+            SpawnCount 2
+            WaitBeforeStarting 35
+            WaitBetweenSpawns 20
+            WaitForAllSpawned "2a"
+        
+            TotalCurrency 50
+        
+            Squad
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Giant_Pyro_flare_spammer_redux
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Sniper_bow_conch
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "2c"
+            Where spawnbot
+            TotalCount 8
+            MaxActive 6
+            SpawnCount 1
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 1.5
+            WaitForAllSpawned "2b"
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Sniper_bow_conch
+            }
+        }
+        WaveSpawn
+        {
+            Name "2c"
+            Where spawnbot
+            TotalCount 12
+            MaxActive 8
+            SpawnCount 2
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 1.5
+            WaitForAllSpawned "2b"
+        
+            TotalCurrency 50
+        
+            TFBot
+            {
+                Template T_TFBot_Heavy_stock
+                Skill Normal
+            }
+        }
+        WaveSpawn
+        {
+            Name "2c-giant"
+            Where spawnbot
+            TotalCount 2
+            MaxActive 2
+            SpawnCount 1
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 18
+            WaitForAllSpawned "2b-giant"
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Giant_Scout_Baseball_nf
+            }
+        }
+        WaveSpawn
+        {
+            Name "2c-giant-extra"
+            Where spawnbot
+            TotalCount 2
+            MaxActive 2
+            SpawnCount 2
+            WaitBeforeStarting 18
+            WaitBetweenSpawns 18
+            WaitForAllSpawned "2c-giant"
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Giant_Scout_Baseball_nf
+            }
+        }
+        WaveSpawn
+        {
+            Name "2c-support"
+            Where spawnbot
+            TotalCount 30
+            MaxActive 5
+            SpawnCount 1
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 10
+            WaitForAllSpawned "2b"
+
+            Support 1
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Heavy_SG_shotguner_accurate
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////
+    // WAVE 3 - $550 //////////////////////////////////
+    ///////////////////////////////////////////////////
+    
+    Wave
+    {
+        StartWaveOutput
+        {
+            Target wave_start_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+        Explanation
+        {
+            Line "{ecd452}>Combat tanks are here! They're weaponized but can't deploy bombs, and they'll be patrolling around the map."
+        }
+        InitWaveOutput
+		{
+			Target wave_start_relay
+			Action RunScriptCode
+			Param
+			"
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_2_relay`, `Trigger`) // 设置该回合路线
+                //ClientPrint(null,3,`\x08ecd452FF>Combat tanks are here! They're weaponized but can't deploy bombs, and they'll be patrolling around the map.`) // 战斗坦克来了！不会部署炸弹，但搭载有强力的武器的它们会在地图上巡逻。
+                IncludeScript(`tankextensions_main`, getroottable())
+                IncludeScript(`tankextensions/combattank`, getroottable())
+                IncludeScript(`tankextensions/combattank_weapons/minigun`, getroottable())
+                IncludeScript(`tankextensions/combattank_weapons/railgun`, getroottable())
+                IncludeScript(`tankextensions/combattank_weapons/rocketpod`, getroottable())
+                IncludeScript(`havana_minor_fix`, getroottable())
+                TankExt.CreateLoopPaths
+                (
+                    {
+	                    boss_path_patrol = 
+                        [
+		                    Vector(-1136, -456, 160) // boss_path_1
+		                    Vector(-1072, 56, 140) // boss_path_28
+		                    Vector(-752, 288, 140) // boss_path_34
+		                    Vector(-323.764, -138.215, 158.017) // boss_path_split
+		                    Vector(-255.764, -306.215, 170.017) // THE LOOP START
+		                    Vector(-243.764, -358.215, 174.017) // boss_path_43
+		                    Vector(-231.764, -614.215, 202.017) // boss_path_48
+		                    Vector(160.236, -810.215, 270.017) // boss_path_57
+		                    Vector(296.236, -1058.22, 260.017) // boss_path_63
+		                    Vector(276.236, -2028, 224) // boss_path_10
+		                    Vector(432.236, -2176, 224) // boss_path_74
+		                    Vector(2068.24, -2176, 224) // Under the arch, boss_path_11
+		                    Vector(2260.24, -2088, 224) // boss_path_78
+		                    Vector(2548.24, -1824, 224) // boss_path_12
+		                    Vector(2644.24, -1728, 320) // boss_path_13
+		                    Vector(2792.24, -1608, 320) // boss_path_15
+                            Vector(3404.24, -1600, 320)
+		                    Vector(3404.24, -2506.21, 302.017) // boss_path_alt_105
+                            Vector(3140.24, -2962.21, 302.017) // boss_path_alt_25
+		                    Vector(3008.24, -3298.21, 302.017) // boss_path_alt_23
+                            Vector(2628.24, -3298.21, 302.017) // boss_path_alt_22
+		                    Vector(2296.24, -3298.21, 206.017) // boss_path_alt_21
+		                    Vector(1576.24, -3306.21, 206.017) // boss_path_alt_92
+                            Vector(1476.24, -3218.21, 206.017) // boss_path_alt_20
+		                    Vector(1448.24, -2914.21, 206.017) // boss_path_alt_82
+		                    Vector(1468.24, -2282.21, 206.017) // boss_path_alt_19
+		                    Vector(1732.24, -1954.21, 206.017) // boss_path_alt_18
+		                    Vector(1796.24, -1538.21, 302.017) // boss_path_alt_16
+		                    Vector(1795.24, -840.215, 302.017) // boss_path_alt_15
+                            Vector(1668.24, -738.215, 302.017) // boss_path_alt_14
+		                    Vector(1336, -738.215, 304) // boss_path_alt_13
+                            Vector(764, -738.215, 304) 
+                            Vector(764, -174.215, 304) 
+		                    Vector(20.236, -166.215, 171.017)
+		                    Vector(-255.764, -306.215, 170.017) // same as begin loop
+                        ]
+                    }
+                )
+                TankExt.StartingPathNames
+                (
+                    [
+	                    `boss_path_patrol_1`
+                    ]
+                )
+                TankExt.SetValueOverrides({
+                        COMBATTANK_ROTATE_SPEED_DEFAULT   = 0.6
+                        COMBATTANK_MINIGUN_BULLET_DAMAGE  = 12
+                })
+			"
+		}
+        WaveSpawn
+        {
+            Name "3support"
+            Where spawnbot
+            TotalCount 30
+            MaxActive 3
+            SpawnCount 1
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 10
+        
+            TotalCurrency 30
+
+            Support 1
+        
+            TFBot
+            { 
+                Template T_TFBot_Pyro_combo_flarepush
+                Action Mobber
+            }
+        }
+        WaveSpawn
+        {
+            Name "3a"
+            Where spawnbot
+            TotalCount 8
+            MaxActive 5
+            SpawnCount 1
+            WaitBeforeStarting 2
+            WaitBetweenSpawns 1
+        
+            TotalCurrency 25
+
+
+            TFBot
+            { 
+                Template T_TFBot_Demo_loch
+            }
+                 
+        }
+        WaveSpawn
+        {
+            Name "3a"
+            Where spawnbot
+            TotalCount 12
+            MaxActive 8
+            SpawnCount 4
+            WaitBeforeStarting 1
+            WaitBetweenSpawns 7
+        
+            TotalCurrency 25
+
+
+            TFBot
+            { 
+                Template T_TFBot_Heavy_shotguner
+            }
+                 
+        }
+        WaveSpawn
+        {
+            Name "3a-giant"
+            Where spawnbot
+            TotalCount 2
+            MaxActive 2
+            SpawnCount 1
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 18
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Giant_Soldier_buff_burstfire
+            }
+        }
+        WaveSpawn
+        {
+            Name "3atank"
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 0
+        
+            TotalCurrency 50
+
+            FirstSpawnWarningSound "ambient/alarms/doomsday_lift_alarm.wav"
+        
+            Tank
+            {
+                Name "combattank|minigun|minigun"
+                StartingPathTrackNode "boss_path_patrol_1"
+                Health 10000
+                Speed 75
+                Skin 0
+                ClassIcon tank_combat_minigun
+        
+                //OnBombDroppedOutput
+                //{
+                //    Target boss_deploy_relay
+                //    Action Trigger
+                //}
+            }
+        }
+        WaveSpawn
+        {
+            Name "3b"
+            Where spawnbot
+            TotalCount 10
+            MaxActive 6
+            SpawnCount 2
+            WaitBeforeStarting 14
+            WaitBetweenSpawns 3
+            WaitForAllSpawned "3a"
+        
+            TotalCurrency 50
+        
+            Squad
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Heavy_shotguner
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Medic_kritz
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "3b"
+            Where spawnbot
+            TotalCount 10
+            MaxActive 5
+            SpawnCount 1
+            WaitBeforeStarting 12
+            WaitBetweenSpawns 1
+            WaitForAllSpawned "3a"
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Soldier_stock
+            }
+        }
+        WaveSpawn
+        {
+            Name "3b-giant"
+            Where spawnbot
+            TotalCount 6
+            MaxActive 4
+            SpawnCount 2
+            WaitBeforeStarting 25
+            WaitBetweenSpawns 14
+            WaitForAllSpawned "3a-giant"
+        
+            TotalCurrency 50
+        
+            Squad
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Giant_Pyro_fury
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Medic_kritz
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "3ctank"
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 0
+        
+            TotalCurrency 50
+
+            WaitForAllSpawned "3b-giant"
+            WaitForAllDead "3atank"
+
+            FirstSpawnWarningSound "ambient/alarms/doomsday_lift_alarm.wav"
+        
+            Tank
+            {
+                Name "combattank|rocketpod|rocketpod"
+                StartingPathTrackNode "boss_path_patrol_1"
+                Health 10000
+                Speed 75
+                Skin 0
+                ClassIcon tank_combat_rocket
+        
+                //OnBombDroppedOutput
+                //{
+                //    Target boss_deploy_relay
+                //    Action Trigger
+                //}
+            }
+        }
+        WaveSpawn
+        {
+            Name "3c"
+            Where spawnbot
+            TotalCount 12
+            MaxActive 8
+            SpawnCount 4
+            WaitBeforeStarting 13
+            WaitBetweenSpawns 5
+            WaitForAllSpawned "3b"
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Demo_loch
+            }
+        }
+        WaveSpawn
+        {
+            Name "3c"
+            Where spawnbot
+            TotalCount 8
+            MaxActive 6
+            SpawnCount 1
+            WaitBeforeStarting 13
+            WaitBetweenSpawns 1.5
+            WaitForAllSpawned "3b"
+        
+            TotalCurrency 50
+        
+            TFBot
+            { 
+                Template T_TFBot_Heavy_shotguner
+            }
+        }
+        WaveSpawn
+        {
+            Name "3c"
+            Where spawnbot
+            TotalCount 4
+            MaxActive 4
+            SpawnCount 2
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 18
+            WaitForAllSpawned "3b-giant"
+        
+            TotalCurrency 50
+        
+            Squad
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Giant_Demo_scatter
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Medic_kritz
+                }
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "3support-final"
+            Where spawnbot
+            TotalCount 30
+            MaxActive 3
+            SpawnCount 1
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 2
+            WaitForAllSpawned "3c"
+        
+            TotalCurrency 10
+
+            Support 1
+        
+            TFBot
+            { 
+                Template T_TFBot_Pyro_combo_flarepush
+                //Action Mobber
+            }
+        }
+
+        WaveSpawn
+        {
+            Name "3support-final"
+            Where spawnbot
+            TotalCount 30
+            MaxActive 12
+            SpawnCount 2
+            WaitBeforeStarting 30
+            WaitBetweenSpawns 2
+            WaitForAllSpawned "3c"
+        
+            TotalCurrency 10
+
+            Support 1
+        
+            RandomChoice
+	    {
+		TFBot
+		{
+		    Template T_TFBot_Soldier_stock
+		}
+		TFBot
+		{
+		    Template T_TFBot_Pyro_combo_flarepush
+		}
+	    }
+        }
+    }
+
+    ///////////////////////////////////////////////////
+    // WAVE 4 - $600 //////////////////////////////////
+    ///////////////////////////////////////////////////
+    
+    Wave
+    {
+        StartWaveOutput
+        {
+            Target wave_start_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+        InitWaveOutput
+		{
+			Target wave_start_relay
+			Action RunScriptCode
+			Param
+			"
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_1_upper_relay`, `Trigger`) // 设置该回合路线
+                IncludeScript(`tankextensions_main`, getroottable())
+                IncludeScript(`tankextensions/combattank`, getroottable())
+                IncludeScript(`tankextensions/combattank_weapons/minigun`, getroottable())
+                IncludeScript(`tankextensions/combattank_weapons/railgun`, getroottable())
+                IncludeScript(`tankextensions/combattank_weapons/rocketpod`, getroottable())
+                IncludeScript(`havana_minor_fix`, getroottable())
+                TankExt.CreateLoopPaths
+                (
+                    {
+	                    boss_path_patrol = 
+                        [
+		                    Vector(-1136, -456, 160) // boss_path_1
+		                    Vector(-1072, 56, 140) // boss_path_28
+		                    Vector(-752, 288, 140) // boss_path_34
+		                    Vector(-323.764, -138.215, 158.017) // boss_path_split
+		                    Vector(-255.764, -306.215, 170.017) // THE LOOP START
+		                    Vector(-243.764, -358.215, 174.017) // boss_path_43
+		                    Vector(-231.764, -614.215, 202.017) // boss_path_48
+		                    Vector(160.236, -810.215, 270.017) // boss_path_57
+		                    Vector(296.236, -1058.22, 260.017) // boss_path_63
+		                    Vector(276.236, -2028, 224) // boss_path_10
+		                    Vector(432.236, -2176, 224) // boss_path_74
+		                    Vector(2068.24, -2176, 224) // Under the arch, boss_path_11
+		                    Vector(2260.24, -2088, 224) // boss_path_78
+		                    Vector(2548.24, -1824, 224) // boss_path_12
+		                    Vector(2644.24, -1728, 320) // boss_path_13
+		                    Vector(2792.24, -1608, 320) // boss_path_15
+                            Vector(3404.24, -1600, 320)
+		                    Vector(3404.24, -2506.21, 302.017) // boss_path_alt_105
+                            Vector(3140.24, -2962.21, 302.017) // boss_path_alt_25
+		                    Vector(3008.24, -3298.21, 302.017) // boss_path_alt_23
+                            Vector(2628.24, -3298.21, 302.017) // boss_path_alt_22
+		                    Vector(2296.24, -3298.21, 206.017) // boss_path_alt_21
+		                    Vector(1576.24, -3306.21, 206.017) // boss_path_alt_92
+                            Vector(1476.24, -3218.21, 206.017) // boss_path_alt_20
+		                    Vector(1448.24, -2914.21, 206.017) // boss_path_alt_82
+		                    Vector(1468.24, -2282.21, 206.017) // boss_path_alt_19
+		                    Vector(1732.24, -1954.21, 206.017) // boss_path_alt_18
+		                    Vector(1796.24, -1538.21, 302.017) // boss_path_alt_16
+		                    Vector(1795.24, -840.215, 302.017) // boss_path_alt_15
+                            Vector(1668.24, -738.215, 302.017) // boss_path_alt_14
+		                    Vector(1336, -738.215, 304) // boss_path_alt_13
+                            Vector(764, -738.215, 304) 
+                            Vector(764, -174.215, 304) 
+		                    Vector(20.236, -166.215, 171.017)
+		                    Vector(-255.764, -306.215, 170.017) // same as begin loop
+                        ]
+                    }
+                )
+                TankExt.StartingPathNames
+                (
+                    [
+	                    `boss_path_patrol_1`
+                    ]
+                )
+                TankExt.SetValueOverrides({
+                        COMBATTANK_ROTATE_SPEED_DEFAULT   = 0.6
+                        COMBATTANK_MINIGUN_BULLET_DAMAGE  = 12
+                })
+			"
+		}
+        WaveSpawn
+        {
+            Name "4gscout"
+            Where spawnbot
+            TotalCount 8
+            MaxActive 3
+            SpawnCount 1
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 22
+        
+            TotalCurrency 50
+
+            TFBot
+            {
+                Template T_TFBot_Giant_Scout_popper
+            }
+        }
+        WaveSpawn
+        {
+            Name "4a"
+            Where spawnbot
+            TotalCount 12
+            MaxActive 8
+            SpawnCount 2
+            WaitBeforeStarting 1
+            WaitBetweenSpawns 3
+        
+            TotalCurrency 50
+
+            Squad
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Soldier_stock
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Medic_big_heal_pop
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "4a"
+            Where spawnbot
+            TotalCount 12
+            MaxActive 7
+            SpawnCount 1
+            WaitBeforeStarting 1
+            WaitBetweenSpawns 4
+        
+            TotalCurrency 50
+
+            TFBot
+            {
+                Template T_TFBot_Demo_Burst_nf
+                Skill Hard
+            }
+        }
+        WaveSpawn
+        {
+            Name "4btank"
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 0
+        
+            TotalCurrency 50
+
+            WaitForAllSpawned "4a"
+
+            FirstSpawnWarningSound "ambient/alarms/doomsday_lift_alarm.wav"
+        
+            Tank
+            {
+                Name "combattank|railgun|railgun"
+                StartingPathTrackNode "boss_path_patrol_1"
+                Health 12000
+                Speed 75
+                Skin 0
+                ClassIcon tank_combat_railgun
+        
+                //OnBombDroppedOutput
+                //{
+                //    Target boss_deploy_relay
+                //    Action Trigger
+                //}
+            }
+        }
+        WaveSpawn
+        {
+            Name "4btank"
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 0
+        
+            TotalCurrency 50
+
+            WaitForAllSpawned "4a"
+
+            FirstSpawnWarningSound "mvm/mvm_tank_start.wav"
+        
+            Tank
+            {
+                Name "tankboss"
+                StartingPathTrackNode "boss_path_fix1"
+                Health 18000
+                Speed 75
+                Skin 0
+        
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "4b-giant"
+            Where spawnbot
+            TotalCount 3
+            MaxActive 2
+            SpawnCount 1
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 23
+        
+            TotalCurrency 50
+
+            WaitForAllSpawned "4a"
+
+            TFBot
+            {
+                Template T_TFBot_Giant_Soldier_RocketShotgun_nf
+            }
+        }
+        WaveSpawn
+        {
+            Name "4b-support"
+            Where spawnbot
+            TotalCount 20
+            MaxActive 6
+            SpawnCount 1
+            WaitBeforeStarting 12
+            WaitBetweenSpawns 2
+        
+            TotalCurrency 50
+
+            WaitForAllSpawned "4a"
+
+            Support Limited
+
+            TFBot
+            {
+                Template T_TFBot_Heavy_gnome_deadly
+                Action Mobber
+            }
+        }
+        WaveSpawn
+        {
+            Name "4b"
+            Where spawnbot
+            TotalCount 10
+            MaxActive 6
+            SpawnCount 1
+            WaitBeforeStarting 12
+            WaitBetweenSpawns 1
+        
+            TotalCurrency 50
+
+            WaitForAllSpawned "4a"
+
+            TFBot
+            {
+                Template T_TFBot_Soldier_stock
+            }
+        }
+        WaveSpawn
+        {
+            Name "4c"
+            Where spawnbot
+            TotalCount 16
+            MaxActive 10
+            SpawnCount 2
+            WaitBeforeStarting 16
+            WaitBetweenSpawns 5
+        
+            TotalCurrency 50
+
+            WaitForAllSpawned "4b"
+
+            Squad
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Demo_Burst_nf
+                    Skill Hard
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Soldier_stock
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "4c-support"
+            Where spawnbot
+            TotalCount 30
+            MaxActive 6
+            SpawnCount 2
+            WaitBeforeStarting 16
+            WaitBetweenSpawns 6
+        
+            TotalCurrency 50
+
+            Support 1
+
+            WaitForAllSpawned "4b"
+
+            Squad
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Demo_persian
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Medic_uber_quickfix
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "4c-giant"
+            Where spawnbot
+            TotalCount 2
+            MaxActive 2
+            SpawnCount 1
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 25
+        
+            TotalCurrency 100
+
+            WaitForAllSpawned "4b-giant"
+
+            TFBot
+            {
+                Template T_TFBot_Giant_Heavy_booster
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////
+    // WAVE 5 - $650 //////////////////////////////////
+    ///////////////////////////////////////////////////
+    
+    Wave
+    {
+        StartWaveOutput
+        {
+            Target wave_start_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+        SpawnTemplate TitleCard
+        SpawnTemplate TitleCard2
+        SpawnTemplate Queue_and_Slow
+        Explanation
+        {
+            Line "{ecd452}>A Behemoth is lurking outside of the harbour ... Don't let it step into the base!"
+        }
+        InitWaveOutput
+		{
+			Target wave_start_relay
+			Action RunScriptCode
+			Param
+			"
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_clearall_relay`, `Trigger`)
+				EntFire(`bombpath_1_relay`, `Trigger`) // 设置该回合路线
+                //ClientPrint(null,3,`\x08ecd452FF>A Behemoth is lurking outside of the harbour ... Don't let it step into the base!`) // 一辆战争巨兽正在哈瓦那的港口外徘徊...别让它踏进基地！
+                IncludeScript(`tankextensions_main`, getroottable())
+                IncludeScript(`tankextensions/combattank`, getroottable())
+                IncludeScript(`tankextensions/combattank_weapons/minigun`, getroottable())
+                IncludeScript(`tankextensions/combattank_weapons/railgun`, getroottable())
+                IncludeScript(`tankextensions/combattank_weapons/rocketpod`, getroottable())
+                IncludeScript(`tankextensions/drilltank`, getroottable())
+                IncludeScript(`tankextensions/stickytank`, getroottable())
+                IncludeScript(`tankextensions/teletank`, getroottable())
+                IncludeScript(`havana_minor_fix`, getroottable())
+                TankExt.SetValueOverrides({
+                        COMBATTANK_ROTATE_SPEED_DEFAULT   = 0.6
+                        COMBATTANK_MINIGUN_BULLET_DAMAGE  = 12
+                        TELETANK_UBER_DURATION_MULT = 0.5
+                        STICKYTANK_PROJECTILE_DAMAGE = 60
+                })
+                SpawnEntityFromTable(`info_particle_system`,
+			    {
+				    targetname = `operator_indicator_beam`
+				    origin = `-175 -1842 266` // 坐标
+				    start_active = 1,
+				    effect_name = `teleporter_mvm_bot_persist`
+			    })
+			    SpawnEntityFromTable(`prop_dynamic`,
+			    {
+				    targetname = `operator_indicator`
+				    origin = `-175 -1842 286`
+				    model = `models/props_mvm/robot_spawnpoint.mdl`
+                    DefaultAnim = `idle`
+				    skin = 2
+				    disableshadows = 1
+			    })
+			"
+		}
+        WaveSpawn // Callout
+        {
+            WaitBeforeStarting 10
+
+            FirstSpawnWarningSound "vo/mvm/norm/demoman_mvm_cheers08.mp3"
+        }
+        WaveSpawn
+        {
+            Name "5bombrunner"
+            Where spawnbot
+            TotalCount 3
+            MaxActive 3
+            SpawnCount 3
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 0
+        
+            TotalCurrency 25
+
+            TFBot
+            {
+                Template T_TFBot_Giant_Scout_Baseball_Armored_nf
+            }
+        }
+        WaveSpawn
+        {
+            Name "tanka"
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 0
+        
+            TotalCurrency 75
+
+            FirstSpawnWarningSound "ambient/alarms/doomsday_lift_alarm.wav"
+        
+            Tank
+            {
+                Name "drilltank"
+                StartingPathTrackNode "boss_path_altfix1"
+                Health 16000
+                Speed 75
+                Skin 1
+                ClassIcon tank_drill_lite
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "tankb"
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            WaitBeforeStarting 13
+            WaitBetweenSpawns 0
+        
+            TotalCurrency 75
+
+            FirstSpawnWarningSound "ambient/alarms/doomsday_lift_alarm.wav"
+
+            Tank
+            {
+                Name "teletank"
+                StartingPathTrackNode "boss_path_altfix1"
+                Health 13000
+                Speed 75
+                Skin 1
+                ClassIcon tank_tele
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "tankc"
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            WaitBeforeStarting 16
+            WaitBetweenSpawns 0
+        
+            TotalCurrency 75
+
+            FirstSpawnWarningSound "ambient/alarms/doomsday_lift_alarm.wav"
+        
+            Tank
+            {
+                Name "stickytank"
+                StartingPathTrackNode "boss_path_altfix1"
+                Health 13000
+                Speed 75
+                Skin 1
+                ClassIcon tank_sticky_hellmet
+                Scale 0.75
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "tankd"
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            WaitBeforeStarting 19
+            WaitBetweenSpawns 0
+        
+            TotalCurrency 75
+
+            FirstSpawnWarningSound "mvm/giant_heavy/giant_heavy_entrance.wav"
+
+            FirstSpawnOutput
+            {
+                Target boss_title_relay
+                Action Trigger
+            }
+        
+            Tank
+            {
+                Name "combattank|minigun|rocketpod"
+                StartingPathTrackNode "boss_path_altfix1"
+                Health 11000
+                Speed 75
+                Skin 1
+                ClassIcon tank_combat_minigun_rocket
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+            }
+        }
+        WaveSpawn // tanka death
+        {
+            WaitForAllDead "tanka"
+        
+            StartWaveWarningSound "npc/attack_helicopter/aheli_megabomb_siren1.wav"
+        }
+        WaveSpawn // tankb death
+        {
+            WaitForAllDead "tankb"
+        
+            StartWaveWarningSound "npc/attack_helicopter/aheli_megabomb_siren1.wav"
+        
+            FirstSpawnOutput
+            {
+                Target tank_1_wait
+                Action Trigger
+            }
+        }
+        WaveSpawn // tankc death
+        {
+            WaitForAllDead "tankc"
+        
+            StartWaveWarningSound "npc/attack_helicopter/aheli_megabomb_siren1.wav"
+        
+            FirstSpawnOutput
+            {
+                Target tank_12_wait
+                Action Trigger
+            }
+        }
+        WaveSpawn // tankd death
+        {
+            WaitForAllDead "tankd"
+        
+            StartWaveWarningSound "npc/attack_helicopter/aheli_megabomb_siren1.wav"
+        }
+        WaveSpawn // if 2 tanks died: call for more robots
+        {
+            Name "tankab"
+            WaitForAllDead "tanka"
+            WaitForAllDead "tankb"
+        
+            FirstSpawnOutput
+            {
+                Target "spawnbot_w5_reinforce"
+                Action Enable
+            }
+        }
+        WaveSpawn
+        {
+            WaitForAllDead "tanka"
+            WaitForAllDead "tankc"
+        
+            FirstSpawnOutput
+            {
+                Target "spawnbot_w5_reinforce"
+                Action Enable
+            }
+        }
+        WaveSpawn
+        {
+            WaitForAllDead "tanka"
+            WaitForAllDead "tankd"
+        
+            FirstSpawnOutput
+            {
+                Target "spawnbot_w5_reinforce"
+                Action Enable
+            }
+        }
+        WaveSpawn
+        {
+            WaitForAllDead "tankb"
+            WaitForAllDead "tankc"
+        
+            FirstSpawnOutput
+            {
+                Target "spawnbot_w5_reinforce"
+                Action Enable
+            }
+        }
+        WaveSpawn
+        {
+            WaitForAllDead "tankb"
+            WaitForAllDead "tankd"
+        
+            FirstSpawnOutput
+            {
+                Target "spawnbot_w5_reinforce"
+                Action Enable
+            }
+        }
+        WaveSpawn
+        {
+            Name "tankcd"
+            WaitForAllDead "tankc"
+            WaitForAllDead "tankd"
+        
+            FirstSpawnOutput
+            {
+                Target "spawnbot_w5_reinforce"
+                Action Enable
+            }
+        }
+        WaveSpawn
+        {
+            Name "5"
+            Where spawnbot
+            TotalCount 25
+            MaxActive 2
+            SpawnCount 1
+            WaitBeforeStarting 1
+            WaitBetweenSpawns 30
+
+            Support 1
+        
+            TotalCurrency 25
+
+            TFBot
+            {
+                Template T_TFBot_Giant_Soldier_nf
+                ClassIcon soldier_giant_support
+            }
+        }
+        WaveSpawn // Callout
+        {
+            WaitBeforeStarting 1
+            WaitForAllSpawned "5supportBoss"
+            FirstSpawnWarningSound "vo/mvm/norm/demoman_mvm_autodejectedtie02.mp3"
+            FirstSpawnOutput
+            {
+                Target operator_indicator
+                Action $Setkey$skin
+                Param 1
+            }
+        }
+        WaveSpawn // Callout
+        {
+            WaitBeforeStarting 4
+            WaitForAllSpawned "5supportBoss"
+            FirstSpawnWarningSound "vo/mvm/norm/demoman_mvm_autodejectedtie01.mp3"
+        }
+        WaveSpawn // Callout
+        {
+            WaitBeforeStarting 6
+            WaitForAllSpawned "5supportBoss"
+            FirstSpawnWarningSound "vo/mvm/norm/engineer_mvm_dominationengineer_mvm01.mp3"
+        }
+        WaveSpawn // Callout
+        {
+            WaitBeforeStarting 8
+            WaitForAllSpawned "5supportBoss"
+            FirstSpawnWarningSound "vo/mvm/norm/engineer_mvm_specialcompleted09.mp3"
+        }
+        WaveSpawn // Callout
+        {
+            WaitBeforeStarting 10
+            WaitForAllSpawned "5supportBoss"
+            FirstSpawnWarningSound "mvm/mvm_tele_deliver.wav"
+        }
+        WaveSpawn
+        {
+            Name "5supportBoss"
+            Where spawnbot_w5_reinforce
+            TotalCount 4
+            MaxActive 4
+            SpawnCount 4
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 1
+            Support Limited
+            TotalCurrency 100
+
+            Squad
+            {
+                ShouldPreserveSquad 1
+                TFBot
+                {
+                    Template T_TFBot_Giant_Engineer_buff_pistol
+                    Name "Tank Operator"
+                    ClassIcon engineer_giant_support
+                    AlwaysGlow 1
+                    DeathSound "vo/mvm/norm/engineer_mvm_paincrticialdeath01.mp3"
+                    FireInput
+				    {
+					    Target !self
+					    Action $TeleportToEntity
+					    Param "operator_indicator_beam"
+					    Delay 10
+					    Repeats 1
+				    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Engineer_gunslinger
+                    ClassIcon engineer_giant_support
+                    AlwaysGlow 1
+                    DeathSound "vo/mvm/norm/engineer_mvm_paincrticialdeath02.mp3"
+                    Name "Tank Repairman"
+                    FireInput
+				    {
+					    Target !self
+					    Action $TeleportToEntity
+					    Param "operator_indicator_beam"
+					    Delay 10
+					    Repeats 1
+				    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Engineer_shortcircuit
+                    ClassIcon engineer_giant_support
+                    AlwaysGlow 1
+                    DeathSound "vo/mvm/norm/engineer_mvm_paincrticialdeath03.mp3"
+                    Name "Tank Electrician"
+                    FireInput
+				    {
+					    Target !self
+					    Action $TeleportToEntity
+					    Param "operator_indicator_beam"
+					    Delay 10
+					    Repeats 1
+				    }
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Engineer_widowmaker
+                    ClassIcon engineer_giant_support
+                    AlwaysGlow 1
+                    DeathSound "vo/mvm/norm/engineer_mvm_paincrticialdeath04.mp3"
+                    Name "Tank Guard"
+                    FireInput
+				    {
+					    Target !self
+					    Action $TeleportToEntity
+					    Param "operator_indicator_beam"
+					    Delay 10
+					    Repeats 1
+				    }
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "5"
+            Where spawnbot
+            TotalCount 100
+            MaxActive 6
+            SpawnCount 2
+            WaitBeforeStarting 1
+            WaitBetweenSpawns 3
+
+            Support 1
+        
+            TotalCurrency 100
+
+            RandomChoice
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Demo_stock
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Demo_persian
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Pyro_Flaregun_nf
+                    Skill Hard
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Sniper_bow_ignite
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Heavy_shotguner
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "5tele"
+            Where spawnbot
+            TotalCount 50
+            MaxActive 4
+            SpawnCount 2
+            WaitBeforeStarting 40
+            WaitBetweenSpawns 10
+
+            Support 1
+        
+            TotalCurrency 50
+
+            RandomChoice
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Demo_stock
+                    Tag bot_teletank 
+                    Action Mobber
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Heavy_shotguner
+                    Tag bot_teletank 
+                    Action Mobber
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "5reinforce"
+            Where spawnbot_w5_reinforce
+            TotalCount 50
+            MaxActive 4
+            SpawnCount 4
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 1
+
+            Support 1
+        
+            TotalCurrency 50
+
+            RandomChoice
+            {
+                TFBot
+                { 
+                    Template T_TFBot_Demo_stock
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Demo_persian
+                }
+                TFBot
+                { 
+                    Template T_TFBot_Heavy_shotguner
+                }
+            }
+        }
+        WaveSpawn
+        {
+            Name "5bossfinal"
+            Where spawnbot
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            WaitBeforeStarting 13
+            WaitBetweenSpawns 1
+            TotalCurrency 0
+            WaitForAllSpawned "5supportBoss"
+            
+
+            TFBot
+            {
+                Template T_TFBot_Chief_Demo_Night_Feast
+                DeathSound "vo/mvm/norm/demoman_mvm_paincrticialdeath01.mp3"
+                AlwaysGlow 1
+            }
+
+            FirstSpawnOutput
+            {
+                Target boss_title_relay_2
+                Action Trigger
+            }
+        }
+        WaveSpawn // Callout
+        {
+            WaitBeforeStarting 3
+            WaitForAllSpawned "5bossfinal"
+            FirstSpawnWarningSound "vo/mvm/norm/demoman_mvm_specialcompleted07.mp3"
+
+            FirstSpawnOutput
+            {
+                Target operator_indicator
+                Action $Setkey$skin
+                Param 2
+            }
+        }
+        WaveSpawn // Callout
+        {
+            WaitBeforeStarting 6
+            WaitForAllSpawned "5bossfinal"
+            FirstSpawnWarningSound "vo/mvm/norm/demoman_mvm_autocappedintelligence02.mp3"
+            FirstSpawnOutput
+            {
+                Target operator_indicator_beam
+                Action kill
+            }
+        }
+        WaveSpawn // Callout
+        {
+            WaitBeforeStarting 9
+            WaitForAllSpawned "5bossfinal"
+            FirstSpawnWarningSound "mvm/giant_heavy/giant_heavy_entrance.wav"
+        }
+    }
+
+    ///////////////////////////////////////////////////
+    // WAVE 6 - SECRET WAVE CONFIRMED /////////////////
+    ///////////////////////////////////////////////////
+
+    //Mission // w5 engi
+    //{
+    //    Where spawnbot_mission_spy
+    //    Objective Engineer
+    //    BeginAtWave 6
+    //    RunForThisManyWaves 1
+    //    DesiredCount 1
+    //
+    //    InitialCooldown 0
+    //    CooldownTime 1
+    //
+    //  TFBot
+    //    {
+    //        Template T_TFBot_Engineer_Sentry_Tele_Battle // 正常入场，放置步哨和传送
+    //    }
+    //}
+    
+    //Wave
+    //{
+    //    StartWaveOutput
+    //    {
+    //        Target wave_start_relay
+    //       Action Trigger
+    //    }
+    //    DoneOutput
+    //    {
+    //        Target wave_finished_relay
+    //       Action Trigger
+    //   }
+    //    InitWaveOutput
+	//	{
+	//		Target wave_start_relay
+	//		Action RunScriptCode
+	//		Param
+	//		"
+	//			EntFire(`bombpath_choose_relay`, `Kill`)
+	//			EntFire(`bombpath_clearall_relay`, `Trigger`)
+	//			EntFire(`bombpath_2_relay`, `Trigger`)
+    //          IncludeScript(`havana_minor_fix`, getroottable())
+    //        "
+    //    }
+    //    WaveSpawn
+    //    {
+    //        Name "test"
+    //        Where spawnbot
+    //        TotalCount 100
+    //        MaxActive 20
+    //        SpawnCount 1
+    //        WaitBeforeStarting 0.1
+    //      WaitBetweenSpawns 0.1
+    //    
+    //        TotalCurrency 50
+    //
+    //        TFBot
+    //        {
+    //            Template T_TFBot_Scout_milk
+    //        }
+    //    }
+    //}   
+
+    ///////////////////////////////////////////////////
+    // POINTTEMPLATES /////////////////////////////////
+    ///////////////////////////////////////////////////
+
+    PointTemplates
+    {
+        Nav_and_Box_Fix
+        {
+            func_nav_avoid
+            {
+                "targetname" "bombpath_1_lower_nav_avoid"
+                "origin" "3779 -2565 407"
+                "mins" "-200 -200 -200"
+                "maxs" "200 200 200"
+                "tags" "bomb_carrier common"
+                "startdisabled" "1"
+            }
+            func_nav_avoid
+            {
+                "targetname" "bombpath_1_nav_avoid"
+                "origin" "-236 -408 238"
+                "mins" "-400 -400 -400"
+                "maxs" "400 400 400"
+                "tags" "bomb_carrier common"
+                "startdisabled" "1"
+            }
+            func_nav_avoid
+            {
+                "targetname" "bombpath_2_nav_avoid"
+                "origin" "738 -543 238"
+                "mins" "-300 -300 -300"
+                "maxs" "300 300 300"
+                "tags" "bomb_carrier common"
+                "startdisabled" "1"
+            }
+            func_nav_avoid
+            {
+                "targetname" "bombpath_2_nav_avoid"
+                "origin" "1505 -2678 223"
+                "mins" "-400 -400 -400"
+                "maxs" "400 400 400"
+                "tags" "bomb_carrier common"
+                "startdisabled" "1"
+            }
+            func_nav_avoid
+            {
+                "targetname" "bombpath_2_lower_nav_avoid"
+                "origin" "3779 -1610 407"
+                "mins" "-200 -200 -200"
+                "maxs" "200 200 200"
+                "tags" "bomb_carrier common"
+                "startdisabled" "1"
+            }
+            func_nobuild // box under the arch
+            {
+                "origin" "1985.88 -1845.67 301.4"
+                "maxs" "60 60 60"
+                "mins" "-60 -60 -60"
+                "AllowSentry" "0"
+                "AllowDispenser" "0"
+                "AllowTeleporter" "0"
+            }
+            func_nobuild // box near the death pit
+            {
+                "origin" "2807.45 -3633.88 564.65"
+                "maxs" "90 90 90"
+                "mins" "-90 -90 -90"
+                "AllowSentry" "0"
+                "AllowDispenser" "0"
+                "AllowTeleporter" "0"
+            }
+        }
+        Queue_and_Slow // Decoration Only
+        {
+            logic_relay
+            {
+                "targetname" "speed_controller_driller"
+                "OnTrigger" "drilltank,SetSpeed,0,0,-1"
+                "OnTrigger" "drilltank,SetSpeed,75,2,-1" // 2秒即可追上
+            }
+            logic_relay
+            {
+                "targetname" "speed_controller_tele"
+                "OnTrigger" "teletank,SetSpeed,0,0,-1"
+                "OnTrigger" "teletank,SetSpeed,75,2,-1"
+            }
+            logic_relay
+            {
+                "targetname" "tank_1_wait"
+                "OnTrigger" "speed_controller_driller,Trigger,,0,-1"
+            }
+            logic_relay
+            {
+                "targetname" "tank_12_wait"
+                "OnTrigger" "speed_controller_driller,Trigger,,0,-1"
+                "OnTrigger" "speed_controller_tele,Trigger,,0,-1"
+            }
+        }
+        TitleCard
+        {
+            game_text
+			{
+				"targetname"	"w5_titletext_1"
+				"message"		"<THE BEHEMOTH>" // 战 争 巨 兽
+				"x"				"-1"
+				"y"				"0.35"
+				"spawnflags"	"1"
+				"channel"		"2"
+				"color"			"255 255 255"
+				"fadein"		"0.5"
+				"fadeout"		"1"
+				"holdtime"		"4"
+			}
+			game_text
+			{
+				"targetname"	"w5_titletext_2"
+				"message"		"<///ARMOURED TRAIN DEPLOYED///>" // ///装甲列车已部署///
+				"x"				"-1"
+				"y"				"0.4"
+				"channel"		"4"
+				"spawnflags"	"1"
+				"color"			"255 255 255"
+				"fadein"		"0.5"
+				"fadeout"		"1"
+				"holdtime"		"3.8"
+			}
+			logic_relay
+			{
+				"targetname"	"boss_title_relay"
+				"OnTrigger"		"w5_titletext_1,Display,,0.1,-1"
+				"OnTrigger"		"w5_titletext_2,Display,,1,-1"
+			}
+        }
+        TitleCard2
+        {
+            game_text
+			{
+				"targetname"	"w5_titletext_3"
+				"message"		"<PALOOZA CRASHER>" // 战 争 巨 兽
+				"x"				"-1"
+				"y"				"0.35"
+				"spawnflags"	"1"
+				"channel"		"2"
+				"color"			"255 255 255"
+				"fadein"		"0.5"
+				"fadeout"		"1"
+				"holdtime"		"4"
+			}
+			game_text
+			{
+				"targetname"	"w5_titletext_4"
+				"message"		"<Cannonball, Mine, Grapeshot!>" // ///装甲列车已部署///
+				"x"				"-1"
+				"y"				"0.4"
+				"channel"		"4"
+				"spawnflags"	"1"
+				"color"			"255 255 255"
+				"fadein"		"0.5"
+				"fadeout"		"1"
+				"holdtime"		"3.8"
+			}
+			logic_relay
+			{
+				"targetname"	"boss_title_relay_2"
+				"OnTrigger"		"w5_titletext_3,Display,,9,-1"
+				"OnTrigger"		"w5_titletext_4,Display,,9.9,-1"
+			}
+            ambient_generic
+            {
+                "targetname" "switcher_soundfx"
+                "spawnflags" "17"
+                "health" "10" // fucking important
+				"pitch" "100"
+                "message" "#weapons/vaccinator_toggle.wav"
+            }
+			ambient_generic // GET LOUDER
+            {
+                "targetname" "switcher_soundfx"
+                "spawnflags" "17"
+                "health" "10" // fucking important
+				"pitch" "100"
+                "message" "#weapons/vaccinator_toggle.wav"
+            }
+        }
+        TankPathFix // If someone wants to create havana missions, feel free to copy this part :D
+        {
+            path_track
+            {
+                "targetname" "boss_path_altfix1"
+                "origin" "-1136 -456 160" // same as boss_path_1
+                "target" "boss_path_altfix2" // the next stop
+	            "speed" "0" // set a new tank speed; 0 means no changing.
+	            "spawnflags" "0" // dont touch it
+	            "radius" "0" // dont touch it
+	            "orientationtype" "1" // dont touch it
+	            "angles" "0 0 0" // dont touch it
+                //"OnPass" "tank_bust_relay_1,Trigger,,0,1" // the reason why I cant use the easy way to create nodes.
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix2"
+                "origin" "-1128 -288 156"
+                "target" "boss_path_altfix3"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix3"
+                "origin" "-1112 -128 148"
+                "target" "boss_path_altfix4"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix4"
+                "origin" "-1096 -40 144"
+                "target" "boss_path_altfix5"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix5"
+                "origin" "-1072 56 140"  // same as boss_path_28
+                "target" "boss_path_altfix6"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix6"
+                "origin" "-1048 112 140"
+                "target" "boss_path_altfix7"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix7"
+                "origin" "-1008 160 140"
+                "target" "boss_path_altfix8"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix8"
+                "origin" "-912 240 140"
+                "target" "boss_path_altfix9"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix9"
+                "origin" "-864 272 142"  // same as boss_path_32
+                "target" "boss_path_altfix10"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix10"
+                "origin" "-816 288 142"
+                "target" "boss_path_altfix11"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix11"
+                "origin" "-752 288 140"
+                "target" "boss_path_altfix12"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix12"
+                "origin" "-696 272 142"
+                "target" "boss_path_altfix13"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix13"
+                "origin" "-632 240 144"
+                "target" "boss_path_altfix14"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix14"
+                "origin" "-592 192 144"
+                "target" "boss_path_altfix15"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix15"
+                "origin" "-552 128 148"  // same as boss_path_38
+                "target" "boss_path_altfix16"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix16"
+                "origin" "-512 64 148"
+                "target" "boss_path_altfix17"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix17"
+                "origin" "-448 -16 152"
+                "target" "boss_path_altfix18"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix18"
+                "origin" "-400 -64 152"
+                "target" "boss_path_altfix19"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix19"
+                "origin" "-352 -112 154" // nearly same as boss_path_split, but always go the alt path
+                "target" "boss_path_altfix20"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+                "altpath" "boss_path_alt_6"
+            }
+            path_track
+            {
+                "targetname" "boss_path_altfix20" // the fake end
+                "origin" "-323.764 -138.215 158.017"  
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            OnSpawnOutput
+            {
+                Target boss_path_altfix19
+                Action EnableAlternatePath
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix1"
+                "origin" "-1136 -456 160" // same as boss_path_1
+                "target" "boss_path_fix2" // the next stop
+	            "speed" "0" // set a new tank speed; 0 means no changing.
+	            "spawnflags" "0" // dont touch it
+	            "radius" "0" // dont touch it
+	            "orientationtype" "1" // dont touch it
+	            "angles" "0 0 0" // dont touch it
+                //"OnPass" "tank_bust_relay_1,Trigger,,0,1" // the reason why I cant use the easy way to create nodes.
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix2"
+                "origin" "-1128 -288 156"
+                "target" "boss_path_fix3"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix3"
+                "origin" "-1112 -128 148"
+                "target" "boss_path_fix4"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix4"
+                "origin" "-1096 -40 144"
+                "target" "boss_path_fix5"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix5"
+                "origin" "-1072 56 140"  // same as boss_path_28
+                "target" "boss_path_fix6"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix6"
+                "origin" "-1048 112 140"
+                "target" "boss_path_fix7"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix7"
+                "origin" "-1008 160 140"
+                "target" "boss_path_fix8"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix8"
+                "origin" "-912 240 140"
+                "target" "boss_path_fix9"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix9"
+                "origin" "-864 272 142"  // same as boss_path_32
+                "target" "boss_path_fix10"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix10"
+                "origin" "-816 288 142"
+                "target" "boss_path_fix11"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix11"
+                "origin" "-752 288 140"
+                "target" "boss_path_fix12"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix12"
+                "origin" "-696 272 142"
+                "target" "boss_path_fix13"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix13"
+                "origin" "-632 240 144"
+                "target" "boss_path_fix14"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix14"
+                "origin" "-592 192 144"
+                "target" "boss_path_fix15"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix15"
+                "origin" "-552 128 148"  // same as boss_path_38
+                "target" "boss_path_fix16"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix16"
+                "origin" "-512 64 148"
+                "target" "boss_path_fix17"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix17"
+                "origin" "-448 -16 152"
+                "target" "boss_path_fix18"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix18"
+                "origin" "-400 -64 152"
+                "target" "boss_path_fix19"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+            }
+            path_track
+            {
+                "targetname" "boss_path_fix19"
+                "origin" "-352 -112 154" // nearly same as boss_path_split, but always go the alt path
+                "target" "boss_path_altfix20"
+	            "speed" "0"
+	            "spawnflags" "0"
+	            "radius" "0"
+	            "orientationtype" "1"
+	            "angles" "0 0 0"
+                "altpath" "boss_path_6"
+            }
+            OnSpawnOutput
+            {
+                Target boss_path_fix19
+                Action EnableAlternatePath
+            }
+        }
+        combo_pyro // 原作者：Royal。我进行了适当的修改。
+		{
+			NoFixup 1
+			logic_relay // 烧到敌人后换为火焰战斧 - 以这个实体为案例讲解运行逻辑。
+      		{
+        		"targetname" "combo_primary_to_melee"
+        		"spawnflags" "2"
+
+        		"OnTrigger" "!self,EnableRefire,,0,-1" // 允许这套操作无限进行。
+        		"OnTrigger" "!activator,$RemoveItemAttribute,fire input on hit|0,0,-1" // 0秒时-清除旧的属性
+        		"OnTrigger" "!activator,$WeaponSwitchSlot,2,0.5,-1" // 0.5秒时-换为Combo武器，2=近战 1=副 0=主
+        		"OnTrigger" "!activator,$AddPlayerAttribute,disable weapon switch|1,0.51,-1" // 0.51秒时-关闭武器切换，让机器人强制使用切换到的Combo武器
+        		"OnTrigger" "!activator,$RemovePlayerAttribute,disable weapon switch,1.1,-1" // 1.1秒时-开启武器切换，机器人将可以切换回主武器。相当于使用Combo武器0.6秒。
+        		"OnTrigger" "!activator,$WeaponSwitchSlot,0,1.11,-1" // 1.11秒时-换为主武器
+        		"OnTrigger" "!activator,$AddItemAttribute,fire input on hit|combo_primary_to_melee^Trigger^|0,1.12,-1" // 1.12秒时-重新添加上Combo属性。
+      		}
+            logic_relay // 烧到敌人后换为信号枪
+            {
+                "targetname" "combo_primary_to_secondary"
+                "spawnflags" "2"
+
+                "OnTrigger" "!self,EnableRefire,,0,-1"
+                "OnTrigger" "!activator,$RemoveItemAttribute,fire input on hit|0,0,-1"
+                "OnTrigger" "!activator,$ChangeAttributes,airblast,0.1,-1" // 0.1秒时-吹走玩家
+                "OnTrigger" "!activator,$ChangeAttributes,normal,0.12,-1"
+                "OnTrigger" "!activator,$WeaponSwitchSlot,1,1.85,-1" // 换武器
+                "OnTrigger" "!activator,$AddPlayerAttribute,disable weapon switch|1,1.81,-1"
+                "OnTrigger" "!activator,$RemovePlayerAttribute,disable weapon switch,2.4,-1"
+                "OnTrigger" "!activator,$WeaponSwitchSlot,0,2.41,-1"
+                "OnTrigger" "!activator,$AddItemAttribute,fire input on hit|combo_primary_to_secondary^Trigger^|0,2.42,-1"
+            }
+            logic_relay // 烧到敌人后换为信号枪-拿信号枪拿得更久
+            {
+                "targetname" "combo_primary_to_secondary_longhold"
+                "spawnflags" "2"
+
+                "OnTrigger" "!self,EnableRefire,,0,-1"
+                "OnTrigger" "!activator,$RemoveItemAttribute,fire input on hit|0,0,-1"
+                "OnTrigger" "!activator,$WeaponSwitchSlot,1,0,-1"
+                "OnTrigger" "!activator,$AddPlayerAttribute,disable weapon switch|1,0.01,-1"
+                "OnTrigger" "!activator,$RemovePlayerAttribute,disable weapon switch,1.5,-1"
+                "OnTrigger" "!activator,$WeaponSwitchSlot,0,1.51,-1"
+                "OnTrigger" "!activator,$AddItemAttribute,fire input on hit|combo_primary_to_secondary_longhold^Trigger^|0,1.52,-1"
+            }
+		}
+        combo_heavy // 仿照Combo Pyro做的Combo Heavy
+		{
+			NoFixup 1
+			logic_relay // 击中敌人后做出嘲讽
+      		{
+        		"targetname" "mittens_taunt"
+        		"spawnflags" "2"
+
+        		"OnTrigger" "!self,EnableRefire,,0,-1" // 允许这套操作无限进行。
+        		"OnTrigger" "!activator,$RemoveItemAttribute,fire input on hit|0,0,-1"
+        		"OnTrigger" "!activator,$Taunt,1,0.13,-1"
+        		"OnTrigger" "!activator,$AddItemAttribute,fire input on hit|mittens_taunt^Trigger^|0,0.2,-1"
+      		}
+		}
+    }
+}
+
+// Changelog:
+//
+// -V1-
+// General: 
+// Removed the "damage causes airblast" 1 on cannon demomans.
+// 
+// W1 - Gsoldiers in the final subwave would come later to make some room for the GDK fight.
+//
+// W2 - Moved the conch bowmans out of the heavy squads in the final subwave; Decreased the skill of Minigiant Cola-Popper scout from expert to normal.
+//
+// W3 - Decrased the turn rate, health (both are reduced to 4500) and minigun damage of combat tanks; Changed all tomislav heavies into normal shotgun heavies; Changed the HOK Gshotgun heavies into GScatter demomans.
+//
+// W4 - Changed all stunners into normal soldiers.
+//
+// W5 - Same combat tank weapon nerf as W3; Reduced the uber duration of teleport bots and the amount of bots that would come out of teleporter; Reduced the damage of the sticky tank; Decreased the amount of the 4 tanks by 3000 respectively; Decreased the total amount of support robots; Changed persian demomans and alwaysfire pyros into eviction heavies; More cash for all robots.
+//
+// Notes:
+// I forgot about the knockback of cannonball itself and mistakenly thought that demo_cannon templates should have a "damage causes airblast" 1 by default, which fucked many ppl during my test, and now they're gone.
+// Pyro in expert missions, especially low cash exps, without a medic, are generally fucked hard. Basically to save this I tried to nerf those pyro-only threats for pyro as much as possible.
+// Minigiant heavies in W2 use basically the GShotgun Heavy's weapon, but with 1/4 dmg, then I wanna indicate players that they're using a threatening shotgun instead of a fully stock one.
+// Anyway, I still wanna keep this mission as a low cash exp as possible.
+//
+// -V2-
+// General:
+// Use rafmod Explanation to show the pre-wave text, instead of vscript clientprint.
+// Changed all cannon demos to loch demos.
+//
+// W1 - No changes. Actually those support pyros had been added since the original release, and in the first and second (which failed due to vscript error) run, I didn't add any anti-spy measure so I guess I'll just keep this wave untouched.
+//
+// W2 - Heavies and conch bowmans would come a little later (5 seconds) to go with Gsandman Scouts.
+//
+// W3 - Decreased the amount of demo and heavy in the final subwave to not drag the pace.
+//
+// W4 - No changes.
+//
+// W5 - Reshuffled the order of the sticky tank and the tele tank, so now when ppl try to get on the top of combat tank they won't be easily stuck; Added 4 "Tank Operator" that would spawn after 2 tanks are destroyed, and a final boss after all tanks killed. Forced the bombpath to not go with the tank fleet so robots won't clump after the fleet.
+//
+// Notes:
+//
+// Precache of all custom assets had been added since the original release so dont worry about that.
+// Also, currently Mobber's AI are fucked and I guess I'll make those hyper mittens Mobber after it's fixed.
+//
+// -V3-
+//
+// W2 - Reverted the nerf on the skill of Minigiant Cola-Popper scout : now they're hard skill; Adjusted the flow of all 3 subwaves to include 2 burst pusher wavespawns, one at the start and one at the end.
+//
+// W3 - Kinda same to W2, turned some stream wavespawns into burst wavespawns; Replaced the igniting bowmans with stock soldiers.
+//
+// W5 - Added 1000 hp to each tank; Added 3 G armoured sandman scout as bombrunner to create a beginning; Changed loch demos into stock demos.
+//
+// Notes:
+//
+// After those changes I tested it with the same team comp as last judge - scout/soldier/pyro/heavy/engi, and this time some burst spawns do gave us significant stress.
+// Only one thing I'm worring about is that almost all waves (w1-w4) contain stock soldiers as main robots. Idk whether it would look repetitive or not, but I cant find another template that is as good as stock soldiers.
+//
+// -V4-
+//
+// W1 - Changed the bombpath to bombpath_1_upper.
+//
+// W2 - Giants in the first subwave would come out faster to make up for the pace.
+//
+// W3 - Buffed 2 combat tanks health to 10000.
+//
+// W4 - Buffed the health of combat tank to 12000.
+//
+// W5 - Changed the speed of all tanks back to normal (75); Boss now spawns after the death of 2 tanks, like those engineers; Added shotgun heavies as support; BUFFED THE BOSS; Edited the spawnpoint hologram for dynamic changes.
+//
+// -V5-
+//
+// Hotfixes on the server.
+//
+// -V5a-
+//
+// Changed w3 combo pyro and w4 hyper mittens to Mobber AI.
+// Increased the amount of burst demo in w4: 15 -> 20. 
+//
+// -RC1-
+//
+// Decoration.
+// Shrank the head scale of giant bowmen to 0.7.
+//
+// -Beta Update 1-
+//
+// Changed the text colour to increase visibility.
+// W3 - Added support bomb carrier pyros after all mainwave robots spawned (Yes this is totally not a buff).
+//
+// -Beta Update 2-
+// 
+// W3 - Added more support robots after the main wave robots all spawned.

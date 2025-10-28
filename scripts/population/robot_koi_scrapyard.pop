@@ -1,0 +1,800 @@
+//Author: Koi (https://steamcommunity.com/profiles/76561198064411172)
+
+//------------------------
+//scrapyard_rc2a map info:
+//Robot spawn points:
+//spawnbot
+//spawnbot_mission_sniper
+//spawnbot_mission_spy
+//spawnbot_mission_sentrybuster
+//spawnbot_left
+//spawnbot_right
+//
+//Wave Relays:
+//wave_start_classic_relay
+//wave_start_ironman_relay
+//wave_finished_relay
+//
+//Tank Robot paths:
+//tank_path_a_1
+//tank_path_b_1
+//
+//Other:
+//Multiple Bombs:
+//second_bomb_classic_enable
+//third_bomb_classic_enable
+//
+//second_bomb_ironman_enable
+//third_bomb_ironman_enable
+//-------------------------
+
+WaveSchedule
+{
+	Templates
+	{
+        T_TFBot_Pyro_Default
+		{
+			Name "Pyro"
+			Class Pyro
+			Skill Easy
+			//Attributes HoldFireUntilFullReload
+			WeaponRestrictions PrimaryOnly
+		}
+		T_TFBot_Pyro_Sharpened_Volcano_Fragment
+		{
+			Name "Volcano Fragment Pyro"
+			Class Pyro
+			Skill Normal
+			ClassIcon pyro_jug_volcanofrag
+			Item "Sharpened Volcano Fragment"
+			WeaponRestrictions MeleeOnly
+			ItemAttributes
+			{
+				ItemName "Sharpened Volcano Fragment"
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 1.1
+			}
+		}
+		T_TFBot_Pyro_Shotgun
+		{
+			Name "Pyro Shotgunner"
+			Class Pyro
+			Skill Hard
+			ClassIcon heavy_shotgun
+			WeaponRestrictions SecondaryOnly
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_SHOTGUN_PYRO"
+				"bullets per shot bonus" 3
+				"damage bonus" 0.33
+				"faster reload rate" 0.1
+				"fire rate bonus" 2.5
+			}
+		}
+		T_TFBot_Pyro_Axtinguisher_Thrower
+		{
+			Name "Axe Thrower Pyro"
+			Class Pyro
+			Skill Hard
+			MaxVisionRange 1200 //Reduce prop spam
+			Attributes SuppressFire
+			WeaponRestrictions PrimaryOnly
+			Item "The Rescue Ranger"
+			Item "The Axtinguisher"
+			ClassIcon pyro_jug_axtinguisher_bright
+			ItemAttributes
+			{
+				ItemName "The Rescue Ranger"
+				//Projectile stats
+				"projectile gravity" -1
+				"projectile speed decreased" 0.4
+				"projectile lifetime" 10 //Optional, prevents very long prop lifetime.
+				"penetrate teammates" 1 //Optional, but useful to prevent teammate absorb.
+				
+				//Damage stats
+				"no damage falloff" 1
+				"damage bonus" 1.1 //44
+				"minicrit vs burning player" 1
+				"damage bonus vs burning" 1.5 //66 base damage
+				"fire input on hit" "!self^ExtinguishPlayer^" //extinguish the player
+				"fire rate bonus" 1.2 //Change to match fire rate
+				"faster reload rate" 0
+				
+				//Visual
+				"arrow hit kill time" 0.1 //Prevents prop from existing after wall hit.
+				
+				"custom projectile model" "models/weapons/w_models/w_drg_ball.mdl"
+				//"custom item model" "models/weapons/c_models/c_fireaxe_pyro/c_fireaxe_pyro_xmas.mdl"
+				"custom item model" "models/weapons/c_models/c_axtinguisher/c_axtinguisher_pyro.mdl"
+				"custom weapon fire sound" "misc/null.wav"
+				"custom kill icon" "axtinguisher"
+			}
+			ItemAttributes
+			{
+				ItemName "The Axtinguisher"
+				"is_passive_weapon" 1
+				"fire rate bonus" 1.2 //Change to match fire rate
+			}
+			ShootTemplate
+			{
+				Name PT_RotatingAxe_Small
+				AttachToProjectile 1
+			}
+			FireWeapon
+			{
+				Type "Primary"
+				Cooldown 1.2 //Fire rate
+				Duration 0.2
+				Delay 4 //FireWeapon ignores spawnroom no attack, delay is used to mimic this.
+				IfSeeTarget 1
+			}
+		}
+		T_TFBot_Giant_Pyro_Axtinguisher_Thrower
+		{
+			Name "Giant Axe Thrower Pyro"
+			Class Pyro
+			Skill Expert
+			Health 3500
+			MaxVisionRange 1200 //Reduce prop spam
+			Attributes SuppressFire
+			Attributes MiniBoss
+			WeaponRestrictions PrimaryOnly
+			Item "The Face of Mercy"
+			Item "The Rescue Ranger"
+			Item "The Axtinguisher"
+			ClassIcon pyro_jug_axtinguisher_bright_giant
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "The Rescue Ranger"
+				//Projectile stats
+				"projectile gravity" -1
+				"projectile speed decreased" 0.4
+				"projectile lifetime" 10 //Optional, prevents very long prop lifetime.
+				"penetrate teammates" 1 //Optional, but useful to prevent teammate absorb.
+				
+				//Damage stats
+				"no damage falloff" 1
+				"damage bonus" 1.5 //60
+				"minicrit vs burning player" 1
+				"damage bonus vs burning" 1.5 //66 base damage
+				"fire input on hit" "!self^ExtinguishPlayer^" //extinguish the player
+				"fire rate bonus" 1.3 //Change to match fire rate
+				"faster reload rate" 0
+				
+				//Visual
+				"arrow hit kill time" 0.1 //Prevents prop from existing after wall hit.
+				"gesture speed increase" 0.9 //slightly slow throw animation
+				
+				"custom projectile model" "models/weapons/w_models/w_drg_ball.mdl"
+				//"custom item model" "models/weapons/c_models/c_fireaxe_pyro/c_fireaxe_pyro_xmas.mdl"
+				"custom item model" "models/weapons/c_models/c_axtinguisher/c_axtinguisher_pyro.mdl"
+				"custom weapon fire sound" "misc/null.wav"
+				"custom kill icon" "axtinguisher"
+			}
+			ItemAttributes
+			{
+				ItemName "The Axtinguisher"
+				"is_passive_weapon" 1
+				"fire rate bonus" 1.3 //Change to match fire rate
+			}
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.6
+				"damage force reduction" 0.6
+				"move speed bonus" 0.5
+				"override footstep sound set" 6
+			}
+			ShootTemplate
+			{
+				Name PT_RotatingAxe_Large
+				AttachToProjectile 1
+			}
+			FireWeapon
+			{
+				Type "Primary"
+				Cooldown 1.3 //Fire rate
+				Duration 0.2
+				Delay 4 //FireWeapon ignores spawnroom no attack, delay is used to mimic this.
+				IfSeeTarget 1
+			}
+		}
+		T_TFBot_Giant_Pyro_NoAB
+		{
+			Name "Giant Pyro"
+			Class Pyro
+			Skill Expert
+			Health 3000
+			ClassIcon pyro_giant
+			Attributes MiniBoss
+			WeaponRestrictions PrimaryOnly
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_FLAMETHROWER"
+				"airblast disabled" 1
+			}
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.6
+				"damage force reduction" 0.6
+				"move speed bonus" 0.5
+				"override footstep sound set" 6
+			}
+		}
+        T_TFBot_Pyro_DragonsFury
+		{
+            Name "Fury Pyro"
+			Class Pyro
+			Skill Easy
+			MaxVisionRange 1000
+            ClassIcon pyro_dragon_fury_swordstone
+			WeaponRestrictions PrimaryOnly
+            Item "The Dragon's Fury"
+		}
+        T_TFBot_Giant_Pyro_DragonsFury
+		{
+			Name "Giant Fury Pyro"
+			Class Pyro
+			Skill Hard
+			Health 3000
+            MaxVisionRange  1000
+			ClassIcon pyro_dragon_fury_swordstone_giant
+			Attributes MiniBoss
+			WeaponRestrictions PrimaryOnly
+            Item "The Dragon's Fury"
+			Tag bot_giant
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.6
+				"damage force reduction" 0.6
+				"move speed bonus" 0.5
+				"override footstep sound set" 6
+			}
+		}
+        T_TFBot_Soldier_Default
+		{
+			Name "Soldier"
+			Class Soldier
+			Skill Hard
+			//Attributes HoldFireUntilFullReload
+			WeaponRestrictions PrimaryOnly
+		}
+		T_TFBot_Demo_Default
+		{
+			Name "Demo"
+			Class Demoman
+			Skill Hard
+			//Attributes HoldFireUntilFullReload
+			WeaponRestrictions PrimaryOnly
+		}
+		T_TFBot_Heavy_Default
+		{
+			Name "Heavy"
+			Class Heavy
+			Skill Normal
+			//Attributes HoldFireUntilFullReload
+			WeaponRestrictions PrimaryOnly
+		}
+		T_TFBot_Demoman_Stickybomber
+		{
+			Name "Stickybomb Demo"
+			Class Demoman
+			Skill Hard
+			ClassIcon demo_sticky_daan
+			//Attributes HoldFireUntilFullReload
+			//Attributes AlwaysFireWeapon
+			WeaponRestrictions SecondaryOnly
+			Item "TF_WEAPON_PIPEBOMBLAUNCHER"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"is_passive_weapon" 1
+				"override projectile type" 27 // Fires nothing
+				"fire rate penalty" 99 // No grenade launcher firing animations
+			}
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_PIPEBOMBLAUNCHER"
+				"stickybomb charge rate" 0.001
+				"max pipebombs decreased" -7
+				"projectile range increased" 0.35
+			}
+		}
+		T_TFBot_Heavyweapons_Heater_Small
+		{
+			Name "Heavy Heater"
+			Class Heavyweapons
+			Skill Hard
+			ClassIcon heavy_heater
+			Item "The Huo Long Heatmaker"
+			WeaponRestrictions PrimaryOnly
+			ItemAttributes
+			{
+				ItemName "The Huo Long Heatmaker"
+			}
+		}
+		T_TFBot_Giant_Heavyweapons_Heater
+		{
+			Name "Giant Heavy Heater"
+			Class Heavyweapons
+			Skill Expert
+			Health 5000
+			ClassIcon heavy_heater_giant
+			Item "The Huo Long Heatmaker"
+			Item "The Bunsen Brave"
+			Attributes MiniBoss
+			WeaponRestrictions PrimaryOnly
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "The Huo Long Heatmaker"
+				"damage bonus" 1
+			}
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.3
+				"damage force reduction" 0.3
+				"move speed bonus" 0.5
+				"override footstep sound set" 2
+			}
+		}
+		T_TFBot_Powerjack_Pyro
+		{
+			Name "Powerjack Pyro"
+			Class Pyro
+			Skill Expert
+			//Scale 1.1
+			//Health 200
+			ClassIcon pyro_powerjack
+			Item "The Powerjack"
+			WeaponRestrictions MeleeOnly
+			ItemAttributes
+			{
+				ItemName "The Powerjack"
+			}
+			CharacterAttributes
+			{
+				"move speed bonus" 1.1
+			}
+		}
+		T_TFBot_Giant_Spy
+		{
+			Name "Giant Spy"
+			Class Spy
+			Skill Hard
+			Health 1600
+			ClassIcon spy_giant
+			Attributes MiniBoss
+			Attributes IgnoreFlag
+			Tag bot_giant
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.7
+				"damage force reduction" 0.7
+				"override footstep sound set" 5
+				"move speed bonus" 1.2
+			}
+		}
+		T_TFBot_Scout_Shortstop_Nerfed
+		{
+			Name "Shortstop Scout"
+			Class Scout
+			Skill Normal //Easy
+			Health 350 //650
+			Scale 1.2 //1.4
+			ClassIcon scout_shortstop
+			Item "The Shortstop"
+			CharacterAttributes
+			{
+				"head scale" 0.8 //0.7
+				"move speed bonus" 0.9 //1.25
+			}
+		}
+		T_TFBot_Pyro_Backburner
+		{
+			Name "Backburner Pyro"
+			Class Pyro
+			Skill Hard
+			ClassIcon pyro_backburner_nys
+			Item "The Backburner"
+			WeaponRestrictions PrimaryOnly
+			ItemAttributes
+			{
+				ItemName "The Backburner"
+				"airblast disabled" 1
+			}
+		}
+		T_TFBot_Giant_Pyro_Backburner
+		{
+			Name "Giant Backburner Pyro"
+			Class Pyro
+			Skill Hard
+			Health 3800
+			ClassIcon pyro_backburner_nys_giant
+			Attributes MiniBoss
+			Item "The Backburner"
+			WeaponRestrictions PrimaryOnly
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "The Backburner"
+				"airblast disabled" 1
+			}
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.6
+				"damage force reduction" 0.6
+				"move speed bonus" 0.5
+				"override footstep sound set" 6
+			}
+		}
+		T_TFBot_Pyro_Phlog
+		{
+			Name "Phlog Pyro"
+			Class Pyro
+			Skill Hard
+			ClassIcon pyro_phlog_v2
+			Item "The Phlogistinator"
+			WeaponRestrictions PrimaryOnly
+			//Attributes AlwaysCrit
+			ItemAttributes
+			{
+				ItemName "The Phlogistinator"
+			}
+		}
+		T_TFBot_Giant_Pyro_Phlog
+		{
+			Name "Giant Phlog Pyro"
+			Class Pyro
+			Skill Hard
+			Health 4000
+			ClassIcon pyro_phlog_v2_giant
+			Attributes MiniBoss
+			Item "The Phlogistinator"
+			WeaponRestrictions PrimaryOnly
+			//Attributes AlwaysCrit
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "The Phlogistinator"
+			}
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.6
+				"damage force reduction" 0.6
+				"move speed bonus" 0.5
+				"override footstep sound set" 6
+			}
+		}
+		T_TFBot_Pyro_Manmelter
+		{
+			Name "Manmelter Pyro"
+			Class Pyro
+			Skill Hard
+			ClassIcon pyro_manmelter
+			Item "The Manmelter"
+			WeaponRestrictions SecondaryOnly
+			ItemAttributes
+			{
+				ItemName "The Manmelter"
+			}
+		}
+		T_TFBot_Giant_Medic_Uber
+		{
+			Name "Giant Medic"
+			Class Medic
+			Skill Hard
+			Health 4500
+			ClassIcon medic_uber_giant
+			Item "TF_WEAPON_MEDIGUN"
+			Attributes MiniBoss
+			Attributes SpawnWithFullCharge
+			WeaponRestrictions SecondaryOnly
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_MEDIGUN"
+				"ubercharge rate bonus" 2
+				"mod weapon blocks healing" 1
+			}
+			CharacterAttributes
+			{
+				"bot medic uber health threshold" 2500 //HP of the medic at which the medic will attempt to pop uber, then impacted by delay timer
+				"bot medic uber deploy delay duration" 4 //wait 4 seconds after uber was originally supposed to fire before actually firing
+				"airblast vulnerability multiplier" 0.6
+				"damage force reduction" 0.6
+				"heal rate bonus" 200
+				"move speed bonus" 0.5
+			}
+		}
+		T_TFBot_ScorchShot_FastShot_FixedIcon
+		{
+			Name "Fast Scorch Shot"
+			Class Pyro
+			Skill Expert
+			ClassIcon pyro_scorch
+			Item "The Scorch Shot"
+			WeaponRestrictions SecondaryOnly
+			ItemAttributes
+			{
+				ItemName "The Scorch Shot"
+				"damage bonus" 1
+				"faster reload rate" 1
+				"fire rate bonus" 0.75
+				"Projectile speed increased" 1.3
+			}
+		}
+		T_TFBot_Giant_Demo_Burst_WithTide
+		{
+			Name "Giant Burst Fire Demo"
+			Class Demoman
+			Skill Hard
+			Health 3300
+			ClassIcon demo_burst_giant
+			Attributes HoldFireUntilFullReload
+			Attributes MiniBoss
+			Item "The Tide Turner"
+			WeaponRestrictions PrimaryOnly
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"clip size upgrade atomic" 7.0
+				"faster reload rate" 0.65
+				"fire rate bonus" 0.1
+				"Projectile speed increased" 1.1
+				"projectile spread angle penalty" 5
+			}
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.4
+				"damage force reduction" 0.4
+				"move speed bonus" 0.5
+				"override footstep sound set" 4
+			}
+		}
+		T_TFBot_Soldier_Buff_Banner_DirectHit
+		{
+			Name "Buff Direct Hit Soldier"
+			Class Soldier
+			Skill Hard
+			ClassIcon soldier_directhit_buff
+			Item "The Buff Banner"
+			Item "The Direct Hit"
+			Attributes SpawnWithFullCharge
+			ItemAttributes
+			{
+				ItemName "The Direct Hit"
+			}
+		}
+		T_TFBot_Soldier_DirectHit
+		{
+			Name "Direct Hit Soldier"
+			Class Soldier
+			Skill Hard
+			ClassIcon soldier_directhit
+			Item "The Direct Hit"
+			ItemAttributes
+			{
+				ItemName "The Direct Hit"
+			}
+		}
+		T_TFBot_Giant_Medic_With_Shield
+		{
+			Name "Giant Shield Medic"
+			Class Medic
+			Skill Expert
+			ClassIcon medic_shield_lite_giant
+			Health 4500
+			Attributes MiniBoss
+			Attributes IgnoreEnemies
+			Attributes SpawnWithFullCharge
+			Attributes ProjectileShield
+			WeaponRestrictions SecondaryOnly
+			Item "TF_WEAPON_MEDIGUN"
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_MEDIGUN"
+				"generate rage on heal" 2 //level 2 projectile shield
+				"increase buff duration" 999 //ensure shield is always active once hit
+				"heal rate bonus" 200
+				"mod weapon blocks healing" 1
+			}
+			CharacterAttributes
+			{
+				"bot medic uber deploy delay duration" 9999 //prevent regular uber deploying
+				"airblast vulnerability multiplier" 0.6
+				"damage force reduction" 0.6
+				"move speed bonus" 0.5
+			}
+		}
+		T_TFBot_Giant_Medic_Vaccinator_Bullet
+		{
+			Name "Giant Bullet Vac"
+			Class Medic
+			Skill Expert
+			ClassIcon medic_bullet_giant
+			Health 4500
+			Attributes MiniBoss
+			Attributes IgnoreEnemies
+			Attributes SpawnWithFullCharge
+			//Attributes VaccinatorBullets //not required, buggy
+			WeaponRestrictions SecondaryOnly
+			Item "The Vaccinator"
+			Tag bot_giant
+			ItemAttributes
+            {
+                ItemName "The Vaccinator"
+                "medigun bullet resist deployed" 0.75 //passive % resistance (1 = full resist, 0.8 = 80% resist, etc)
+                "medigun bullet resist passive" 0.75 //active bubble % resistance (1 = full resist, 0.8 = 80% resist, etc)
+                "medigun charge is resists" 3 //3 = bullet resist, 4 = blast resist, 5 = fire resist
+                "ubercharge rate bonus" 999 //always have a bubble available at all times
+				"heal rate bonus" 999 //keep heal target alive until medic is killed
+				"uber duration bonus" 4 //slightly increases the single-bubble duration
+				"lunchbox adds minicrits" 3 //fixes permabubbles
+				"mod weapon blocks healing" 1
+            }
+			CharacterAttributes
+			{
+				"bot medic uber health threshold" 9999 //pop bubbles immediately upon hit
+				"airblast vulnerability multiplier" 0.6
+				"damage force reduction" 0.6
+				"move speed bonus" 0.5
+			}
+		}
+		T_TFBot_Giant_Medic_Vaccinator_Blast
+		{
+			Name "Giant Blast Vac"
+			Class Medic
+			Skill Expert
+			ClassIcon medic_blast_giant
+			Health 4500
+			Attributes MiniBoss
+			Attributes IgnoreEnemies
+			Attributes SpawnWithFullCharge
+			//Attributes VaccinatorBlast //not required, buggy
+			WeaponRestrictions SecondaryOnly
+			Item "The Vaccinator"
+			Tag bot_giant
+			ItemAttributes
+            {
+                ItemName "The Vaccinator"
+                "medigun blast resist deployed" 0.75 //passive % resistance (1 = full resist, 0.8 = 80% resist, etc)
+                "medigun blast resist passive" 0.75 //active bubble % resistance (1 = full resist, 0.8 = 80% resist, etc)
+                "medigun charge is resists" 4 //3 = bullet resist, 4 = blast resist, 5 = fire resist
+                "ubercharge rate bonus" 999 //always have a bubble available at all times
+				"heal rate bonus" 999 //keep heal target alive until medic is killed
+				"uber duration bonus" 4 //slightly increases the single-bubble duration
+				"lunchbox adds minicrits" 3 //fixes permabubbles
+				"mod weapon blocks healing" 1
+            }
+			CharacterAttributes
+			{
+				"bot medic uber health threshold" 9999 //pop bubbles immediately upon hit
+				"airblast vulnerability multiplier" 0.6
+				"damage force reduction" 0.6
+				"move speed bonus" 0.5
+			}
+		}
+		T_TFBot_Medic_Kritz_Bulky
+        {
+			Name "Bulky Kritz Medic"
+            Class Medic
+            Skill Expert
+			//
+			Scale 1.1
+			Health 250
+			//
+            ClassIcon medic_kritz
+            Attributes IgnoreEnemies
+            Attributes SpawnWithFullCharge
+			Attributes AlwaysCrit
+			Attributes AlwaysFireWeapon //immediately pop kritz
+			WeaponRestrictions SecondaryOnly
+            Item "The Kritzkrieg"
+            ItemAttributes
+            {
+                ItemName "The Kritzkrieg"
+                "ubercharge rate bonus" 999 
+                "uber duration bonus" 999 //always have kritz deployed
+				"mod weapon blocks healing" 1
+            }
+            CharacterAttributes
+            {
+                "heal rate bonus" 2
+                "bot medic uber health threshold" 9999
+            }
+        }
+		T_TFBot_Medic_QuickFix_Fixed
+		{
+			Name "Quick-Fix Medic"
+			Class Medic
+			Skill Normal
+			ClassIcon medic_quickfix
+			Item "The Quick-Fix"
+			WeaponRestrictions SecondaryOnly
+			ItemAttributes
+			{
+				ItemName "The Quick-Fix"
+				"mod weapon blocks healing" 1
+			}
+		}
+		T_TFBot_Pyro_Exploder
+		{
+			Name "Exploder Pyro"
+			Class Pyro
+			Skill Expert
+			//Health 200
+			ClassIcon pyro_gascann_explode
+			//Attributes IgnoreFlag //dont use this it breaks the second bomb
+			Attributes SpawnWithFullCharge //spawn with 1 gas already available
+			WeaponRestrictions SecondaryOnly //always prioritize gas when it's available to throw
+			MaxVisionRange 1000
+			Item "The Gas Passer"
+			ItemAttributes
+			{
+				ItemName "The Gas Passer"
+				"explode_on_ignite" 1
+				"item_meter_charge_rate" 0.5 //always have gas available (see T_TFBot_Chief_Pyro_Exploder if cooldown needed instead)
+        		"fire rate penalty" 3.5 //rate at which the throwing can happen IF gas is always available
+				//"gesture speed increase" 1.25 //make the throw animation about a quarter faster
+				"dmg penalty vs players" 0.1 //base EOI damage is 350, so 0.1 = 35 when ignited
+			}
+		}
+		T_TFBot_Chief_Pyro_Exploder
+		{
+			Name "Chief Exploder Pyro"
+			Class Pyro
+			Skill Expert
+			Health 45000 //55000
+			Scale 1.9
+			ClassIcon pyro_gascann_explode_giant
+			Attributes MiniBoss
+			Attributes UseBossHealthBar
+			//Attributes AlwaysCrit
+			Attributes SpawnWithFullCharge //spawn with 1 gas already available
+			WeaponRestrictions SecondaryOnly //always prioritize gas when it's available to throw
+			MaxVisionRange 1000
+			Item "Propaniac"
+			Item "The Gas Passer"
+			Item "The Degreaser"
+			Tag bot_giant
+			ItemAttributes
+			{
+				ItemName "The Gas Passer"
+				"explode_on_ignite" 1
+				"mult_item_meter_charge_rate" 0.083
+				//REGEN RATE IT BASED ON: item_meter_charge_rate * mult_item_meter_charge_rate
+				//BASE REGEN IS 60 SECONDS
+				//Throw every 5 seconds: 5/60 = 0.083 mult_item_meter_charge_rate
+				//Throw every 10 seconds: 10/60 = 0.167 mult_item_meter_charge_rate
+				//Do not use: "item_meter_charge_rate" 0.5
+        		//Do not use: "fire rate penalty" 2.5
+				"deploy time increased" 0.50 //make the switch speed about twice as fast (?)
+				"gesture speed increase" 1.25 //make the throw animation about a quarter faster
+				"dmg penalty vs players" 0.1 //base EOI damage is 350, so 0.1 = 35 when ignited
+			}
+			ItemAttributes
+			{
+				ItemName "The Degreaser"
+				"airblast pushback scale" 2.0
+				"damage bonus" 0.75 //flamethrower does 3 quarters normal damage
+				"flame_drag" 0.8 //slightly increase the distance of the flame
+			}
+			CharacterAttributes
+			{
+				"airblast vertical vulnerability multiplier" 0.1
+				"airblast vulnerability multiplier" 0.3
+				"damage force reduction" 0.3
+				//"health regen" 200 //was 500
+				"move speed bonus" 0.3 //0.5?
+				"override footstep sound set" 2
+				"rage giving scale" 0.1
+			}
+		}
+    }
+}

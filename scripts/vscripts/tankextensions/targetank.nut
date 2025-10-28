@@ -33,43 +33,39 @@ TankExt.PrecacheSound(TARGETANK_SND_WARNING)
 TankExt.PrecacheSound(TARGETANK_SND_IMPACT)
 TankExt.PrecacheSound(TARGETANK_SND_CHARGE)
 
-TankExt.NewTankScript("targetank", {
-	OnSpawn = function(hTank, sName, hPath)
+TankExt.NewTankType("targetank", {
+	function OnSpawn()
 	{
-		local hTank_scope = hTank.GetScriptScope()
-		hTank_scope.hTargeModel <- SpawnEntityFromTable("prop_dynamic", {
+		local hTargeModel = SpawnEntityFromTableSafe("prop_dynamic", {
 			model      = TARGETANK_MODEL_TARGE
 			origin     = "90 28 84"
 			angles     = "-29.3 194.9 76.8"
 			modelscale = 2.5
 			skin       = 1
 		})
-		hTank_scope.hTrail <- SpawnEntityFromTable("env_spritetrail", {
+		local hTrail = SpawnEntityFromTableSafe("env_spritetrail", {
 			origin     = "-72 0 96"
-			spritename = hTank.GetTeam() == 3 ? "effects/beam001_blu.vmt" : "effects/beam001_red.vmt"
+			spritename = self.GetTeam() == TF_TEAM_BLUE ? "effects/beam001_blu.vmt" : "effects/beam001_red.vmt"
 			startwidth = 128
 			endwidth   = 1
 			lifetime   = 1
 		})
-		hTank_scope.hTrail.AcceptInput("HideSprite", null, null, null)
-		TankExt.SetParentArray([hTank_scope.hTargeModel, hTank_scope.hTrail], hTank)
+		hTrail.AcceptInput("HideSprite", null, null, null)
+		TankExt.SetParentArray([hTargeModel, hTrail], self)
 
-		hTank_scope.hTracks <- []
-		for(local hChild = hTank.FirstMoveChild(); hChild != null; hChild = hChild.NextMovePeer())
+		local hTracks = []
+		for(local hChild = self.FirstMoveChild(); hChild != null; hChild = hChild.NextMovePeer())
 			if(hChild.GetModelName().find("track_"))
-				hTank_scope.hTracks.append(hChild)
+				hTracks.append(hChild)
 
-		hTank_scope.bPaintable <- false
-		hTank_scope.PlayersLast <- []
-		hTank_scope.flTimeNext <- Time() + TARGETANK_RECHARGE_DURATION
-		hTank_scope.flTimeLast <- Time()
-		hTank_scope.flSpeedLast <- 0.0
-		hTank_scope.iState <- 0
-		hTank_scope.TargeThink <- function()
+		bPaintable <- false
+		local PlayersLast = []
+		local flTimeNext  = Time() + TARGETANK_RECHARGE_DURATION
+		local flTimeLast  = Time()
+		local flSpeedLast = 0.0
+		local iState      = 0
+		function Think()
 		{
-			local sModel = self.GetModelName()
-
-			local flTime = Time()
 			local bCanDoAction = flTime >= flTimeNext
 			if(iState == 0 && bCanDoAction)
 			{
@@ -77,17 +73,17 @@ TankExt.NewTankScript("targetank", {
 				iState = 1
 				flSpeedLast = GetPropFloat(self, "m_speed")
 				self.AcceptInput("SetSpeed", "15", null, null)
-				local sSound = @"EmitSoundEx({
+				local sSound = @() EmitSoundEx({
 					sound_name  = TARGETANK_SND_WARNING
 					sound_level = 85
 					filter_type = RECIPIENT_FILTER_GLOBAL
 					entity      = self
-				})"
+				})
 
-				self.AcceptInput("RunScriptCode", sSound, null, null)
-				self.AcceptInput("RunScriptCode", sSound, null, null)
-				EntFireByHandle(self, "RunScriptCode", sSound, 1, null, null)
-				EntFireByHandle(self, "RunScriptCode", sSound, 1, null, null)
+				sSound()
+				sSound()
+				TankExt.DelayFunction(self, this, 1, sSound)
+				TankExt.DelayFunction(self, this, 1, sSound)
 			}
 			else if(iState == 1 && bCanDoAction)
 			{
@@ -117,24 +113,21 @@ TankExt.NewTankScript("targetank", {
 			local Color = function(bool)
 			{
 				local vecColorCombined = Colors[0] * (bool ? 1 - flTimePercentage : flTimePercentage) + Colors[1] * (bool ? flTimePercentage : 1 - flTimePercentage)
-				local sColor = format("%i %i %i", vecColorCombined.x, vecColorCombined.y, vecColorCombined.z)
-				TankExt.SetTankColor(self, sColor)
+				TankExt.SetTankColor(self, format("%i %i %i", vecColorCombined.x, vecColorCombined.y, vecColorCombined.z))
 			}
 
 			if(iState == 0)
 			{
-				if(bPaintable)
-					Color(true)
+				if(bPaintable) Color(true)
 			}
 			else if(iState == 2)
 			{
-				if(bPaintable)
-					Color(false)
+				if(bPaintable) Color(false)
 
 				local flTankSpeed = self.GetAbsVelocity().Length()
 
 				foreach(hTrack in hTracks)
-					hTrack.SetPlaybackRate(flTankSpeed / 75.0)
+					hTrack.SetPlaybackRate(flTankSpeed / 80.0)
 
 				local angRotation = self.GetAbsAngles()
 				local Players = []
@@ -161,11 +154,10 @@ TankExt.NewTankScript("targetank", {
 				PlayersLast = Players
 			}
 		}
-		TankExt.AddThinkToEnt(hTank, "TargeThink")
 	}
 })
 
-TankExt.NewTankScript("targetank_color", {
+TankExt.NewTankType("targetank_color", {
 	Model = {
 		Default    = TARGETANK_MODEL_COLOR
 		Damage1    = TARGETANK_MODEL_COLOR_DAMAGE1
@@ -175,19 +167,16 @@ TankExt.NewTankScript("targetank_color", {
 		RightTrack = TARGETANK_MODEL_COLOR_TRACK_R
 		Bomb       = TARGETANK_MODEL_COLOR_BOMB
 	}
-	OnSpawn = function(hTank, sName, hPath)
+	function OnSpawn()
 	{
-		TankExt.TankScripts.targetank.OnSpawn(hTank, sName, hPath)
-		local hTank_scope = hTank.GetScriptScope()
-
+		TankExt.TankScripts.targetank.OnSpawn.call(this)
 		local Colors1 = split(TARGETANK_COLOR1, " ")
 		local Colors2 = split(TARGETANK_COLOR2, " ")
 		Colors1.apply(@(value) value.tointeger())
 		Colors2.apply(@(value) value.tointeger())
 		local vecColor1 = Vector(Colors1[0], Colors1[1], Colors1[2])
 		local vecColor2 = Vector(Colors2[0], Colors2[1], Colors2[2])
-		hTank_scope.Colors <- [vecColor1, vecColor2]
-
-		hTank_scope.bPaintable = true
+		Colors <- [vecColor1, vecColor2]
+		bPaintable = true
 	}
 })

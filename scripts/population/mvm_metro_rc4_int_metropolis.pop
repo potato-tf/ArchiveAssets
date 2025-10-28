@@ -1,0 +1,2418 @@
+// "Welcome..." - DesTicY
+// Created by Mentrillum
+
+#base robot_giant.pop
+#base robot_standard.pop
+#base robot_mentrillum.pop
+
+WaveSchedule
+{
+	StartingCurrency 1600
+	RespawnWaveTime 2
+	FixedRespawnWaveTime Yes
+	CanBotsAttackWhileInSpawnRoom No
+	WaveStartCountdown 3
+	PrecacheSound "#mentrillum/mvm/music/studiopolis_zone_act_1.wav" [$SIGSEGV]
+	PrecacheSound "#mentrillum/mvm/music/studiopolis_zone_act_2.wav" [$SIGSEGV]
+	PrecacheSound "#mentrillum/mvm/music/stardust_speedway_act_2.wav" [$SIGSEGV]
+	PrecacheSound "#mentrillum/mvm/music/havoc_prognosis.wav" [$SIGSEGV]
+	PrecacheSound "#mentrillum/mvm/music/hard_boiled_heavies.wav" [$SIGSEGV]
+
+	PrecacheModel "models/bots/boss_bot/combat_tank_mk2/mk2_combat_tank_chassis.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/combat_tank_mk2/mk2_railgun.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/combat_tank/railgun_case.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/combat_tank_mk2/mk2_rocket_dumbfire.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/combat_tank_mk2/mk2_rocket_seeker.mdl" [$SIGSEGV]
+	PrecacheModel "models/bots/boss_bot/combat_tank_mk2/mk2_rocket_pod.mdl" [$SIGSEGV]
+
+	Templates
+	{
+		T_TFBot_Scout_Trooper
+		{
+			Class Scout
+			Name "State Trooper Scout"
+			Skill Normal
+			Item "Graybanns"
+			//Item "TTG Badge"
+			//Item "The Fast Learner"
+			Item "Soldier Drill Hat"
+			ItemAttributes
+			{
+				ItemName "The Fast Learner"
+				"set item tint RGB"	1581885
+				"set item tint RGB 2" 1581885
+			}
+
+			ItemAttributes
+			{
+				ItemName "Soldier Drill Hat"
+				"set item tint RGB"	1584957
+			}
+		}
+
+		T_TFBot_Soldier_Policeman
+		{
+			Class Soldier
+			Name "Policeman Soldier"
+			Skill Normal
+			Item "EOTL_Coldfront Curbstompers"
+			ItemModel
+			{
+				ItemName "EOTL_Coldfront Curbstompers"
+				Model "models/player/items/soldier/armored_authority.mdl"
+			}
+			Item "The Soldier's Stogie"
+			Item "Graybanns"
+		}
+
+		T_TFBot_Soldier_Policeman_Elite
+		{
+			Class Soldier
+			ClassIcon soldier_directhit_lite
+			Name "Elite Policeman Soldier"
+			Skill Normal
+			Scale 1.15
+			Health 250
+			Item "The Direct Hit"
+			Item "EOTL_Coldfront Curbstompers"
+			ItemModel
+			{
+				ItemName "EOTL_Coldfront Curbstompers"
+				Model "models/player/items/soldier/armored_authority.mdl"
+			}
+			Item "The Soldier's Stogie"
+			Item "Graybanns"
+			ItemAttributes
+			{
+				ItemName "The Direct Hit"
+				"fire rate bonus" 0.75
+				"faster reload rate" 0.75
+			}
+		}
+
+		T_TFBot_Pyro_Firefighter
+		{
+			Name "Firefighter Pyro"
+			Class Pyro
+			Skill Easy
+			Item "The Triclops"
+			Item "Potato of Labor"
+			ItemModel
+			{
+				ItemName "Potato of Labor"
+				Model "models/player/items/pyro/fireman_helmet.mdl"
+			}
+		}
+
+		T_TFBot_Pyro_BackBurner_Firefighter
+		{
+			Template T_TFBot_Pyro_BackBurner
+			Name "Firefighter Backburner Pyro"
+			Item "The Triclops"
+			Item "Potato of Labor"
+			ItemModel
+			{
+				ItemName "Potato of Labor"
+				Model "models/player/items/pyro/fireman_helmet.mdl"
+			}
+		}
+
+		T_TFBot_Demoman_Armored
+		{
+			Class Demoman
+			ClassIcon demo_armored
+			Name "Riot Demoman"
+			Skill Normal
+			Attributes HoldFireUntilFullReload
+			Scale 1.15
+			Health 225
+			//Item "TTG Badge"
+			Item "Scotch Bonnet"
+		}
+
+		T_TFBot_Demoman_Armored_Elite
+		{
+			Class Demoman
+			ClassIcon demo_clusterbomb_single_armored
+			Name "Elite Riot Demoman"
+			Skill Expert
+			Attributes HoldFireUntilFullReload
+			Scale 1.25
+			Health 300
+			Item "The Iron Bomber"
+			//Item "TTG Badge"
+			Item "Scotch Bonnet"
+			ItemAttributes
+			{
+				ItemName "The Iron Bomber"
+				"faster reload rate" 0.75
+				"fire rate bonus" 0.75
+			}
+		}
+
+		T_TFBot_Heavyweapons_Street_Brawler
+		{
+			Class Heavyweapons
+			ClassIcon heavy_eviction_nys
+			Name "Street Brawler"
+			Skill Expert
+			WeaponRestrictions MeleeOnly
+			Item "The Eviction Notice"
+			Item "Potato of Labor"
+			ItemModel
+			{
+				ItemName "Potato of Labor"
+				Model "models/player/items/heavy/capones_capper.mdl"
+			}
+			Item "Graybanns"
+			ItemAttributes
+			{
+				ItemName "The Eviction Notice"
+				"mod_maxhealth_drain_rate" 0.0
+			}
+		}
+
+		T_TFBot_Heavyweapons_Highway_Patrol
+		{
+			Class Heavyweapons
+			Skill Normal
+			Name "Highway Patrol Heavy"
+			Item "Graybanns"
+			Item "Potato of Labor"
+			ItemModel
+			{
+				ItemName "Potato of Labor"
+				Model "models/player/items/heavy/cop_helmet.mdl"
+			}
+		}
+
+		T_TFBot_Engineer_Widowmaker_Deputy
+		{
+			Name "Deputy Engineer"
+			Template T_TFBot_Engineer_Widowmaker
+			Item "The Law"
+			Item "dec2014 engineer_detectiveradio"
+			Item "The Mantreads"
+		}
+
+		T_TFBot_Medic_QuickFix_Assistance
+		{
+			Template T_TFBot_Medic_QuickFix
+			Item "Medi-Mask"
+			Item "The Surgeon's Stahlhelm"
+		}
+
+		T_TFBot_Medic_QuickFix_Armored_Assistance
+		{
+			Template T_TFBot_Medic_QuickFix_Armored
+			Item "Medi-Mask"
+			Item "The Surgeon's Stahlhelm"
+		}
+
+		T_TFBot_Medic_BigHeal_Assistance
+		{
+			Template T_TFBot_Medic_BigHeal
+			Item "Medi-Mask"
+			Item "The Surgeon's Stahlhelm"
+		}
+
+		T_TFBot_Medic_Kritzkrieg_Assistance
+		{
+			Template T_TFBot_Medic_Kritzkrieg
+			Item "Medi-Mask"
+			Item "The Surgeon's Stahlhelm"
+		}
+
+		T_TFBot_Spy_Backstreet
+		{
+			Class Spy
+			ClassIcon spy_revolver_lite
+			Name "Backstreet Spy"
+			Skill Expert
+			Item "Potato of Labor"
+			ItemModel
+			{
+				ItemName "Potato of Labor"
+				Model "models/player/items/spy/derby_hat.mdl"
+			}
+			//Item "The Business Casual"
+			Item "Graybanns"
+		}
+
+		T_TFBot_Giant_Scout_Laser
+		{
+			Class Scout
+			ClassIcon scout_atomic
+			Name "Giant Taser Scout"
+			WeaponRestrictions PrimaryOnly
+			Health 1600
+			Skill Expert
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Tag bot_giant
+			Item "The Virtual Viewfinder"
+			ItemAttributes
+			{
+				ItemName "tf_weapon_scattergun"
+				"projectile spread angle penalty" 3.5
+				"override projectile type" 13
+				"faster reload rate" 0.65
+				"mult projectile count" 2
+				"projectile speed decreased" 1.25
+			}
+
+			CharacterAttributes
+			{
+				"damage force reduction" 0.70
+				"airblast vulnerability multiplier" 0.70
+				"override footstep sound set" 5
+				"dmg penalty vs players" 0.51
+			}
+		}
+
+		T_TFBot_Giant_Soldier_LieutenantBurstFire
+		{
+			Class Soldier
+			Name "Lieutenant Burst Fire Soldier"
+			ClassIcon soldier_burstfire
+			Health 4000
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Tag bot_giant
+			Item "EOTL_Coldfront Curbstompers"
+			ItemModel
+			{
+				ItemName "EOTL_Coldfront Curbstompers"
+				Model "models/player/items/soldier/armored_authority.mdl"
+			}
+			Item "Graybanns"
+			Item "The Soldier's Stogie"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_ROCKETLAUNCHER"
+				"faster reload rate" 0.4
+				"fire rate bonus" 0.2
+				"clip size upgrade atomic" 5.0
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"Projectile speed increased" 0.9
+			}
+		}
+
+		T_TFBot_Giant_Soldier_Policeman
+		{
+			Class Soldier
+			ClassIcon soldier_giant
+			Name "Giant Policeman Soldier"
+			Health 4000
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Tag bot_giant
+			Item "EOTL_Coldfront Curbstompers"
+			ItemModel
+			{
+				ItemName "EOTL_Coldfront Curbstompers"
+				Model "models/player/items/soldier/armored_authority.mdl"
+			}
+			Item "Graybanns"
+			Item "The Soldier's Stogie"
+
+			CharacterAttributes
+			{
+				"damage force reduction" 0.4
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 3
+				"move speed bonus"	0.5
+			}
+		}
+
+		T_TFBot_Giant_Demoman_Armored
+		{
+			Class Demoman
+			ClassIcon demo_armored
+			Name "Giant Riot Demoman"
+			Health 5000
+			Skill Expert
+			Scale 1.65
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Tag bot_giant
+			//Item "TTG Badge"
+			Item "Scotch Bonnet"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_GRENADELAUNCHER"
+				"clip size bonus" 2.0
+				"fire rate bonus" 0.75
+				"faster reload rate" 0.75
+			}
+
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 4
+				"damage force reduction" 0.4
+				"move speed bonus" 0.4
+			}
+		}
+
+		T_TFBot_Giant_Demoman_Armored_Elite
+		{
+			Class Demoman
+			ClassIcon demo_clusterbomb_single_armored_giant
+			Name "Giant Elite Riot Demoman"
+			Skill Expert
+			WeaponRestrictions PrimaryOnly
+			Attributes MiniBoss
+			Attributes HoldFireUntilFullReload
+			Attributes UseBossHealthBar
+			Scale 1.9
+			Health 15000
+			Tag bot_giant
+			Item "The Iron Bomber"
+			//Item "TTG Badge"
+			Item "Scotch Bonnet"
+			ItemAttributes
+			{
+				ItemName "The Iron Bomber"
+				"clip size bonus" 2.0
+				"faster reload rate" 0.0
+				"fire rate bonus" 0.65
+			}
+
+			CharacterAttributes
+			{
+				"airblast vulnerability multiplier" 0.4
+				"override footstep sound set" 4
+				"damage force reduction" 0.4
+				"move speed bonus" 0.4
+			}
+		}
+
+		T_TFBot_Giant_Heavyweapons_Juggernaut
+		{
+			Class Heavyweapons
+			Name "Giant Armed Juggernaut"
+			ClassIcon heavy_armored
+			Skill Normal
+			Health 7500
+			WeaponRestrictions PrimaryOnly
+			MaxVisionRange 1200
+			Attributes MiniBoss
+			Item "Big Steel Jaw of Summer Fun"
+			ItemAttributes
+			{
+				ItemName "TF_WEAPON_MINIGUN"
+				"crit_dmg_falloff" 1
+				"damage penalty" 0.85
+				"minigun spinup time increased" 1.35
+			}
+			CharacterAttributes
+			{
+				"move speed bonus"	0.5
+				"damage force reduction" 0.3
+				"airblast vulnerability multiplier" 0.3
+				"override footstep sound set" 2
+			}
+		}
+
+		T_TFBot_Giant_Engineer_Widowmaker_Deputy
+		{
+			Name "Giant Deputy Engineer"
+			Template T_TFBot_Giant_Engineer_Widowmaker
+			Item "The Law"
+			Item "dec2014 engineer_detectiveradio"
+			Item "The Mantreads"
+		}
+
+		T_TFBot_Giant_Medic_Regen_Assistance
+		{
+			Template T_TFBot_Giant_Medic_Regen
+			Item "Medi-Mask"
+			Item "The Surgeon's Stahlhelm"
+		}
+	}
+
+	ExtraTankPath
+	{
+		Name "rockettank_path"
+		Node "-2825 3292 24"
+		Node "-2349 3292 24"
+		Node "-2265 3271 24"
+		Node "-2220 3200 24"
+		Node "-2220 2680 24"
+		Node "-2174 2551 24"
+		Node "-2041 2439 24"
+		Node "-1824 2368 24"
+		Node "-1664 2368 24"
+		Node "-1584 2336 24"
+		Node "-1552 2272 24"
+		Node "-1536 2192 24"
+		Node "-1536 2120 48"
+		Node "-1536 2056 72"
+		Node "-1536 1992 96"
+		Node "-1536 1936 96"
+		Node "-1536 1672 96"
+		Node "-1519 1471 96"
+		Node "-1403 1357 96"
+		Node "-1259 1341 96"
+		Node "-1051 1341 96"
+		Node "-810 1486 96"
+		Node "-740 1517 96"
+		Node "-691 1519 96"
+		Node "-621 1510 96"
+		Node "-584 1493 96"
+		Node "-549 1456 96"
+		Node "-503 1350 96"
+		Node "-474 1287 96"
+		Node "-453 1221 96"
+		Node "-422 1086 96"
+		Node "-369 965 96"
+		Node "-305 869 96"
+		Node "-220 831 96"
+		Node "-145 822 96"
+		Node "-93 821 96"
+		Node "-6 821 96"
+		Node "55 831 96"
+		Node "139 848 96"
+		Node "246 848 96"
+		Node "318 840 96"
+		Node "382 810 96"
+		Node "414 768 96"
+		Node "424 712 96"
+		Node "424 416 96"
+		Node "412 72 96"
+		Node "360 -416 96"
+		Node "360 -640 96"
+		Node "360 -1149 96"
+		Node "360 -1544 96"
+		Node "400 -1632 96"
+		Node "432 -1664 96"
+		Node "464 -1712 96"
+		Node "464 -1912 96"
+		Node "456 -1952 96"
+		Node "424 -1984 96"
+		Node "376 -2008 96"
+		Node "328 -2016 96"
+		Node "288 -2016 96"
+		Node "216 -2016 96"
+		Node "168 -2016 112"
+		Node "120 -2016 128"
+		Node "8 -2016 160"
+		Node "-232 -2024 160"
+		Node "-284 -2052 160"
+		Node "-316 -2095 160"
+		Node "-357 -2153 160"
+		Node "-360 -2249 160"
+		Node "-374 -2328 160"
+		Node "-436 -2368 160"
+		Node "-432 -2544 160"
+		Node "-496 -2616 160"
+		Node "-800 -2616 160"
+		Node "-1050 -2616 160"
+	}
+
+	Mission
+	{
+		Objective Sniper
+		Where spawnbot_mission_sniper
+		BeginAtWave	2
+		RunForThisManyWaves	1
+		InitialCooldown	30
+		CooldownTime 50
+		DesiredCount 2
+		TFBot
+		{
+			Template T_TFBot_Sniper
+			Item "Breach and Bomb"
+		}
+	}
+
+	Mission
+	{
+		Objective Spy
+		InitialCooldown 30
+		Where spawnbot_mission_spy
+		BeginAtWave 4
+		RunForThisManyWaves 1
+		CooldownTime 50
+		DesiredCount 2
+
+		TFBot
+		{
+			Template T_TFBot_Spy_Backstreet
+			ClassIcon spy
+		}
+	}
+
+	Mission
+	{
+		Objective DestroySentries
+
+		InitialCooldown 15
+		Where spawnbot_rand
+		BeginAtWave 1
+		RunForThisManyWaves 5
+		CooldownTime 30
+
+		TFBot
+		{
+			Template T_TFBot_SentryBuster
+			Item "Potato of Labor"
+			ItemModel
+			{
+				ItemName "Potato of Labor"
+				Model "models/workshop/player/items/all_class/sbox2014_law/sbox2014_law_demo.mdl"
+			}
+			Item "Graybanns"
+			Name "Building Code Violation"
+			Attributes DisableDodge
+			CharacterAttributes
+			{
+				"move speed bonus" 2
+				"damage force reduction" 0.5
+				"airblast vulnerability multiplier" 0.5
+				"override footstep sound set" 7
+				"cannot be backstabbed" 1
+				"head scale" 2
+				"torso scale" 0.3
+			}
+		}
+	}
+
+	// bombpath_left
+	// bombpath_right
+
+	//==========================
+	//			Wave 1
+	//==========================
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`wave_start_relay`, `Trigger`)
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({sound_name = `#mentrillum/mvm/music/studiopolis_zone_act_1.wav`
+						entity = player
+						filter_type = 4
+						volume = 0.6})
+					}
+				}
+			"
+		}
+		DoneOutput
+		{
+			Target wave_finished_relay
+			Action trigger
+		}
+		InitWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_arrows_clear_relay`, `Trigger`, null, 0.1)
+				EntFire(`bombpath_clearall_relay`, `Trigger`, null, 0.1)
+				EntFire(`bombpath_general_arrows`, `Enable`, null, 0.1)
+				EntFire(`bombpath_left`, `Trigger`, null, 0.5)
+
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/studiopolis_zone_act_1.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+					}
+				}
+			"
+		}
+		Explanation
+		{
+			Line "{FFD800}Don't like the music being played? Go to the sound settings and set the music volume to 0."
+			Line "{FFD800}Alternatively, use the console command {9AFF9A}'snd_musicvolume 0'{FFD800} to turn off the music."
+		}
+
+		Checkpoint Yes
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "01"
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 19
+			TotalCurrency 200
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Demo_RapidFire
+				Name "Giant Corporal Demoman"
+				Item "Graybanns"
+				//Item "TTG Badge"
+				//Item "The Fast Learner"
+				Item "Soldier Drill Hat"
+				ItemAttributes
+				{
+					ItemName "Soldier Drill Hat"
+					"set item tint RGB"	1584957
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "01"
+			TotalCount 35
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 8
+			TotalCurrency 75
+
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Street_Brawler
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "01"
+			TotalCount 28
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 8
+			TotalCurrency 50
+
+			TFBot
+			{
+				Template T_TFBot_Scout_Trooper
+				Skill Easy
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 19
+			TotalCurrency 200
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Policeman
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 18
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 8
+			TotalCurrency 75
+
+			TFBot
+			{
+				Template T_TFBot_Sniper_SMG_Carbine
+				Item "Breach and Bomb"
+				Skill Easy
+				MaxVisionRange 1000
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 30
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 8
+			TotalCurrency 75
+
+			TFBot
+			{
+				Template T_TFBot_Pyro_Firefighter
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 19
+			TotalCurrency 200
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Pyro_DF
+				Name "Giant Firefighter DF Pyro"
+				Item "Potato of Labor"
+				ItemModel
+				{
+					ItemName "Potato of Labor"
+					Model "models/player/items/pyro/fireman_helmet.mdl"
+				}
+				Item "The Triclops"
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 20
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 9
+			TotalCurrency 75
+
+			TFBot
+			{
+				Template T_TFBot_Engineer_Widowmaker_Deputy
+				Skill Easy
+				AimTrackingInterval 1.0
+				MaxVisionRange 1000
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_right
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 30
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 4.5
+			TotalCurrency 50
+			Support 1
+
+			TFBot
+			{
+				Template T_TFBot_Scout_Trooper
+				Skill Hard
+				WeaponRestrictions MeleeOnly
+				ClassIcon scout_bat_nys
+			}
+		}
+	}
+
+	//==========================
+	//			Wave 2
+	//==========================
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`wave_start_relay`, `Trigger`)
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({sound_name = `#mentrillum/mvm/music/studiopolis_zone_act_1.wav`
+						entity = player
+						filter_type = 4
+						volume = 0.6})
+					}
+				}
+			"
+		}
+		DoneOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`wave_finished_relay`, `Trigger`)
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/studiopolis_zone_act_1.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+					}
+				}
+			"
+		}
+		InitWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_arrows_clear_relay`, `Trigger`, null, 0.1)
+				EntFire(`bombpath_clearall_relay`, `Trigger`, null, 0.1)
+				EntFire(`bombpath_general_arrows`, `Enable`, null, 0.1)
+				EntFire(`bombpath_right`, `Trigger`, null, 0.5)
+
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/studiopolis_zone_act_1.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+					}
+				}
+			"
+		}
+
+		Checkpoint Yes
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "01"
+			TotalCount 9
+			MaxActive 9
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 17
+			TotalCurrency 200
+
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Engineer_Widowmaker_Deputy
+					ItemAttributes
+					{
+						ItemName "The Widowmaker"
+						"fire rate bonus" 1.0
+					}
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix_Assistance
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix_Assistance
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "01"
+			TotalCount 24
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 2
+			TotalCurrency 75
+
+			TFBot
+			{
+				Template T_TFBot_Scout_Trooper
+				Skill Easy
+				MaxVisionRange 1000
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "01"
+			TotalCount 18
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 9.5
+			TotalCurrency 75
+
+			TFBot
+			{
+				Class Demoman
+				Skill Normal
+				Name "Corporal Demoman"
+				Item "Graybanns"
+				//Item "TTG Badge"
+				//Item "The Fast Learner"
+				Item "Soldier Drill Hat"
+				ItemAttributes
+				{
+					ItemName "Soldier Drill Hat"
+					"set item tint RGB"	1584957
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			WaitBeforeStarting 8.5
+			WaitBetweenSpawns 19
+			TotalCurrency 200
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Demoman_Armored
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_right
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 20
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 1
+			TotalCurrency 38
+
+			TFBot
+			{
+				Template T_TFBot_Scout_Trooper
+				Skill Hard
+				WeaponRestrictions MeleeOnly
+				ClassIcon scout_bat_nys
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_right
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 20
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 1
+			TotalCurrency 37
+
+			TFBot
+			{
+				Template T_TFBot_Scout_Trooper
+				Skill Easy
+				MaxVisionRange 1000
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 20
+			MaxActive 5
+			SpawnCount 5
+			WaitBeforeStarting 5
+			WaitBetweenSpawns 1
+			TotalCurrency 75
+
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Shotgun
+				Name "Highway Patrol Heavy"
+				Item "Potato of Labor"
+				ItemModel
+				{
+					ItemName "Potato of Labor"
+					Model "models/player/items/heavy/cop_helmet.mdl"
+				}
+				Item "Graybanns"
+				Skill Easy
+				MaxVisionRange 1000
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "03"
+			WaitForAllSpawned "02"
+			WaitBeforeStarting 8
+			TotalCount 1
+			SpawnCount 1
+			TotalCurrency 100
+
+			Tank
+			{
+				Health 17500
+				Speed 75
+				StartingPathTrackNode "boss_path_a1"
+
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 9
+			MaxActive 9
+			SpawnCount 3
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 19
+			TotalCurrency 100
+
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_Crit
+					Health 4000
+					Name "Giant Charged Policeman Soldier"
+					Item "Potato of Labor"
+					ItemModel
+					{
+						ItemName "Potato of Labor"
+						Model "models/player/items/soldier/armored_authority.mdl"
+					}
+					Item "Graybanns"
+					Item "The Soldier's Stogie"
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix_Assistance
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix_Assistance
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 15
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 8
+			TotalCurrency 50
+			Support 1
+
+			TFBot
+			{
+				Template T_TFBot_Soldier_Policeman
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_right
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 24
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 10
+			WaitBetweenSpawns 8
+			TotalCurrency 50
+			Support 1
+
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Street_Brawler
+			}
+		}
+	}
+
+	//==========================
+	//			Wave 3
+	//==========================
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`wave_start_relay`, `Trigger`)
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({sound_name = `#mentrillum/mvm/music/studiopolis_zone_act_2.wav`
+						entity = player
+						filter_type = 4
+						volume = 0.6})
+					}
+				}
+			"
+		}
+		DoneOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`wave_finished_relay`, `Trigger`)
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/studiopolis_zone_act_2.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+					}
+				}
+			"
+		}
+		InitWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_arrows_clear_relay`, `Trigger`, null, 0.1)
+				EntFire(`bombpath_clearall_relay`, `Trigger`, null, 0.1)
+				EntFire(`bombpath_general_arrows`, `Enable`, null, 0.1)
+				EntFire(`bombpath_left`, `Trigger`, null, 0.5)
+
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/studiopolis_zone_act_2.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+					}
+				}
+			"
+		}
+
+		Checkpoint Yes
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "01"
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 14
+			TotalCurrency 300
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Scout_Laser
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "01"
+			TotalCount 6
+			MaxActive 4
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 8
+			TotalCurrency 150
+
+			TFBot
+			{
+				Template T_TFBot_Soldier_SlowBarrage
+				Health 700
+				Item "EOTL_Coldfront Curbstompers"
+				ItemModel
+				{
+					ItemName "EOTL_Coldfront Curbstompers"
+					Model "models/player/items/soldier/armored_authority.mdl"
+				}
+				Item "Graybanns"
+				Item "The Soldier's Stogie"
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_right
+			Name "01"
+			TotalCount 36
+			MaxActive 12
+			SpawnCount 6
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 8
+			TotalCurrency 75
+
+			TFBot
+			{
+				Template T_TFBot_Pyro_BackBurner_Firefighter
+				Skill Easy
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 4
+			MaxActive 4
+			SpawnCount 1
+			WaitBeforeStarting 8.5
+			WaitBetweenSpawns 19
+			TotalCurrency 300
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Heavyweapons_Shotgun
+				Name "Giant Highway Patrol Heavy"
+				Item "Potato of Labor"
+				ItemModel
+				{
+					ItemName "Potato of Labor"
+					Model "models/player/items/heavy/cop_helmet.mdl"
+				}
+				Item "Graybanns"
+				Skill Hard
+				MaxVisionRange 1000
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "02_d"
+			WaitForAllSpawned "01"
+			TotalCount 20
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 1.5
+			TotalCurrency 100
+
+			TFBot
+			{
+				Template T_TFBot_Demoman_Armored
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_right
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 35
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 8
+			TotalCurrency 75
+
+			TFBot
+			{
+				Template T_TFBot_Scout_Trooper
+				Skill Hard
+				WeaponRestrictions MeleeOnly
+				ClassIcon scout_bat_nys
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_right
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 18
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 8
+			TotalCurrency 100
+
+			TFBot
+			{
+				Template T_TFBot_Spy_Backstreet
+				Skill Easy
+				WeaponRestrictions PrimaryOnly
+				Action FetchFlag
+				AimTrackingInterval 1.0
+				MaxVisionRange 1000
+				CharacterAttributes
+				{
+					"cannot disguise" 1
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 9.5
+			WaitBetweenSpawns 18
+			TotalCurrency 300
+
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demo_MineLayer
+					Item "Graybanns"
+					Item "The Shrapnel Shell"
+					Item "Potato of Labor"
+					ItemModel
+					{
+						ItemName "Potato of Labor"
+						Model "models/player/items/demo/demo_scotchbonnet.mdl"
+					}
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_QuickFix_Armored_Assistance
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 25
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 9
+			TotalCurrency 50
+			Support Limited
+
+			TFBot
+			{
+				Template T_TFBot_Soldier_Policeman
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 20
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 9
+			TotalCurrency 50
+			Support Limited
+
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Highway_Patrol
+				Skill Easy
+				MaxVisionRange 1000
+			}
+		}
+	}
+
+	//==========================
+	//			Wave 4
+	//==========================
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`wave_start_relay`, `Trigger`)
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({sound_name = `#mentrillum/mvm/music/studiopolis_zone_act_2.wav`
+						entity = player
+						filter_type = 4
+						volume = 0.6})
+					}
+				}
+			"
+		}
+		DoneOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`wave_finished_relay`, `Trigger`)
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/studiopolis_zone_act_2.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/havoc_prognosis.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+					}
+				}
+			"
+		}
+		InitWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_arrows_clear_relay`, `Trigger`, null, 0.1)
+				EntFire(`bombpath_clearall_relay`, `Trigger`, null, 0.1)
+				EntFire(`bombpath_general_arrows`, `Enable`, null, 0.1)
+				EntFire(`bombpath_right`, `Trigger`, null, 0.5)
+
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/studiopolis_zone_act_2.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/havoc_prognosis.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+					}
+				}
+
+				if (!(`tankextensions_main` in getroottable()))
+				{
+					IncludeScript(`tankextensions_main`, getroottable())
+				}
+
+				if (!(`tankextensions/bannertank` in getroottable()))
+				{
+					IncludeScript(`tankextensions/bannertank`, getroottable())
+				}
+
+				TankExt.SetValueOverrides
+				({
+					BANNERTANK_RANGE_MULT = 1.6
+				})
+
+				if (!(`mvm_metro_metropolis` in getroottable()))
+				{
+					IncludeScript(`mvm_metro_metropolis`, getroottable())
+				}
+			"
+		}
+
+		Checkpoint Yes
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "01"
+			TotalCount 3
+			MaxActive 3
+			SpawnCount 1
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 20
+			TotalCurrency 300
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Heavyweapons_Juggernaut
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_right
+			Name "01"
+			TotalCount 20
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 8
+			TotalCurrency 100
+
+			TFBot
+			{
+				Template T_TFBot_Scout_Trooper
+				Skill Easy
+				MaxVisionRange 1000
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "01"
+			TotalCount 20
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 8
+			TotalCurrency 100
+
+			TFBot
+			{
+				Template T_TFBot_Soldier_Policeman_Elite
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 12
+			MaxActive 9
+			SpawnCount 3
+			WaitBeforeStarting 9.5
+			WaitBetweenSpawns 18
+			TotalCurrency 300
+
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_LieutenantBurstFire
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal_Assistance
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_BigHeal_Assistance
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 21
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 8
+			TotalCurrency 100
+
+			TFBot
+			{
+				Template T_TFBot_Pyro_DF
+				Name "Firefighter DF Pyro"
+				Item "Potato of Labor"
+				ItemModel
+				{
+					ItemName "Potato of Labor"
+					Model "models/player/items/pyro/fireman_helmet.mdl"
+				}
+				Item "The Triclops"
+				Skill Easy
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 20
+			MaxActive 5
+			SpawnCount 5
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 1
+			TotalCurrency 100
+
+			TFBot
+			{
+				Template T_TFBot_Engineer_Widowmaker_Deputy
+				Skill Hard
+				AimTrackingInterval 0.1
+				MaxVisionRange 1000
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_rand
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 9.5
+			TotalCurrency 50
+			Support 1
+
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Highway_Patrol
+				Skill Easy
+				MaxVisionRange 850
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_rand
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 18
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 7
+			WaitBetweenSpawns 9
+			TotalCurrency 50
+			Support 1
+
+			TFBot
+			{
+				Template T_TFBot_Pyro_Firefighter
+				Attributes AlwaysFireWeapon
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_rand
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 18
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 8
+			TotalCurrency 50
+			Support 1
+
+			TFBot
+			{
+				Template T_TFBot_Soldier_Policeman
+				Skill Easy
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_rand
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 12
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 10
+			TotalCurrency 50
+			Support 1
+
+			TFBot
+			{
+				Template T_TFBot_Demoman_Armored
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_boss
+			Name "03"
+			WaitForAllSpawned "02"
+			WaitBeforeStarting 10.5
+			FirstSpawnOutput
+			{
+				Target gamerules
+				Action RunScriptCode
+				Param "Metropolis.StartFadeOutTrack(`#mentrillum/mvm/music/studiopolis_zone_act_2.wav`)"
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "03_a"
+			WaitForAllSpawned "02"
+			WaitBeforeStarting 12.5
+			TotalCount 1
+			SpawnCount 1
+			TotalCurrency 100
+
+			FirstSpawnOutput
+			{
+				Target gamerules
+				Action RunScriptCode
+				Param "
+					for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+					{
+						if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+						{
+							EmitSoundEx({sound_name = `#mentrillum/mvm/music/havoc_prognosis.wav`
+							entity = player
+							filter_type = 4
+							volume = 0.6})
+						}
+					}
+				"
+			}
+
+			Tank
+			{
+				Health 12500
+				Speed 75
+				Name "bannertank_conch"
+				StartingPathTrackNode "boss_path_a1"
+				ClassIcon tank_banner_trio
+
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "03_b"
+			WaitForAllSpawned "03_a"
+			WaitBeforeStarting 25
+			TotalCount 1
+			SpawnCount 1
+			TotalCurrency 100
+
+			Tank
+			{
+				Health 9500
+				Speed 75
+				Name "bannertank_backup"
+				StartingPathTrackNode "boss_path_a1"
+				ClassIcon tank_banner_trio
+
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "03_c"
+			WaitForAllSpawned "03_b"
+			WaitBeforeStarting 25
+			TotalCount 1
+			SpawnCount 1
+			TotalCurrency 100
+
+			Tank
+			{
+				Health 13000
+				Speed 75
+				Name "bannertank_buff"
+				StartingPathTrackNode "boss_path_a1"
+				ClassIcon tank_banner_trio
+
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+	}
+
+	//==========================
+	//			Wave 5
+	//==========================
+	Wave
+	{
+		StartWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`wave_start_relay`, `Trigger`)
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({sound_name = `#mentrillum/mvm/music/stardust_speedway_act_2.wav`
+						entity = player
+						filter_type = 4
+						volume = 0.6})
+					}
+				}
+			"
+		}
+		DoneOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`wave_finished_relay`, `Trigger`)
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/stardust_speedway_act_2.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/hard_boiled_heavies.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+					}
+				}
+			"
+		}
+		InitWaveOutput
+		{
+			Target gamerules
+			Action RunScriptCode
+			Param "
+				EntFire(`bombpath_choose_relay`, `Kill`)
+				EntFire(`bombpath_arrows_clear_relay`, `Trigger`, null, 0.1)
+				EntFire(`bombpath_clearall_relay`, `Trigger`, null, 0.1)
+				EntFire(`bombpath_general_arrows`, `Enable`, null, 0.1)
+				EntFire(`bombpath_right`, `Trigger`, null, 0.5)
+
+				for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+				{
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/stardust_speedway_act_2.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+					}
+
+					if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+					{
+						EmitSoundEx({
+							sound_name = `#mentrillum/mvm/music/hard_boiled_heavies.wav`
+							entity = player
+							filter_type = 4
+							flags = 4
+						})
+					}
+				}
+
+				if (!(`mvm_metro_metropolis` in getroottable()))
+				{
+					IncludeScript(`mvm_metro_metropolis`, getroottable())
+				}
+
+				if (!(`tankextensions_main` in getroottable()))
+				{
+					IncludeScript(`tankextensions_main`, getroottable())
+				}
+
+				EntityOutputs.AddOutput(Entities.FindByName(null, `rockettank_path_73`), `OnPass`, `!activator`, `SetSpeed`, `0.0`, 0.0, 1)
+
+				if (!(`tankextensions/combattank` in getroottable()))
+				{
+					IncludeScript(`tankextensions/combattank`, getroottable())
+				}
+
+				if (!(`tankextensions/combattank_weapons/railgun` in getroottable()))
+				{
+					IncludeScript(`tankextensions/combattank_weapons/railgun`, getroottable())
+				}
+
+				if (!(`tankextensions/combattank_weapons/rocketpod` in getroottable()))
+				{
+					IncludeScript(`tankextensions/combattank_weapons/rocketpod`, getroottable())
+				}
+
+				TankExt.SetValueOverrides
+				({
+					COMBATTANK_RAILGUN_FIRE_DELAY = 3
+					COMBATTANK_RAILGUN_BULLET_DAMAGE = 50
+					COMBATTANK_ROCKETPOD_ROCKET_SPEED = 1000
+					COMBATTANK_ROCKETPOD_RELOAD_DELAY = 0.15
+				})
+			"
+		}
+
+		Checkpoint Yes
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "01"
+			TotalCount 9
+			MaxActive 6
+			SpawnCount 3
+			WaitBeforeStarting 0
+			WaitBetweenSpawns 19
+			TotalCurrency 100
+
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Soldier_LieutenantBurstFire
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_Kritzkrieg_Assistance
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Medic_Kritzkrieg_Assistance
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "01"
+			TotalCount 20
+			MaxActive 8
+			SpawnCount 4
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 8
+			TotalCurrency 50
+
+			TFBot
+			{
+				Template T_TFBot_Demoman_Armored_Elite
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_right
+			Name "01"
+			TotalCount 25
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 1
+			WaitBetweenSpawns 8
+			TotalCurrency 50
+
+			TFBot
+			{
+				Template T_TFBot_Heavyweapons_Street_Brawler
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 6
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 9
+			WaitBetweenSpawns 20
+			TotalCurrency 100
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Spammer
+				Health 4000
+				Name "Giant Rapid Policeman Soldier"
+				Item "Potato of Labor"
+				ItemModel
+				{
+					ItemName "Potato of Labor"
+					Model "models/player/items/soldier/armored_authority.mdl"
+				}
+				Item "Graybanns"
+				Item "The Soldier's Stogie"
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 24
+			MaxActive 4
+			SpawnCount 4
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 2.5
+			TotalCurrency 50
+
+			TFBot
+			{
+				Template T_TFBot_Scout_Trooper
+				Attributes AlwaysCrit
+				Skill Easy
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_right
+			Name "02"
+			WaitForAllSpawned "01"
+			TotalCount 30
+			MaxActive 10
+			SpawnCount 5
+			WaitBeforeStarting 6
+			WaitBetweenSpawns 9
+			TotalCurrency 50
+
+			TFBot
+			{
+				Template T_TFBot_Spy_Backstreet
+				WeaponRestrictions PrimaryOnly
+				Skill Normal
+				Action FetchFlag
+				AimTrackingInterval 0.25
+				MaxVisionRange 1000
+				CharacterAttributes
+				{
+					"cannot disguise" 1
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_boss
+			Name "03"
+			WaitForAllSpawned "02"
+			WaitBeforeStarting 6
+			FirstSpawnOutput
+			{
+				Target gamerules
+				Action RunScriptCode
+				Param "Metropolis.StartFadeOutTrack(`#mentrillum/mvm/music/stardust_speedway_act_2.wav`)"
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_boss
+			Name "03"
+			WaitForAllSpawned "02"
+			TotalCount 2
+			MaxActive 2
+			SpawnCount 2
+			WaitBeforeStarting 8
+			WaitBetweenSpawns 9
+			TotalCurrency 200
+
+			FirstSpawnOutput
+			{
+				Target gamerules
+				Action RunScriptCode
+				Param "
+					for (local i = 1, player; i <= MaxClients().tointeger(); i++)
+					{
+						if ((player = PlayerInstanceFromIndex(i)) != null && !IsPlayerABot(player))
+						{
+							EmitSoundEx({sound_name = `#mentrillum/mvm/music/hard_boiled_heavies.wav`
+							entity = player
+							filter_type = 4
+							volume = 0.6})
+						}
+					}
+				"
+			}
+
+			Squad
+			{
+				TFBot
+				{
+					Template T_TFBot_Giant_Demoman_Armored_Elite
+				}
+
+				TFBot
+				{
+					Template T_TFBot_Giant_Medic_Regen
+					Name "Giant Regen Medic"
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_rand
+			Name "03_s"
+			WaitForAllSpawned "02"
+			TotalCount 14
+			MaxActive 6
+			SpawnCount 2
+			WaitBeforeStarting 17
+			WaitBetweenSpawns 8.5
+			TotalCurrency 50
+			Support 1
+
+			TFBot
+			{
+				Template T_TFBot_Sniper_SMG_Carbine
+				Item "Breach and Bomb"
+				Skill Easy
+				MaxVisionRange 1000
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_rand
+			Name "03_s"
+			WaitForAllSpawned "02"
+			TotalCount 14
+			MaxActive 4
+			SpawnCount 2
+			WaitBeforeStarting 17
+			WaitBetweenSpawns 8.5
+			TotalCurrency 50
+			Support 1
+
+			TFBot
+			{
+				Template T_TFBot_Soldier_Policeman
+				Skill Easy
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_rand
+			Name "03_s"
+			WaitForAllSpawned "02"
+			TotalCount 14
+			MaxActive 5
+			SpawnCount 2
+			WaitBeforeStarting 17
+			WaitBetweenSpawns 8.5
+			TotalCurrency 50
+			Support 1
+
+			TFBot
+			{
+				Template T_TFBot_Scout_Trooper
+				ClassIcon scout_giant
+				Skill Easy
+				MaxVisionRange 1000
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_rand
+			Name "03_s"
+			WaitForAllSpawned "02"
+			TotalCount 14
+			MaxActive 4
+			SpawnCount 1
+			WaitBeforeStarting 17
+			WaitBetweenSpawns 3
+			TotalCurrency 50
+			Support 1
+
+			TFBot
+			{
+				Template T_TFBot_Engineer_Widowmaker_Deputy
+				Skill Easy
+				MaxVisionRange 1000
+				AimTrackingInterval 1.0
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot
+			Name "04"
+			WaitForAllDead "03"
+			WaitBeforeStarting 3
+			TotalCount 1
+			SpawnCount 1
+			TotalCurrency 150
+
+			Tank
+			{
+				Health 17500
+				Speed 75
+				Name "combattank|rocketpod|railgun"
+				StartingPathTrackNode "rockettank_path_1"
+				ClassIcon tank_combat_rocket_railgun
+
+				OnKilledOutput
+				{
+					Target boss_dead_relay
+					Action Trigger
+				}
+
+				OnBombDroppedOutput
+				{
+					Target boss_deploy_relay
+					Action Trigger
+				}
+			}
+		}
+
+		WaveSpawn
+		{
+			Where spawnbot_boss
+			Name "04_a"
+			WaitForAllDead "03"
+			TotalCount 1
+			MaxActive 1
+			SpawnCount 1
+			WaitBeforeStarting 8.5
+			WaitBetweenSpawns 3
+			TotalCurrency 50
+
+			TFBot
+			{
+				Template T_TFBot_Giant_Soldier_Spammer_Buff
+				Health 17500
+				Attributes UseBossHealthBar
+				Scale 1.9
+				Name "Chief Policeman Soldier"
+				Item "Potato of Labor"
+				ItemModel
+				{
+					ItemName "Potato of Labor"
+					Model "models/player/items/soldier/armored_authority.mdl"
+				}
+				Item "Graybanns"
+				Item "The Soldier's Stogie"
+				AlwaysGlow 1
+				ItemAttributes
+				{
+					ItemName "The Buff Banner"
+					"increase buff duration" 18.0
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,64 @@
+"VertexlitGeneric"
+{
+	"$baseTexture" "models/bots/boss_blimp/blimp_all_damage3_final"
+	"$bumpmap" "models/bots/boss_blimp/blimp_all_damage3_normal"
+
+	"$phong"                "1"
+	"$phongexponent"        "10"
+	"$phongboost"           "4"
+	"$phongfresnelranges"	"[.25 1 4]"
+	"$phongexponenttexture" "models/bots/boss_blimp/blimp_all_exp"
+
+	"$blendtintbybasealpha"   "1"
+	"$blendtintcoloroverbase" "1"
+
+	"$rimlight"         "1"
+	"$rimlightexponent" "4"
+	"$rimlightboost"    ".8"
+	"$rimmask"          "1"
+
+	$color_red   "{ 210 90 90 }"
+	$color_blue  "{ 110 160 190 }"
+	$color_tmp   "[0 0 0]"
+	$color_white "0"
+	$zero        "0"
+
+	Proxies
+	{
+		// $color_white is 0 for values 0 or 1, 1 for values not 0 or 1
+		ToggleTexture
+		{
+			toggleTextureVar         $basetexture
+			toggleTextureFrameNumVar $color_white
+			toggleShouldWrap         0
+		}
+		// $frame is 0 for red, 1 for blue
+		TeamTexture
+		{
+			resultVar $frame
+		}
+		Multiply
+		{
+			srcVar1   $frame
+			srcVar2   $color_blue
+			resultVar $color_tmp
+		}
+		SelectFirstIfNonZero
+		{
+			srcVar1   $color_tmp
+			srcVar2   $color_red
+			resultVar $color_tmp
+		}
+		SelectFirstIfNonZero
+		{
+			srcVar1   $color_white
+			srcVar2   $color_tmp
+			resultVar $color2
+		}
+		Equals
+		{
+			srcVar1   $zero
+			resultVar $frame
+		}
+	}
+}

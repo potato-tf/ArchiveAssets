@@ -14,87 +14,97 @@ foreach(k,v in HAMMERTANK_VALUES_TABLE)
 	{
 		local hVictim = params.const_entity
 		local hAttacker = params.attacker
-		if(hVictim && hAttacker && hAttacker.GetClassname() == "tank_boss" && "HammerThink" in hAttacker.GetScriptScope())
+		if(hVictim && hAttacker && hAttacker.GetClassname() == "tank_boss")
 		{
-			if(!("HAMMERTANK_KILL_ICON" in ROOT) || !HAMMERTANK_KILL_ICON || !HAMMERTANK_KILL_ICON.IsValid())
-				::HAMMERTANK_KILL_ICON <- SpawnEntityFromTable("info_target", { classname = "necro_smasher" })
-			params.force_friendly_fire = HAMMERTANK_FRIENDLY_FIRE
-			params.inflictor = HAMMERTANK_KILL_ICON
-			HAMMERTANK_KILL_ICON.SetAbsOrigin(hAttacker.GetScriptScope().vecSmash)
+			local HammerScope = TankExt.GetMultiScopeTable(hAttacker.GetScriptScope(), "hammertank")
+			if(HammerScope)
+			{
+				if(!("HAMMERTANK_KILL_ICON" in ROOT) || !HAMMERTANK_KILL_ICON || !HAMMERTANK_KILL_ICON.IsValid())
+					::HAMMERTANK_KILL_ICON <- SpawnEntityFromTableSafe("info_target", { classname = "necro_smasher" })
+				params.force_friendly_fire = HAMMERTANK_FRIENDLY_FIRE
+				params.inflictor = HAMMERTANK_KILL_ICON
+				HAMMERTANK_KILL_ICON.SetAbsOrigin(HammerScope.vecSmash)
+			}
 		}
 	}
 }
 __CollectGameEventCallbacks(HammerTankEvents)
 
-TankExt.PrecacheSound("misc/halloween/strongman_fast_swing_01.wav")
-TankExt.PrecacheSound("misc/halloween/strongman_fast_whoosh_01.wav")
-TankExt.PrecacheSound("misc/halloween/strongman_fast_impact_01.wav")
-TankExt.PrecacheSound("ambient/explosions/explode_1.wav")
-TankExt.PrecacheSound("doors/vent_open2.wav")
+PrecacheModel(HAMMERTANK_MODEL_HAMMER)
+TankExt.PrecacheSound(")misc/halloween/strongman_fast_swing_01.wav")
+TankExt.PrecacheSound(")misc/halloween/strongman_fast_whoosh_01.wav")
+TankExt.PrecacheSound(")misc/halloween/strongman_fast_impact_01.wav")
+TankExt.PrecacheSound(")ambient/explosions/explode_1.wav")
+TankExt.PrecacheSound(")doors/vent_open2.wav")
 
-TankExt.NewTankScript("hammertank", {
-	OnSpawn = function(hTank, sName, hPath)
+TankExt.NewTankType("hammertank", {
+	function OnSpawn()
 	{
-		local hTank_scope = hTank.GetScriptScope()
-		local hHammer = SpawnEntityFromTable("prop_dynamic", {
+		local hHammer = SpawnEntityFromTableSafe("prop_dynamic", {
 			model          = HAMMERTANK_MODEL_HAMMER
 			origin         = "-143 48 -28"
 			angles         = "-30 0 0"
 			modelscale     = 0.6
 			disableshadows = 1
 		})
-		TankExt.SetParentArray([hHammer], hTank)
-		hTank_scope.bSmashing <- false
-		hTank_scope.vecSmash <- Vector()
-		hTank_scope.SmashImpact <- function()
+		TankExt.SetParentArray([hHammer], self)
+
+		local SmashImpact = function()
 		{
+			if(!self.IsValid()) return
 			EmitSoundEx({
-				sound_name = "ambient/explosions/explode_1.wav"
+				sound_name  = ")ambient/explosions/explode_1.wav"
+				sound_level = 100
+				entity      = self
 				filter_type = RECIPIENT_FILTER_GLOBAL
 			})
 			EmitSoundEx({
-				sound_name = "misc/halloween/strongman_fast_impact_01.wav"
+				sound_name  = ")misc/halloween/strongman_fast_impact_01.wav"
+				sound_level = 100
+				entity      = self
 				filter_type = RECIPIENT_FILTER_GLOBAL
 			})
 			DispatchParticleEffect("hammer_impact_button", vecSmash, Vector(1, 0, 0))
 			ScreenShake(vecSmash, 9, 2.5, 3, 1500, 0, true)
 
-			local iTeamNum = self.GetTeam()
 			for(local hPlayer; hPlayer = FindByClassnameWithin(hPlayer, "player", vecSmash, 384);)
 				if(hPlayer.IsAlive() && (HAMMERTANK_FRIENDLY_FIRE || hPlayer.GetTeam() != iTeamNum))
 				{
 					local vecTowards = hPlayer.GetOrigin() - vecSmash
-					local flDist = vecTowards.Length()
-					vecTowards.Norm()
-					hPlayer.ApplyAbsVelocityImpulse(vecTowards * 200 + Vector(0, 0, 500))
-					if(flDist < 128)
+					if(vecTowards.LengthSqr() < 16384) // sqr(128)
 						hPlayer.TakeDamageEx(self, self, null, Vector(), Vector(), HAMMERTANK_DAMAGE, DMG_CRUSH)
+					else
+					{
+						vecTowards.Norm()
+						hPlayer.ApplyAbsVelocityImpulse(vecTowards * 200 + Vector(0, 0, 500))
+					}
 				}
 		}
-		hTank_scope.HammerThink <- function()
+
+		vecSmash <- Vector()
+		local bSmashing = false
+		function Think()
 		{
-			vecSmash = self.GetOrigin() + self.GetForwardVector() * 352 + self.GetRightVector() * -48
-			local iTeamNum = self.GetTeam()
+			vecSmash = vecOrigin + self.GetForwardVector() * 352 + self.GetRightVector() * -48
 			if(!bSmashing)
 				for(local hPlayer; hPlayer = FindByClassnameWithin(hPlayer, "player", vecSmash, 256);)
 					if(hPlayer.IsAlive() && hPlayer.GetTeam() != iTeamNum)
 					{
 						bSmashing = true
-						local DelayCode = @(delay, string) EntFireByHandle(self, "RunScriptCode", string, delay, null, null)
 						hHammer.AcceptInput("SetAnimation", "smash", null, null)
 						EmitSoundEx({
-							sound_name = "misc/halloween/strongman_fast_swing_01.wav"
+							sound_name = ")misc/halloween/strongman_fast_swing_01.wav"
+							sound_level = 100
+							entity      = self
 							filter_type = RECIPIENT_FILTER_GLOBAL
 						})
-						DelayCode(0.5, "EmitSoundEx({ sound_name = `misc/halloween/strongman_fast_swing_01.wav`, pitch = 70, filter_type = RECIPIENT_FILTER_GLOBAL })")
-						DelayCode(1, "EmitSoundEx({ sound_name = `misc/halloween/strongman_fast_whoosh_01.wav`, filter_type = RECIPIENT_FILTER_GLOBAL, })")
-						DelayCode(1.3, "SmashImpact()")
-						DelayCode(3.4, "EmitSoundEx({ sound_name = `doors/vent_open2.wav`, pitch = 70, filter_type = RECIPIENT_FILTER_GLOBAL })")
-						DelayCode(3.4 + HAMMERTANK_COOLDOWN, "bSmashing = false")
+						TankExt.DelayFunction(self, this, 0.5, function() { EmitSoundEx({ sound_name = ")misc/halloween/strongman_fast_swing_01.wav", pitch = 70, sound_level = 100, entity = self, filter_type = RECIPIENT_FILTER_GLOBAL }) })
+						TankExt.DelayFunction(self, this, 1.0, function() { EmitSoundEx({ sound_name = ")misc/halloween/strongman_fast_whoosh_01.wav", sound_level = 100, entity = self, filter_type = RECIPIENT_FILTER_GLOBAL, }) })
+						TankExt.DelayFunction(self, this, 1.3, SmashImpact)
+						TankExt.DelayFunction(self, this, 3.4, function() { EmitSoundEx({ sound_name = ")doors/vent_open2.wav", pitch = 70, sound_level = 100, entity = self, filter_type = RECIPIENT_FILTER_GLOBAL }) })
+						TankExt.DelayFunction(self, this, 3.4 + HAMMERTANK_COOLDOWN, function() { bSmashing = false })
 						break
 					}
-			return -1
 		}
-		TankExt.AddThinkToEnt(hTank, "HammerThink")
 	}
 })

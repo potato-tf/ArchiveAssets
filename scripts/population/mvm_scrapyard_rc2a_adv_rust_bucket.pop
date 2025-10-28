@@ -1,0 +1,1391 @@
+//Mission: Rust Bucket
+//Mission Author: Koi (https://steamcommunity.com/profiles/76561198064411172)
+//Difficulty: Advanced
+//Map: Scrapyard
+
+//------------------------
+//scrapyard_rc2a map info:
+//Robot spawn points:
+//spawnbot
+//spawnbot_mission_sniper
+//spawnbot_mission_spy
+//spawnbot_mission_sentrybuster
+//spawnbot_left
+//spawnbot_right
+//
+//Wave Relays:
+//wave_start_classic_relay
+//wave_start_ironman_relay
+//wave_finished_relay
+//
+//Tank Robot paths:
+//tank_path_a_1
+//tank_path_b_1
+//
+//Other:
+//Multiple Bombs:
+//second_bomb_classic_enable
+//third_bomb_classic_enable
+//
+//second_bomb_ironman_enable
+//third_bomb_ironman_enable
+//-------------------------
+
+// Made using VSCode, with extensions:
+// xyantoaster_'s MvM Popfile Snippets
+// Potato's MvM Servers (Swordstone)'s Popfile Language Support
+// pfwobcke (Revan)'s VSCode Popfile Money Counter
+// pfwobcke (Revan)'s VSCode VDF
+
+//
+// Starting Currency: 1000
+// +----------+----------+----------+-------------------------+
+// | Wave     | Currency | A+       | Total After Wave, W/ A+ |
+// +----------+----------+----------+-------------------------+
+// | Wave 1   | 800      | 900      | 1900                    |
+// | Wave 2   | 700      | 800      | 2700                    |
+// | Wave 3   | 900      | 1000     | 3700                    |
+// | Wave 4   | 900      | 1000     | 4700                    |
+// | Wave 5   | 900      | 1000     | 5700                    |
+// | Wave 6   | 500      | 600      | 6300                    |
+// +----------+----------+----------+-------------------------+
+// | Total    | 4700     | 5300     |
+// +----------+----------+----------+
+//
+
+#base robot_giant.pop
+#base robot_standard.pop
+#base robot_koi_scrapyard.pop
+WaveSchedule
+{
+    StartingCurrency                      1000
+    RespawnWaveTime                       3 // This number times 2 for red's respawn in seconds
+    CanBotsAttackWhileInSpawnRoom         No // Can the bots attack before they have dropped into the map?
+    AddSentryBusterWhenKillCountExceeds   15 // Will automatically spawn a Sentry Buster when Red's Engineer(s) get more than X kills
+    AddSentryBusterWhenDamageDealtExceeds 3000 // Will automatically spawn a Sentry Buster when the Red's Engineer(s) gets more than X total damage
+    FixedRespawnWaveTime                  Yes // If this is set to 'No', then the RespawnWaveTime can vary slightly
+    Advanced                              1 // Only enable for Advanced/Expert missions (for achievements)
+
+	PrecacheModel "models/props_tumb/mvm/tank_shield.mdl"
+
+    //Rafmod
+    PointTemplates
+    {
+        PT_RotatingAxe_Small //Utilized by small axethrower pyros
+        {
+            OnSpawnOutput
+            {
+                Target "!activator"
+                Action "addoutput"
+                Param "rendermode 10"
+                Delay 0.01
+            }
+            prop_dynamic
+            {
+                "targetname" "axe1"
+                "parentname" "rot"
+                "model" "models/weapons/c_models/c_axtinguisher/c_axtinguisher_pyro.mdl"
+                "modelscale" 1 //regular size
+                "skin" 1
+                "angles" "0 0 0"
+            }
+            func_rotating
+            {
+                "targetname" "rot"
+                "spawnflags" 73 //not solid, spin on Y, start active
+                "fanfriction" 100
+                "maxspeed" 400
+            }
+        }
+        PT_RotatingAxe_Large //Utilized by giant axethrower pyros
+        {
+            OnSpawnOutput
+            {
+                Target "!activator"
+                Action "addoutput"
+                Param "rendermode 10"
+                Delay 0.01
+            }
+            prop_dynamic
+            {
+                "targetname" "axe1"
+                "parentname" "rot"
+                "model" "models/weapons/c_models/c_axtinguisher/c_axtinguisher_pyro.mdl"
+                "modelscale" 1.5 //large for giant
+                "skin" 1
+                "angles" "0 0 0"
+            }
+            func_rotating
+            {
+                "targetname" "rot"
+                "spawnflags" 73 //not solid, spin on Y, start active
+                "fanfriction" 100
+                "maxspeed" 400
+            }
+        }
+    }
+
+    // Sentry Buster Support (Wave 1-6)
+    Mission
+    {
+        Objective           DestroySentries
+        Where               spawnbot_mission_sentrybuster
+        BeginAtWave         1
+        RunForThisManyWaves 6
+        CooldownTime        70
+        DesiredCount        1
+        InitialCooldown     30
+        TFBot
+        {
+            Template T_TFBot_SentryBuster
+        }
+    }
+
+    // Sniper Support (Wave 1-2, 4-6)
+    Mission 
+	{
+        Objective           Sniper
+		Where               spawnbot_mission_sniper
+		InitialCooldown     90
+		BeginAtWave         1
+		RunForThisManyWaves 2
+		CooldownTime        60
+		DesiredCount        2
+		TFBot
+		{
+			Template T_TFBot_Sniper
+			Skill Normal
+		}
+	}
+    Mission 
+	{
+        Objective           Sniper
+		Where               spawnbot_mission_sniper
+		InitialCooldown     90
+		BeginAtWave         4
+		RunForThisManyWaves 1
+		CooldownTime        60
+		DesiredCount        2
+		TFBot
+		{
+			Template T_TFBot_Sniper
+			Skill Normal
+		}
+	}
+    Mission 
+	{
+        Objective           Sniper
+		Where               spawnbot_mission_sniper
+		InitialCooldown     90
+		BeginAtWave         5
+		RunForThisManyWaves 2
+		CooldownTime        60
+		DesiredCount        3
+		TFBot
+		{
+			Template T_TFBot_Sniper
+			Skill Hard
+		}
+	}
+
+    // Spy Support (Wave 2-3, 6)
+    Mission 
+	{
+        Objective           Spy
+		Where               spawnbot_mission_spy
+		InitialCooldown     20
+		BeginAtWave         2
+		RunForThisManyWaves 1
+		CooldownTime        20
+		DesiredCount        1
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Skill Normal
+		}
+	}
+    Mission 
+	{
+        Objective           Spy
+		Where               spawnbot_mission_spy
+		InitialCooldown     2
+		BeginAtWave         3
+		RunForThisManyWaves 1
+		CooldownTime        20
+		DesiredCount        3
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Skill Hard
+		}
+	}
+    Mission 
+	{
+        Objective           Spy
+		Where               spawnbot_mission_spy
+		InitialCooldown     2
+		BeginAtWave         6
+		RunForThisManyWaves 1
+		CooldownTime        15
+		DesiredCount        2
+		TFBot
+		{
+			Template T_TFBot_Spy
+			Skill Hard
+		}
+	}
+
+    // Engineer Support (Wave 3, 5)
+    Mission
+	{
+		Objective	        Engineer
+		Where	            spawnbot_right
+		BeginAtWave	        3
+		RunForThisManyWaves	1
+		InitialCooldown	    0
+		CooldownTime	    40
+		DesiredCount	    1
+		TFBot
+		{
+			Health 500
+			Template T_TFBot_Engineer_Sentry_Teleporter
+			TeleportWhere spawnbot
+			TeleportWhere spawnbot_left
+			TeleportWhere spawnbot_right
+			TeleportWhere spawnbot_mission_sniper
+			TeleportWhere spawnbot_mission_sentrybuster
+			CharacterAttributes
+			{
+				"kill forces attacker to laugh"	1
+			}
+		}
+	}
+    Mission
+	{
+		Objective	        Engineer
+		Where	            spawnbot_right
+		BeginAtWave	        5
+		RunForThisManyWaves	1
+		InitialCooldown	    0
+		CooldownTime	    40
+		DesiredCount	    1
+		TFBot
+		{
+			Health 500
+			Template T_TFBot_Engineer_Sentry_Teleporter
+			TeleportWhere spawnbot
+			TeleportWhere spawnbot_left
+			TeleportWhere spawnbot_right
+			TeleportWhere spawnbot_mission_sniper
+			TeleportWhere spawnbot_mission_sentrybuster
+			CharacterAttributes
+			{
+				"kill forces attacker to laugh"	1
+			}
+		}
+	}
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // Wave 1 - 800
+    Wave
+    {
+        ///////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////
+        // EXPLANATION ONLY VALID UNTIL END OF BOLTED BARBECUE EVENT TIMEFRAME
+        Explanation
+        {
+            Line "{ffffff}-------------------------------------------------------"
+            Line "{ffffff}<<< {cf6a32}RUST BUCKET {70b04a}SPEEDRUN CHALLENGE {ffffff}>>>"
+            Line "{f0e68c}The fastest mission speedrun time before"
+            Line "{f0e68c}Bolted Barbecue ends will win {ffd700}30 KEYS{f0e68c}."
+            Line "{f0e68c}(Divided equally between team members)"
+            Line "{ffffff}-------------------------------------------------------"
+        }
+        ///////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////
+
+        StartWaveOutput
+        {
+            Target wave_start_classic_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+
+        // Supports
+        // Sharpened volcano frag
+        WaveSpawn
+        {
+            Name "wave1s1"
+            Where spawnbot_left
+            TotalCount 32
+            MaxActive 2
+            SpawnCount 2
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 6
+            TotalCurrency 0
+            
+            Support 1
+            
+            TFBot
+            {
+                Template T_TFBot_Pyro_Sharpened_Volcano_Fragment
+            }
+        }
+        // Axethrower pyros
+        WaveSpawn
+        {
+            Name "wave1s2"
+            Where spawnbot_right
+            TotalCount 32 
+            MaxActive 2
+            SpawnCount 2
+            WaitBeforeStarting 3
+            WaitBetweenSpawns 8 
+            TotalCurrency 0 
+            
+            Support 1
+            
+            TFBot
+            {
+                Template T_TFBot_Pyro_Axtinguisher_Thrower
+                //Template T_TFBot_Scout_SunStick
+                //Skill Expert
+            }
+        }
+
+        // Main wave
+        // Soldiers
+        WaveSpawn
+        {
+            Name "wave1a1"
+            Where spawnbot
+            TotalCount 16
+            MaxActive 6
+            SpawnCount 2 
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 18
+            TotalCurrency 50
+            TFBot
+            {
+                Template T_TFBot_Soldier_Default
+            }
+        }
+        // Shotgunner Pyros
+        WaveSpawn
+        {
+            Name "wave1a2"
+            Where spawnbot
+            TotalCount 24
+            MaxActive 8
+            SpawnCount 4
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 13
+            TotalCurrency 50
+            TFBot
+            {
+                Template T_TFBot_Pyro_Shotgun
+                //Skill Hard
+            }
+        }
+        // Flare Pyros
+        WaveSpawn
+        {
+            Name "wave1a3"
+            Where spawnbot
+            TotalCount 18
+            MaxActive 8
+            SpawnCount 1
+            WaitBeforeStarting 2
+            WaitBetweenSpawns 8
+            TotalCurrency 50
+            TFBot
+            {
+                Template T_TFBot_Pyro_Flaregun
+            }
+        }
+        // Giant axe thrower pyros
+        WaveSpawn
+        {
+            Name "wave1a4"
+            Where spawnbot
+            TotalCount 5
+            MaxActive 2
+            SpawnCount 1
+            WaitBeforeStarting 15
+            WaitBetweenSpawns 25
+            TotalCurrency 200
+            TFBot
+            {
+                Template T_TFBot_Giant_Pyro_Axtinguisher_Thrower
+                //Template T_TFBot_Giant_Pyro_Flare_Spammer
+            }
+        }
+        // Giant Pyros
+        WaveSpawn
+        {
+            Name "wave1a5"
+            Where spawnbot
+            TotalCount 3
+            MaxActive 2
+            SpawnCount 1
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 20
+            TotalCurrency 200
+            TFBot
+            {
+                Template T_TFBot_Giant_Pyro_NoAB
+            }
+        }
+        // Giant Pyros with DragonsFury
+        WaveSpawn
+        {
+            Name "wave1b1"
+            Where spawnbot
+            TotalCount 3
+            MaxActive 2
+            SpawnCount 1
+            WaitBeforeStarting 25
+            WaitBetweenSpawns 20
+            TotalCurrency 200
+            WaitForAllDead "wave1a5"
+            TFBot
+            {
+                Template T_TFBot_Giant_Pyro_DragonsFury
+            }
+        }
+        // Dragons Fury Pyros
+        WaveSpawn
+        {
+            Name "wave1b2"
+            Where spawnbot
+            TotalCount 15
+            MaxActive 9
+            SpawnCount 3
+            WaitBeforeStarting 30
+            WaitBetweenSpawns 7
+            TotalCurrency 50
+            WaitForAllDead "wave1a5"
+            TFBot
+            {
+                Template T_TFBot_Pyro_DragonsFury
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // Wave 2 - 700
+    Wave
+    {
+        StartWaveOutput
+        {
+            Target wave_start_classic_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+
+        // Supports
+        // Stickybomb demos
+        WaveSpawn
+        {
+            Name "wave2s1"
+            Where spawnbot_left
+            TotalCount 32
+            MaxActive 2
+            SpawnCount 2
+            WaitBeforeStarting 22 //match the small bat+med entry
+            WaitBetweenSpawns 9
+            TotalCurrency 0
+            WaitForAllSpawned "wave2a3" //match the small bat+med entry
+            
+            Support 1
+            
+            TFBot
+            {
+                Template T_TFBot_Demoman_Stickybomber
+            }
+        }
+
+        // Main wave
+        // Regular giant soldier intro
+        WaveSpawn
+        {
+            Name "wave2a1"
+            Where spawnbot
+            TotalCount 2
+            MaxActive 2
+            SpawnCount 1
+            WaitBeforeStarting 20
+            WaitBetweenSpawns 28
+            TotalCurrency 100
+            TFBot
+            {
+                Template T_TFBot_Giant_Soldier
+                Attributes AlwaysCrit
+            }
+        }
+        // FOS heavies
+        WaveSpawn
+        {
+            Name "wave2a2"
+            Where spawnbot
+            TotalCount 8
+            MaxActive 8
+            SpawnCount 1
+            WaitBeforeStarting 3
+            WaitBetweenSpawns 10
+            TotalCurrency 100
+            TFBot
+            {
+                Template T_TFBot_Heavyweapons_Fist
+                Skill Hard
+            }
+        }
+        // Regular heavies
+        WaveSpawn
+        {
+            Name "wave2a3"
+            Where spawnbot
+            TotalCount 24
+            MaxActive 16
+            SpawnCount 2
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 6
+            TotalCurrency 100
+            TFBot
+            {
+                Template T_TFBot_Heavy_Default
+            }
+        }
+        // Giant Battalions Soldiers
+        WaveSpawn
+        {
+            Name "wave2b1"
+            Where spawnbot
+            TotalCount 3
+            MaxActive 2
+            SpawnCount 1
+            //WaitBeforeStarting 45
+            WaitBeforeStarting 12
+            WaitBetweenSpawns 30
+            TotalCurrency 300
+            WaitForAllSpawned "wave2a3"
+            TFBot
+            {
+                Template T_TFBot_Giant_Soldier_Extended_Battalion
+            }
+        }
+        // Black box soldiers with bigheal meds
+        WaveSpawn
+        {
+            Name "wave2b2"
+            Where spawnbot_right
+            TotalCount 28
+            MaxActive 22
+            SpawnCount 2
+            //WaitBeforeStarting 55
+            WaitBeforeStarting 22
+            WaitBetweenSpawns 7
+            TotalCurrency 100
+            WaitForAllSpawned "wave2a3"
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Soldier_RocketShotgun
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickFix_Fixed
+                    Tag bot_squad_member
+                }
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // Wave 3 - 900
+    Wave
+    {
+        StartWaveOutput
+        {
+            Target wave_start_classic_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+
+        // Supports
+        // Powerjack pyros
+        WaveSpawn
+        {
+            Name "wave3s1"
+            Where spawnbot_left
+            TotalCount 32
+            MaxActive 2
+            SpawnCount 2
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 7
+            TotalCurrency 0
+            
+            Support 1
+            
+            TFBot
+            {
+                Template T_TFBot_Powerjack_Pyro
+            }
+        }
+        WaveSpawn
+        {
+            Name "wave3s2"
+            Where spawnbot_right
+            TotalCount 32
+            MaxActive 2
+            SpawnCount 2
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 7
+            TotalCurrency 0
+            
+            Support 1
+            
+            TFBot
+            {
+                Template T_TFBot_Powerjack_Pyro
+            }
+        }
+
+        // Main wave
+        // Giant spies
+        WaveSpawn
+        {
+            Name "wave3a1"
+            Where spawnbot
+            TotalCount 2
+            MaxActive 2
+            SpawnCount 2
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 0
+            TotalCurrency 200
+            TFBot
+            {
+                Template T_TFBot_Giant_Spy
+            }
+        }
+        // FAN scout constant threat
+        WaveSpawn
+        {
+            Name "wave3a2"
+            Where spawnbot
+            TotalCount 7
+            MaxActive 4
+            SpawnCount 1
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 21
+            TotalCurrency 100
+            TFBot
+            {
+                Template T_TFBot_Giant_Scout_FAN
+            }
+        }
+        // Regular Tank
+        WaveSpawn
+		{
+            Name "wave3b1"
+            TotalCount 1
+            WaitBeforeStarting 30
+            TotalCurrency 300
+            FirstSpawnOutput
+            {
+                Target boss_spawn_relay
+                Action Trigger
+            }
+            Tank
+            {
+                Name "Tank"
+                Health 12000
+                Speed 75
+                //SpawnTemplate "TankVacFire"
+                //ClassIcon tank_vac_fire_lite
+                StartingPathTrackNode tank_path_a_1
+                OnKilledOutput
+                {
+                    Target boss_dead_relay
+                    Action Trigger
+                }
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay
+                    Action Trigger
+                }
+            }
+		}
+        // Giant conch soldiers
+        WaveSpawn
+        {
+            Name "wave3b2"
+            Where spawnbot
+            TotalCount 5
+            MaxActive 5
+            SpawnCount 1
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 25
+            TotalCurrency 200
+            WaitForAllSpawned "wave3b1"
+            TFBot
+            {
+                Template T_TFBot_Giant_Soldier_Extended_Concheror
+            }
+        }
+        // Shortstop scouts with quickfix medics
+        WaveSpawn
+        {
+            Name "wave3b3"
+            Where spawnbot
+            TotalCount 24
+            MaxActive 12
+            SpawnCount 2
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 9
+            TotalCurrency 100
+            WaitForAllSpawned "wave3b1"
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Scout_Shortstop_Nerfed
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_QuickFix_Fixed
+                    Tag bot_squad_member
+                }
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // Wave 4 - 900
+    Wave
+    {
+        StartWaveOutput
+        {
+            Target wave_start_classic_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+
+        // Supports
+        // Sun on a stick scouts
+        WaveSpawn
+        {
+            Name "wave4s1"
+            Where spawnbot_left
+            TotalCount 32
+            MaxActive 6
+            SpawnCount 2
+            WaitBeforeStarting 2
+            WaitBetweenSpawns 10
+            TotalCurrency 0 
+            
+            Support 1
+            
+            TFBot
+            {
+                Template T_TFBot_Scout_SunStick
+                Skill Expert
+            }
+        }
+        //Late wave simple soldier stream
+        WaveSpawn
+        {
+            Name "wave4s2"
+            Where spawnbot
+            TotalCount 15
+            MaxActive 8
+            SpawnCount 1
+            WaitBeforeStarting 30
+            WaitBetweenSpawns 3
+            TotalCurrency 0
+            WaitForAllSpawned "wave4a3"
+
+            Support 1
+
+            TFBot
+            {
+                Template T_TFBot_Soldier_Default
+            }
+        }
+
+        // Main wave
+        // Manmelter pyros
+        WaveSpawn
+        {
+            Name "wave4a1"
+            Where spawnbot
+            TotalCount 21
+            MaxActive 21
+            SpawnCount 3
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 10
+            TotalCurrency 100
+            TFBot
+            {
+                Template T_TFBot_Pyro_Manmelter
+                Attributes AlwaysCrit
+            }
+        }
+        // Phlog pyros
+        WaveSpawn
+        {
+            Name "wave4a2"
+            Where spawnbot
+            TotalCount 16
+            MaxActive 16
+            SpawnCount 2
+            WaitBeforeStarting 2
+            WaitBetweenSpawns 9
+            TotalCurrency 100
+            TFBot
+            {
+                Template T_TFBot_Pyro_Phlog
+                Attributes AlwaysCrit
+            }
+        }
+        // Giant Phlog pyros with giant uber meds
+        WaveSpawn
+        {
+            Name "wave4a3"
+            Where spawnbot
+            TotalCount 8
+            MaxActive 4 //keep 4 but lower WaitBetweenSpawns
+            SpawnCount 4
+            WaitBeforeStarting 5
+            WaitBetweenSpawns 8 //15
+            TotalCurrency 400
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Pyro_Phlog
+                    Attributes AlwaysCrit
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Medic_Uber
+                    Tag bot_squad_member
+                }
+            }
+        }
+        // Giant black box soldiers squadded with conches
+        WaveSpawn
+        {
+            Name "wave4b1"
+            Where spawnbot
+            TotalCount 18
+            MaxActive 18
+            SpawnCount 6
+            WaitBeforeStarting 25
+            WaitBetweenSpawns 10
+            TotalCurrency 300
+            WaitForAllSpawned "wave4a3"
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Soldier_RocketShotgun
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Extended_Concheror
+                    tag bot_squad_member
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Extended_Concheror
+                    tag bot_squad_member
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Extended_Concheror
+                    tag bot_squad_member
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Extended_Concheror
+                    tag bot_squad_member
+                }
+                TFBot
+                {
+                    Template T_TFBot_Soldier_Extended_Concheror
+                    tag bot_squad_member
+                }
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // Wave 5 - 900
+    Wave
+    {
+        StartWaveOutput
+        {
+            Target wave_start_classic_relay
+            Action Trigger
+        }
+        InitWaveOutput // Vac tank setup using TankExtensions vscript tanks
+        {
+            Target bignet
+            Action RunScriptCode
+            Param
+            "IncludeScript(`tankextensions_main`, getroottable())
+            IncludeScript(`tankextensions/vactank`, getroottable())" //TankExt.AddTankIcon(1, `tank_vac_fire_lite`, `vactank_fire`)
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+
+        // Supports
+        // Bonk scouts
+        WaveSpawn
+        {
+            Name "wave5s1"
+            Where spawnbot
+            TotalCount 32
+            MaxActive 1
+            SpawnCount 1
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 5
+            TotalCurrency 0
+            
+            Support 1
+            
+            TFBot
+            {
+                Template T_TFBot_Scout_Bonk
+            }
+        }
+
+        // Main wave
+        // Demoknights
+        WaveSpawn
+        {
+            Name "wave5a1"
+            Where spawnbot_right
+            TotalCount 20
+            MaxActive 10
+            SpawnCount 5
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 10
+            TotalCurrency 100
+            TFBot
+            {
+                Template T_TFBot_Demoman_Knight
+                Attributes AlwaysCrit
+            }
+        }
+        // Giant pipe demos (with shield charge)
+        WaveSpawn
+        {
+            Name "wave5a2"
+            Where spawnbot
+            TotalCount 5
+            MaxActive 5
+            SpawnCount 1
+            WaitBeforeStarting 3
+            WaitBetweenSpawns 10
+            TotalCurrency 100
+            TFBot
+            {
+                Template T_TFBot_Giant_Demo_Burst_WithTide
+                Attributes AlwaysCrit
+            }
+        }
+        // Backburner pyros
+        WaveSpawn
+        {
+            Name "wave5a3"
+            Where spawnbot
+            TotalCount 21
+            MaxActive 21
+            SpawnCount 3
+            WaitBeforeStarting 4
+            WaitBetweenSpawns 10
+            TotalCurrency 100
+            TFBot
+            {
+                Template T_TFBot_Pyro_Backburner
+            }
+        }
+        // Fire Tank
+        WaveSpawn
+		{
+            Name "wave5b1"
+            TotalCount 1
+            WaitBeforeStarting 58
+            TotalCurrency 300
+            FirstSpawnOutput
+            {
+                Target boss_spawn_relay
+                Action Trigger
+            }
+            Tank
+            {
+                Name "vactank_fire" //must use name vactank_fire
+                Health 20000
+                Speed 75
+                ClassIcon tank_vac_fire_lite
+                StartingPathTrackNode tank_path_a_1
+                OnKilledOutput
+                {
+                    Target boss_dead_relay
+                    Action Trigger
+                }
+                OnBombDroppedOutput
+                {
+                    Target boss_deploy_relay 
+                    Action Trigger
+                }
+            }
+		}
+        // Giant shotgunner heavies
+        WaveSpawn
+        {
+            Name "wave5b2"
+            Where spawnbot
+            TotalCount 6
+            MaxActive 3
+            SpawnCount 1
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 20
+            TotalCurrency 100
+            WaitForAllSpawned "wave5b1"
+            TFBot
+            {
+                Template T_TFBot_Giant_Heavyweapons_Shotgun
+            }
+        }
+        // Buff direct hit soldiers
+        WaveSpawn
+        {
+            Name "wave5b3"
+            Where spawnbot
+            TotalCount 16
+            MaxActive 16
+            SpawnCount 2
+            WaitBeforeStarting 3
+            WaitBetweenSpawns 11
+            TotalCurrency 100
+            WaitForAllDead "wave5b1"
+            TFBot
+            {
+                Template T_TFBot_Soldier_DirectHit
+            }
+        }
+        // Giant backburner pyros with squads of uber medics
+        WaveSpawn
+        {
+            Name "wave5b4"
+            Where spawnbot
+            TotalCount 20
+            MaxActive 15
+            SpawnCount 5
+            WaitBeforeStarting 2
+            WaitBetweenSpawns 18
+            TotalCurrency 100
+            WaitForAllDead "wave5b1"
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Pyro_Backburner
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic
+                    Tag bot_squad_member
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic
+                    Tag bot_squad_member
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic
+                    Tag bot_squad_member
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic
+                    Tag bot_squad_member
+                }
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // Wave 6 - 400
+    Wave
+    {
+        StartWaveOutput
+        {
+            Target wave_start_classic_relay
+            Action Trigger
+        }
+        DoneOutput
+        {
+            Target wave_finished_relay
+            Action Trigger
+        }
+
+        // Main wave
+        // Dragons fury pyros
+        WaveSpawn
+        {
+            Name "wave6a1"
+            Where spawnbot
+            TotalCount 18
+            MaxActive 16
+            SpawnCount 2
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 10
+            TotalCurrency 50
+            TFBot
+            {
+                Template T_TFBot_Pyro_DragonsFury
+                //Attributes AlwaysCrit
+            }
+        }
+        // Pipe demos
+        WaveSpawn
+        {
+            Name "wave6a2"
+            Where spawnbot
+            TotalCount 18
+            MaxActive 16
+            SpawnCount 2
+            WaitBeforeStarting 0
+            WaitBetweenSpawns 10
+            TotalCurrency 100
+            TFBot
+            {
+                Template T_TFBot_Demo_Default
+                Attributes AlwaysCrit
+                Attributes AlwaysFireWeapon
+            }
+        }
+        // Giant Dragons fury pyros with giant shield medic
+        WaveSpawn
+        {
+            Name "wave6a3"
+            Where spawnbot
+            TotalCount 8
+            MaxActive 8
+            SpawnCount 2
+            WaitBeforeStarting 4
+            WaitBetweenSpawns 18
+            TotalCurrency 150
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Pyro_DragonsFury
+                    Attributes AlwaysCrit
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Medic_With_Shield
+                    Tag bot_squad_member
+                }
+            }
+        }
+        // Giant heater heavies with giant blast vac and giant bullet vac
+        // Plus some additional small kritz meds
+        WaveSpawn
+        {
+            Name "wave6b1"
+            Where spawnbot
+            TotalCount 12
+            MaxActive 12
+            SpawnCount 6
+            WaitBeforeStarting 13
+            WaitBetweenSpawns 25
+            TotalCurrency 150
+            WaitForAllDead "wave6a3"
+            Squad
+            {
+                TFBot
+                {
+                    Template T_TFBot_Giant_Heavyweapons_Heater
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Medic_Vaccinator_Bullet
+                    Tag bot_squad_member
+                }
+                TFBot
+                {
+                    Template T_TFBot_Giant_Medic_Vaccinator_Blast
+                    Tag bot_squad_member
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_Kritz_Bulky
+                    Tag bot_squad_member
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_Kritz_Bulky
+                    Tag bot_squad_member
+                }
+                TFBot
+                {
+                    Template T_TFBot_Medic_Kritz_Bulky
+                    Tag bot_squad_member
+                }
+            }
+        }
+        // Heavy heaters
+        WaveSpawn
+        {
+            Name "wave6b2"
+            Where spawnbot
+            TotalCount 28 //32
+            MaxActive 16
+            SpawnCount 4
+            WaitBeforeStarting 8
+            WaitBetweenSpawns 7
+            TotalCurrency 50
+            WaitForAllDead "wave6a3"
+            TFBot
+            {
+                Template T_TFBot_Heavyweapons_Heater_Small
+            }
+        }
+
+        // Boss Wave Ending
+        // Boss support 1: left side gas pyros
+        WaveSpawn
+        {
+            Name "wave6bossSupport1"
+            Where spawnbot_left
+            TotalCount 10
+            MaxActive 4
+            SpawnCount 2
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 8
+            TotalCurrency 0
+            WaitForAllDead "wave6b1"
+
+            Support 1
+
+            TFBot
+            {
+                Template T_TFBot_Pyro_Exploder
+            }
+        }
+        // Boss support 2: right side gas pyros
+        WaveSpawn
+        {
+            Name "wave6bossSupport2"
+            Where spawnbot_right
+            TotalCount 10
+            MaxActive 4
+            MaxActive 4
+            SpawnCount 2
+            WaitBeforeStarting 10
+            WaitBetweenSpawns 8
+            TotalCurrency 0
+            WaitForAllDead "wave6b1"
+
+            Support 1
+
+            TFBot
+            {
+                Template T_TFBot_Pyro_Exploder
+            }
+        }
+        // Boss: chief gas pyro
+        WaveSpawn
+        {
+            Name "wave6bossIntro"
+            WaitForAllDead "wave6b1"
+            WaitBeforeStarting 3
+            StartWaveWarningSound "vo\mvm\mght\pyro_mvm_m_laughevil01.mp3"
+        }
+        WaveSpawn
+        {
+            Name "wave6boss"
+            Where spawnbot
+            TotalCount 1
+            MaxActive 1
+            SpawnCount 1
+            WaitForAllSpawned "wave6bossIntro"
+            WaitBeforeStarting 2 //spawn 2 seconds after the intro sound
+            WaitBetweenSpawns 0
+            TotalCurrency 0
+            DoneWarningSound "vo\mvm\mght\pyro_mvm_m_painsevere05.mp3" //death sound
+            LastSpawnOutput
+            {
+                Target second_bomb_classic_enable //add second bomb
+                Action Trigger
+            }
+            TFBot
+            {
+                Template T_TFBot_Chief_Pyro_Exploder
+            }
+        }
+    }
+}

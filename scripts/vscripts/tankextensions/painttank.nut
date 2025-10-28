@@ -19,7 +19,7 @@ PrecacheModel(PAINTTANK_MODEL_COLOR_TRACK_L)
 PrecacheModel(PAINTTANK_MODEL_COLOR_TRACK_R)
 PrecacheModel(PAINTTANK_MODEL_COLOR_BOMB)
 
-TankExt.NewTankScript("painttank*", {
+TankExt.NewTankType("painttank*", {
 	Model = {
 		Default    = PAINTTANK_MODEL_COLOR
 		Damage1    = PAINTTANK_MODEL_COLOR_DAMAGE1
@@ -29,10 +29,10 @@ TankExt.NewTankScript("painttank*", {
 		RightTrack = PAINTTANK_MODEL_COLOR_TRACK_R
 		Bomb       = PAINTTANK_MODEL_COLOR_BOMB
 	}
-	OnSpawn = function(hTank, sName, hPath)
+	function OnSpawn()
 	{
-		local sParams = split(sName, "|")
+		local sParams = split(sTankName, "|")
 		if(sParams.len() == 1) sParams.append("255 255 255")
-        TankExt.SetTankColor(hTank, sParams[1])
+        TankExt.SetTankColor(self, sParams[1])
 	}
 })

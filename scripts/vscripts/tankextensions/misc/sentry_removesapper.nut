@@ -1,9 +1,9 @@
 TankExt.PrecacheSound("Building_Sentry.Damage")
-bHasSapperLast <- false
-iHealthLast <- 0
-flNextDamage <- 0
-flTimeRemove <- 0
-SentrySapThink <- function()
+local bHasSapperLast = false
+local iHealthLast    = 0
+local flNextDamage   = 0
+local flTimeRemove   = 0
+function SentrySapThink()
 {
 	if(!self.IsValid()) return
 	local bHasSapper = GetPropBool(self, "m_bHasSapper")
