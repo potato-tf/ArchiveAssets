@@ -1,6 +1,8 @@
 --Originally made by royal, modified by therealscroob/crilly
 --I have only edited the templates, copy-pasted a function 4 times,and added a gross if statement brick.
 
+local PlayersWithCallbacks = {}
+
 local BOTS_VARIANTS = { --duplicate or redundant templates are here as parking space for variants once the script is functional
 	soldier = {
 		Display = "Giant Soldier",
@@ -855,9 +857,37 @@ local function addGlobalCallbacks(player)
 	end)
 end
 
-function OnPlayerConnected(player)
-	addGlobalCallbacks(player)
-end
+AddEventCallback("player_spawn", function(eventTable)
+	--print("Added callbacks")
+	
+	local spawnedPlayer = ents.GetPlayerByUserId(eventTable.userid)
+	--print(spawnedPlayer)
+	
+	local revisedTable = {}
+	local spawnedPlayerInTable = false
+	
+	for _, player in pairs(PlayersWithCallbacks) do
+		--if IsValid(player) then
+		--	table.insert(revisedTable, player)
+		--end
+		if player == spawnedPlayer then
+			spawnedPlayerInTable = true
+		end	
+	end
+	--if #revisedTable ~= #PlayersWithCallbacks then
+	--	PlayersWithCallbacks = {}
+	--	print("A player was invalid, rebuilding")
+	--	for _, player in pairs(revisedTable) do
+	--		table.insert(PlayersWithCallbacks, player)
+	--	end	
+	--end
+	
+	if spawnedPlayerInTable == false then
+		print("Added spawning player to table and applied callbacks")
+		addGlobalCallbacks(spawnedPlayer)
+		table.insert(PlayersWithCallbacks, spawnedPlayer)
+	end
+end)
 
 local function removeCallbacks(player, callbacks)
 	if not IsValid(player) then
@@ -1126,6 +1156,8 @@ local function setupBot(bot, owner, handle, building)
 
 		bot:ResetFakeSendProp("m_iTeamNum")
 		bot.m_iTeamNum = 1
+			
+		bot.m_bGlowEnabled = 0		
 
 		removeCallbacks(bot, callbacks)
 		if IsValid(building) then
@@ -1330,6 +1362,7 @@ local function startBotConstruction(owner, building, bot)
 			bot:PlaySound("weapons/sentry_finish.wav")	
 			bot:RemoveCond(TF_COND_STUNNED)
 			bot:RemoveCond(TF_COND_STEALTHED_USER_BUFF_FADING)
+			bot.m_bGlowEnabled = 1	
 			building.m_bBuilding = 0
 			return
 		end
@@ -1422,13 +1455,17 @@ function SentrySpawned(_, building)
 			effect_name = "teleportedin_blue",
 			start_active = 1,
 			flag_as_weather = 0,
-		}, true, true)
+		}, true, true)	
 		teleParticle:SetAbsOrigin(botSpawn:GetAbsOrigin())
 		teleParticle:Start()
+			
+		botSpawn.m_bGlowEnabled = 1		
 	
 		timer.Simple(1, function ()
 			teleParticle:Remove()
 		end)
+			
+			
 
 		startBotConstruction(owner, newBuilding, botSpawn)
 
@@ -1477,6 +1514,7 @@ function SentrySpawned(_, building)
 		local kneecapGiant = false	
 			
 		local kneecapCooldown = 0	
+		local autoKneecapNotified = false	
 
 		-- bot behavior
 		-- default behavior is always following you
@@ -1488,20 +1526,19 @@ function SentrySpawned(_, building)
 			end
 				
 
-			if not owner:IsAlive() then		
-						
-				if not botSpawn:InCond(TF_COND_STUNNED) then
-	
-				botSpawn:AddCond(TF_COND_MVM_BOT_STUN_RADIOWAVE, 50000, botSpawn)
-					
-				end
-						
-				return
+			if not owner:IsAlive() and autoKneecapNotified == false then		
+				owner:AcceptInput("$displaytextchat", "{FFFF00}Giant OS{reset} {FFFFFF} : Engineer death detected. Giant is now {Blue}Parked")	
+				owner:PlaySoundToSelf("radio5.mp3")
+				owner:PlaySoundToSelf("mvm/giant_demoman/giant_demoman_step_01.wav")				
+				autoKneecapNotified = true	
+				kneecapGiant = true
+				botSpawn:RemoveCond(17)	
+				botSpawn.m_flChargeMeter = 0		
 			end
 		
 					
-			if owner:IsAlive() and botSpawn:GetConditionProvider(TF_COND_MVM_BOT_STUN_RADIOWAVE) == botSpawn then
-				botSpawn:RemoveCond(TF_COND_STUNNED)		
+			if owner:IsAlive() then
+				autoKneecapNotified = false		
 			end			
 			
 			local botMisc
@@ -1584,7 +1621,7 @@ function SentrySpawned(_, building)
 			end
 							
 
-			if owner.m_hActiveWeapon.m_iClassname == "tf_weapon_laser_pointer" then						
+			if owner:IsAlive() and owner.m_hActiveWeapon.m_iClassname == "tf_weapon_laser_pointer" then						
 				-- wrangle behavior:
 				-- if attack is held: fire weapon
 				-- if alt fire is held: move toward cursor while attacking independently						
@@ -1666,13 +1703,13 @@ function SentrySpawned(_, building)
 
 			if distance >= SPEED_BOOST_DISTANCE then
 				botSpawn:AddCond(TF_COND_SPEED_BOOST, 1)
-			end
+			end		
 
 			local stringStart = "interrupt_action -switch_action Default"
 					
 				
 					
-			if owner.m_nButtons >= 8192 and kneecapCooldown <= 0 then
+			if owner.m_nButtons >= 33554432 and kneecapCooldown <= 0 then
 						
 					if kneecapGiant == false then	
 						kneecapGiant = true		
@@ -1685,7 +1722,7 @@ function SentrySpawned(_, building)
 						owner:PlaySoundToSelf("radio4.mp3")
 						owner:PlaySoundToSelf("sentry_spot_low.mp3")	
 					end
-				kneecapCooldown = 0.3		
+				kneecapCooldown = 0.35		
 			end
 					
 			if kneecapCooldown > 0 then
@@ -1697,6 +1734,10 @@ function SentrySpawned(_, building)
 			if distance <= 150 or kneecapGiant == true then
 				botSpawn:BotCommand(stringStart .. " -duration 0.1")
 				--print(owner.m_nButtons)
+				if kneecapGiant == true and botSpawn:InCond(17) then
+					botSpawn:RemoveCond(17)	
+					botSpawn.m_flChargeMeter = 0		
+				end			
 				return
 			end
 
@@ -1824,8 +1865,8 @@ AddEventCallback("player_death", function(eventTable)
 		killAddition = 5
 	end
 	
-	--heal 50 when euthanizing a common, heal 250 when euthanizing a giant
-	attackerBot.m_iHealth = attackerBot.m_iHealth + 50 * killAddition
+	--heal 100 when euthanizing a common, heal 500 when euthanizing a giant
+	attackerBot.m_iHealth = attackerBot.m_iHealth + 100 * killAddition
 	
 	--20 banner charge from a common, 50 from a giant
 	if attackerBot:GetPlayerItemBySlot(1):GetItemName() == "The Buff Banner" or attackerBot:GetPlayerItemBySlot(1):GetItemName() == "The Concheror" then
@@ -1837,15 +1878,6 @@ AddEventCallback("player_death", function(eventTable)
 		--print("We just got banner charge")
 		--print (attackerBot.m_flRageMeter)		
 		end		
-	end
-		
-	--20 charge from a common, 40 from a giant
-	if attackerBot:GetPlayerItemBySlot(1):GetItemName() == "The Splendid Screen" or attackerBot:GetPlayerItemBySlot(1):GetItemName() == "The Chargin' Targe" and attackerBot.m_flChargeMeter < 100 then
-	attackerBot.m_flChargeMeter = attackerBot.m_flChargeMeter + killAddition * 5 + 15
-	print("We just got charge")			
-		if attackerBot.m_flChargeMeter > 100 then
-			attackerBot.m_flChargeMeter = 100
-		end
 	end		
 	
 	local particlelocation = activeBuiltBots[player:GetHandleIndex()]:GetAbsOrigin() + Vector(0, 0, 125) --taken from bbox_heal_on_building_hit.lua
@@ -1871,11 +1903,11 @@ function checkIfMeleeHitAlly(param, activator, calller)
 		--ripped from my med hunter script, hybrid of red sniper laser check and some original work on my end
 	
 		local TraceLineOfSight = {
-			start = activator,
-			distance = 100,
-			angles = getEyeAngles(activator),
-			mask = MASK_SOLID,
-			collisiongroup = COLLISION_GROUP_PLAYER,
+			start = activator, -- Start position vector. Can also be set to entity, in this case the trace will start from entity eyes position
+			distance = 100, -- Used if endpos is nil
+			angles = getEyeAngles(activator), -- Used if endpos is nil
+			mask = MASK_SOLID, -- Solid type mask, see MASK_* globals
+			collisiongroup = COLLISION_GROUP_PLAYER, -- Pretend the trace to be fired by an entity belonging to this group. See COLLISION_GROUP_* globals
 		}
 		local lineOfSightTraceTable = util.Trace(TraceLineOfSight)
 		
@@ -1887,7 +1919,7 @@ function checkIfMeleeHitAlly(param, activator, calller)
 			--code to consume metal taken from b8's tank repair script
 		
 			local METAL_TO_HEALTH_RATIO = 16
-			-- TODO: This should be a bot tag
+		
 			if hitEntity:GetPlayerName() == "Giant VIP Heavy" then
 				METAL_TO_HEALTH_RATIO = 8
 			end
@@ -1904,7 +1936,7 @@ function checkIfMeleeHitAlly(param, activator, calller)
 			local metalLost = (oldMetal - newMetal)
 			hitEntity.m_iHealth = hitEntity.m_iHealth + 1 + (metalLost * METAL_TO_HEALTH_RATIO * activator:GetAttributeValueByClass("mult_repair_value", 1))
 		
-			hitEntity:TakeDamage({ -- make the bot take 1 damage so the sentry healthbar updates, compensated by adding +1 hp above.
+			hitEntity:TakeDamage({ -- make the bot take 1 damage so the sentry healthbar updates.
 				Damage = 1,
 				Attacker = activator,
 				Weapon = none,
@@ -1924,6 +1956,6 @@ function checkIfMeleeHitAlly(param, activator, calller)
 			if IsValid(building) then	
 				building.m_iHealth = bot.m_iHealth
 			end
-		end
+		end	
 	util.FinishLagCompensation(activator)
 end
