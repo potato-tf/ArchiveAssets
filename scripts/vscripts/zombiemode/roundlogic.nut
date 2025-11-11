@@ -32,7 +32,7 @@ if (max_active > 24) max_active = 24
 			Entities.FindByName(null, "respawner").AcceptInput("ForceTeamRespawn","2",null,null)
 			Entities.FindByName(null, "checkpoint_relay").AcceptInput("AddOutput","OnTrigger gameover_relay:CancelPending::0:-1",null,null)
 			Entities.FindByName(null, "gameover_relay").AcceptInput("AddOutput","OnTrigger fade_out:Fade::21:-1",null,null)
-			delete GlobalFixes.TakeDamageTable.HolidayPunchFix
+			// delete GlobalFixes.TakeDamageTable.HolidayPunchFix
 			spawn_interval = spawn_interval - (0.04 * player_count)
 			if (player_count > 4)
 			{
@@ -51,7 +51,7 @@ if (max_active > 24) max_active = 24
 		NetProps.SetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveClassCounts", zombie_count)
 		NetProps.SetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveEnemyCount", zombie_count)
 		// spawn a bot_generator later with values from here
-		local generator = SpawnEntityFromTable("bot_generator"
+		local generator = SpawnEntityFromTable("bot_generator",
 		{
 			useTeamSpawnPoint = 1
 			maxActive = max_active
@@ -77,7 +77,7 @@ if (max_active > 24) max_active = 24
 		NetProps.SetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveEnemyCount", special_count)
 		SpawnEntityFromTable("point_commentary_node", {origin = "92 -598 -741"})
 		boss_multiplier = special_count * 1.3
-		local generator = SpawnEntityFromTable("bot_generator"
+		local generator = SpawnEntityFromTable("bot_generator",
 		{
 			useTeamSpawnPoint = 1
 			maxActive = max_active
@@ -103,7 +103,7 @@ function ZM_GetPlayerCount()
     foreach (player in PopExtUtil.HumanArray)
 	{
 		player_count++
-		if ("Preserved" in player.GetScriptScope()) player.GetScriptScope().Preserved.timesrepaired = 0	// reset their barricade cap here while we're doing a headcount
+		if ("PRESERVED" in player.GetScriptScope()) player.GetScriptScope().PRESERVED.timesrepaired = 0	// reset their barricade cap here while we're doing a headcount
 	}
 	if (round_number == 1) players_counted = player_count
 	if (round_number > 1)

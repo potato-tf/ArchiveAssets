@@ -52,8 +52,8 @@ local Upgradelist = // so we know what weapon turns into what
 		wepslot = Upgradelist[weapon].slot
 		pap_weaponmodel.SetModel(model)
 		local scope = activator.GetScriptScope()
-		scope.Preserved.papweapon = upgraded
-		scope.Preserved.papslot = wepslot
+		scope.PRESERVED.papweapon = upgraded
+		scope.PRESERVED.papslot = wepslot
 		pap_train.AcceptInput("SetSpeedForwardModifier","5",null,null)
 		pap_start.AcceptInput("trigger","",null,null)
 		if (model2 != "null")
@@ -85,7 +85,7 @@ local Upgradelist = // so we know what weapon turns into what
 		pap_button.AcceptInput("unlock","",null,null)
 		if (boxuser != null)
 		{
-			boxuser.GetScriptScope().Preserved.isusingstrongmann = false
+			boxuser.GetScriptScope().PRESERVED.isusingstrongmann = false
 			ClearPaPScope(boxuser)
 			boxuser = null
 		}
