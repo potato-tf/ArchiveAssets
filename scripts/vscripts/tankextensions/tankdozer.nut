@@ -38,6 +38,10 @@ PrecacheModel(PROPCOLLISION_BARREL)
 			local DozerScope = TankExt.GetMultiScopeTable(hVictim.GetScriptScope(), "tankdozer")
 			if(DozerScope)
 			{
+				local vecShot = params.damage_position
+				if(vecShot.LengthSqr() == 0)
+					return
+
 				local CrateCollision = {}
 				local CreateCrateCollisionProp = function(sModel, vecOrigin, angRotation)
 				{
@@ -60,7 +64,6 @@ PrecacheModel(PROPCOLLISION_BARREL)
 				CreateCrateCollisionProp(PROPCOLLISION_BARREL, Vector(-79, 56, 22), QAngle(0, 0, 90))
 				CreateCrateCollisionProp(PROPCOLLISION_BARREL, Vector(79, 56, 46), QAngle(0, 0, 90))
 
-				local vecShot   = params.damage_position
 				local vecCenter = hVictim.GetCenter()
 				local Trace = {
 					mask   = MASK_SOLID
@@ -109,10 +112,13 @@ PrecacheModel(PROPCOLLISION_BARREL)
 							{
 								params.damage = 0
 							}
-							else if(sClassname == "worldspawn" && (Trace.end - vecCenter).LengthSqr() != 0)
+							else if(sClassname == "worldspawn")
 							{
-								Trace.end = vecCenter
-								TraceRecursive()
+								if(Trace.end != vecCenter)
+								{
+									Trace.end = vecCenter
+									TraceRecursive()
+								}
 							}
 							else
 							{
@@ -123,7 +129,7 @@ PrecacheModel(PROPCOLLISION_BARREL)
 							}
 						}
 					}
-					else if((Trace.end - vecCenter).LengthSqr() != 0)
+					else if(Trace.end != vecCenter)
 					{
 						Trace.end = vecCenter
 						TraceRecursive()
