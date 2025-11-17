@@ -12,78 +12,22 @@ on:
   workflow_dispatch:
   
 concurrency:
+
   group: main
   cancel-in-progress: true
   
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+
+  asset-pack:
+
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+
       - uses: actions/checkout@v3
         with:
           path: tf/download
-
-      # - uses: zerotier/github-action@v1
-      #   with:
-      #     auth_token: ${{ secrets.ZEROTIER_KEY }}
-      #     network_id: e4da7455b253a261
-
-      # Install wakeonlan
-      - name: Make scripts executable
-        run: sudo apt-get install -y wakeonlan
-        
-      - name: Setup SSH Keys and known_hosts
-        env:
-            SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-            ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-            ssh-add - <<< "${{ secrets.DEPLOY_KEY_NEW }}"
-
-      # Compress WAV files before packaging
-      # - name: Compress WAV files
-      #  run: |
-      #    sudo apt-get install -y ffmpeg
-      #    cd tf/download/sound
-          
-          # Function to compress a WAV file to ADPCM_MS format
-      #    compress_wav_file() {
-      #      local file="$1"
-            
-            # Check if the file is already in ADPCM_MS format
-      #      ffmpeg_output=$(ffprobe -v quiet -select_streams a:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 -- "$file" 2>/dev/null)
-            
-      #      if [[ "$ffmpeg_output" != *"adpcm_ms"* ]]; then
-      #        echo "Compressing: $file"
-
-      #        tmp="${file}.tmp.wav"
-              
-              # Convert to ADPCM_MS (directly overwrite in the compressed_assets directory)
-      #        ffmpeg -v error -i "$file" -c:a adpcm_ms -map_metadata 0 -y "$tmp" 2>/dev/null
-              
-      #        if [ $? -eq 0 ]; then
-      #          echo "✅: $file"
-      #          mv -- "$tmp" "$file"
-      #        else
-      #          echo "❌: $file"
-      #          rm -f -- "$tmp"
-      #        fi
-      #      else
-      #        echo "👍: $file"
-      #      fi
-      #    }
-          
-          # Find and compress all WAV files in the compressed_assets copy
-          
-      #    find . -type f -name "*.wav" | while read -r wav_file; do
-      #      compress_wav_file "$wav_file" &
-      #    done
-      #    wait
 
       - name: Create asset pack
         run: |
@@ -110,12 +54,68 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_REGION: 'auto'   # optional: defaults to us-east-1
           AWS_S3_ENDPOINT: https://d7d00000029f3cf361b520329f5e69df.r2.cloudflarestorage.com
+  
+  fastdl:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      
+      - uses: actions/checkout@v3
+        with:
+          path: tf/download
+
+      # Install wakeonlan
+      - name: Make scripts executable
+        run: sudo apt-get install -y wakeonlan
+        
+      - name: Setup SSH Keys and known_hosts
+        env:
+            SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+            ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+            ssh-add - <<< "${{ secrets.DEPLOY_KEY_NEW }}"
 
       - name: Create bz2 archives
         run: |
           cd tf/download
           find . -type f -not \( -name "*.pop" -or -name "*.nav" -or -name "*.res" -or -name "*.bz2" -or -name "*.lua" -or -name "*.nut" -or -name "*.raw" -or -name "*.bsp" \) \( ! -regex '.*/\..*' \) | parallel bzip2 -f -k
           
+      - name: Sync with fastdl endpoints
+        env:
+            SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+
+          cd tf/download
+
+          mapfile -t servers < <(curl -s https://raw.githubusercontent.com/potato-tf/deploy/refs/heads/main/serverlist.json | jq -r '.servers[]')
+          for i in "${servers[@]}"; do a=( $i );
+          {
+            ssh -o StrictHostKeyChecking=no -p ${a[0]} ${a[1]} "touch ${a[2]}/tf2server/tf/occupiedservers/wake; exit 0"
+
+            rsync -a --mkpath -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --update --delete --include="*/" --include="*.bz2" --include="*.bsp" --include="*.raw" --exclude="*" . ${a[1]}:${a[2]}/www/html/gameassets/archive/
+
+          } &
+          done
+          wait
+
+  game-servers:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v3
+        with:
+          path: tf/download
+
+      - name: Setup SSH Keys and known_hosts
+        env:
+            SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+            ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+            ssh-add - <<< "${{ secrets.DEPLOY_KEY_NEW }}"
+
       - name: Sync with game servers
         env:
             SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -129,8 +129,6 @@ jobs:
             ssh -o StrictHostKeyChecking=no -p ${a[0]} ${a[1]} "touch ${a[2]}/tf2server/tf/occupiedservers/wake; exit 0"
 
             rsync -a --mkpath -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --update --delete --exclude=".*" --exclude="*.bz2" . ${a[1]}:${a[2]}/tf2server/tf/archive/
-            rsync -a --mkpath -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --update --delete --include="*/" --include="*.bz2" --include="*.bsp" --include="*.raw" --exclude="*" . ${a[1]}:${a[2]}/www/html/gameassets/archive/
-
           } &
           done
           wait
