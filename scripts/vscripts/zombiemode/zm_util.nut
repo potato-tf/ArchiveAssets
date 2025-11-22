@@ -79,7 +79,7 @@ const POWERUP_TIME = 30;
 	if (self.GetActiveWeapon().GetSlot() >= 2)
 	{
 		self.SetCustomModelWithClassAnimations(PlayerModels[playerclass])
-		scope.Preserved.activeweapon = wep
+		scope.PRESERVED.activeweapon = wep
 		SetPropInt(self,"m_nRenderMode",0)
 		SetPropInt(self,"Alpha",255)
 		return
@@ -91,7 +91,7 @@ const POWERUP_TIME = 30;
 	SetPropInt(self,"Alpha",1)
 	local playeranim = PopExtUtil.CreatePlayerWearable(self,PlayerModels[playerclass],true)
 	SetPropBool(playeranim,"m_bGlowEnabled",true)
-	scope.Preserved.activeweapon = wep
+	scope.PRESERVED.activeweapon = wep
 }
 ::RoundEnd <- function(activator)
 {
@@ -340,23 +340,23 @@ const POWERUP_TIME = 30;
 ::ClearBoxScope <- function(self)
 {
 	local scope = self.GetScriptScope();
-	if (scope.Preserved.isusingbox == true) return // do not clear scope if this is not cleared, failsafe against quick rollers
-	scope.Preserved.mysteryslot = "null"
-	scope.Preserved.mysteryitemname = "null"
-	scope.Preserved.mysteryresponse = "null"
+	if (scope.PRESERVED.isusingbox == true) return // do not clear scope if this is not cleared, failsafe against quick rollers
+	scope.PRESERVED.mysteryslot = "null"
+	scope.PRESERVED.mysteryitemname = "null"
+	scope.PRESERVED.mysteryresponse = "null"
 }
 ::ClearPaPScope <- function(self)
 {
 	local scope = self.GetScriptScope();
-	if (scope.Preserved.isusingstrongmann == true) return // do not clear scope if this is not cleared, failsafe against quick rollers
-	scope.Preserved.papweapon = "null"
+	if (scope.PRESERVED.isusingstrongmann == true) return // do not clear scope if this is not cleared, failsafe against quick rollers
+	scope.PRESERVED.papweapon = "null"
 }
 ::ConfirmNotInUse <- function()	// check that box is not being used
 {
 	foreach (player in PopExtUtil.HumanArray)
 	{
 		local scope = player.GetScriptScope()
-		if (scope.Preserved.isusingstrongmann == true)
+		if (scope.PRESERVED.isusingstrongmann == true)
 		{
 			return false;
 			break
@@ -382,7 +382,7 @@ const POWERUP_TIME = 30;
 }
 ::ClearBots <- function() // begone, bot
 {
-	local generator = SpawnEntityFromTable("tf_logic_training_mode"
+	local generator = SpawnEntityFromTable("tf_logic_training_mode",
 	{
 		targetname = "bot_wiper"
 	})
@@ -392,14 +392,14 @@ const POWERUP_TIME = 30;
 
 ::RoundEnd_Think <- function()
 {
-	if (PopExtUtil.CountAliveBots() == 1)
+	if (PopExtUtil.CountAlivePlayers( true ) == 1)
 	{
 		EntFireByHandle(checkpoint_relay, "trigger", "", 0, null, null);
 	}
 }
 ::BossEnd_Think <- function()
 {
-	if (PopExtUtil.CountAliveBots() == 1)
+	if (PopExtUtil.CountAlivePlayers( true ) == 1)
 	{
 		EntFireByHandle(checkpoint_relay_boss, "trigger", "", 0, null, null);
 	}
@@ -419,7 +419,7 @@ const POWERUP_TIME = 30;
 	local scope = self.GetScriptScope();
 	local round_number = NetProps.GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveCount")
 	if (!self.IsValid()) return
-	if (!"Preserved" in self.GetScriptScope()) return
+	if (!"PRESERVED" in self.GetScriptScope()) return
 	if (GetRoundState() == 10) // give starting weapon because it's pre-round
 	{
 		self.SetCurrency(500)
@@ -429,27 +429,27 @@ const POWERUP_TIME = 30;
 			weapon_secondary = "ZM_Pistol"
 			weapon_melee = "null"
 		}
-		if ("Preserved" in self.GetScriptScope())
+		if ("PRESERVED" in self.GetScriptScope())
 		{
 			foreach (k, v in items)
-			self.GetScriptScope().Preserved[k] <- v
+				self.GetScriptScope().PRESERVED[k] <- v
 		}
-		::CustomWeapons.GiveItem(scope.Preserved.weapon_secondary, self)
-		EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 2), 2)",0.1,null,self);
+		PopExtWeapons.GiveItem(scope.PRESERVED.weapon_secondary, self)
+		PopExtUtil.ScriptEntFireSafe(self, "SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 2), 2)", 0.1, null, self);
 	}
 	if (GetRoundState() == 4)
 	{
-		if (("weapon_primary" && "weapon_secondary") in scope.Preserved)
+		if (("weapon_primary" && "weapon_secondary") in scope.PRESERVED)
 		{
-			::CustomWeapons.GiveItem(scope.Preserved.weapon_primary, self)
-			::CustomWeapons.GiveItem(scope.Preserved.weapon_secondary, self)
-			::CustomWeapons.GiveItem(scope.Preserved.weapon_melee, self)
+			PopExtWeapons.GiveItem(scope.PRESERVED.weapon_primary, self)
+			PopExtWeapons.GiveItem(scope.PRESERVED.weapon_secondary, self)
+			PopExtWeapons.GiveItem(scope.PRESERVED.weapon_melee, self)
 			ApplyPerkBonuses(self)
-			EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 1), 1)",0.1,null,self);
-			EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 2), 2)",0.1,null,self);
+			PopExtUtil.ScriptEntFireSafe(self, "SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 1), 1)", 0.1, null, self);
+			PopExtUtil.ScriptEntFireSafe(self, "SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 2), 2)", 0.1, null, self);
 			return
 		}
-		if (!("weapon_primary" && "weapon_secondary") in scope.Preserved)
+		if (!("weapon_primary" && "weapon_secondary") in scope.PRESERVED)
 		{
 			if (round_number > 10)
 			{
@@ -460,17 +460,17 @@ const POWERUP_TIME = 30;
 					weapon_secondary = "ZM_Raygun"
 					weapon_melee = "null"
 				}
-				if ("Preserved" in self.GetScriptScope())
+				if ("PRESERVED" in self.GetScriptScope())
 				{
 					foreach (k, v in items)
-					self.GetScriptScope().Preserved[k] <- v
+					self.GetScriptScope().PRESERVED[k] <- v
 				}
 				EntFireByHandle(self,"runscriptcode","self.AddCustomAttribute(`max health additive bonus`,100,-1)",1.2,null,self);
-				scope.Preserved.powerups["Saxton Ale"] <- true
+				scope.PRESERVED.powerups["Saxton Ale"] <- true
 				
-				::CustomWeapons.GiveItem(scope.Preserved.weapon_primary, self)
-				::CustomWeapons.GiveItem(scope.Preserved.weapon_secondary, self)
-				::CustomWeapons.GiveItem(scope.Preserved.weapon_melee, self)
+				PopExtWeapons.GiveItem(scope.PRESERVED.weapon_primary, self)
+				PopExtWeapons.GiveItem(scope.PRESERVED.weapon_secondary, self)
+				PopExtWeapons.GiveItem(scope.PRESERVED.weapon_melee, self)
 			}
 		}
 		else
@@ -482,21 +482,21 @@ const POWERUP_TIME = 30;
 				weapon_secondary = "ZM_Pistol"
 				weapon_melee = "null"
 			}
-			if ("Preserved" in self.GetScriptScope())
+			if ("PRESERVED" in self.GetScriptScope())
 			{
 				foreach (k, v in items)
-				self.GetScriptScope().Preserved[k] <- v
+				self.GetScriptScope().PRESERVED[k] <- v
 			}
-			::CustomWeapons.GiveItem(scope.Preserved.weapon_primary, self)
-			::CustomWeapons.GiveItem(scope.Preserved.weapon_secondary, self)
-			::CustomWeapons.GiveItem(scope.Preserved.weapon_melee, self)
+			PopExtWeapons.GiveItem(scope.PRESERVED.weapon_primary, self)
+			PopExtWeapons.GiveItem(scope.PRESERVED.weapon_secondary, self)
+			PopExtWeapons.GiveItem(scope.PRESERVED.weapon_melee, self)
 		}
 	}
 }
 
 ::ShowGasOnPlayer <- function(self)
 {
-	local scope = self.GetScriptScope().Preserved
+	local scope = self.GetScriptScope().PRESERVED
 	local gastext = ""
 	local text_gas = FindByName(null, "__text_gas")
 	if (text_gas == null)
@@ -522,7 +522,7 @@ const POWERUP_TIME = 30;
 }
 ::UpdatePowerupDurations <- function(self)
 {
-	local scope = self.GetScriptScope().Preserved
+	local scope = self.GetScriptScope().PRESERVED
 	local deathmachinetext = ""
 	local instakilltext = ""
 	local doublepointstext = ""
@@ -559,7 +559,7 @@ const POWERUP_TIME = 30;
 ::UpdateHUDForPerks <- function(self)
 {
 //	return 		// disable for now, can't get this shit to display right
-	local scope = self.GetScriptScope().Preserved
+	local scope = self.GetScriptScope().PRESERVED
 	local hasostarion = false
 	local hassaxton = false 
 	local hasdoubletap = false 
@@ -612,9 +612,9 @@ const POWERUP_TIME = 30;
 	self.ValidateScriptScope()
 	local scope = self.GetScriptScope();
 	self.AddCondEx(6,10,null)
-	scope.Preserved.timesteleported = scope.Preserved.timesteleported + (POWERUP_TIME - 29)
-	scope.Preserved.teleporttime = Time() + STRONGMANN_TIME; // I dunno keep it as like a minute??
-	scope.Preserved.isinstrongmannroom = true; // trip look up for playerlogic
+	scope.PRESERVED.timesteleported = scope.PRESERVED.timesteleported + (POWERUP_TIME - 29)
+	scope.PRESERVED.teleporttime = Time() + STRONGMANN_TIME; // I dunno keep it as like a minute??
+	scope.PRESERVED.isinstrongmannroom = true; // trip look up for playerlogic
 	ScreenFade(self,255,255,255,255,1,0,1)
 	ScreenShake(self.GetCenter(),16,144,2,48,0,true)
 	local strongmannwarp = Entities.FindByName(null, "warp_destination")
@@ -632,8 +632,8 @@ const POWERUP_TIME = 30;
 	self.ValidateScriptScope()
 	local scope = self.GetScriptScope();
 	self.AddCondEx(6,10,null)
-	scope.Preserved.teleporttime = Time() + STRONGMANN_TIME - 10; // I dunno keep it as like a minute??
-	scope.Preserved.isinstrongmannroom = true; // trip look up for playerlogic
+	scope.PRESERVED.teleporttime = Time() + STRONGMANN_TIME - 10; // I dunno keep it as like a minute??
+	scope.PRESERVED.isinstrongmannroom = true; // trip look up for playerlogic
 	ScreenFade(self,255,255,255,255,1,0,1)
 	ScreenShake(self.GetCenter(),16,144,2,48,0,true)
 	local secretwarp = Entities.FindByName(null, "boardroom_destination")
@@ -665,7 +665,7 @@ const POWERUP_TIME = 30;
 
 ::SpawnPowerup <- function(player)
 {
-	if (player.GetScriptScope().Preserved.isenteringlevel == 1 || powerupcount == 4) return
+	if (player.GetScriptScope().PRESERVED.isenteringlevel == 1 || powerupcount == 4) return
 	if (powerupcooldown > 0)
 	{
 		powerupcooldown -= 1
@@ -726,7 +726,7 @@ const POWERUP_TIME = 30;
 	PopExtUtil.PlaySoundOnClient(self,"items/powerup_pickup_crits.wav",1.0,100)
 	PopExtUtil.PlaySoundOnClient(self,"deadlands/powerup_instagib.mp3",1.0,100)
 	self.AddCondEx(56,30,null)
-	scope.Preserved.instakilltime = Time() + POWERUP_TIME;
+	scope.PRESERVED.instakilltime = Time() + POWERUP_TIME;
 	ClientPrint(self, HUD_PRINTCENTER, "Instakill!");
 	UpdatePowerupDurations(self)
 }
@@ -738,8 +738,8 @@ const POWERUP_TIME = 30;
 		{
 			PopExtUtil.PlaySoundOnClient(player,"deadlands/pickup_maxammo.mp3",1.0,100)
 			PopExtUtil.PlaySoundOnClient(player,"deadlands/powerup_maxammo.mp3",1.0,100)
-			SetPropIntArray(player, "m_iAmmo", ::CustomWeapons.GetMaxAmmo(player, 1), 1)
-			SetPropIntArray(player, "m_iAmmo", ::CustomWeapons.GetMaxAmmo(player, 2), 2) 
+			SetPropIntArray(player, "m_iAmmo", PopExtWeapons.GetMaxAmmo(player, 1), 1)
+			SetPropIntArray(player, "m_iAmmo", PopExtWeapons.GetMaxAmmo(player, 2), 2) 
 			ClientPrint(player, HUD_PRINTCENTER, "Max Ammo!");
 		}
 	}
@@ -761,7 +761,7 @@ const POWERUP_TIME = 30;
 ::ActivateDoublePoints <- function(self)
 {
 	local scope = self.GetScriptScope();
-	scope.Preserved.doublepointstime = Time() + POWERUP_TIME;
+	scope.PRESERVED.doublepointstime = Time() + POWERUP_TIME;
 	ClientPrint(self, HUD_PRINTCENTER, "Double Points!");
 	PopExtUtil.PlaySoundOnClient(self,"items/powerup_pickup_haste.wav",1.0,100)
 	PopExtUtil.PlaySoundOnClient(self,"deadlands/powerup_doublepoints.mp3",1.0,100)
@@ -810,19 +810,19 @@ const POWERUP_TIME = 30;
 			break
 		}
 	}
-	::CustomWeapons.GiveItem("Death Machine", self);
-	EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 1), 1)",0,null,self);
+	PopExtWeapons.GiveItem("Death Machine", self);
+	EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 1), 1)",0,null,self);
 	ClientPrint(self, HUD_PRINTCENTER, "Death Machine!");
 	self.SetIsMiniBoss(true)
 	ApplyPerkBonuses(self)
-	scope.Preserved.miniguntime = Time() + POWERUP_TIME;
-	scope.Preserved.hasdeathmachine = true
+	scope.PRESERVED.miniguntime = Time() + POWERUP_TIME;
+	scope.PRESERVED.hasdeathmachine = true
 	UpdatePowerupDurations(self)
 }
 ::PlayPerkAnimation <- function(self) 
 {
 	local main_viewmodel = GetPropEntity(self, "m_hViewModel")
-	::CustomWeapons.GiveItem("Perk Bottle", self);
+	PopExtWeapons.GiveItem("Perk Bottle", self);
 	main_viewmodel.SetSequence(main_viewmodel.LookupSequence("bb_fire_red"))
 	main_viewmodel.ResetSequence(main_viewmodel.LookupSequence("bb_fire_red"))
 	main_viewmodel.SetPlaybackRate(0.7)
@@ -854,7 +854,7 @@ const POWERUP_TIME = 30;
 	target = targetarray[RandomInt(0,targetarray.len()-1)]
 	
 	if (target == null) return	// wtf??
-	self.GetScriptScope().Preserved.attackcooldown = Time() + POWERUP_TIME;
+	self.GetScriptScope().PRESERVED.attackcooldown = Time() + POWERUP_TIME;
 	self.Taunt(0,11)
 	self.Taunt(0,11)
 	self.AddCustomAttribute("no_attack", 1, 3)
@@ -1068,18 +1068,18 @@ const POWERUP_TIME = 30;
 		if (user.GetPlayerClass() == 2)
 		{
 			UseBossSpawnLocation(user)
-			user.GetScriptScope().Preserved.isenteringlevel = 1
+			user.GetScriptScope().PRESERVED.isenteringlevel = 1
 		}
 		else
 		{
 			MoveToSpawnLocation(user)
-			user.GetScriptScope().Preserved.isenteringlevel = 1
+			user.GetScriptScope().PRESERVED.isenteringlevel = 1
 		}
 	}
 }
 ::DropGascans <- function (user)
 {
-	local scope = user.GetScriptScope().Preserved
+	local scope = user.GetScriptScope().PRESERVED
 
 	// =======
 	// fellen: These gas can drops have their props way offset from their parent buttons.

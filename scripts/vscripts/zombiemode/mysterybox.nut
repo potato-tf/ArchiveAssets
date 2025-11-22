@@ -93,31 +93,31 @@ local UserTookItem = false
 			local scope = activator.GetScriptScope()
 			
 			dumpster_weapon.SetModel(BoxTable[diceroll].model)
-			scope.Preserved.mysteryslot = BoxTable[diceroll].slot
-			scope.Preserved.mysteryitemname = BoxTable[diceroll].itemname
-			scope.Preserved.mysteryresponse = BoxTable[diceroll].response
+			scope.PRESERVED.mysteryslot = BoxTable[diceroll].slot
+			scope.PRESERVED.mysteryitemname = BoxTable[diceroll].itemname
+			scope.PRESERVED.mysteryresponse = BoxTable[diceroll].response
 			EntFireByHandle(activator,"runscriptcode","ClearBoxScope(self)",10,null,null);
 			
 			if (BoxTable[diceroll].itemname == "ZM_Raygun" && timesmoved == 0)
 			{
 				dumpster_weapon.SetModel("models/workshop/weapons/c_models/c_pep_pistol/c_pep_pistol.mdl")
-				scope.Preserved.mysteryitemname = "ZM_PistolB";
-				scope.Preserved.mysteryslot = "secondary";
-				scope.Preserved.mysteryresponse = "TLK_MVM_LOOT_COMMON";
+				scope.PRESERVED.mysteryitemname = "ZM_PistolB";
+				scope.PRESERVED.mysteryslot = "secondary";
+				scope.PRESERVED.mysteryresponse = "TLK_MVM_LOOT_COMMON";
 			}
 			if ((BoxTable[diceroll].itemname == "ZM_BurningLove" && timesmoved <= 1) || (BoxTable[diceroll].itemname == "ZM_BurningLove" && uberw_picked))
 			{
 				dumpster_weapon.SetModel("models/weapons/c_models/c_packer.mdl")
-				scope.Preserved.mysteryitemname = "ZM_Packer";
-				scope.Preserved.mysteryslot = "primary";
-				scope.Preserved.mysteryresponse = "TLK_MVM_LOOT_RARE";
+				scope.PRESERVED.mysteryitemname = "ZM_Packer";
+				scope.PRESERVED.mysteryslot = "primary";
+				scope.PRESERVED.mysteryresponse = "TLK_MVM_LOOT_RARE";
 			}
 		}
 		if (timesrolled >= maxrolls) // you rolled too many times, you get the dud!
 		{
 			activator.RemoveCurrency(-950)
 			local scope = activator.GetScriptScope()
-			scope.Preserved.isusingbox = false
+			scope.PRESERVED.isusingbox = false
 			timesrolled = 0
 			timesmoved += 1
 			maxrolls = RandomInt(6,10)
@@ -157,7 +157,7 @@ local UserTookItem = false
 		dumpster_dud.AcceptInput("disable","",null,null)
 		if (boxuser != null)
 		{
-			boxuser.GetScriptScope().Preserved.isusingbox = false
+			boxuser.GetScriptScope().PRESERVED.isusingbox = false
 			ClearBoxScope(boxuser)
 			boxuser = null
 		}

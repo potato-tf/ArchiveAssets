@@ -44,12 +44,12 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 			doublepointstime = 	0
 			multiplier =		1	// double points, to double points
 		}
-		if ("Preserved" in player.GetScriptScope())
+		if ("PRESERVED" in player.GetScriptScope())
 		{
 			foreach (k, v in items)
-			player.GetScriptScope().Preserved[k] <- v	// calls an error but still works, probably happens because the player entity doesn't exist when the hook tries to hook?
+			player.GetScriptScope().PRESERVED[k] <- v	// calls an error but still works, probably happens because the player entity doesn't exist when the hook tries to hook?
 			PlayerSpawn(player);
-			EntFireByHandle(player,"RunScriptCode","ApplyPlayerAttributes(self)",0.1,null,player);
+			PopExtUtil.ScriptEntFireSafe(player, "ApplyPlayerAttributes(self)", 0.1, null, player);
 		}
 		};
 		if (player.GetTeam() == 3)
@@ -68,14 +68,14 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 			isinanimation  = 0	// if true, bot gets no_attack
 			}
 			foreach (k, v in items)
-			player.GetScriptScope().Preserved[k] <- v
+			player.GetScriptScope().PRESERVED[k] <- v
 			ZombieSpawn(player);
 		}
     } 
 	function OnGameEvent_player_changeclass(params)
 	{
 		local player = GetPlayerFromUserID(params.userid);
-		if (player.GetTeam() == 2) EntFireByHandle(player,"RunScriptCode","ApplyPlayerAttributes(self)",0.1,null,player);
+		if (player.GetTeam() == 2) PopExtUtil.ScriptEntFireSafe(player, "ApplyPlayerAttributes(self)", 0.1, null, player);
 	}
 	function OnScriptHook_OnTakeDamage (params)
 	{
@@ -87,9 +87,9 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 		if (attacker == null) return
 		if (attacker.GetTeam() == 3)
 		{
-			if (attacker.GetScriptScope().Preserved.zombie_type <= 5) NetProps.SetPropString(params.weapon, "m_iClassname", "unarmed_combat")
-			if (attacker.GetScriptScope().Preserved.zombie_type == 7) NetProps.SetPropString(params.weapon, "m_iClassname", "battleaxe")
-			if (attacker.GetScriptScope().Preserved.zombie_type == 10) NetProps.SetPropString(params.weapon, "m_iClassname", "battleneedle")
+			if (attacker.GetScriptScope().PRESERVED.zombie_type <= 5) NetProps.SetPropString(params.weapon, "m_iClassname", "unarmed_combat")
+			if (attacker.GetScriptScope().PRESERVED.zombie_type == 7) NetProps.SetPropString(params.weapon, "m_iClassname", "battleaxe")
+			if (attacker.GetScriptScope().PRESERVED.zombie_type == 10) NetProps.SetPropString(params.weapon, "m_iClassname", "battleneedle")
 		}
 		if (attacker.GetTeam() == 2)
 		{
@@ -118,7 +118,7 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 		if ((victim.GetTeam() == 2 && victim.IsPlayer() && victim.GetCustomAttribute("health regen",0) != 0))
 		{
 			victim.RemoveCustomAttribute("health regen")
-			victim.GetScriptScope().Preserved.hurttime = Time() + (DISP_COOLDOWN + 1)
+			victim.GetScriptScope().PRESERVED.hurttime = Time() + (DISP_COOLDOWN + 1)
 		}
 	}
 	function OnGameEvent_player_builtobject(params)
@@ -168,7 +168,7 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 				{
 					if (players.IsAlive && players.GetTeam() == 2)
 					{
-						local scope = players.GetScriptScope().Preserved
+						local scope = players.GetScriptScope().PRESERVED
 						local HasMaxedAmmo = false
 						if ((GetPropIntArray(players,"m_iAmmo",1) < CustomWeapons.GetMaxAmmo(players, 1)) || (GetPropIntArray(players,"m_iAmmo",2) < CustomWeapons.GetMaxAmmo(players, 2)))
 						{
@@ -221,7 +221,7 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 				victim.RemoveCond(129)
 				victim.RemoveCond(70)
 				PopExtUtil.PlaySoundOnClient(victim,"misc/halloween/merasmus_stun.wav",1.0,100)
-				EntFireByHandle(victim,"runscriptcode","UpdateHUDForPerks(self)",0.1,null,victim);
+				PopExtUtil.ScriptEntFireSafe(victim, "UpdateHUDForPerks(self)", 0.1, null, victim);
 			}
 		}	
 		if (victim.GetTeam() == 3) // we can probably do something more with this
@@ -237,15 +237,15 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 				if (params.damageamount > 4 && attacker.GetTeam() == 2) // player_hurt can't check damagetype
 				{
 					local currency = GetPropInt(FindByClassname(null, "tf_mann_vs_machine_stats"),"m_currentWaveStats.nCreditsAcquired")
-					attacker.RemoveCurrency(-10 * attacker.GetScriptScope().Preserved.multiplier) // the rest of the cash is handled by player_death below
-					currency = currency + (10 * attacker.GetScriptScope().Preserved.multiplier)
+					attacker.RemoveCurrency(-10 * attacker.GetScriptScope().PRESERVED.multiplier) // the rest of the cash is handled by player_death below
+					currency = currency + (10 * attacker.GetScriptScope().PRESERVED.multiplier)
 					SetPropInt(FindByClassname(null, "tf_mann_vs_machine_stats"),"m_currentWaveStats.nCreditsAcquired",currency)
 					SetPropInt(FindByClassname(null, "tf_mann_vs_machine_stats"),"m_currentWaveStats.nCreditsDropped",currency)	// writing into creditsacquired affects this too
 				}
-				if (victim.GetScriptScope().Preserved.zombie_type == 5 && (victim.GetHealth() / victim.GetMaxHealth().tofloat()) <= 0.2 && victim.IsAllowedToTaunt())
+				if (victim.GetScriptScope().PRESERVED.zombie_type == 5 && (victim.GetHealth() / victim.GetMaxHealth().tofloat()) <= 0.2 && victim.IsAllowedToTaunt())
 				{
-					victim.GetScriptScope().Preserved.voicecooldown = Time() + 5
-					victim.GetScriptScope().Preserved.attackcooldown = Time() + 5
+					victim.GetScriptScope().PRESERVED.voicecooldown = Time() + 5
+					victim.GetScriptScope().PRESERVED.attackcooldown = Time() + 5
 					victim.AddCustomAttribute("gesture speed increase" ,0.3, -1);
 					victim.Taunt(1,92)
 					EntFireByHandle(victim, "SetHealth", "-300", 2, victim, victim) 
@@ -258,7 +258,7 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 				}
 				if (params.damageamount > victim.GetHealth()) // death sounds
 				{
-					if (victim.GetScriptScope().Preserved.zombie_type <= 3)
+					if (victim.GetScriptScope().PRESERVED.zombie_type <= 3)
 					{
 						EmitSoundEx
 						({
@@ -267,7 +267,7 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 							filter_type = Constants.EScriptRecipientFilter.RECIPIENT_FILTER_DEFAULT
 						});
 					}
-					if (victim.GetScriptScope().Preserved.zombie_type == 4)
+					if (victim.GetScriptScope().PRESERVED.zombie_type == 4)
 					{
 						EmitSoundEx
 						({
@@ -276,7 +276,7 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 							filter_type = Constants.EScriptRecipientFilter.RECIPIENT_FILTER_DEFAULT
 						});
 					}
-					if (victim.GetScriptScope().Preserved.zombie_type == 5)
+					if (victim.GetScriptScope().PRESERVED.zombie_type == 5)
 					{
 						EmitSoundEx
 						({
@@ -285,7 +285,7 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 							filter_type = Constants.EScriptRecipientFilter.RECIPIENT_FILTER_DEFAULT
 						});
 					}
-					if (victim.GetScriptScope().Preserved.zombie_type == 8)
+					if (victim.GetScriptScope().PRESERVED.zombie_type == 8)
 					{
 						EmitSoundEx
 						({
@@ -325,9 +325,9 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 					ForceMaxAmmo(deadguy)
 				}
 			}
-			if (deadguy.GetScriptScope().Preserved.zombie_type == 5)
+			if (deadguy.GetScriptScope().PRESERVED.zombie_type == 5)
 			{
-				EntFireByHandle(deadguy, "runscriptcode", "SpawnEntityFromTable(`npc_handgrenade`{origin = self.GetCenter()})",0, deadguy, deadguy) 
+				PopExtUtil.ScriptEntFireSafe(deadguy, "SpawnEntityFromTable(`npc_handgrenade`, {origin = self.GetCenter()})", 0, deadguy, deadguy);
 			}
 			// kill money
 			if (attacker == null) return
@@ -336,7 +336,7 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 				local currency = GetPropInt(FindByClassname(null, "tf_mann_vs_machine_stats"),"m_currentWaveStats.nCreditsAcquired")
 				payout = -40
 				assist = -25
-				local multiplier = attacker.GetScriptScope().Preserved.multiplier
+				local multiplier = attacker.GetScriptScope().PRESERVED.multiplier
 				if (multiplier == null)
 				{
 					printl("wtf??")
@@ -366,10 +366,10 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 		{
 			deadguy.SetCustomModelWithClassAnimations(PlayerModels[playerclass])
 			deadguy.RemoveCurrency(deadguy.GetCurrency() * 0.05)
-			if ("gasheld" in deadguy.GetScriptScope().Preserved) DropGascans(deadguy)
+			if ("gasheld" in deadguy.GetScriptScope().PRESERVED) DropGascans(deadguy)
 			if (PopExtUtil.CountAlivePlayers() == 1) LastManWarning()
-			EntFire("tf_gamerules", "RunScriptCode", "if (PopExtUtil.CountAlivePlayers() == 0) EntFire(`gameover_relay`, `trigger`)")
-			EntFireByHandle(deadguy,"runscriptcode","for (local entity; entity = Entities.FindByClassname(entity, `entity_revive_marker`);){SetPropBool(entity,`m_bGlowEnabled`,true)}",0.2,null,deadguy);
+			PopExtUtil.ScriptEntFireSafe("tf_gamerules", "if (PopExtUtil.CountAlivePlayers() == 0) EntFire(`gameover_relay`, `trigger`)");
+			PopExtUtil.ScriptEntFireSafe(deadguy, "for (local entity; entity = Entities.FindByClassname(entity, `entity_revive_marker`);){SetPropBool(entity,`m_bGlowEnabled`,true)}", 0.2, null, deadguy);
 		}
 	}
 	function OnGameEvent_player_disconnect(params)
@@ -379,7 +379,7 @@ if ("RedRidgeEvents" in getroottable()) delete ::RedRidgeEvents // this is done 
 		if (quitter.GetTeam() == 2)	// no no, no no no no
 		{
 			local scope = quitter.GetScriptScope();
-			if ("gasheld" in scope.Preserved) DropGascans(quitter)
+			if ("gasheld" in scope.PRESERVED) DropGascans(quitter)
 		}
 	}
 	function OnGameEvent_teamplay_round_win(params)

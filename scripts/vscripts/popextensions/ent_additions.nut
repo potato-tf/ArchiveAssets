@@ -1,40 +1,35 @@
-//fold constants/functions again here so this can be standalone
-if ( !( "CONST" in getroottable() ) ) {
+// fold constants/functions again here so this can be standalone
+::CONST <- getconsttable()
+::ROOT  <- getroottable()
 
-    ::CONST <- getconsttable()
-    ::ROOT <- getroottable()
+CONST.setdelegate( { _newslot = @( k, v ) compilestring( "const " + k + "=" + ( typeof v == "string" ? ( "\"" + v + "\"" ) : v ) )() } )
+CONST.MAX_CLIENTS <- MaxClients().tointeger()
 
-    CONST.setdelegate( { _newslot = @( k, v ) compilestring( "const " + k + "=" + ( typeof v == "string" ? ( "\"" + v + "\"" ) : v ) )() } )
-    CONST.MAX_CLIENTS <- MaxClients().tointeger()
+// fold every class into the root table for performance
+foreach( _class in [ "NetProps", "Entities", "EntityOutputs", "NavMesh", "Convars" ])
+    foreach( k, v in ROOT[_class].getclass() )
+        if ( !( k in ROOT ) && k != "IsValid" )
+            ROOT[k] <- ROOT[_class][k].bindenv( ROOT[_class] )
 
-    foreach( k, v in ::NetProps.getclass() )
-        if ( k != "IsValid" && !( k in ROOT ) )
-            ROOT[k] <- ::NetProps[k].bindenv( ::NetProps )
+if ( !( "ConstantNamingConvention" in ROOT ) ) {
 
-    foreach( k, v in ::Entities.getclass() )
-        if ( k != "IsValid" && !( k in ROOT ) )
-            ROOT[k] <- ::Entities[k].bindenv( ::Entities )
+    foreach( a, b in Constants ) {
 
-    foreach( k, v in ::EntityOutputs.getclass() )
-        if ( k != "IsValid" && !( k in ROOT ) )
-            ROOT[k] <- ::EntityOutputs[k].bindenv( ::EntityOutputs )
+        foreach( k, v in b ) {
 
-    foreach( k, v in ::NavMesh.getclass() )
-        if ( k != "IsValid" && !( k in ROOT ) )
-            ROOT[k] <- ::NavMesh[k].bindenv( ::NavMesh )
+            if ( k in CONST )
+                continue
 
-    if ( !( "ConstantNamingConvention" in ROOT ) ) {
+            if ( v == null )
+                v = 0
 
-        foreach( a, b in Constants )
-            foreach( k, v in b ) {
-
-                CONST[k] <- v != null ? v : 0
-                ROOT[k] <- v != null ? v : 0
-            }
+            CONST[k] <- v
+            ROOT[k]  <- v
+        }
     }
 }
 
-local SINGLE_TICK = 0.015
+local SINGLE_TICK = FrameTime()
 
 if ( !( "EntAdditions" in ROOT ) ) {
 
@@ -49,11 +44,11 @@ if ( !( "EntAdditions" in ROOT ) ) {
                     id       = entity.GetScriptId()
                     index    = entity.entindex()
                     callback = callback
-                    _get = function( k ) {
+                    function _get ( k ) {
 
                         return parent[k]
                     }
-                    _delslot = function( k ) {
+                    function _delslot ( k ) {
 
                         if ( k == id ) {
 
@@ -69,27 +64,27 @@ if ( !( "EntAdditions" in ROOT ) ) {
         }
         Precache = {
             //mini-sentry spawnflag
-            obj_sentrygun = function( ent, spawnflags ) {
+            function obj_sentrygun ( ent, spawnflags ) {
                 if ( spawnflags & 64 )
                     SetPropBool( ent, "m_bMiniBuilding", true )
             }
         }
         OnPostSpawn = {
             //non-solid spawnflag
-            func_button = function( ent, spawnflags ) {
+            function func_button ( ent, spawnflags ) {
                 if ( spawnflags & 16384 ) {
 
                     ent.AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID )
                     ent.AddSolidFlags( FSOLID_NOT_SOLID )
                 }
             }
-            func_rot_button = function( ent, spawnflags ) {
+            function func_rot_button ( ent, spawnflags ) {
                 //fix broken locked spawnflag
                 if ( spawnflags & SF_BUTTON_LOCKED )
                     SetPropBool( ent, "m_bLocked", true )
             }
             //mini-sentry spawnflag
-            obj_sentrygun = function( ent, spawnflags ) {
+            function obj_sentrygun ( ent, spawnflags ) {
                 if ( spawnflags & 64 ) {
 
                     ent.SetModelScale( 0.75, 0.0 )
@@ -97,24 +92,25 @@ if ( !( "EntAdditions" in ROOT ) ) {
                 }
             }
             //fix invulnerable flag not working
-            obj_dispenser = function( ent, spawnflags ) {
+            function obj_dispenser ( ent, spawnflags ) {
                 if ( spawnflags & 2 )
                     SetPropInt( ent, "m_takedamage", 0 )
             }
             //start disabled spawnflag
-            light_dynamic = function( ent, spawnflags ) {
+            function light_dynamic ( ent, spawnflags ) {
                 if ( spawnflags & 16 )
                     ent.AcceptInput( "TurnOff", "", null, null )
             }
             //fix func_rotating capping at 360,000 degrees
             //fix killing func_rotating before stopping sound causing sound to play forever
-            func_rotating = function( ent, spawnflags ) {
+            function func_rotating ( ent, spawnflags ) {
 
                 local maxangle = 350000.0 //max angle is actually 360,000.0, reset it a bit earlier just in case
                 local xyz = array( 3, 0.0 )
                 ent.ValidateScriptScope()
                 local scope = ent.GetScriptScope()
-                scope.RotateFixThink <- function() {
+
+                function RotateFixThink() {
 
                     for ( local i = 0; i < 3; i++ ) {
 
@@ -128,6 +124,7 @@ if ( !( "EntAdditions" in ROOT ) ) {
                     }
                     return -1
                 }
+                scope.RotateFixThink <- RotateFixThink
                 AddThinkToEnt( ent, "RotateFixThink" )
                 scope.noise <- GetPropString( ent, "m_NoiseRunning" )
 
@@ -137,7 +134,7 @@ if ( !( "EntAdditions" in ROOT ) ) {
             // add spawnflag to allow for taking damage
             // fix not being able to disable on dead players
             // fix persisting between map/round changes
-            point_viewcontrol = function( ent, spawnflags ) {
+            function point_viewcontrol ( ent, spawnflags ) {
 
                 function InputEnable() {
 
@@ -148,7 +145,10 @@ if ( !( "EntAdditions" in ROOT ) ) {
 
                         local takedamage = GetPropInt( activator, "m_takedamage" )
                         SetPropEntity( ent, "m_hPlayer", null )
-                        EntFireByHandle( activator, "RunScriptCode", format( "SetPropInt( self, `m_takedamage`, %d )", takedamage ), SINGLE_TICK, null, null )
+                        local cmd = "SetPropInt( self, `m_takedamage`, " + takedamage + " )"
+                        EntFireByHandle( activator, "RunScriptCode", cmd, SINGLE_TICK, null, null )
+                        if ( "PopGameStrings" in ROOT )
+                            PopGameStrings.AddStrings( cmd )
                     }
                     if ( ent.IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
                         return true
@@ -156,14 +156,13 @@ if ( !( "EntAdditions" in ROOT ) ) {
                     if ( spawnflags & 256 ) {
 
                         ent.AddEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE )
-                        for ( local i = 1; i <= MAX_CLIENTS; i++ ) {
 
-                            local player = PlayerInstanceFromIndex( i )
-                            if ( player && player.IsValid() ) {
+                        for ( local i = 1, player; i <= MAX_CLIENTS; player = PlayerInstanceFromIndex( i ), i++ ) {
 
-                                ent.AcceptInput( "Enable", "", player, player )
-                                SetPropEntity( ent, "m_hPlayer", player )
-                            }
+                            if ( !player ) continue
+
+                            ent.AcceptInput( "Enable", "", player, player )
+                            SetPropEntity( ent, "m_hPlayer", player )
                         }
                         ent.RemoveEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE )
                     }
@@ -181,23 +180,33 @@ if ( !( "EntAdditions" in ROOT ) ) {
                         SetPropEntity( ent, "m_hPlayer", activator )
                         local life_state = GetPropInt( activator, "m_lifeState" )
                         SetPropInt( activator, "m_lifeState", LIFE_ALIVE )
-                        EntFireByHandle( activator, "RunScriptCode", format( "SetPropInt( self, `m_lifeState`, %d )", life_state ), SINGLE_TICK, null, null )
+
+                        local cmd = "SetPropInt( self, `m_lifeState`, " + life_state + " )"
+                        EntFireByHandle( activator, "RunScriptCode", cmd, SINGLE_TICK, null, null )
+
+                        if ( "PopGameStrings" in ROOT )
+                            PopGameStrings.AddStrings( cmd )
                     }
 
                     if ( spawnflags & 256 ) {
 
                         ent.AddEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE )
-                        for ( local i = 1; i <= MAX_CLIENTS; i++ ) {
 
-                            local player = PlayerInstanceFromIndex( i )
-                            if ( player && player.IsValid() ) {
+                        for ( local i = 1, player; i <= MAX_CLIENTS; player = PlayerInstanceFromIndex( i ), i++ ) {
 
-                                SetPropEntity( ent, "m_hPlayer", player )
-                                local life_state = GetPropInt( player, "m_lifeState" )
-                                SetPropInt( player, "m_lifeState", LIFE_ALIVE )
-                                ent.AcceptInput( "Disable", "", player, player )
-                                EntFireByHandle( player, "RunScriptCode", format( "SetPropInt( self, `m_lifeState`, %d )", life_state ), SINGLE_TICK, null, null )
-                            }
+                            if ( !player ) continue
+
+                            SetPropEntity( ent, "m_hPlayer", player )
+                            local life_state = GetPropInt( player, "m_lifeState" )
+                            SetPropInt( player, "m_lifeState", LIFE_ALIVE )
+                            ent.AcceptInput( "Disable", "", player, player )
+
+                            local cmd = "SetPropInt( self, `m_lifeState`, " + life_state + " )"
+                            EntFireByHandle( player, "RunScriptCode", cmd, SINGLE_TICK, null, null )
+
+                            if ( "PopGameStrings" in ROOT )
+                                PopGameStrings.AddStrings( cmd )
+
                         }
                         ent.RemoveEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE )
                     }
@@ -214,14 +223,15 @@ if ( !( "EntAdditions" in ROOT ) ) {
             //fix TeamNum not working
             //fix FireSound not working, added volume setting ( example: "sound_name_here.wav|40" )
             //fix ModelScale not working on arrows/rockets
-            tf_point_weapon_mimic = function( ent, spawnflags ) {
+            function tf_point_weapon_mimic ( ent, spawnflags ) {
+
                 local particle = CreateByClassname( "trigger_particle" )
                 ent.ValidateScriptScope()
 
                 local modelscale = GetPropFloat( ent, "m_flModelScale" )
                 local firesound = GetPropString( ent, "m_pzsFireSound" )
 
-                ent.GetScriptScope().ProjectileFixes <- function() {
+                function ProjectileFixes() {
 
                     for ( local projectile; projectile = FindByClassnameWithin( projectile, "tf_projectile*", ent.GetOrigin(), 1 ); ) {
 
@@ -276,24 +286,24 @@ if ( !( "EntAdditions" in ROOT ) ) {
 
                     return -1
                 }
+                ent.GetScriptScope().ProjectileFixes <- ProjectileFixes
                 AddThinkToEnt( ent, "ProjectileFixes" )
             }
         }
         Events = {
 
-            function OnGameEvent_recalculate_holidays( _ ) {
+            function _DisableAll() {
 
-                if ( GetRoundState() == GR_STATE_GAME_OVER )
-                    EntFire( "player", "RunScriptCode", "DoEntFire( `point_viewcontrol`, `Disable`, ``, -1, self, self )" )
+                local cmd = "DoEntFire( `point_viewcontrol`, `Disable`, ``, -1, self, self )"
+                EntFire( "player", "RunScriptCode", cmd )
+
+                if ( "PopGameStrings" in ROOT )
+                    PopGameStrings.AddStrings( cmd )
             }
 
-            function OnGameEvent_round_start( _ ) {
-                EntFire( "player", "RunScriptCode", "DoEntFire( `point_viewcontrol`, `Disable`, ``, -1, self, self )" )
-            }
-
-            function OnGameEvent_teamplay_round_start( _ ) {
-                EntFire( "player", "RunScriptCode", "DoEntFire( `point_viewcontrol`, `Disable`, ``, -1, self, self )" )
-            }
+            function OnGameEvent_recalculate_holidays( _ ) { if ( GetRoundState() == GR_STATE_GAME_OVER ) _DisableAll() }
+            function OnGameEvent_round_start( _ ) { _DisableAll() }
+            function OnGameEvent_teamplay_round_start( _ ) { _DisableAll() }
         }
     }
     __CollectGameEventCallbacks( EntAdditions.Events )
@@ -312,6 +322,7 @@ function OnPostSpawn() {
 
     local classname = self.GetClassname()
     local spawnflags = GetPropInt( self, "m_spawnflags" )
+
     if ( classname in EntAdditions.OnPostSpawn )
         EntAdditions.OnPostSpawn[classname]( self, spawnflags )
 }

@@ -17,7 +17,7 @@ const BREAK_RADIUS = 120;
 	function CheckBarricade(self)
 	{
 		local barricade = null
-		local scope = self.GetScriptScope().Preserved
+		local scope = self.GetScriptScope().PRESERVED
 		if (!self.IsAlive() || scope.isenteringlevel == 0) return
 		barricade; barricade = Entities.FindByNameWithin(barricade, "barricade*", self.GetOrigin(), BREAK_RADIUS);	// does this support fuzzy search?
 		if (barricade == null)
@@ -76,7 +76,7 @@ const BREAK_RADIUS = 120;
 	{
 		self.StopTaunt(false)	// cancel active taunt before it loops back to starting
 		local botmodel = self.GetModelName()
-		local scope = self.GetScriptScope().Preserved
+		local scope = self.GetScriptScope().PRESERVED
 		self.AddCustomAttribute("no_jump", 1, 4)
 		self.AddCustomAttribute("no_duck", 1, 4)
 		self.AddCustomAttribute("move speed bonus", 0.000001, 4)
@@ -127,7 +127,7 @@ const BREAK_RADIUS = 120;
 	}
 	function UpdateBarricadeHealth(self,barricade)
 	{
-			local scope = self.GetScriptScope().Preserved
+			local scope = self.GetScriptScope().PRESERVED
 			local health = barricade.GetHealth()
 			health = health - 1
 			if (health < 1)
@@ -170,20 +170,20 @@ const BREAK_RADIUS = 120;
 		EntFireByHandle(barricade,"SetHealth",health.tostring(), 1, null, null)
 		EntFireByHandle(barricade, "runscriptcode", "EmitSoundEx({ sound_name = `Breakable.MatWood`, origin = self.GetCenter(), filter_type = Constants.EScriptRecipientFilter.RECIPIENT_FILTER_DEFAULT});",1, null, null)
 		EntFireByHandle(barricade, "SetModel", BarricadeModel[health],1, null, null)
-		if (self.GetScriptScope().Preserved.timesrepaired <= 5)
+		if (self.GetScriptScope().PRESERVED.timesrepaired <= 5)
 		{
 			PopExtUtil.PlaySoundOnClient(self,"mvm/mvm_bought_upgrade.wav",0.7,100)
-			self.RemoveCurrency(-10 * self.GetScriptScope().Preserved.multiplier)
-			currency = currency + (10 * self.GetScriptScope().Preserved.multiplier)
+			self.RemoveCurrency(-10 * self.GetScriptScope().PRESERVED.multiplier)
+			currency = currency + (10 * self.GetScriptScope().PRESERVED.multiplier)
 			SetPropInt(FindByClassname(null, "tf_player_manager"),"m_iCurrencyCollected",currency)
 			SetPropInt(FindByClassname(null, "tf_mann_vs_machine_stats"),"m_currentWaveStats.nCreditsAcquired",currency)
 			SetPropInt(FindByClassname(null, "tf_mann_vs_machine_stats"),"m_currentWaveStats.nCreditsDropped",currency)
-			self.GetScriptScope().Preserved.timesrepaired = self.GetScriptScope().Preserved.timesrepaired + (BREAK_RADIUS - 119)
+			self.GetScriptScope().PRESERVED.timesrepaired = self.GetScriptScope().PRESERVED.timesrepaired + (BREAK_RADIUS - 119)
 		}
 	}
 	function ClearLevelCheck(self)
 	{
-		local scope = self.GetScriptScope().Preserved
+		local scope = self.GetScriptScope().PRESERVED
 		scope.isenteringlevel = 0
 	}
 }

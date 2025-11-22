@@ -125,8 +125,8 @@ local ImportantItems =
 ::ApplyPerkBonuses <- function(self) // apply perk bonuses to weapons
 {
 	local scope = self.GetScriptScope()
-	if ("Quickola" in scope.Preserved.powerups) 	self.AddCustomAttribute("Reload time decreased" ,0.5, -1);
-	if ("Double Tap" in scope.Preserved.powerups) self.AddCustomAttribute("fire rate bonus" ,0.67, -1);
+	if ("Quickola" in scope.PRESERVED.powerups) 	self.AddCustomAttribute("Reload time decreased" ,0.5, -1);
+	if ("Double Tap" in scope.PRESERVED.powerups) self.AddCustomAttribute("fire rate bonus" ,0.67, -1);
 }
 
 ::ApplyPlayerAttributes <- function(self) // moved here because popfile version is not reliable
@@ -203,24 +203,24 @@ local ImportantItems =
 //			NetProps.SetPropInt(self, "m_nButtons",Constants.FButtons.IN_SCORE)
 //		}
 //	}
-	if (scope.Preserved.isinstrongmannroom == true && (scope.Preserved.teleporttime < Time()))
+	if (scope.PRESERVED.isinstrongmannroom == true && (scope.PRESERVED.teleporttime < Time()))
 	{
-		if (scope.Preserved.isusingstrongmann == false) // teleport back to start if not using strongmann machine
+		if (scope.PRESERVED.isusingstrongmann == false) // teleport back to start if not using strongmann machine
 		{
-			if (scope.Preserved.timesteleported == 3)
+			if (scope.PRESERVED.timesteleported == 3)
 			{
 				EntFireByHandle(boardsign, "StartTouch", "", -1, self, self) // also exists in the bot prison
-				scope.Preserved.isinstrongmannroom = false // stop touching it forever
-				scope.Preserved.timesteleported = 0
+				scope.PRESERVED.isinstrongmannroom = false // stop touching it forever
+				scope.PRESERVED.timesteleported = 0
 			}
 			else
 			{
 				EntFireByHandle(exitsign, "StartTouch", "", -1, self, self) // also exists in the bot prison
-				scope.Preserved.isinstrongmannroom = false // stop touching it forever
+				scope.PRESERVED.isinstrongmannroom = false // stop touching it forever
 			}
 		}
 	}
-	if (scope.Preserved.isinanimation == true && main_viewmodel.IsSequenceFinished() == true) // only really used by the perk boost animation
+	if (scope.PRESERVED.isinanimation == true && main_viewmodel.IsSequenceFinished() == true) // only really used by the perk boost animation
 	{
 		for (local i = 0; i < MAX_WEAPONS; i++)
 		{
@@ -235,14 +235,14 @@ local ImportantItems =
 				break
 			}
 		}
-		::CustomWeapons.GiveItem(scope.Preserved.weapon_secondary, self);
-		EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 2), 2)",0,null,self);
+		PopExtWeapons.GiveItem(scope.PRESERVED.weapon_secondary, self);
+		EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 2), 2)",0,null,self);
 		self.GetActiveWeapon().SetClip1(self.GetActiveWeapon().GetMaxClip1())
 		ApplyPerkBonuses(self);
-		scope.Preserved.isinanimation = false
-		if (scope.Preserved.weapon_secondary == null) PopExtUtil.WeaponSwitchSlot(self,2)
+		scope.PRESERVED.isinanimation = false
+		if (scope.PRESERVED.weapon_secondary == null) PopExtUtil.WeaponSwitchSlot(self,2)
 	}
-	if (scope.Preserved.hasdeathmachine == true && scope.Preserved.miniguntime < Time())
+	if (scope.PRESERVED.hasdeathmachine == true && scope.PRESERVED.miniguntime < Time())
 	{
 		NetProps.SetPropEntity(self, "m_hActiveWeapon", null)
 		for (local i = 0; i < MAX_WEAPONS; i++)
@@ -258,33 +258,33 @@ local ImportantItems =
 				break
 			}
 		}
-		::CustomWeapons.GiveItem(scope.Preserved.weapon_primary,self)
-		EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 1), 1)",0,null,self);
+		PopExtWeapons.GiveItem(scope.PRESERVED.weapon_primary,self)
+		EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 1), 1)",0,null,self);
 		ApplyPerkBonuses(self)
-		if (scope.Preserved.weapon_primary == "null") // give a sniper to avoid player having permanent death machine
+		if (scope.PRESERVED.weapon_primary == "null") // give a sniper to avoid player having permanent death machine
 		{
-			::CustomWeapons.GiveItem("ZM_Sniper",self)
-			scope.Preserved.weapon_primary = "ZM_Sniper"
+			PopExtWeapons.GiveItem("ZM_Sniper",self)
+			scope.PRESERVED.weapon_primary = "ZM_Sniper"
 			ApplyPerkBonuses(self)
-			EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 1), 1)",0,null,self);
+			EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 1), 1)",0,null,self);
 		}
 		self.SetIsMiniBoss(false)
 		PopExtUtil.SwitchToFirstValidWeapon(self)
-		scope.Preserved.hasdeathmachine = false
+		scope.PRESERVED.hasdeathmachine = false
 	}
 	else
-	if (scope.Preserved.doublepointstime > Time())
+	if (scope.PRESERVED.doublepointstime > Time())
 	{
-		scope.Preserved.multiplier = 2
+		scope.PRESERVED.multiplier = 2
 //		UpdatePowerupDurations(self)
 	}
 	else
 	{
-		scope.Preserved.multiplier = 1
+		scope.PRESERVED.multiplier = 1
 	}
-	if ((self.GetHealth() < self.GetMaxHealth()) && (scope.Preserved.hurttime < Time()))
+	if ((self.GetHealth() < self.GetMaxHealth()) && (scope.PRESERVED.hurttime < Time()))
 	{
-		if ("Saxton Ale" in scope.Preserved.powerups)
+		if ("Saxton Ale" in scope.PRESERVED.powerups)
 		{
 			self.AddCustomAttribute("health regen",25, 1)
 		}
@@ -295,7 +295,7 @@ local ImportantItems =
 	}
 	if (self.GetActiveWeapon() != null)
 	{
-		if (self.GetActiveWeapon().GetClassname() != scope.Preserved.activeweapon) 
+		if (self.GetActiveWeapon().GetClassname() != scope.PRESERVED.activeweapon) 
 		{
 			if (scope != null && "popWearablesToDestroy" in scope)
 			{
@@ -318,11 +318,11 @@ local ImportantItems =
 
 		function GivePowerup(button, powerup, price)
 		{
-			if (powerup in scope.Preserved.powerups || (powerup == "Ostarion's Reserve" && self.InCond(129))) return // NO
+			if (powerup in scope.PRESERVED.powerups || (powerup == "Ostarion's Reserve" && self.InCond(129))) return // NO
 			
 			if (powerup == "Max Ammo")
 			{
-				price = price + (500 * scope.Preserved.ammobuys)
+				price = price + (500 * scope.PRESERVED.ammobuys)
 			}
 			ClientPrint(self, HUD_PRINTCENTER, format("Hold Action key to purchase %s for $%d", powerup, price));
 			if (self.IsUsingActionSlot())
@@ -331,7 +331,7 @@ local ImportantItems =
 				{
 					button.EmitSound("buttons/button8.wav");
 					self.AcceptInput("speakresponseconcept", "TLK_PLAYER_NEGATIVE", self, self);
-					scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME - 2;
+					scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME - 2;
 					SetPropBool(self, "m_bUsingActionSlot", false)
 					return
 				}
@@ -341,7 +341,7 @@ local ImportantItems =
 				if (powerup != "Max Ammo")
 				{
 					PlayPerkAnimation(self)
-					scope.Preserved.isinanimation = true
+					scope.PRESERVED.isinanimation = true
 				}
 				if (powerup == "Saxton Ale")
 				{
@@ -350,8 +350,8 @@ local ImportantItems =
 					EntFireByHandle(self,"runscriptcode","UpdateHUDForPerks(self)",1.25,null,self);
 					ClientPrint(self, HUD_PRINTCENTER,"Perk Bonus activated: Increased max health and regeneration!")
 					self.RemoveCurrency(price);
-					scope.Preserved.powerups[powerup] <- true
-					scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
+					scope.PRESERVED.powerups[powerup] <- true
+					scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
 					SetPropBool(self, "m_bUsingActionSlot", false)
 				}
 				if (powerup == "Double Tap")
@@ -361,8 +361,8 @@ local ImportantItems =
 					EntFireByHandle(self,"runscriptcode","UpdateHUDForPerks(self)",1.25,null,self);
 					ClientPrint(self, HUD_PRINTCENTER,"Perk Bonus activated: Increased fire rate!")
 					self.RemoveCurrency(price);
-					scope.Preserved.powerups[powerup] <- true
-					scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
+					scope.PRESERVED.powerups[powerup] <- true
+					scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
 					SetPropBool(self, "m_bUsingActionSlot", false)
 				}
 				if (powerup == "Quickola")
@@ -372,8 +372,8 @@ local ImportantItems =
 					EntFireByHandle(self,"runscriptcode","UpdateHUDForPerks(self)",1.25,null,self);
 					ClientPrint(self, HUD_PRINTCENTER,"Perk Bonus activated: Increased reload speed!")
 					self.RemoveCurrency(price);
-					scope.Preserved.powerups[powerup] <- true
-					scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
+					scope.PRESERVED.powerups[powerup] <- true
+					scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
 					SetPropBool(self, "m_bUsingActionSlot", false)
 				}
 				if (powerup == "Ostarion's Reserve")
@@ -386,19 +386,19 @@ local ImportantItems =
 					self.RemoveCurrency(price); 
 					EntFireByHandle(quickrev_math,"Subtract","1",1.2,null,self);
 
-					scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
+					scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
 					SetPropBool(self, "m_bUsingActionSlot", false)
 				}
 				if (powerup == "Max Ammo")
 				{
 					PopExtUtil.PlaySoundOnClient(self,"mvm/mvm_bought_upgrade.wav",0.7,100)
 					PopExtUtil.PlaySoundOnClient(self,"deadlands/pickup_maxammo.mp3",1.0,100)
-					SetPropIntArray(self, "m_iAmmo", ::CustomWeapons.GetMaxAmmo(self, 1), 1)
-					SetPropIntArray(self, "m_iAmmo", ::CustomWeapons.GetMaxAmmo(self, 2), 2) 
+					SetPropIntArray(self, "m_iAmmo", PopExtWeapons.GetMaxAmmo(self, 1), 1)
+					SetPropIntArray(self, "m_iAmmo", PopExtWeapons.GetMaxAmmo(self, 2), 2) 
 					self.RemoveCurrency(price); 
-					scope.Preserved.ammobuys += 1
+					scope.PRESERVED.ammobuys += 1
 	
-					scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
+					scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
 					SetPropBool(self, "m_bUsingActionSlot", false)
 				}
 			}
@@ -406,14 +406,14 @@ local ImportantItems =
 	
 		function GiveWallGun(button, weapon, price, slot, responseconcept = "TLK_MVM_LOOT_COMMON") 
 		{
-			if ( weapon == scope.Preserved.weapon_primary || weapon == scope.Preserved.weapon_secondary ) // OH RIGHT WE CAN ACTUALLY USE THESE!!!
+			if ( weapon == scope.PRESERVED.weapon_primary || weapon == scope.PRESERVED.weapon_secondary ) // OH RIGHT WE CAN ACTUALLY USE THESE!!!
 			{
 				price *= 0.5
 				ClientPrint(self, HUD_PRINTCENTER, format("Hold Action key to buy ammo ($%d)", price.tointeger()));
 			}
 			else
 			ClientPrint(self, HUD_PRINTCENTER, format("Hold Action key to purchase ($%d)", price.tointeger()));
-			if (self.IsUsingActionSlot() && playermoney >= price && weapon != scope.Preserved.weapon_primary && weapon != scope.Preserved.weapon_secondary && scope.Preserved.cooldowntime < Time())
+			if (self.IsUsingActionSlot() && playermoney >= price && weapon != scope.PRESERVED.weapon_primary && weapon != scope.PRESERVED.weapon_secondary && scope.PRESERVED.cooldowntime < Time())
 			{
 				button.EmitSound("ui/item_heavy_gun_pickup.wav");
 				PopExtUtil.PlaySoundOnClient(self,"mvm/mvm_bought_upgrade.wav",0.7,100)
@@ -435,9 +435,9 @@ local ImportantItems =
 							break
 						}
 					}
-					::CustomWeapons.GiveItem(weapon, self);
-					scope.Preserved.weapon_primary <- weapon;
-					EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 1), 1)",0,null,self);
+					PopExtWeapons.GiveItem(weapon, self);
+					scope.PRESERVED.weapon_primary <- weapon;
+					PopExtUtil.ScriptEntFireSafe(self, "SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 1), 1)", 0, null, self);
 					self.GetActiveWeapon().SetClip1(self.GetActiveWeapon().GetMaxClip1())
 				}
 				if (slot == "secondary") // redundancy fallbacks in case players die during perk bottle / death machine
@@ -455,44 +455,44 @@ local ImportantItems =
 							break
 						}
 					}
-					::CustomWeapons.GiveItem(weapon, self);
-					scope.Preserved.weapon_secondary <- weapon;
-					EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 2), 2)",0,null,self);
+					PopExtWeapons.GiveItem(weapon, self);
+					scope.PRESERVED.weapon_secondary <- weapon;
+					PopExtUtil.ScriptEntFireSafe(self, "SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 2), 2)", 0, null, self);
 					self.GetActiveWeapon().SetClip1(self.GetActiveWeapon().GetMaxClip1())
 				}
 				if (slot == "melee")
 				{
-					scope.Preserved.weapon_melee <- weapon
-					::CustomWeapons.GiveItem(weapon, self);
+					scope.PRESERVED.weapon_melee <- weapon
+					PopExtWeapons.GiveItem(weapon, self);
 				}
 				PopExtUtil.PlaySoundOnClient(self,"deadlands/wallgun_purchase.mp3",0.7,100)
 				self.RemoveCurrency(price)
 				ApplyPerkBonuses(self)
-				scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
+				scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
 				SetPropBool(self, "m_bUsingActionSlot", false)
 			}
-			if (self.IsUsingActionSlot() && playermoney >= price && (weapon == scope.Preserved.weapon_primary || weapon == scope.Preserved.weapon_secondary) && scope.Preserved.cooldowntime < Time())
+			if (self.IsUsingActionSlot() && playermoney >= price && (weapon == scope.PRESERVED.weapon_primary || weapon == scope.PRESERVED.weapon_secondary) && scope.PRESERVED.cooldowntime < Time())
 			{
 				button.EmitSound("items/gunpickup2.wav");
 				PopExtUtil.PlaySoundOnClient(self,"mvm/mvm_bought_upgrade.wav",0.7,100)
 				ClientPrint(self, HUD_PRINTCENTER, "");
-				if (weapon == scope.Preserved.weapon_primary)
+				if (weapon == scope.PRESERVED.weapon_primary)
 				{
-					SetPropIntArray(self, "m_iAmmo", ::CustomWeapons.GetMaxAmmo(self, 1), 1) 
+					SetPropIntArray(self, "m_iAmmo", PopExtWeapons.GetMaxAmmo(self, 1), 1) 
 				}
-				else if (weapon == scope.Preserved.weapon_secondary)
+				else if (weapon == scope.PRESERVED.weapon_secondary)
 				{
-					SetPropIntArray(self, "m_iAmmo", ::CustomWeapons.GetMaxAmmo(self, 2), 2) 
+					SetPropIntArray(self, "m_iAmmo", PopExtWeapons.GetMaxAmmo(self, 2), 2) 
 				}
 				
 				self.RemoveCurrency(price)
-				scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
+				scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
 				SetPropBool(self, "m_bUsingActionSlot", false)
 			}
 			if (self.IsUsingActionSlot() && playermoney < price)
 			{
 				self.AcceptInput("speakresponseconcept", "TLK_PLAYER_NEGATIVE", self, self);
-				scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
+				scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
 				SetPropBool(self, "m_bUsingActionSlot", false)
 			}
 		}
@@ -500,20 +500,20 @@ local ImportantItems =
 		function ActivateTrap(button, relay, price) 
 		{
 			ClientPrint(self, HUD_PRINTCENTER, format("Hold Action key to activate trap ($%d)", price.tointeger()));
-			if (self.IsUsingActionSlot() && playermoney >= price && scope.Preserved.cooldowntime < Time())
+			if (self.IsUsingActionSlot() && playermoney >= price && scope.PRESERVED.cooldowntime < Time())
 			{
 				button.EmitSound("ui/item_heavy_gun_pickup.wav");
 				PopExtUtil.PlaySoundOnClient(self,"mvm/mvm_bought_upgrade.wav",0.7,100)
 				ClientPrint(self, HUD_PRINTCENTER, "");
 				self.RemoveCurrency(price)
 				EntFire(relay, "trigger");
-				scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
+				scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
 				SetPropBool(self, "m_bUsingActionSlot", false)
 			}
 			if (self.IsUsingActionSlot() && playermoney < price)
 			{
 				self.AcceptInput("speakresponseconcept", "TLK_PLAYER_NEGATIVE", self, self);
-				scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
+				scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME;
 				SetPropBool(self, "m_bUsingActionSlot", false)
 			}
 		}
@@ -525,7 +525,7 @@ local ImportantItems =
 				local timesfueled = GetPropInt(car_fuel_counter, "m_iHealth")
 				if (timesfueled < 5)
 				{
-					if (scope.Preserved.gasheld == 0)
+					if (scope.PRESERVED.gasheld == 0)
 					{
 						ClientPrint(self, HUD_PRINTCENTER,"The van seems out of fuel")
 						return
@@ -540,8 +540,8 @@ local ImportantItems =
 						ClientPrint(self, HUD_PRINTCENTER,"")
 						PopExtUtil.PlaySoundOnClient(self,"weapons/draw_gas_can.wav",0.7,100)
 						button.AcceptInput("Press", "", self, null);
-						scope.Preserved.gasheld = scope.Preserved.gasheld - (BUTTON_COOLDOWN_TIME -2);
-						scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME -1.5;
+						scope.PRESERVED.gasheld = scope.PRESERVED.gasheld - (BUTTON_COOLDOWN_TIME -2);
+						scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME -1.5;
 						SetPropBool(self, "m_bUsingActionSlot", false)
 					}
 				}
@@ -558,18 +558,18 @@ local ImportantItems =
 					ClientPrint(self, HUD_PRINTCENTER,"")
 					PopExtUtil.PlaySoundOnClient(self,"weapons/draw_gas_can.wav",0.7,100)
 					button.AcceptInput("Press", "", self, null);
-					if (!Preserved.gasheld in self.GetScriptScope())
+					if (!PRESERVED.gasheld in self.GetScriptScope())
 					{
 						local items = 
 						{							 
 							gasheld = 0
 						}
 						foreach (k, v in items)
-						self.GetScriptScope().Preserved[k] <- v
+						self.GetScriptScope().PRESERVED[k] <- v
 					}
-					scope.Preserved.gasheld = scope.Preserved.gasheld + (BUTTON_COOLDOWN_TIME -2);
+					scope.PRESERVED.gasheld = scope.PRESERVED.gasheld + (BUTTON_COOLDOWN_TIME -2);
 					ShowGasOnPlayer(self)
-					scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME - 2;
+					scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME - 2;
 					SetPropBool(self, "m_bUsingActionSlot", false)
 				}
 			}
@@ -585,7 +585,7 @@ local ImportantItems =
 					button.AcceptInput("Press", "", self, null);
 					overload_button.AcceptInput("Unlock", "", self, null);
 					computer_button.AcceptInput("Unlock", "", self, null);
-					scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME - 2;
+					scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME - 2;
 					SetPropBool(self, "m_bUsingActionSlot", false)
 					if (computer_prompt_1 && computer_prompt_2 && computer_prompt_1.IsValid() && computer_prompt_2.IsValid())	// delete the prompts if you somehow got the codebook before even getting the hint for it
 					{
@@ -639,10 +639,10 @@ local ImportantItems =
 					break
 				}
 		
-		if (key in WallGuns && scope.Preserved.cooldowntime < Time()) GiveWallGun(button, WallGuns[key].itemname, WallGuns[key].price, WallGuns[key].slot)
-		if (key in Powerups && scope.Preserved.cooldowntime < Time()) GivePowerup(button, Powerups[key].powerup, Powerups[key].price)
-		if (key in Traps && scope.Preserved.cooldowntime < Time()) 	ActivateTrap(button, Traps[key].relay, Traps[key].price)
-		if (key in ImportantItems && scope.Preserved.cooldowntime < Time()) 	InteractImportantItem(button, ImportantItems[key].item)
+		if (key in WallGuns && scope.PRESERVED.cooldowntime < Time()) GiveWallGun(button, WallGuns[key].itemname, WallGuns[key].price, WallGuns[key].slot)
+		if (key in Powerups && scope.PRESERVED.cooldowntime < Time()) GivePowerup(button, Powerups[key].powerup, Powerups[key].price)
+		if (key in Traps && scope.PRESERVED.cooldowntime < Time()) 	ActivateTrap(button, Traps[key].relay, Traps[key].price)
+		if (key in ImportantItems && scope.PRESERVED.cooldowntime < Time()) 	InteractImportantItem(button, ImportantItems[key].item)
 
 	}
 	for (local door; door = FindByClassnameWithin(door, "func_door", self.GetOrigin(), BUTTON_RADIUS); ) // door checks
@@ -659,7 +659,7 @@ local ImportantItems =
 					self.AcceptInput("SpeakResponseConcept", "TLK_PLAYER_NEGATIVE", self, self)
 		
 					//set cooldown time
-					scope.Preserved.cooldowntime = Time() + (BUTTON_COOLDOWN_TIME - 2)
+					scope.PRESERVED.cooldowntime = Time() + (BUTTON_COOLDOWN_TIME - 2)
 					//manually set it here just in case
 					SetPropBool(self, "m_bUsingActionSlot", false)
 					return
@@ -673,7 +673,7 @@ local ImportantItems =
 				ClientPrint(self, HUD_PRINTCENTER, "") // blank out message
 			
 				//set cooldown time
-				scope.Preserved.cooldowntime = Time() + (BUTTON_COOLDOWN_TIME - 2)
+				scope.PRESERVED.cooldowntime = Time() + (BUTTON_COOLDOWN_TIME - 2)
 				//manually set it here just in case
 				SetPropBool(self, "m_bUsingActionSlot", false)
 			}
@@ -693,7 +693,7 @@ local ImportantItems =
 					break
 				}
 
-		if (key in DoorButtons && scope.Preserved.cooldowntime < Time()) PurchaseDoor(door, DoorButtons[key])
+		if (key in DoorButtons && scope.PRESERVED.cooldowntime < Time()) PurchaseDoor(door, DoorButtons[key])
 	}
 	for (local box; box = FindByClassnameWithin(box, "func_button", self.GetOrigin(), BUTTON_RADIUS); ) 
 	{	
@@ -715,7 +715,7 @@ local ImportantItems =
 					self.AcceptInput("SpeakResponseConcept", "TLK_PLAYER_NEGATIVE", self, self)
 		
 					//set cooldown time
-					scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME
+					scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME
 					//manually set it here just in case
 					SetPropBool(self, "m_bUsingActionSlot", false)
 					return
@@ -726,10 +726,10 @@ local ImportantItems =
 				PopExtUtil.PlaySoundOnClient(self,"mvm/mvm_bought_upgrade.wav",0.7,100)
 				self.RemoveCurrency(price)
 				ClientPrint(self, HUD_PRINTCENTER, "") // blank out message
-				scope.Preserved.isusingbox = true
+				scope.PRESERVED.isusingbox = true
 			
 				//set cooldown time
-				scope.Preserved.cooldowntime = Time() + (BUTTON_COOLDOWN_TIME + 1.15)
+				scope.PRESERVED.cooldowntime = Time() + (BUTTON_COOLDOWN_TIME + 1.15)
 				//manually set it here just in case
 				SetPropBool(self, "m_bUsingActionSlot", false)
 			}
@@ -760,9 +760,9 @@ local ImportantItems =
 							break
 						}
 					}
-					::CustomWeapons.GiveItem(weapon, self);
-					scope.Preserved.weapon_primary <- weapon;
-					EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 1), 1)",0,null,self);
+					PopExtWeapons.GiveItem(weapon, self);
+					scope.PRESERVED.weapon_primary <- weapon;
+					EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 1), 1)",0,null,self);
 					self.GetActiveWeapon().SetClip1(self.GetActiveWeapon().GetMaxClip1())
 				}
 				if (slot == "secondary") // redundancy fallbacks in case players die during perk bottle / death machine
@@ -780,20 +780,20 @@ local ImportantItems =
 							break
 						}
 					}
-					::CustomWeapons.GiveItem(weapon, self);
-					scope.Preserved.weapon_secondary <- weapon;
-					EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 2), 2)",0,null,self);
+					PopExtWeapons.GiveItem(weapon, self);
+					scope.PRESERVED.weapon_secondary <- weapon;
+					EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 2), 2)",0,null,self);
 					self.GetActiveWeapon().SetClip1(self.GetActiveWeapon().GetMaxClip1())
 				}
 				box.EmitSound("ui/item_heavy_gun_pickup.wav");
 				self.AcceptInput("speakresponseconcept", response, self, self);
-				scope.Preserved.isusingbox = false
+				scope.PRESERVED.isusingbox = false
 				ClearBoxScope(self)
 				::Mysterybox.MarkAsTaken()
 				::Mysterybox.Reset()
 				ApplyPerkBonuses(self)
 				
-				scope.Preserved.cooldowntime = Time() + (BUTTON_COOLDOWN_TIME)
+				scope.PRESERVED.cooldowntime = Time() + (BUTTON_COOLDOWN_TIME)
 				SetPropBool(self, "m_bUsingActionSlot", false)
 			}
 		}
@@ -802,11 +802,11 @@ local ImportantItems =
 		{
 			if (self.GetActiveWeapon().GetSlot() == 0)
 			{
-				activeweapon = scope.Preserved.weapon_primary
+				activeweapon = scope.PRESERVED.weapon_primary
 			}
 			if (self.GetActiveWeapon().GetSlot() == 1)
 			{
-				activeweapon = scope.Preserved.weapon_secondary
+				activeweapon = scope.PRESERVED.weapon_secondary
 			}
 			if (self.GetActiveWeapon().GetSlot() == 2)
 			{
@@ -831,7 +831,7 @@ local ImportantItems =
 						box.EmitSound("doors/door_locked2.wav")
 					
 						//set cooldown time
-						scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME
+						scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME
 						//manually set it here just in case
 						SetPropBool(self, "m_bUsingActionSlot", false)
 						return
@@ -844,10 +844,10 @@ local ImportantItems =
 					PopExtUtil.PlaySoundOnClient(self,"mvm/mvm_bought_upgrade.wav",0.7,100)
 					self.RemoveCurrency(price)
 					ClientPrint(self, HUD_PRINTCENTER, "") // blank out message
-					scope.Preserved.isusingstrongmann = true
+					scope.PRESERVED.isusingstrongmann = true
 			
 					//set cooldown time
-					scope.Preserved.cooldowntime = Time() + (BUTTON_COOLDOWN_TIME + 2)
+					scope.PRESERVED.cooldowntime = Time() + (BUTTON_COOLDOWN_TIME + 2)
 					//manually set it here just in case
 					SetPropBool(self, "m_bUsingActionSlot", false)
 				}
@@ -880,11 +880,11 @@ local ImportantItems =
 							break
 						}
 					}
-					::CustomWeapons.GiveItem(weapon, self);
-					scope.Preserved.weapon_primary <- weapon;
-					EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 1), 1)",0,null,self)
+					PopExtWeapons.GiveItem(weapon, self);
+					scope.PRESERVED.weapon_primary <- weapon;
+					EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 1), 1)",0,null,self)
 					if (weapon != "ZM_SuperRusty" && weapon != "ZM_SuperFlamer") self.GetActiveWeapon().SetClip1(self.GetActiveWeapon().GetMaxClip1())
-					if (weapon == "ZM_SVDL") scope.Preserved.weapon_secondary <- null;
+					if (weapon == "ZM_SVDL") scope.PRESERVED.weapon_secondary <- null;
 				}
 				if (slot == "secondary") // redundancy fallbacks in case players die during perk bottle / death machine
 				{
@@ -901,17 +901,17 @@ local ImportantItems =
 							break
 						}
 					}
-					::CustomWeapons.GiveItem(weapon, self);
-					scope.Preserved.weapon_secondary <- weapon;
-					EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, ::CustomWeapons.GetMaxAmmo(self, 2), 2)",0,null,self);
+					PopExtWeapons.GiveItem(weapon, self);
+					scope.PRESERVED.weapon_secondary <- weapon;
+					EntFireByHandle(self,"runscriptcode","SetPropIntArray(self, `m_iAmmo`, PopExtWeapons.GetMaxAmmo(self, 2), 2)",0,null,self);
 					self.GetActiveWeapon().SetClip1(self.GetActiveWeapon().GetMaxClip1())
 				}
 				ApplyPerkBonuses(self);
 				self.AcceptInput("speakresponseconcept", "TLK_MVM_LOOT_ULTRARARE", self, self);
-				scope.Preserved.isusingstrongmann = false
+				scope.PRESERVED.isusingstrongmann = false
 				ClearPaPScope(self)
 				::Strongmachine.Reset()
-				scope.Preserved.cooldowntime = Time() + (BUTTON_COOLDOWN_TIME)
+				scope.PRESERVED.cooldowntime = Time() + (BUTTON_COOLDOWN_TIME)
 				SetPropBool(self, "m_bUsingActionSlot", false)
 			}
 		}
@@ -933,7 +933,7 @@ local ImportantItems =
 				else ClientPrint(self, HUD_PRINTCENTER, "")
 			
 				//set cooldown time
-				scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME
+				scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME
 				//manually set it here just in case
 				SetPropBool(self, "m_bUsingActionSlot", false)
 				
@@ -970,11 +970,11 @@ local ImportantItems =
 					break
 				}
 		
-		if (key in Mysteryboxes && scope.Preserved.cooldowntime < Time() && !GetPropBool(box, "m_bLocked") && scope.Preserved.isusingbox == false) RollForGun(box, Mysteryboxes[key])
-		if (key in Mysteryboxes && scope.Preserved.cooldowntime < Time() && GetPropBool(box, "m_bLocked") && scope.Preserved.isusingbox == true) ReceiveGun(box, Preserved.mysteryitemname, Preserved.mysteryslot, Preserved.mysteryresponse)
-		if (key in Strongmann   && scope.Preserved.cooldowntime < Time() && !GetPropBool(box, "m_bLocked") && scope.Preserved.isusingstrongmann == false) UpgradeWeapon(box, Strongmann[key])
-		if (key in Strongmann 	&& scope.Preserved.cooldowntime < Time() && GetPropBool(box, "m_bLocked") && scope.Preserved.isusingstrongmann == true) TakeUpgradeWeapon(box, Preserved.papweapon, Preserved.papslot)
-		if (key in GenericButtons && scope.Preserved.cooldowntime < Time())
+		if (key in Mysteryboxes && scope.PRESERVED.cooldowntime < Time() && !GetPropBool(box, "m_bLocked") && scope.PRESERVED.isusingbox == false) RollForGun(box, Mysteryboxes[key])
+		if (key in Mysteryboxes && scope.PRESERVED.cooldowntime < Time() && GetPropBool(box, "m_bLocked") && scope.PRESERVED.isusingbox == true) ReceiveGun(box, PRESERVED.mysteryitemname, PRESERVED.mysteryslot, PRESERVED.mysteryresponse)
+		if (key in Strongmann   && scope.PRESERVED.cooldowntime < Time() && !GetPropBool(box, "m_bLocked") && scope.PRESERVED.isusingstrongmann == false) UpgradeWeapon(box, Strongmann[key])
+		if (key in Strongmann 	&& scope.PRESERVED.cooldowntime < Time() && GetPropBool(box, "m_bLocked") && scope.PRESERVED.isusingstrongmann == true) TakeUpgradeWeapon(box, PRESERVED.papweapon, PRESERVED.papslot)
+		if (key in GenericButtons && scope.PRESERVED.cooldowntime < Time())
 		{
 			local param = "", delay = -1, activator, caller
 			if ("param" in GenericButtons[key]) param = GenericButtons[key].param 
@@ -989,19 +989,19 @@ local ImportantItems =
 	for (local reanimator; reanimator = FindByClassnameWithin(reanimator, "entity_revive_marker", self.GetOrigin(), BUTTON_RADIUS); ) 
 	{
 		ClientPrint(self, HUD_PRINTCENTER,"Hold Action Key to revive your teammate")
-		if (self.IsUsingActionSlot() && scope.Preserved.cooldowntime < Time() && self.IsAllowedToTaunt()) 
+		if (self.IsUsingActionSlot() && scope.PRESERVED.cooldowntime < Time() && self.IsAllowedToTaunt()) 
 		{
 			ClientPrint(self, HUD_PRINTCENTER,"")
 			self.Taunt(1,92)
 			EntFireByHandle(self,"runscriptcode","RevivePlayer()",0.65,null,self);
-			scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME - 2
+			scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME - 2
 			SetPropBool(self, "m_bUsingActionSlot", false)
 		}
 		function RevivePlayer()
 		{
 			local reanimator = FindByClassnameWithin(reanimator, "entity_revive_marker", self.GetOrigin(), BUTTON_RADIUS);
 			local owner = GetPropEntity(reanimator, "m_hOwner")
-			local multiplier = self.GetScriptScope().Preserved.multiplier
+			local multiplier = self.GetScriptScope().PRESERVED.multiplier
 			if (owner == null)
 			{
 				self.StunPlayer(0.2,1,2,self)
@@ -1035,10 +1035,10 @@ local ImportantItems =
 			return
 		}
 		ClientPrint(self, HUD_PRINTCENTER,"Hold Action Key to build barricade")
-		if (self.IsUsingActionSlot() && scope.Preserved.cooldowntime < Time() && health < 7) 
+		if (self.IsUsingActionSlot() && scope.PRESERVED.cooldowntime < Time() && health < 7) 
 		{
 			::Barricades.RepairBarricade(self,barricade)
-			scope.Preserved.cooldowntime = Time() + BUTTON_COOLDOWN_TIME - 1.95	// for jank prevention, let above function finish before we get to do it again
+			scope.PRESERVED.cooldowntime = Time() + BUTTON_COOLDOWN_TIME - 1.95	// for jank prevention, let above function finish before we get to do it again
 		}
 	}
 	return -1
