@@ -1961,12 +1961,6 @@ if (!("onetimeactions_performed" in PEA))
 {
 	PEA["onetimeactions_performed"] <- true
 	getroottable()["onetimeactions_performed"] <- PEA["onetimeactions_performed"]
-	
-	NavMesh.GetNavAreaByID(582).Disconnect(NavMesh.GetNavAreaByID(79))
-	NavMesh.GetNavAreaByID(582).Disconnect(NavMesh.GetNavAreaByID(275))
-	NavMesh.GetNavAreaByID(582).Disconnect(NavMesh.GetNavAreaByID(3131))
-	
-	NavMesh.GetNavAreaByID(3131).Disconnect(NavMesh.GetNavAreaByID(582))
 
 	PrecacheSound("mvm/mvm_tele_deliver.wav")
 	PrecacheSound("ambient/alarms/doomsday_lift_alarm.wav")
