@@ -1949,7 +1949,7 @@
 			StartDisabled    = 0
 			maxfalloff       = -1
 			minfalloff       = -1
-			filename         = "download/darker_color_correction.raw"
+			filename         = "materials/colorcorrection/darker_color_correction.raw"
 		}) 
 	}
 }
