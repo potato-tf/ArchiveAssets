@@ -8,14 +8,17 @@ on:
   push:
     branches: [ "main" ]
 
+  repository_dispatch:
+    types: [moonlight-updated]
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-  
+
 concurrency:
 
   group: main
   cancel-in-progress: true
-  
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
@@ -33,10 +36,10 @@ jobs:
         run: |
           mv 'tf/download/.github/HOW TO INSTALL!.gif' .
           {
-            zip -r archive-assets.zip tf -x '*/.*' -x '*.bz2' -x 'tf_mvm_missioncycle.res' 
+            zip -r archive-assets.zip tf -x '*/.*' -x '*.bz2' -x 'tf_mvm_missioncycle.res'
             zip archive-assets.zip 'HOW TO INSTALL!.gif'
           } &
-          
+
           {
             zip -r archive-assets-no-maps.zip tf -x '*/.*' -x '*.bz2' -x 'tf/download/maps/*' -x 'tf_mvm_missioncycle.res'
             zip archive-assets-no-maps.zip 'HOW TO INSTALL!.gif'
@@ -54,21 +57,26 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_REGION: 'auto'   # optional: defaults to us-east-1
           AWS_S3_ENDPOINT: https://d7d00000029f3cf361b520329f5e69df.r2.cloudflarestorage.com
-  
+
   fastdl:
 
     runs-on: ubuntu-latest
 
     steps:
-      
+
       - uses: actions/checkout@v3
         with:
-          path: tf/download
+          path: tf/potato
+
+      - uses: actions/checkout@v3
+        with:
+          repository: Moonlight-MvM/Moonlight-Archives
+          path: tf/moonlight
 
       # Install wakeonlan
       - name: Make scripts executable
         run: sudo apt-get install -y wakeonlan
-        
+
       - name: Setup SSH Keys and known_hosts
         env:
             SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -76,16 +84,23 @@ jobs:
             ssh-agent -a $SSH_AUTH_SOCK > /dev/null
             ssh-add - <<< "${{ secrets.DEPLOY_KEY_NEW }}"
 
+      - name: Merge repositories locally for fastdl
+        run: |
+
+          mkdir -p tf/download
+
+          rsync -a --ignore-existing --remove-source-files tf/potato/* tf/download/
+          rsync -a --ignore-existing --remove-source-files tf/moonlight/* tf/download/
+
       - name: Create bz2 archives
         run: |
           cd tf/download
           find . -type f -not \( -name "*.pop" -or -name "*.nav" -or -name "*.res" -or -name "*.bz2" -or -name "*.lua" -or -name "*.nut" -or -name "*.raw" -or -name "*.bsp" -or -name "*_particles.txt" \) \( ! -regex '.*/\..*' \) | parallel bzip2 -f -k
-          
+
       - name: Sync with fastdl endpoints
         env:
             SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-
           cd tf/download
 
           mapfile -t servers < <(curl -s https://raw.githubusercontent.com/potato-tf/deploy/refs/heads/main/serverlist.json | jq -r '.servers[]')
@@ -93,8 +108,7 @@ jobs:
           {
             ssh -o StrictHostKeyChecking=no -p ${a[0]} ${a[1]} "touch ${a[2]}/tf2server/tf/occupiedservers/wake; exit 0"
 
-            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --mkpath --update --delete --include="*/" --include="*.bz2" --include="*.bsp" --include="*.raw" --exclude="*" . ${a[1]}:${a[2]}/www/html/gameassets/archive_potato/
-            # ssh -o StrictHostKeyChecking=no -p ${a[0]} ${a[1]} "rsync -a --remove-source-files --mkpath ${a[2]}/www/html/gameassets/archive_potato/* ${a[2]}/www/html/gameassets/archive/"
+            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --mkpath --update --delete --include="*/" --include="*.bz2" --include="*.bsp" --include="*.raw" --exclude="*" . ${a[1]}:${a[2]}/www/html/gameassets/archive/
           } &
           done
           wait
@@ -107,7 +121,12 @@ jobs:
 
       - uses: actions/checkout@v3
         with:
-          path: tf/download
+          path: tf/potato
+
+      - uses: actions/checkout@v3
+        with:
+          repository: Moonlight-MvM/Moonlight-Archives
+          path: tf/moonlight
 
       - name: Setup SSH Keys and known_hosts
         env:
@@ -116,11 +135,17 @@ jobs:
             ssh-agent -a $SSH_AUTH_SOCK > /dev/null
             ssh-add - <<< "${{ secrets.DEPLOY_KEY_NEW }}"
 
+      - name: Merge repositories locally
+        run: |
+          mkdir -p tf/download
+
+          rsync -a --ignore-existing --remove-source-files tf/potato/* tf/download/ 2>/dev/null || true
+          rsync -a --ignore-existing --remove-source-files tf/moonlight/* tf/download/ 2>/dev/null || true
+
       - name: Sync with game servers
         env:
             SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-
           cd tf/download
 
           mapfile -t servers < <(curl -s https://raw.githubusercontent.com/potato-tf/deploy/refs/heads/main/serverlist.json | jq -r '.servers[]')
@@ -128,8 +153,7 @@ jobs:
           {
             ssh -o StrictHostKeyChecking=no -p ${a[0]} ${a[1]} "touch ${a[2]}/tf2server/tf/occupiedservers/wake; exit 0"
 
-            rsync -a --mkpath -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --update --mkpath --delete --exclude=".*" --exclude="*.bz2" . ${a[1]}:${a[2]}/tf2server/tf/archive_potato/
-            # ssh -o StrictHostKeyChecking=no -p ${a[0]} ${a[1]} "rsync -a --remove-source-files --mkpath ${a[2]}/tf2server/tf/archive_potato/* ${a[2]}/tf2server/tf/archive/"
+            rsync -a -e "ssh -p ${a[0]} -o StrictHostKeyChecking=no" --update --mkpath --delete --exclude=".*" --exclude="*.bz2" . ${a[1]}:${a[2]}/tf2server/tf/archive/
           } &
           done
           wait
