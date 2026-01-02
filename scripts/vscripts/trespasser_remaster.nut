@@ -4338,8 +4338,16 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 			}
 			else
 			{
-				if (bExists && hPlayer.IsBotOfType(TF_BOT_TYPE))
-					hPlayer.ForceChangeTeam(TEAM_SPECTATOR, true)
+				if (bExists)
+				{
+					if (hPlayer.IsBotOfType(TF_BOT_TYPE))
+						hPlayer.ForceChangeTeam(TEAM_SPECTATOR, true)
+					else
+					{
+						player.SetHealth(0)
+						player.TakeDamage(1, 0, null)
+					}
+				}
 				RemovePlayerFromPullDownTable.append(hPlayer)
 			}
 		}
