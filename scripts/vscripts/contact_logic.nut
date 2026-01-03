@@ -29,14 +29,14 @@ local CurrentWaveNum = GetPropInt(FindByClassname(null, "tf_objective_resource")
             if (alive && !("botCreated" in scope)) {
                 scope.botCreated <- true
 
-                foreach(tag, table in robotTags)
-                    if (player.HasBotTag(tag)) {
-                        scope.popFiredDeathHook <- false
-                        PopExtHooks.AddHooksToScope(tag, table, scope)
+                // foreach(tag, table in PopExt.robotTags)
+                //     if (player.HasBotTag(tag)) {
+                //         scope.popFiredDeathHook <- false
+                //         PopExtHooks.AddHooksToScope(tag, table, scope)
 
-                        if ("OnSpawn" in table)
-                            table.OnSpawn(player, tag)
-                    }
+                //         if ("OnSpawn" in table)
+                //             table.OnSpawn(player, tag)
+                //     }
             }
             // Make sure that ondeath hook is fired always
             if (!alive && "popFiredDeathHook" in scope) {
@@ -802,8 +802,15 @@ PopExt.AddRobotTag("cannon_puppet", {
         bot.GetScriptScope().curThreshold <- 0.5
     },
     OnDeath = function(bot, params) {
-        delete bot.GetScriptScope().PlayerThinkTable.TelePuppetThink
-        delete Contact.cannonPuppet
+        try {
+            ClientPrint(null,3,"cannon_puppet on death")
+            delete bot.GetScriptScope().PlayerThinkTable.TelePuppetThink
+            delete Contact.cannonPuppet
+            EntFire("bignet", "RunScriptCode", "Contact.LoseWave7()", 0.5, null)
+        } catch (exception){
+            ClientPrint(null,3,exception.tostring())
+        }
+
     },
 })
 
@@ -1187,32 +1194,6 @@ Contact.NavTest <- function() {
 }
 
 Contact.engiTank <- null
-// Contact.SetupEngiTank <- function(tank)
-// {
-//     Contact.engiTank = tank
-//     //tank.SetSolid(2)
-//     Contact.BaseBoss = Entities.FindByName(null, "controlpanel_baseboss")
-//     EntFireByHandle(tank, "RunScriptCode", "Contact.SetupEngiTank2(Contact.engiTank)",6, tank,tank)
-// }
-// Contact.SetupEngiTank2 <- function(tank)
-// {
-//     if(debugzz) ClientPrint(null,3,"setup tank")
-//     // tank.SetAbsOrigin(Contact.engiDrone.GetOrigin() + Vector(0, 0, 70))
-//     // tank.SetAbsAngles(QAngle(0,0,0))
-
-//     local ufo = Entities.FindByName(null, "engi_ufo")
-//     // local child = tank
-//     // local parent = ufo //Contact.engiDrone
-
-//     // SetPropEntity(child, "m_hMovePeer", parent.FirstMoveChild())
-// 	// SetPropEntity(parent, "m_hMoveChild", child)
-// 	// SetPropEntity(child, "m_hMoveParent", parent)
-
-//     // EntFireByHandle(tank, "SetParent", "!activator", 0.0, parent, parent)
-
-//     EntFireByHandle(tank, "$TeleportToEntity", "!activator", 0, ufo, ufo)
-//     EntFireByHandle(tank, "SetParent", "!activator", 0.1, ufo, ufo)
-// }
 
 Contact.tanks <- {}
 Contact.tankModelFix <- function(tank) {
@@ -1254,6 +1235,7 @@ PopExt.AddTankName("engiufotank*", {
     },
 
     OnDeath = function(tank, params) {
+        ClientPrint(null,3,"CALLING UFOTANK ONDEATH")
         Contact.KillEngiDrone()
     }
 })
@@ -1293,18 +1275,29 @@ PopExt.AddRobotTag("engidrone", {
     },
 
     OnDeath = function(bot, params) {
+        ClientPrint(null,2,"engidrone ondeath")
        NetProps.SetPropString(bot, "m_iName", "")
        EntFireByHandle(bot, "EnableDamageForces", null, 0.0, null, null)
        bot.SetGravity(1.0)
-       //try delete bot.GetScriptScope().PlayerThinkTable.EngiDroneThink catch(e) return
-       try delete bot.GetScriptScope().PlayerThinkTable.EngiUfoTriggerThink catch(e) return
     },
 })
+Contact.lock <- false
 Contact.KillEngiDrone <- function()
 {
-    if(Contact.engiDrone != null && Contact.engiDrone.IsValid() && NetProps.GetPropInt(Contact.engiDrone, "m_lifeState") == 0) {
+    // if(Contact.engiDrone != null && Contact.engiDrone.IsValid() && NetProps.GetPropInt(Contact.engiDrone, "m_lifeState") == 0) {
+    //     Contact.engiDroneLastLoc <- Contact.engiDrone.GetOrigin()
+    //     EntFireByHandle(Contact.engiDrone, "$Suicide", null, 0.1, null, null)
+    // }
+    if (Contact.lock) {
+        if(Contact.engiDrone != null && Contact.engiDrone.IsValid() && Contact.engiDrone.GetClassname() == "player" && NetProps.GetPropInt(Contact.engiDrone, "m_lifeState") == 0) {
+        	EntFire("bignet", "RunScriptCode", "Contact.KillEngiDrone()", 0.1, null)
+        }
+    }
+    Contact.lock = true
+    if(Contact.engiDrone != null && Contact.engiDrone.IsValid() && Contact.engiDrone.GetClassname() == "player" && NetProps.GetPropInt(Contact.engiDrone, "m_lifeState") == 0) {
         Contact.engiDroneLastLoc <- Contact.engiDrone.GetOrigin()
-        EntFireByHandle(Contact.engiDrone, "$Suicide", null, 0.1, null, null)
+        EntFireByHandle(Contact.engiDrone, "RunScriptCode", "if(self.IsValid() && NetProps.GetPropInt(self, `m_lifeState`) == 0) EntFireByHandle(Contact.engiDrone, `$Suicide`, null, 0, null, null); Contact.lock=false", 0.5, null, null)
+
     }
     //Contact.engiDrone.TakeDamage(9999999, 1, Contact.engiDrone)
 }
