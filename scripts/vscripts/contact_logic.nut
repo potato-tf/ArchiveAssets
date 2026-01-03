@@ -803,7 +803,6 @@ PopExt.AddRobotTag("cannon_puppet", {
     },
     OnDeath = function(bot, params) {
         try {
-            ClientPrint(null,3,"cannon_puppet on death")
             delete bot.GetScriptScope().PlayerThinkTable.TelePuppetThink
             delete Contact.cannonPuppet
             EntFire("bignet", "RunScriptCode", "Contact.LoseWave7()", 0.5, null)
@@ -1235,7 +1234,6 @@ PopExt.AddTankName("engiufotank*", {
     },
 
     OnDeath = function(tank, params) {
-        ClientPrint(null,3,"CALLING UFOTANK ONDEATH")
         Contact.KillEngiDrone()
     }
 })
@@ -1275,7 +1273,6 @@ PopExt.AddRobotTag("engidrone", {
     },
 
     OnDeath = function(bot, params) {
-        ClientPrint(null,2,"engidrone ondeath")
        NetProps.SetPropString(bot, "m_iName", "")
        EntFireByHandle(bot, "EnableDamageForces", null, 0.0, null, null)
        bot.SetGravity(1.0)
