@@ -17,12 +17,24 @@
 
 // Report any bugs or feature requests regarding this script to fellen.
 
-::ROOT <- getroottable()
-if ("ReskinReanimators" in ROOT) return
+local CONST = getconsttable()
+local ROOT = getroottable()
 if (!("ConstantNamingConvention" in ROOT))
-	foreach (a, b in Constants)
-		foreach (k, v in b)
-			ROOT[k] <- v != null ? v : 0
+{
+	foreach (enum_table in Constants)
+	{
+		foreach (name, value in enum_table)
+		{
+			if (value == null)
+				value = 0
+
+			CONST[name] <- value
+			ROOT[name] <- value
+		}
+	}
+}
+
+const TF_DEATH_FEIGN_DEATH = 0x20
 
 ::ReskinReanimators <- {
 
@@ -44,6 +56,9 @@ if (!("ConstantNamingConvention" in ROOT))
 
 	// Fired every player death.
 	function OnGameEvent_player_death(params) {
+		if (params.death_flags & TF_DEATH_FEIGN_DEATH)
+			return
+
 		local p = GetPlayerFromUserID(params.userid)
 		if (!AllowTargetPlayer(p)) return
 
