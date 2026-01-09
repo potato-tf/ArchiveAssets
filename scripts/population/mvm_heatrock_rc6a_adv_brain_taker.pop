@@ -4341,55 +4341,7 @@ population
 		InitWaveOutput
 		{
 			Target	bombpath_forcebottompaths
-			Action	RunScriptCode
-			Param	"
-				self.AcceptInput(`Trigger`, null, null, null)
-
-				objres <- Entities.FindByClassname(null, `tf_objective_resource`)
-
-				function FindIconIndex(name) {
-					for (local i = 0; i < 12; ++i)
-						if (NetProps.GetPropStringArray(objres, `m_iszMannVsMachineWaveClassNames`, i) == name)
-							return i
-					for (local i = 0; i < 12; ++i)
-						if (NetProps.GetPropStringArray(objres, `m_iszMannVsMachineWaveClassNames2`, i) == name)
-							return i
-					return null
-				}
-				function SetFlagsByIndex(index, bits) {
-					if (index >= 12) {
-						NetProps.SetPropIntArray(objres, `m_nMannVsMachineWaveClassFlags2`, bits, index - 12)
-						return
-					}
-					NetProps.SetPropIntArray(objres, `m_nMannVsMachineWaveClassFlags`, bits, index)
-				}
-				function SetCountByIndex(index, count) {
-					if (index >= 12) {
-						NetProps.SetPropIntArray(objres, `m_nMannVsMachineWaveClassCounts2`, count, index - 12)
-						return
-					}
-					NetProps.SetPropIntArray(objres, `m_nMannVsMachineWaveClassCounts`, count, index)
-				}
-
-				// Icons we want to set to mainwave, infinite & miniboss.
-				icons <- [
-					FindIconIndex(`demo_burst_giant`),
-					FindIconIndex(`heavy_brass_nys`),
-					FindIconIndex(`medic_giant`)
-				]
-
-				function AliveIcons() {
-					foreach (i in icons) {
-						SetCountByIndex(i, 99)
-						SetFlagsByIndex(i, 9) // MVM_CLASS_FLAG_NORMAL|MVM_CLASS_FLAG_MINIBOSS
-					}
-					// Fix wavebar progress.
-					NetProps.SetPropInt(objres, `m_nMannVsMachineWaveEnemyCount`,
-						1 + icons.len() * 99)
-					return -1.0
-				}
-				AddThinkToEnt(self, `AliveIcons`)
-			"
+			Action	Trigger
 		}
 		StartWaveOutput
 		{
@@ -4414,24 +4366,8 @@ population
 
 			WaitBeforeStarting 15
 			WaitBetweenSpawns  0
-			
+
 			FirstSpawnWarningSound "mvm\giant_heavy\giant_heavy_entrance.wav"
-			
-			// Clean-up our fake giant support icons once the boss dies.
-			DoneOutput
-			{
-				Target	bombpath_forcebottompaths
-				Action	RunScriptCode
-				Param	"
-					function DeadIcons() {
-						foreach (i in icons)
-							SetCountByIndex(i, 0)
-						NetProps.SetPropInt(objres, `m_nMannVsMachineWaveEnemyCount`, 99)
-						return -1.0
-					}
-					AddThinkToEnt(self, `DeadIcons`)
-				"
-			}
 
 			TFBot
 			{ 
@@ -4812,291 +4748,6 @@ population
 
 		WaveSpawn
 		{
-			TotalCurrency	600
-			TotalCount	10
-			MaxActive	10
-			SpawnCount	10
-			WaitBeforeStarting	0
-			WaitBetweenSpawns	22
-			Support	Limited
-			Where	spawnbot
-			
-			FirstSpawnOutput
-			{
-				Target	vlvx4
-				Action	PlaySound
-			}
-			
-			RandomChoice //1 out of 20 chance to drop crumpkin
-			{
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-					AddTemplate DropsSmallCrumpkin [$SIGSEGV]
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-			}
-		}
-		WaveSpawn
-		{
-			TotalCurrency	1080
-			TotalCount	120
-			MaxActive	4
-			SpawnCount	4
-			WaitBeforeStarting	33
-			WaitBetweenSpawns	22
-			Support	1
-			Where	spawnbot
-			
-			RandomChoice //1 out of 12 chance to drop crumpkin
-			{
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-					AddTemplate DropsSmallCrumpkin [$SIGSEGV]
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-				TFBot
-				{
-					Class	Soldier
-					Skill	Expert
-				}
-			}
-		}
-		WaveSpawn
-		{
-			TotalCurrency	900
-			TotalCount	100
-			MaxActive	5
-			SpawnCount	5
-			WaitBeforeStarting	11
-			WaitBetweenSpawns	22
-			Support	1
-			Where	spawnbot
-			RandomChoice
-			{
-				TFBot
-				{
-					Class	Pyro
-					Skill	Expert
-					Item "The Phlogistinator"
-					AddTemplate DropsSmallCrumpkin [$SIGSEGV]
-				}
-				TFBot
-				{
-					Class	Pyro
-					Skill	Expert
-					Item "The Phlogistinator"
-				}
-				TFBot
-				{
-					Class	Pyro
-					Skill	Expert
-					Item "The Phlogistinator"
-				}
-				TFBot
-				{
-					Class	Pyro
-					Skill	Expert
-					Item "The Phlogistinator"
-				}
-				TFBot
-				{
-					Class	Pyro
-					Skill	Expert
-					Item "The Phlogistinator"
-				}
-				TFBot
-				{
-					Class	Pyro
-					Skill	Expert
-					Item "The Phlogistinator"
-				}
-				TFBot
-				{
-					Class	Pyro
-					Skill	Expert
-					Item "The Phlogistinator"
-				}
-				TFBot
-				{
-					Class	Pyro
-					Skill	Expert
-					Item "The Phlogistinator"
-				}
-				TFBot
-				{
-					Class	Pyro
-					Skill	Expert
-					Item "The Phlogistinator"
-				}
-				TFBot
-				{
-					Class	Pyro
-					Skill	Expert
-					Item "The Phlogistinator"
-				}
-				TFBot
-				{
-					Class	Pyro
-					Skill	Expert
-					Item "The Phlogistinator"
-				}
-				TFBot
-				{
-					Class	Pyro
-					Skill	Expert
-					Item "The Phlogistinator"
-				}
-			}
-		}
-		WaveSpawn
-		{
 			TotalCurrency	100
 			TotalCount	1
 			MaxActive	1
@@ -5348,30 +4999,6 @@ population
 		}
 		WaveSpawn
 		{
-			Name  "BossMinions"
-			Where spawnbot
-   
-			TotalCount 100
-			MaxActive  4
-			SpawnCount 1
-			TotalCurrency 0
-
-			WaitBeforeStarting 25
-			WaitBetweenSpawns  5.8
-			Support 1
-			RandomChoice
-			{
-				RandomChoice
-				{
-					TFBot
-					{
-						Template T_TFBot_Baby_Punch
-					}
-				}
-			}
-		}
-		WaveSpawn
-		{
 			TotalCurrency	0
 			TotalCount	10
 			MaxActive	1
@@ -5397,6 +5024,311 @@ population
 		}
 		WaveSpawn
 		{
+			TotalCurrency	600
+			TotalCount	10
+			MaxActive	10
+			SpawnCount	10
+			WaitBeforeStarting	0
+			WaitBetweenSpawns	22
+			Support	Limited
+			Where	spawnbot
+			
+			FirstSpawnOutput
+			{
+				Target	vlvx4
+				Action	PlaySound
+			}
+			
+			RandomChoice //1 out of 20 chance to drop crumpkin
+			{
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+					AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency	1080
+			TotalCount	120
+			MaxActive	4
+			SpawnCount	4
+			WaitBeforeStarting	33
+			WaitBetweenSpawns	22
+			Support	1
+			Where	spawnbot
+
+			RandomChoice //1 out of 12 chance to drop crumpkin
+			{
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+					AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+				TFBot
+				{
+					Class	Soldier
+					Skill	Expert
+				}
+			}
+		}
+		WaveSpawn
+		{
+			TotalCurrency	900
+			TotalCount	100
+			MaxActive	5
+			SpawnCount	5
+			WaitBeforeStarting	11
+			WaitBetweenSpawns	22
+			Support	1
+			Where	spawnbot
+			RandomChoice
+			{
+				TFBot
+				{
+					Class	Pyro
+					Skill	Expert
+					Item "The Phlogistinator"
+					AddTemplate DropsSmallCrumpkin [$SIGSEGV]
+				}
+				TFBot
+				{
+					Class	Pyro
+					Skill	Expert
+					Item "The Phlogistinator"
+				}
+				TFBot
+				{
+					Class	Pyro
+					Skill	Expert
+					Item "The Phlogistinator"
+				}
+				TFBot
+				{
+					Class	Pyro
+					Skill	Expert
+					Item "The Phlogistinator"
+				}
+				TFBot
+				{
+					Class	Pyro
+					Skill	Expert
+					Item "The Phlogistinator"
+				}
+				TFBot
+				{
+					Class	Pyro
+					Skill	Expert
+					Item "The Phlogistinator"
+				}
+				TFBot
+				{
+					Class	Pyro
+					Skill	Expert
+					Item "The Phlogistinator"
+				}
+				TFBot
+				{
+					Class	Pyro
+					Skill	Expert
+					Item "The Phlogistinator"
+				}
+				TFBot
+				{
+					Class	Pyro
+					Skill	Expert
+					Item "The Phlogistinator"
+				}
+				TFBot
+				{
+					Class	Pyro
+					Skill	Expert
+					Item "The Phlogistinator"
+				}
+				TFBot
+				{
+					Class	Pyro
+					Skill	Expert
+					Item "The Phlogistinator"
+				}
+				TFBot
+				{
+					Class	Pyro
+					Skill	Expert
+					Item "The Phlogistinator"
+				}
+			}
+		}
+		WaveSpawn
+		{
+			Name  "BossMinions"
+			Where spawnbot
+
+			TotalCount 100
+			MaxActive  4
+			SpawnCount 1
+			TotalCurrency 0
+
+			WaitBeforeStarting 25
+			WaitBetweenSpawns  5.8
+			Support 1
+			HideIcon 1 [$SIGSEGV]
+
+			TFBot
+			{
+				Template T_TFBot_Baby_Punch
+			}
+		}
+		WaveSpawn
+		{
 			Name DeathAnimation
 			Where spawnbot
    
@@ -5408,11 +5340,11 @@ population
 			WaitBeforeStarting 0
 			WaitBetweenSpawns 0
 			WaitForAllDead Boss
+			HideIcon 1 [$SIGSEGV]
 
 			TFBot
 			{
 				Class HeavyWeapons
-				ClassIcon medic_giant
 				Name "Captain Punch The MDXXVIII"
 				Item "War Head"
 				Item "Fists of Steel"
