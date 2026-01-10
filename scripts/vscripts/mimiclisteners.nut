@@ -2,14 +2,14 @@
 ::mimicListeners <- {
 	playerBotPairs = {}
 
-	reset = function() {
+	function reset() {
 		delete ::mimicListeners
     }
 	
-	OnGameEvent_recalculate_holidays = function(_) {if(GetRoundState() == 3) reset()}
-	OnGameEvent_mvm_wave_complete = function(_) {reset()}
+	function OnGameEvent_recalculate_holidays(_) {if(GetRoundState() == 3) reset()}
+	function OnGameEvent_mvm_wave_complete(_) {reset()}
 	
-	OnGameEvent_player_spawn = function(params) {
+	function OnGameEvent_player_spawn(params) {
 		local player = GetPlayerFromUserID(params.userid);
 		
 		if(IsPlayerABot(player)) {
@@ -22,7 +22,7 @@
 			local interruptstring = "interrupt_action -posent " + player.GetName() + " -lookposent " + player.GetName() 
 				+ " -killlook -waituntildone -alwayslook"
 			
-			if(NetProps.GetPropInt(bot, "m_lifeState") != 0) { //no need if bot has been killed
+			if(!bot.IsAlive()) { //no need if bot has been killed
 				return
 			}
 			
@@ -39,7 +39,7 @@
 		}
 	}
 	
-	OnGameEvent_player_turned_to_ghost = function(params) {
+	function OnGameEvent_player_turned_to_ghost(params) {
 		local player = GetPlayerFromUserID(params.userid);
 		
 		if(player.GetEntityIndex() in playerBotPairs) {
@@ -48,7 +48,7 @@
 		}
 	}
 	
-	registerPair = function(playerIndex, botIndex) {
+	function registerPair(playerIndex, botIndex) {
 		playerBotPairs[playerIndex] <- botIndex
 	}
 }

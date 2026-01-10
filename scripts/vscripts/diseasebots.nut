@@ -20,8 +20,19 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 
 ::diseaseCallbacks <- {
 	pneumoniaBot = null
+	modelnames = {
+		Pneumonia = "medic",
+		Sarcoma_w6 = "heavy_boss",
+		Sarcoma = "heavy_boss",
+		Dyspnea = "soldier_boss",
+		Tachycardia = "scout_boss",
+		UKGR_Tumor = "medic_ukgr",
+		Malignant_Tumor = "heavy",
+		Cardiomyopathy = "demo_boss",
+		Hemorrhagic_Fever = "pyro_boss"
+	}
 
-	Cleanup = function() {
+	function Cleanup() {
 		for (local i = 1; i <= MaxPlayers ; i++)
 		{
 			local player = PlayerInstanceFromIndex(i)
@@ -34,6 +45,7 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 
 			if(IsPlayerABot(player)) continue
 			if(player.GetTeam() != TF_TEAM_RED) continue
+			
 			player.SetScriptOverlayMaterial(null)
 			player.RemoveCustomAttribute("move speed penalty")
 			player.RemoveCustomAttribute("halloween increased jump height")
@@ -60,17 +72,17 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 		delete ::diseaseCallbacks
     }
 
-	OnGameEvent_recalculate_holidays = function(_) {
+	function OnGameEvent_recalculate_holidays(_) {
 		if(GetRoundState() == 3) {
 			Cleanup()
 		}
 	}
 
-	OnGameEvent_mvm_wave_complete = function(_) {
+	function OnGameEvent_mvm_wave_complete(_) {
 		Cleanup()
 	}
 
-	playSound = function(soundName, player) { //scope moment
+	function playSound(soundName, player) { //scope moment
 		EmitSoundEx({
 			sound_name = soundName
 			origin = player.GetOrigin()
@@ -80,7 +92,7 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 		})
 	}
 
-	OnGameEvent_player_death = function(params) {
+	function OnGameEvent_player_death(params) {
 		local player = GetPlayerFromUserID(params.userid)
 		if(player == null) return
 		
@@ -167,7 +179,7 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 		EntFire("uber_flask_short_trigger*", "RunScriptCode", "diseaseCallbacks.killInTime(self, 2, 1.5)", -1)
 	}
 
-	OnGameEvent_player_spawn = function(params) {
+	function OnGameEvent_player_spawn(params) {
 		local player = GetPlayerFromUserID(params.userid)
 
 		if(player == null) return
@@ -177,7 +189,6 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 			EntFireByHandle(player, "RunScriptCode", "diseaseCallbacks.addPlayerDebuffThink()", -1, player, null)
 		}
 		else {
-			player.ValidateScriptScope()
 			player.GetScriptScope().onContainmentBreach <- function() {
 				self.AddCondEx(TF_COND_SPEED_BOOST, -1, null)
 			}
@@ -185,13 +196,12 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 		}
 	}
 
-	setupPneumoniaSpawner = function() {
+	function setupPneumoniaSpawner() {
 		local template = Entities.FindByName(null, "pneumonia_spawn_template")
 		template.ValidateScriptScope()
 		local scope = template.GetScriptScope()
 
 		scope.PreSpawnInstance <- function(classname, targetname) { //this needs to be present
-
 		}
 
 		scope.PostSpawn <- function(entities) {
@@ -214,51 +224,28 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 		}
 	}
 
-	specialDiseaseCheck = function() {
+	function specialDiseaseCheck() {
 		local tags = {}
 		activator.GetAllBotTags(tags)
 
 		foreach(i, tag in tags) {
-			switch(tag) {
-				case "Pneumonia":
-					activator.SetCustomModelWithClassAnimations("models/bots/forgotten/disease_bot_medic.mdl")
+			if(tag in modelnames) {
+				activator.SetCustomModelWithClassAnimations("models/bots/forgotten/disease_bot_" + modelnames[tag] + ".mdl")
+				if(tag == "Pneumonia") {
 					diseaseCallbacks.addPneumoniaThink(activator)
-					break
-				case "Sarcoma_w6":
-					activator.SetCustomModelWithClassAnimations("models/bots/forgotten/disease_bot_heavy_boss.mdl")
-					break
-				case "Sarcoma":
-					activator.SetCustomModelWithClassAnimations("models/bots/forgotten/disease_bot_heavy_boss.mdl")
+				}
+				else if(tag == "Sarcoma") {
 					activator.AcceptInput("RunScriptCode", "diseaseCallbacks.addSarcomaThink()", activator, null)
-					break
-				case "Dyspnea":
-					activator.SetCustomModelWithClassAnimations("models/bots/forgotten/disease_bot_soldier_boss.mdl")
-					break
-				case "Tachycardia":
-					activator.SetCustomModelWithClassAnimations("models/bots/forgotten/disease_bot_scout_boss.mdl")
-					break
-				case "UKGR_Tumor":
-					activator.SetCustomModelWithClassAnimations("models/bots/forgotten/disease_bot_medic_ukgr.mdl")
-					break
-				case "Malignant_Tumor":
-					activator.SetCustomModelWithClassAnimations("models/bots/forgotten/disease_bot_heavy.mdl")
-					break
-				case "Cardiomyopathy":
-					activator.SetCustomModelWithClassAnimations("models/bots/forgotten/disease_bot_demo_boss.mdl")
-					break
-				case "Hemorrhagic_Fever":
-					activator.SetCustomModelWithClassAnimations("models/bots/forgotten/disease_bot_pyro_boss.mdl")
-					break
-				default:
-					break
+				}
+				break
 			}
 		}
 	}
 
-	addPneumoniaThink = function(bot) {
+	function addPneumoniaThink(bot) {
 		pneumoniaBot = bot
 		bot.GetScriptScope().pneumoniaThink <- function() {
-			if(NetProps.GetPropInt(self, "m_lifeState") != 0) {
+			if(!self.IsAlive()) {
 				AddThinkToEnt(self, null)
 				NetProps.SetPropString(self, "m_iszScriptThinkFunction", "")
 			}
@@ -271,7 +258,7 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 		AddThinkToEnt(bot, "pneumoniaThink")
 	}
 
-	addSarcomaThink = function() {
+	function addSarcomaThink() {
 		//Stage 0 = Unarmed bot (Has SuppressFire) 0.8 scale 1.5 speed
 		//Stage 1 = Melee bot 1.25 scale 1 speed
 		//Stage 2 = Stock shotgun bot 1.5 scale 0.75 speed
@@ -347,7 +334,7 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 		}
 
 		scope.sarcomaThink <- function() {
-			if(NetProps.GetPropInt(self, "m_lifeState") != 0) {
+			if(!self.IsAlive()) {
 				AddThinkToEnt(self, null)
 				NetProps.SetPropString(self, "m_iszScriptThinkFunction", "")
 				if(chargeupParticle.IsValid()) {
@@ -441,26 +428,14 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 		AddThinkToEnt(activator, "sarcomaThink")
 	}
 
-	addPlayerDebuffThink = function() {
+	function addPlayerDebuffThink() {
 		//printl("Player Debuff Check is thonking...")
 		local scope = activator.GetScriptScope()
-
-		if(!("medigun" in scope) || !scope.medigun.IsValid()) {
-			scope.medigun <- null
-			for(local i = 0; i < NetProps.GetPropArraySize(activator, "m_hMyWeapons"); i++) {
-				local wep = NetProps.GetPropEntityArray(activator, "m_hMyWeapons", i)
-
-				if(wep && wep.GetClassname() == "tf_weapon_medigun") {
-					scope.medigun = NetProps.GetPropEntityArray(activator, "m_hMyWeapons", i);
-					break;
-				}
-			}
-		}
 
 		scope.dyspneaDebuffed <- false
 		scope.tachycardiaDebuffed <- false
 		scope.playerDebuffThink <- function() {
-			if(NetProps.GetPropInt(self, "m_lifeState") != 0) {
+			if(!self.IsAlive()) {
 				delete thinkTable.playerDebuffThink
 				return
 			}
@@ -472,7 +447,7 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 			if(self.InCond(12) && !dyspneaDebuffed) {
 				dyspneaDebuffed = true
 				self.SetScriptOverlayMaterial("effects/forgotten_dyspnea_debuff")
-				diseaseCallbacks.playSound(::pomsonSound, self)
+				diseaseCallbacks.playSound(pomsonSound, self)
 			}
 			else if(!self.InCond(12) && dyspneaDebuffed) {
 				dyspneaDebuffed = false
@@ -515,7 +490,7 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 		scope.thinkTable.playerDebuffThink <- scope.playerDebuffThink
 	}
 
-	killInTime = function(ent, seconds, flashSeconds) {
+	function killInTime(ent, seconds, flashSeconds) {
 		if(ent.GetScriptThinkFunc() == "killThink") {
 			return
 		}
@@ -541,19 +516,10 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 		AddThinkToEnt(ent, "killThink")
 	}
 
-	activateHemorrhagicFever = function() {
+	function activateHemorrhagicFever() {
 		activator.SetUseBossHealthBar(true)
 		local scope = activator.GetScriptScope()
-		scope.flamethrower <- null
-
-		for(local i = 0; i < NetProps.GetPropArraySize(activator, "m_hMyWeapons"); i++) {
-			local wep = NetProps.GetPropEntityArray(activator, "m_hMyWeapons", i)
-
-            if(wep && wep.GetClassname() == "tf_weapon_flamethrower") {
-                scope.flamethrower = NetProps.GetPropEntityArray(activator, "m_hMyWeapons", i);
-                break;
-            }
-        }
+		scope.flamethrower <- getWeapon(activator, "tf_weapon_flamethrower")
 		
 		scope.flamethrowerParticle <- SpawnEntityFromTable("trigger_particle", {
 			particle_name = "hemorrhagic_fever_flamethrower"
@@ -644,7 +610,7 @@ PrecacheEntityFromTable({classname = "info_particle_system", effect_name = "sarc
 }
 __CollectGameEventCallbacks(diseaseCallbacks)
 diseaseCallbacks.setupPneumoniaSpawner()
-for (local i = 1; i <= MaxPlayers ; i++)
+for(local i = 1; i <= MaxPlayers ; i++)
 {
 	local player = PlayerInstanceFromIndex(i)
 	if(player == null) continue
@@ -654,7 +620,7 @@ for (local i = 1; i <= MaxPlayers ; i++)
 	}
 }
 
-::applyFlaskBoost <- function(flaskLevel) {
+function root::applyFlaskBoost(flaskLevel) {
 	local selfHealth = self.GetHealth()
 	//Level 2 = tumor potions
 	local hpBoost = (flaskLevel == 2) ? 60 : 200
@@ -663,19 +629,6 @@ for (local i = 1; i <= MaxPlayers ; i++)
 	local condBoostDuration = (flaskLevel == 2) ? 4 : 8
 	self.AddCondEx(16, condBoostDuration, null)
 	self.AddCondEx(26, condBoostDuration, null)
-
-	local scope = self.GetScriptScope()
-	if(!("medigun" in scope) || !medigun.IsValid()) {
-		scope.medigun <- null
-		for(local i = 0; i < NetProps.GetPropArraySize(self, "m_hMyWeapons"); i++) {
-			local wep = NetProps.GetPropEntityArray(self, "m_hMyWeapons", i)
-
-			if(wep && wep.GetClassname() == "tf_weapon_medigun") {
-				scope.medigun = NetProps.GetPropEntityArray(self, "m_hMyWeapons", i);
-				break;
-			}
-		}
-	}
 
 	if(medigun == null) {
 		return
