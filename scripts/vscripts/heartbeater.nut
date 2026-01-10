@@ -12,7 +12,7 @@ PrecacheSound("ui/heartbeat4.mp3")
 PrecacheSound("ui/heartbeat5.mp3")
 
 ::heartbeaterCallbacks <- {
-	Cleanup = function() {
+	function Cleanup() {
 		for (local i = 1; i <= MaxPlayers ; i++)
 		{
 			local player = PlayerInstanceFromIndex(i)
@@ -31,17 +31,17 @@ PrecacheSound("ui/heartbeat5.mp3")
 		delete ::heartbeaterCallbacks
     }
 	
-	OnGameEvent_mvm_wave_complete = function(_) {
+	function OnGameEvent_mvm_wave_complete(_) {
 		Cleanup()
 	}
 	
-	OnGameEvent_recalculate_holidays = function(_) {
+	function OnGameEvent_recalculate_holidays(_) {
 		if(GetRoundState() == 3) {
 			Cleanup()
 		} 
 	}
 	
-	OnGameEvent_player_spawn = function(params) {
+	function OnGameEvent_player_spawn(params) {
 		local player = GetPlayerFromUserID(params.userid)
 		if(player == null) return
 		
@@ -55,7 +55,7 @@ PrecacheSound("ui/heartbeat5.mp3")
 		EntFireByHandle(player, "RunScriptCode", "heartbeaterCallbacks.addHeartbeaterThink()", -1, player, null)
 	}
 	
-	addHeartbeaterThink = function() {
+	function addHeartbeaterThink() {
 		if(!activator.HasBotTag("heartbeater")) {
 			return
 		}
@@ -194,7 +194,7 @@ PrecacheSound("ui/heartbeat5.mp3")
 		AddThinkToEnt(activator, "heartbeaterThink")
 	}
 	
-	NerfPlayerUberShield = function() {
+	function NerfPlayerUberShield() {
 		// local currentUberDuration = self.GetCustomAttribute("uber duration bonus", 0)
 		activator.AddCustomAttribute("uber duration bonus", -6, -1)
 		EntFireByHandle(activator, "RunScriptCode", "heartbeaterCallbacks.drainShieldIfActive()", -1, activator, null)
@@ -203,9 +203,10 @@ PrecacheSound("ui/heartbeat5.mp3")
 		activator.AddCustomAttribute("halloween increased jump height", 0.5, -1)
 	}
 
-	drainShieldIfActive = function() {
-		activator.GetScriptScope().drainShieldThink <- function() {
-			if(NetProps.GetPropInt(self, "m_lifeState") != 0) {
+	function drainShieldIfActive() {
+		local scope = activator.GetScriptScope()
+		scope.drainShieldThink <- function() {
+			if(!self.IsAlive()) {
 				delete thinkTable.drainShieldThink
 				return
 			}
@@ -220,10 +221,10 @@ PrecacheSound("ui/heartbeat5.mp3")
 				NetProps.SetPropFloat(self, "m_Shared.m_flRageMeter", newRageMeter)
 			}
 		}
-		activator.GetScriptScope().thinkTable.drainShieldThink <- activator.GetScriptScope().drainShieldThink
+		scope.thinkTable.drainShieldThink <- scope.drainShieldThink
 	}
 
-	buffBoss = function() {
+	function buffBoss() {
 		//Flag to apply debuffs when players respawn
 		bossIsBuffed = true
 		for (local i = 1; i <= MaxPlayers ; i++)
