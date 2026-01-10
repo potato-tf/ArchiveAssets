@@ -19,9 +19,6 @@ WaveSchedule
 	EventPopfile Halloween
     //Sigsegv mod-exclusive
 	MedigunShieldDamage 1 [$SIGSEGV] //Shield Medics can now harm human team
-	SentryBusterFriendlyFire 0 [$SIGSEGV] //Sentry Busters will no longer harm other robots
-    SniperHideLasers 1 [$SIGSEGV] //Sniper-bots no longer have laser sights
-    ImprovedAirblast 1 [$SIGSEGV] //Pyro-bots will airblast more projectiles including grenades and stickybombs
     ItemAttributes [$SIGSEGV] //Adds attributes to specified item given to players
 	{
 		ItemName "The Gas Passer"
@@ -117,7 +114,7 @@ WaveSchedule
 			{
 				ItemName	"the gas passer"
 				"item_meter_charge_rate" 5
-				"weapon burn dmg increased" 3
+				"weapon burn dmg increased" 2
 			}
 			CharacterAttributes
 			{
@@ -619,7 +616,7 @@ WaveSchedule
                 "kill forces attacker to laugh"	1
             }
 		}
-        T_TFBot_Giant_Spy_Void
+        T_TFBot_Giant_Spy_Void  //removed because if even one of these is left alive, regular Spy announcements do not trigger until all Void Spies are destroyed
         {
             Name	"Abyssal Dr. Enforcicle"
             Health  3000
@@ -681,7 +678,6 @@ WaveSchedule
 			ClassIcon sentry_buster
 			Attributes MiniBoss
 			Attributes	DisableDodge
-            ExtAttr AlwaysFireWeaponAlt [$SIGSEGV] //Sigsegv mod-exclusive
 			WeaponRestrictions MeleeOnly
 			Item  "the wrap assassin"
 			Item "The Wing Mann"	
@@ -694,10 +690,9 @@ WaveSchedule
 			{
 				"head scale" 3
 				"torso scale"	0
-				"damage force reduction" 0
-				"airblast vulnerability multiplier" 0
-                "airblast vertical vulnerability multiplier" 0
-				"rage giving scale"	0
+				"damage force reduction" 0.1
+				"airblast vulnerability multiplier" 0.1
+                "airblast vertical vulnerability multiplier" 0.1
                 "move speed bonus" 2
                 "cannot be backstabbed" 1
 			}
@@ -724,10 +719,6 @@ WaveSchedule
             TFBot
             {
                 Template T_TFBot_Giant_Sniper_Void
-            }
-            TFBot
-            {
-                Template T_TFBot_Giant_Spy_Void
             }
 		}
     }
@@ -761,9 +752,7 @@ WaveSchedule
 		{
 			Line "{green}////////////////////"
 			Line "{yellow}NOTICE"
-			Line "{blue}Robots are not so careless now; Sentry Busters cannot blow up other robots!"
             Line "{blue}Medic Robots have enhanced Projectile Shields that can deal damage on contact!"
-            Line "{blue}Pyro Robots are more skilled at airblasting projectiles such as stickybombs; Shoot with caution!"
 			Line "{green}////////////////////"
 		}
         //"Wave 1"
@@ -920,11 +909,6 @@ WaveSchedule
                 Item        "Head Hunter"
                 Item        "Claws And Infect"
                 Item        "Crazy Legs"
-                ItemAttributes
-				{
-					ItemName	"the shortstop"   
-					"reload time increased hidden" 1
-				}
 			}
         }
         WaveSpawn
@@ -1128,11 +1112,6 @@ WaveSchedule
                 ClassIcon scout
                 Template T_TFBot_Scout_Sandman_FastCharge
                 Attributes AlwaysCrit
-                ItemAttributes
-				{
-					ItemName    "the sandman"
-					"damage bonus" 2
-				}
                 CharacterAttributes
                 {
                     "kill forces attacker to laugh"	1
@@ -1636,17 +1615,13 @@ WaveSchedule
                     Name "Resistance Piercer Bowman"
 					Template T_TFBot_Sniper_Huntsman_Spammer
 					Skill  Expert
+					MaxVisionRange 750
 					Item "the razorback"
                     Item "the fruit shoot"
                     ItemAttributes
 					{
 						ItemName "the huntsman"
 						"dmg pierces resists absorbs"	1
-					}
-					ItemAttributes
-					{
-						ItemName "the razorback"
-						"jarate backstabber"	1
 					}
                     CharacterAttributes
                     {
@@ -1658,6 +1633,7 @@ WaveSchedule
                     Name "Resistance Piercer Bowman"
 					Template T_TFBot_Sniper_Huntsman_Spammer
 					Skill  Expert
+					MaxVisionRange 750
 					Item "the cozy camper"
                     Item "the fruit shoot"
                     ItemAttributes
@@ -1680,9 +1656,9 @@ WaveSchedule
                     Name "Resistance Piercer Bowman"
 					Template T_TFBot_Sniper_Huntsman_Spammer
 					Skill  Expert
+					MaxVisionRange 750
 					Item "Darwin's Danger Shield"
                     Item "the fruit shoot"
-                    Tag bot_flank
                     ItemAttributes
 					{
 						ItemName "the huntsman"
@@ -1715,14 +1691,8 @@ WaveSchedule
 				{
 					ItemName    "the sandman"
 					"effect bar recharge rate increased"    0.05
-					"dmg penalty vs players"	3	// 45 damage balls
+					"dmg penalty vs players"	2	// 30 damage balls
 				    "damage bonus"	0.34 //deals regular melee damage (34)
-                    "mod stun waist high airborne"	1
-				}
-				CharacterAttributes
-				{
-					"damage force reduction" 0
-					"airblast vulnerability multiplier" 0
 				}
 			}
 		}
@@ -1768,19 +1738,12 @@ WaveSchedule
                 Template	T_TFBot_Giant_Scout_Baseball
                 Attributes AlwaysCrit
                 ClassIcon scout_giant
-                Tag bot_flank
 				ItemAttributes
 				{
 					ItemName    "the sandman"
 					"effect bar recharge rate increased"    0.05
-					"dmg penalty vs players"	3	// 45 damage balls
+					"dmg penalty vs players"	2	// 30 damage balls
 				    "damage bonus"	0.34 //deals regular melee damage (34)
-                    "mod stun waist high airborne"	1
-				}
-				CharacterAttributes
-				{
-					"damage force reduction" 0
-					"airblast vulnerability multiplier" 0
 				}
 			}
 		}
@@ -2121,68 +2084,28 @@ WaveSchedule
 			Where   spawnbot
             Where   spawnbot_side
             WaitBetweenSpawns     1
-			RandomChoice
-			{
-                TFBot
+			TFBot
+            {
+                Template	T_TFBot_Scout_Shortstop
+                Skill Hard
+                Name "Special Delivery Scout"
+                Attributes AlwaysFireWeapon
+                 WeaponRestrictions SecondaryOnly
+                ClassIcon scout
+                Item	"mad milk"
+                Item    "the milkman"
+                Item    "the holy mackerel"
+                ItemAttributes
                 {
-                    Template	T_TFBot_Scout_Shortstop
-                    Skill Hard
-                    Name "Special Delivery Scout"
-                    Attributes AlwaysFireWeapon
-                    WeaponRestrictions SecondaryOnly
-                    ClassIcon scout
-                    Item	"mad milk"
-                    Item    "the milkman"
-                    Item    "the holy mackerel"
-                    ItemAttributes
-                    {
-                        ItemName	"the shortstop"
-                        "reload time increased hidden" 1
-                        "faster reload rate"	0.5
-                    }
-                    ItemAttributes
-                    {
-                        ItemName	"mad milk"
-                        "effect bar recharge rate increased"	0.2
-                        "applies snare effect" 0.35
-                    }
-                    CharacterAttributes
-                    {
-                        "deploy time increased" 0
-                        "kill forces attacker to laugh"	1
-                    }
+                    ItemName	"mad milk"
+                    "effect bar recharge rate increased"	0.2
                 }
-                TFBot
+                CharacterAttributes
                 {
-                    Template	T_TFBot_Scout_Shortstop
-                    Skill Hard
-                    Name "Special Delivery Scout"
-                    Attributes AlwaysFireWeapon
-                    WeaponRestrictions SecondaryOnly
-                    ClassIcon scout
-                    Tag bot_flank
-                    Item	"mad milk"
-                    Item    "the milkman"
-                    Item    "the holy mackerel"
-                    ItemAttributes
-                    {
-                        ItemName	"the shortstop"
-                        "reload time increased hidden" 1
-                        "faster reload rate"	0.5
-                    }
-                    ItemAttributes
-                    {
-                        ItemName	"mad milk"
-                        "effect bar recharge rate increased"	0.2
-                        "applies snare effect" 0.35
-                    }
-                    CharacterAttributes
-                    {
-                        "deploy time increased" 0
-                        "kill forces attacker to laugh"	1
-                    }
+                    "deploy time increased" 0
+                    "kill forces attacker to laugh"	1
                 }
-			}
+            }
 		}
         //Final Bosses
         WaveSpawn
@@ -2229,7 +2152,6 @@ WaveSchedule
                 Skill Expert
                 Attributes AlwaysCrit
                 Item "the milkman"
-                Tag bot_flank
                 CharacterAttributes
                 {
                     "kill forces attacker to laugh"	1
