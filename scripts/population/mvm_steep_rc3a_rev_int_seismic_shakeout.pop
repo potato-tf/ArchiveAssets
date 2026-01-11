@@ -5968,45 +5968,12 @@ population
 			Action RunScriptCode
 			Param
 			"
-				IncludeScript(`reskin-reanimators.nut`, getroottable())
 				EntFire(`closeredwall_init_fm*`, `Trigger`)
+				IncludeScript(`reskin-reanimators.nut`, getroottable())
 
-				PrecacheScriptSound(`Announcer.MVM_Spy_Alert`)
-				PrecacheScriptSound(`Announcer.mvm_spybot_death_all`)
-
-				::DisableSpyAlert <-
-				{
-					mvm_stats = Entities.FindByClassname(null, `tf_mann_vs_machine_stats`)
-
-					function OnGameEvent_mvm_mission_update(params)
-					{
-						if (params[`class`] != Constants.ETFClass.TF_CLASS_SPY)
-							return
-
-						local sound_string = params.count > 0 ? `Announcer.mvm_spybot_death_all` : `Announcer.MVM_Spy_Alert`
-
-						for (local i = MaxClients().tointeger(); --i;)
-						{
-							local player = PlayerInstanceFromIndex(i)
-							if (!player || player.IsBotOfType(Constants.EBotType.TF_BOT_TYPE))
-								continue
-
-							player.StopSound(sound_string)
-						}
-					}
-
-					function OnGameEvent_stats_resetround(_)
-					{
-						if (GetRoundState() != Constants.ERoundState.GR_STATE_PREROUND)
-							return
-
-						if (NetProps.GetPropInt(mvm_stats, `m_iCurrentWaveIdx`) != 0)
-							return
-
-						delete ::DisableSpyAlert
-					}
-				}
-				__CollectGameEventCallbacks(DisableSpyAlert)
+				// Disable 'Alert! There are Spies coming.', as our bomb carrier is always a Spy.
+				IncludeScript(`wave-alerts.nut`, getroottable())
+				WaveAlerts.SetAllowSpyUpdates(false)
 			"
 		}
 		StartWaveOutput

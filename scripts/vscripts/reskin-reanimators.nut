@@ -7,7 +7,7 @@
 //  {
 //      Target BigNet
 //      Action RunScriptCode
-//      Param "IncludeScript(`reskin-reanimators.nut`)"
+//      Param "IncludeScript(`reskin-reanimators.nut`, getroottable())"
 //  }
 
 // You should also include the reanimator model using a sigsegv-mvm precache so that it is
