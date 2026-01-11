@@ -47,16 +47,9 @@ function PopExtHoming::HomingProjectileThink() {
 
 function PopExtHoming::SelectVictim( projectile ) {
 
-    local min_distance = 32768.0, target = null, player_array = {}
+    local min_distance = 32768.0, target
 
-    local owner = projectile.GetOwner()
-
-    if ( !owner || !owner.IsValid() )
-        player_array = PopExtUtil.PlayerArray
-    else
-        player_array = owner.IsBotOfType( 1337 ) ? PopExtUtil.HumanArray : PopExtUtil.BotArray
-
-    foreach ( player in player_array ) {
+    foreach ( player in PopExtUtil.PlayerArray ) {
 
         local distance = ( projectile.GetOrigin() - player.GetOrigin() ).Length()
 
@@ -84,16 +77,15 @@ function PopExtHoming::IsValidTarget( victim, distance, min_distance, projectile
             return false
 
         // Check for stealth and disguise conditions if not ignored
-        if ( !projectile_scope.ignore_stealthed_spies && ( victim.IsStealthed() || victim.IsFullyInvisible() ) )
+        if ( projectile_scope.ignore_stealthed_spies && ( victim.IsStealthed() || victim.IsFullyInvisible() ) )
             return false
 
-        if ( !projectile_scope.ignore_disguised_spies && victim.GetDisguiseTarget() != null )
+        if ( projectile_scope.ignore_disguised_spies && victim.GetDisguiseTarget() )
             return false
     }
 
     return true
 }
-
 
 function PopExtHoming::FaceTowards( new_target, projectile, projectile_speed ) {
 
@@ -131,7 +123,4 @@ function PopExtHoming::IsLookingAt( projectile, new_target ) {
     return false
 }
 
-function PopExtHoming::IsValidProjectile( projectile, table ) {
-
-    return ( projectile.GetClassname() in table )
-}
+function PopExtHoming::IsValidProjectile( projectile, table ) { return ( projectile.GetClassname() in table ) }

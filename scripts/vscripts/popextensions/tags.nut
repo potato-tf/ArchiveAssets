@@ -430,7 +430,7 @@ PopExtTags.TagFunctions <- {
 		local spellbook = PopExtUtil.HasItemInLoadout( bot, "tf_weapon_spellbook" )
 
 		//equip a spellbook if the bot doesn't have one
-		if ( spellbook == null ) {
+		if ( !spellbook ) {
 
 			local book = PopExtUtil.SpawnEnt( "tf_weapon_spellbook", "__popext_spellbook" )
 			PopExtUtil.InitEconItem( book, ID_BASIC_SPELLBOOK )
@@ -559,7 +559,7 @@ PopExtTags.TagFunctions <- {
 		if ( wep == "ActiveWeapon" )
 			weapon = bot.GetActiveWeapon()
 
-		if ( weapon == null )
+		if ( !weapon )
 			weapon = -1
 
 		if ( !delay || typeof value == "array" || typeof value == "table" ) {
@@ -630,7 +630,7 @@ PopExtTags.TagFunctions <- {
 
 			local t = aibot.FindClosestThreat( visionoverride, false )
 
-			if ( t == null || t.IsFullyInvisible() || t.IsStealthed() ) return
+			if ( !t || t.IsFullyInvisible() || t.IsStealthed() ) return
 
 			if ( aibot.threat != t ) {
 
@@ -641,7 +641,7 @@ PopExtTags.TagFunctions <- {
 			}
 
 			if ( !bot.HasBotTag( "popext_mobber" ) )
-				aibot.UpdatePathAndMove( t.GetOrigin() )
+				aibot.FindPathToThreat(), aibot.MoveToThreat()
 		}
 		PopExtUtil.AddThink( bot, MeleeAIThink )
 	}
@@ -674,9 +674,9 @@ PopExtTags.TagFunctions <- {
 
 			if ( threat_type == "closest" ) {
 
-				if ( ( threat && !threat.IsAlive() ) || Time() > cooldown ) {
+				if ( !threat || !threat.IsValid() || !threat.IsAlive() || Time() > cooldown ) {
 
-					aibot.threat = aibot.FindClosestThreat( INT_MAX, false )
+					aibot.SetThreat( aibot.FindClosestThreat( INT_MAX, false ) )
 					cooldown = Time() + threat_cooldown //find new threat every threat_cooldown seconds
 				}
 			}
@@ -686,18 +686,12 @@ PopExtTags.TagFunctions <- {
 
 					local threats = aibot.CollectThreats( INT_MAX, true, true )
 					if ( !threats.len() ) return
-					aibot.threat = threats[RandomInt( 0, threats.len() - 1 )]
+					aibot.SetThreat( threats[ RandomInt( 0, threats.len() - 1 ) ] )
 				}
-
 			}
-			if ( threat && threat.IsValid() && threat.IsAlive() ) {
 
-				local distance = ( bot.GetOrigin() - threat.GetOrigin() ).Length()
-				if ( distance > threat_dist )
-					aibot.UpdatePathAndMove( threat.GetOrigin(), lookat, turnrate, turnrate )
-				else
-					aibot.LookAt( threat.EyePosition() - Vector( 0, 0, 20 ), 1500, 1500 )
-			}
+			aibot.FindPathToThreat()
+			aibot.MoveToThreat()
 		}
 		PopExtUtil.AddThink( bot, MobberThink )
 	}
@@ -733,7 +727,7 @@ PopExtTags.TagFunctions <- {
 		}
 
 		function MoveToPointThink() {
-			aibot.UpdatePathAndMove( pos )
+			aibot.UpdatePath( pos, true, true )
 		}
 		PopExtUtil.AddThink( bot, MoveToPointThink )
 	}
@@ -785,7 +779,7 @@ PopExtTags.TagFunctions <- {
 
 			if ( !bot.HasBotTag( "popext_generatorbot" ) && action_point && ( bot.GetOrigin() - action_point.GetOrigin() ).Length() > distance ) {
 
-				aibot.UpdatePathAndMove( action_point.GetOrigin() )
+				aibot.UpdatePath( action_point.GetOrigin(), true, true )
 			}
 
 			if ( waituntildone && action_point && ( bot.GetOrigin() - action_point.GetOrigin() ).Length() > distance ) {
@@ -1827,7 +1821,7 @@ PopExtTags.TagFunctions <- {
 
 			local slot = args.type ? args.type.tointeger() : -1
 			local wep  = ( slot == -1 ) ? _bot.GetActiveWeapon() : PopExtUtil.GetItemInSlot( _bot, slot )
-			if ( wep == null ) return
+			if ( !wep ) return
 
 			local itemid = PopExtUtil.GetItemIndex( wep )
 			local wearable = CreateByClassname( "tf_wearable" )
@@ -1992,7 +1986,7 @@ PopExtTags.TagFunctions <- {
 					}
 				}
 
-				if ( victim == null ) {
+				if ( !victim ) {
 					bot_scope.NextTeleportTime = Time() + 1.0
 					bot_scope.TeleportAttempt++
 					return
