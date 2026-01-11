@@ -1,8 +1,8 @@
 //Tincan Termination
 //An Advanced mission for the map Autumnull by botrot.
 
-//Wave 1: $750; Wave 2: $700; Wave 3: $700; Wave 4: $800; Wave 5: $700; Wave 6: $900; Wave 7: $650; 
-//Total Mission Money (including starting money): $6000; $6600 with bonus from A+ rating
+//Wave 1: $750; Wave 2: $700; Wave 3: $700; Wave 4: $800; Wave 5: $700; Wave 6: $1100; Wave 7: $650; 
+//Total Mission Money (including starting money): $6200; $6800 with bonus from A+ rating
 
 #base robot_giant.pop
 #base robot_standard.pop
@@ -17,9 +17,6 @@ WaveSchedule
     Advanced   1
 	//Sigsegv mod-exclusive
 	MedigunShieldDamage 1 [$SIGSEGV] //Shield Medics can now harm human team
-	SentryBusterFriendlyFire 0 [$SIGSEGV] //Sentry Busters will no longer harm other robots
-    SniperHideLasers 1 [$SIGSEGV] //Sniper-bots no longer have laser sights
-	ImprovedAirblast 1 [$SIGSEGV] //Pyro-bots will airblast more projectiles including grenades and stickybombs
 	ItemAttributes [$SIGSEGV] //Adds attributes to specified item given to players
 	{
 		ItemName "The Gas Passer"
@@ -37,7 +34,6 @@ WaveSchedule
 			Skill	Hard
 			WeaponRestrictions	MeleeOnly
 			Item	"the back scratcher"
-            Attributes AlwaysCrit
 		}
         T_TFBot_Pyro_Fury
 		{
@@ -51,16 +47,16 @@ WaveSchedule
 		}
 		T_TFBot_Pyro_Flare_Rapid
 		{
-			ClassIcon  pyro_flare
+			ClassIcon  pyro_detonator_lite_spammer
             Name	"Rapid Flare Pyro"
             Class	Pyro
             Skill	Normal
-            Item "the flare gun"
+            Item "the detonator"
             Item "old guadalajara"
             WeaponRestrictions SecondaryOnly
             ItemAttributes
             {
-                ItemName "the flare gun"
+                ItemName "the detonator"
                 "fire rate bonus" 0.4
                 "reload time decreased" 0.2
             }
@@ -120,6 +116,7 @@ WaveSchedule
         {
 			UseMeleeThreatPrioritization 1 [$SIGSEGV] //Sigsegv-mod exclusive; will prioritize closest target
             Class Heavyweapons
+			ClassIcon heavy_accurate_lite
             Name "Giant Penetrating Heavy"
             Skill Expert
             Health 5000
@@ -147,11 +144,12 @@ WaveSchedule
 		{
 			Name "Bullet Vaccinator Medic"
 			Class Medic
-			ClassIcon medic_bullet
+			ClassIcon medic_bullet_package
 			Skill Expert
 			Attributes SpawnWithFullCharge
 			WeaponRestrictions SecondaryOnly
 			Attributes IgnoreEnemies
+			Attributes VaccinatorBullets
 			Item "The Virus Doctor"
 			ItemAttributes
 			{
@@ -174,7 +172,7 @@ WaveSchedule
 			Class Medic
 			Name "Shield Medic"
 			Skill Expert
-			ClassIcon medic_shield
+			ClassIcon medic_shield_lite
 			WeaponRestrictions SecondaryOnly
 			Attributes SpawnWithFullCharge
 			Attributes IgnoreEnemies
@@ -290,8 +288,6 @@ WaveSchedule
 			Attributes MiniBoss
 			Attributes	DisableDodge
 			WeaponRestrictions MeleeOnly
-			ExtAttr AlwaysFireWeaponAlt [$SIGSEGV]  //Sigsegv mod-exclusive
-			WeaponRestrictions MeleeOnly
 			Item  "the wrap assassin"
 			Item "The Wing Mann"	
 			ItemAttributes
@@ -301,12 +297,12 @@ WaveSchedule
             }
             CharacterAttributes
 			{
+				"override footstep sound set" 7
 				"head scale" 3
 				"torso scale"	0
-				"damage force reduction" 0
-				"airblast vulnerability multiplier" 0
-                "airblast vertical vulnerability multiplier" 0
-				"rage giving scale"	0
+				"damage force reduction" 0.1
+				"airblast vulnerability multiplier" 0.1
+                "airblast vertical vulnerability multiplier" 0.1
                 "move speed bonus" 2
                 "cannot be backstabbed" 1
 			}
@@ -338,10 +334,9 @@ WaveSchedule
 			{
 				"override footstep sound set" 7
 				"voice pitch scale" 0
-				"damage force reduction" 0
-				"airblast vulnerability multiplier" 0
-                "airblast vertical vulnerability multiplier" 0
-				"rage giving scale"	0
+				"damage force reduction" 0.1
+				"airblast vulnerability multiplier" 0.1
+                "airblast vertical vulnerability multiplier" 0.1
                 "move speed bonus" 2
                 "cannot be backstabbed" 1
 			}
@@ -496,12 +491,6 @@ WaveSchedule
 				"mult sniper charge penalty DISPLAY ONLY" 1
 				"sniper charge per sec" 3
 			}
-			ItemAttributes
-			{
-				ItemName	"the shahanshah"
-				"dmg bonus while half dead" 2
-				"dmg penalty while half alive" 0.5
-			}
 		}
 	
 	}
@@ -552,12 +541,6 @@ WaveSchedule
 				"mult sniper charge penalty DISPLAY ONLY" 1
 				"sniper charge per sec" 3
 			}
-			ItemAttributes
-			{
-				ItemName	"the shahanshah"
-				"dmg bonus while half dead" 2
-				"dmg penalty while half alive" 0.5
-			}
 		}
 	
 	}
@@ -598,13 +581,6 @@ WaveSchedule
 			Target	wave_finished_relay
 			Action	Trigger
 		}
-		Explanation [$SIGSEGV] //Sigsegv mod-exclusive; displays a message before a wave starts
-		{
-			Line "{green}////////////////////"
-			Line "{yellow}NOTICE"
-			Line "{blue}Robots are not so careless now; Sentry Busters cannot blow up other robots!"
-			Line "{green}////////////////////"
-		}
         WaveSpawn
 		{
 			Name	wave1a
@@ -618,7 +594,6 @@ WaveSchedule
 			TFBot
 			{
 				Template	T_TFBot_Heavy_IronFist_Airblast
-                Attributes AlwaysCrit
 			}
 		}
         WaveSpawn
@@ -637,8 +612,7 @@ WaveSchedule
 				TFBot
 				{
 					Class	Scout
-					Skill	Hard
-					WeaponRestrictions	PrimaryOnly
+					Skill Easy
 					Item	"the shortstop"
 				}
 				TFBot
@@ -652,7 +626,6 @@ WaveSchedule
 					ItemAttributes
 					{
 						ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
-						"damage penalty" 1
 						"mad milk syringes" 1
 					}
 					CharacterAttributes
@@ -692,9 +665,11 @@ WaveSchedule
 			Where	spawnbot
 			TFBot
 			{
-				Class	Soldier
-				Skill	Hard
+				Class Soldier
+				Skill Hard
 				Item	"the direct hit"
+				ClassIcon soldier_directhit_lite
+				Name "Direct Hit Soldier"
 			}
 		}
         WaveSpawn
@@ -711,12 +686,6 @@ WaveSchedule
 			TFBot
 			{
 				Template	T_TFBot_Giant_Scout_Baseball
-				ItemAttributes
-				{
-					ItemName    "the sandman"
-					"effect bar recharge rate increased"    0.05
-					"mark for death" 1
-				}
 			}
 		}
         WaveSpawn
@@ -805,14 +774,6 @@ WaveSchedule
 		{
 			Target	wave_finished_relay
 			Action	Trigger
-		}
-		Explanation [$SIGSEGV] //Sigsegv mod-exclusive; displays a message before a wave starts
-		{
-			Line "{green}////////////////////"
-			Line "{yellow}NOTICE"
-			Line "{blue}Sniper Robot rifles don't emit lasers; Watch your heads!"
-			Line "{blue}Pyro Robots are more skilled at airblasting projectiles such as stickybombs; Shoot with caution!"
-			Line "{green}////////////////////"
 		}
         WaveSpawn
 		{
@@ -972,12 +933,7 @@ WaveSchedule
 				Item "the back scatter"
 				Item "Bonk! Atomic Punch"
 				Item "Bonk Helm"
-				ClassIcon scout_bonk
-				ItemAttributes
-				{
-					ItemName "the back scatter"
-					"spread penalty" 1
-				}
+				ClassIcon scout_bonk_nys
 				CharacterAttributes
 				{
 					"deploy time increased"	0.5
@@ -1000,11 +956,12 @@ WaveSchedule
 				//Sigsegv-mod exclusive; this bot will lead grenades and aim at enemy's feet for increased accuracy
 				AimLeadProjectileSpeed 1216.6 [$SIGSEGV]
                 AimAt Feet [$SIGSEGV] 
-				Name   "Giant Demoman"
+				Name   "Giant Buff Banner Demoman"
 				Template T_TFBot_Giant_Demo_RapidFire
 				Attributes	SpawnWithFullCharge
+				ClassIcon demo_buff_lite
 				Item	"The Buff Banner"
-				Item    "The Chargin' Targe"
+				Item    "The Tide Turner"
 				CharacterAttributes
 				{
 					"deploy time increased"	0.5
@@ -1044,7 +1001,6 @@ WaveSchedule
                     ClassIcon pyro_gascann
 					Name "Giant Gaseous Pyro"
                     Template	T_TFBot_Giant_Pyro
-                    Attributes AlwaysCrit
                     Attributes AlwaysFireWeapon
                     WeaponRestrictions SecondaryOnly
                     Item  "employee of the mmmph"
@@ -1060,8 +1016,7 @@ WaveSchedule
                     {
                         ItemName	"the gas passer"
                         "item_meter_charge_rate" 5
-                        "weapon burn dmg increased" 3
-                        "applies snare effect" 0.35
+                        "weapon burn dmg increased" 2
                     }
                     CharacterAttributes
                     {
@@ -1072,11 +1027,19 @@ WaveSchedule
 				{
 					Template T_TFBot_Giant_Medic_Regen
                     Name "Giant Regen Medic"
+					CharacterAttributes
+					{
+						"mod weapon blocks healing" 1
+					}
 				}
                 TFBot
 				{
 					Template T_TFBot_Giant_Medic_Regen
                     Name "Giant Regen Medic"
+					CharacterAttributes
+					{
+						"mod weapon blocks healing" 1
+					}
 				}
 			}
 		}
@@ -1215,7 +1178,6 @@ WaveSchedule
 					ClassIcon pyro_gascann
 					Name "Giant Gaseous Pyro"
 					Template	T_TFBot_Giant_Pyro
-					Attributes AlwaysCrit
 					Attributes AlwaysFireWeapon
 					WeaponRestrictions SecondaryOnly
 					Item  "employee of the mmmph"
@@ -1230,8 +1192,7 @@ WaveSchedule
 					{
 						ItemName	"the gas passer"
 						"item_meter_charge_rate" 5
-						"weapon burn dmg increased" 3
-						"applies snare effect" 0.35
+						"weapon burn dmg increased" 2
 					}
 					CharacterAttributes
 					{
@@ -1250,7 +1211,6 @@ WaveSchedule
 					ItemAttributes
 					{
 						ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
-						"damage penalty" 1
 						"mad milk syringes" 1
 					}
 				}
@@ -1356,11 +1316,6 @@ WaveSchedule
 					Skill	Normal
 					Item	"the shortstop"
 					Item	"crit-a-cola"
-					ItemAttributes
-					{
-						ItemName	"crit-a-cola"
-						"mod_mark_attacker_for_death" 0
-					}
 					CharacterAttributes
 					{
 						"deploy time increased" 0.5
@@ -1377,7 +1332,7 @@ WaveSchedule
 					ItemAttributes
 					{
 						ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
-						"damage penalty" 1
+						"mad milk syringes" 1
 					}
 					CharacterAttributes
 					{
@@ -1400,6 +1355,10 @@ WaveSchedule
 			TFBot
             {
                 Template T_TFBot_Giant_Scout_FAN
+				CharacterAttributes
+				{	
+					"mod weapon blocks healing" 1
+				}
             }
 		}
         WaveSpawn
@@ -1471,7 +1430,6 @@ WaveSchedule
 					ItemAttributes
 					{
 						ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
-						"damage penalty" 1
 						"mad milk syringes" 1
 					}
 				}
@@ -1485,7 +1443,6 @@ WaveSchedule
 					ItemAttributes
 					{
 						ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
-						"damage penalty" 1
 						"mad milk syringes" 1
 					}
 				}
@@ -1499,7 +1456,6 @@ WaveSchedule
 					ItemAttributes
 					{
 						ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
-						"damage penalty" 1
 						"mad milk syringes" 1
 					}
 				}
@@ -1558,7 +1514,6 @@ WaveSchedule
                     Name 	"Bison Soldier"
 					Class	Soldier
 					Skill	Expert
-                    Attributes AlwaysCrit
 					WeaponRestrictions SecondaryOnly
 					Item "the righteous bison"
 					ItemAttributes
@@ -1599,11 +1554,11 @@ WaveSchedule
 					//Sigsegv-mod exclusive; this bot will lead grenades and aim at enemy's feet for increased accuracy
 					AimLeadProjectileSpeed 1216.6 [$SIGSEGV]
 					AimAt Feet [$SIGSEGV] 
-				    ClassIcon soldier_banner_trio
+				    ClassIcon demo_banner_trio_lite
 					Template T_TFBot_Giant_Demoman
 					Attributes	SpawnWithFullCharge
 					Item	"The Buff Banner"
-					Item    "The Chargin' Targe"
+					Item    "The Tide Turner"
 					Item    "The Cyborg Stunt Helmet"
 					ItemAttributes
                     {
@@ -1621,11 +1576,11 @@ WaveSchedule
 					//Sigsegv-mod exclusive; this bot will lead grenades and aim at enemy's feet for increased accuracy
 					AimLeadProjectileSpeed 1216.6 [$SIGSEGV]
 					AimAt Feet [$SIGSEGV] 
-				    ClassIcon soldier_banner_trio
+				    ClassIcon  demo_banner_trio_lite
 					Template T_TFBot_Giant_Demoman
 					Attributes	SpawnWithFullCharge
 					Item	"The Battalion's Backup"
-					Item    "The Chargin' Targe"
+					Item    "The Tide Turner"
 					Item    "The Cyborg Stunt Helmet"
 					ItemAttributes
                     {
@@ -1643,11 +1598,11 @@ WaveSchedule
 					//Sigsegv-mod exclusive; this bot will lead grenades and aim at enemy's feet for increased accuracy
 					AimLeadProjectileSpeed 1216.6 [$SIGSEGV]
 					AimAt Feet [$SIGSEGV] 
-				    ClassIcon soldier_banner_trio
+				    ClassIcon  demo_banner_trio_lite
 					Template T_TFBot_Giant_Demoman
 					Attributes	SpawnWithFullCharge
 					Item	"The Concheror"
-					Item    "The Chargin' Targe"
+					Item    "The Tide Turner"
 					Item    "The Cyborg Stunt Helmet"
 					ItemAttributes
                     {
@@ -1679,20 +1634,29 @@ WaveSchedule
 				TFBot
 				{
 					Class Pyro
+					Name  "Backburner Pyro"
+					Item  "the backburner"
 					Skill Easy
-					Item "the backburner"
+					Item  "employee of the mmmph"
+					ClassIcon pyro_backburner_nys
 				}
 				TFBot
 				{
 					Class Pyro
+					Name  "Backburner Pyro"
+					Item  "the backburner"
 					Skill Easy
-					Item "the backburner"
+					Item  "employee of the mmmph"
+					ClassIcon pyro_backburner_nys
 				}
 				TFBot
 				{
 					Class Pyro
+					Name  "Backburner Pyro"
+					Item  "the backburner"
 					Skill Normal
-					Item "the backburner"
+					Item  "employee of the mmmph"
+					ClassIcon pyro_backburner_nys
 				}
 			}
 		}
@@ -1728,7 +1692,6 @@ WaveSchedule
 					ItemAttributes
 					{
 						ItemName "TF_WEAPON_SYRINGEGUN_MEDIC"
-						"damage penalty" 1
 						"mad milk syringes" 1
 					}
 				}
@@ -1850,7 +1813,7 @@ WaveSchedule
 					}
 					CharacterAttributes
 					{
-						"increase buff duration"	9.0
+						"increase buff duration"	3.0
 						"deploy time increased"	0.5
 					}
 				}
@@ -1858,7 +1821,7 @@ WaveSchedule
 		}
 	}
 	//Wave 6
-	//Total Money: $800, $900 with bonus from A+ rating
+	//Total Money: $1100, $1200 with bonus from A+ rating
 	Wave
 	{
         StartWaveOutput
@@ -1937,12 +1900,6 @@ WaveSchedule
 			TFBot
 			{
 				Template	T_TFBot_Giant_Scout_Baseball
-				ItemAttributes
-				{
-					ItemName    "the sandman"
-					"effect bar recharge rate increased"    0.05
-					"mark for death" 1
-				}
 			}
 		}
 		WaveSpawn
@@ -2032,6 +1989,8 @@ WaveSchedule
 				Class Soldier
 				Skill Hard
 				Item	"the direct hit"
+				ClassIcon soldier_directhit_lite
+				Name "Direct Hit Soldier"
 			}
 		}
 		WaveSpawn
@@ -2121,7 +2080,7 @@ WaveSchedule
         {
 			Name	wave6c
 			WaitForAllSpawned  wave6b
-			TotalCurrency	100
+			TotalCurrency	300
 			TotalCount	2
 			MaxActive	2
 			SpawnCount  2
@@ -2184,16 +2143,12 @@ WaveSchedule
 					Skill  Expert
 					Item "the razorback"
                     Item "the fruit shoot"
-					ClassIcon sniper_bow_multi
+					ClassIcon sniper_bow_multi_hyper
+					MaxVisionRange 750
                     ItemAttributes
 					{
 						ItemName "the huntsman"
 						"dmg pierces resists absorbs"	1
-					}
-					ItemAttributes
-					{
-						ItemName "the razorback"
-						"jarate backstabber"	1
 					}
                 }
                 TFBot
@@ -2203,16 +2158,12 @@ WaveSchedule
 					Skill  Expert
 					Item "the cozy camper"
                     Item "the fruit shoot"
-					ClassIcon sniper_bow_multi
+					ClassIcon sniper_bow_multi_hyper
+					MaxVisionRange 750
                     ItemAttributes
 					{
 						ItemName "the huntsman"
 						"dmg pierces resists absorbs"	1
-					}
-					ItemAttributes
-					{
-						ItemName "the cozy camper"
-						"health regen"	40
 					}
 					CharacterAttributes
 					{
@@ -2226,7 +2177,8 @@ WaveSchedule
 					Skill  Expert
 					Item "Darwin's Danger Shield"
                     Item "the fruit shoot"
-					ClassIcon sniper_bow_multi
+					ClassIcon sniper_bow_multi_hyper
+					MaxVisionRange 750
                     ItemAttributes
 					{
 						ItemName "the huntsman"
@@ -2285,7 +2237,7 @@ WaveSchedule
 			TotalCount	4
 			MaxActive	4
 			SpawnCount	1
-			WaitBeforeStarting	0
+			WaitBeforeStarting	5
 			WaitBetweenSpawns   6
 			Where	spawnbot
 			TFBot
@@ -2312,33 +2264,29 @@ WaveSchedule
 			TFBot
 			{
 				UseMeleeThreatPrioritization 1 [$SIGSEGV] //Sigsegv-mod exclusive; will prioritize closest target
-				ClassIcon pyro_flare
-				Name "Giant Scorch Fury Pyro"
+				ClassIcon pyro_dragon_fury_fast
+				Name "Giant Fast Furious Pyro"
+				Health  3000
 				Class Pyro
-				Health 3000
 				Skill Expert
-                Attributes AlwaysCrit
-				Attributes MiniBoss
-                Attributes AlwaysFireWeapon
-                Item  "The Bolted Birdcage"
-                Item "the dragon's fury"
-				Item "The Scorch Shot"
-                ItemAttributes
-                {
-                   	ItemName "The Scorch Shot"
-                    "reload time decreased" 0.3
-					"fire rate bonus" 0.3
-                    "projectile spread angle penalty" 5
-					"is_passive_weapon" 1
-                }
-                CharacterAttributes
-                {
+				MaxVisionRange	1000
+				Item "the dragon's fury"
+				WeaponRestrictions PrimaryOnly
+				Attributes  MiniBoss
+				Attributes AlwaysCrit
+				CharacterAttributes
+				{
 					"move speed bonus"	0.5
 					"damage force reduction" 0.6
 					"airblast vulnerability multiplier" 0.6
 					"override footstep sound set" 6
-                    "max health additive bonus" 2825
-                }
+					 "max health additive bonus" 2825
+				}
+				ItemAttributes
+				{
+					ItemName "The Dragon's Fury"
+					"speed_boost_on_hit" 5
+				}
 			}
 		}
 		WaveSpawn
@@ -2413,15 +2361,15 @@ WaveSchedule
 				}
 				TFBot
 				{
+					Template T_TFBot_Medic_Overheal
+				}
+				TFBot
+				{
+					Template T_TFBot_Medic_Overheal
+				}
+				TFBot
+				{
 					Template T_TFBot_Medic_BulletVAC
-				}
-				TFBot
-				{
-					Template T_TFBot_Medic_Overheal
-				}
-				TFBot
-				{
-					Template T_TFBot_Medic_Overheal
 				}
 				TFBot
 				{
