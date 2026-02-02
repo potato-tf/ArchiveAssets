@@ -370,7 +370,7 @@ changePhase <- function() {
 				if(!player.HasBotTag("UKGR_Tumor")) continue
 				player.Teleport(true, lastPosition, false, QAngle(), false, Vector())
 			}
-			self.Teleport(true, Vector(-2600, -871, 1493), false, QAngle(), false, Vector()) //Teleports to spawnbot_altmode
+			self.SetAbsOrigin(Vector(-9728, -320, 1463)) //spawnbot_altmode
 			teleportParticle.SetOrigin(lastPosition)
 			teleportParticle.AcceptInput("Start", null, null, null)
 			break
