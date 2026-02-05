@@ -1,4 +1,4 @@
-IncludeScript("customweaponsvillaedit.nut", getroottable())
+IncludeScript("customweaponsvillaedit.nut", root)
 
 PrecacheSound("misc/halloween/spell_fireball_impact.wav")
 PrecacheSound("ambient/explosions/explode_1.wav")
@@ -123,7 +123,8 @@ PrecacheEntityFromTable({classname = "ukgr_death_explosion", effect_name = "boss
 						if(player == null) continue
 						if(IsPlayerABot(player)) continue
 
-						EntFireByHandle(player, "runscriptcode", "self.Teleport(true, Vector(-2909, 3766, 2251), true, QAngle(2, -42.31, 0), false, Vector())",
+						//bottom right corner of the arena
+						EntFireByHandle(player, "runscriptcode", "self.Teleport(true, Vector(-9757, 4918, 2507), true, QAngle(2, -42.31, 0), false, Vector())",
 							1, null, null)
 					}
 					break
