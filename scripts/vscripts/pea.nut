@@ -522,7 +522,7 @@ switch (GetMapName())
 	case "mvm_hoovydam_b11": DisableRomevision(); EntFire("initMain_roadside", "Trigger"); break
 
 	case "mvm_null_b9a": DisableRomevision(); break
-	case "mvm_decay_rc1": DisableRomevision(); break
+	case "mvm_decay_rc1a": DisableRomevision(); break
 
 	case "mvm_quetzal_rc5": DisableRomevision(); break
 	case "mvm_powerplant_rc1": DisableRomevision(); break
