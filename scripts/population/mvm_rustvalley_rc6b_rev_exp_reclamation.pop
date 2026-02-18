@@ -344,6 +344,26 @@ WaveSchedule
 				Target capture_filter
 				Action Kill
 			}
+			OnSpawnOutput {
+				Target expert_hint
+				Action Kill
+			}
+			OnSpawnOutput {
+				Target wave_start_relay_expert
+				Action RunScriptCode
+				Param "
+					local outputs = []
+					for (local i = EntityOutputs.GetNumElements(self, `OnTrigger`) - 1; i >= 0; i--)
+					{
+						local output = {}
+						EntityOutputs.GetOutputTable(self, `OnTrigger`, output, i)
+						if (endswith(output.target, `trigtimer`))
+							outputs.push(output)
+					}
+					foreach (output in outputs)
+						EntityOutputs.RemoveOutput(self, `OnTrigger`, output.target, output.input, output.parameter)
+				"
+			}
 		}
 		reversegatebot //red gatebot logic, this will also force blu gatebots to defend the gates
 		{
@@ -1747,14 +1767,8 @@ WaveSchedule
 	Wave {
 		InitWaveOutput
 		{
-			Target BigNet
-			Action RunScriptCode
-			Param
-			"
-				Entities.FindByName(null, `ambience`).AcceptInput(`StopSound`, ``, null, null)
-
-
-			"
+			Target ambience
+			Action StopSound
 		}
 		StartWaveOutput
 		{
