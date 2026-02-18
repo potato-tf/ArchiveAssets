@@ -435,28 +435,26 @@ WaveSchedule
             NoFixup 1
 			logic_relay
 			{
-
                 "targetname" "unblockhatch"
 				"OnSpawn"   "func_capturezone,Disable,,0,-1"
 				"OnSpawn"   "func_flagdetectionzone,Disable,,0,-1"
 				"OnTrigger" "func_flagdetectionzone,Enable,,0,-1"
 				"OnTrigger" "func_capturezone,Enable,,0,-1"
-				"OnTrigger" "prop_forcefield_hatch,SetAnimation,disable,0,-1"
-				"OnTrigger" "prop_forcefield_hatch,Kill,,1,-1"
+				"OnTrigger" "func_capturezone,AddOutput,OnCapture prop_forcefield_hatch:Kill::0.5:-1,0,-1"
+				"OnTrigger" "prop_forcefield_hatch,SetAnimation,disable,0.02,-1"
+				"OnTrigger" "prop_forcefield_hatch,SetPlaybackRate,0,1,-1"
+				"OnTrigger" "prop_forcefield_hatch,RunScriptCode,self.SetCycle(0.99),1,-1"
+				"OnTrigger" "prop_forcefield_hatch,$SetProp$m_bClientSideAnimation,0,1,-1"
 				"OnTrigger" "hatchopen,Show,,0,-1"
 				"OnTrigger" "thirdperson,Enable,,0.01,-1"
 			}
 			prop_dynamic
 			{
 				"targetname" "prop_forcefield_hatch"
-				"angles" "0 0 0"
 				"model" "models/props_mvm/hatch_shield.mdl"
 				"disableshadows" "1"
-				"skin" "0"
-				"solid" "0"
-				"spawnflags" "0"
 				"DefaultAnim" "ref"
-				"origin" "-3822.866699 -199.705338 -379.256287"
+				"origin" "-3615 -198 -377"
 			}
 		}
 		enableforwardsniperhints
@@ -800,7 +798,7 @@ WaveSchedule
 			  "parentname" "hatch_prop"
 			  "display_text" "The bomb can now be deployed!"
 			  "lifetime"     "10"
-			  "origin" "-3822 -224 -352"
+			  "origin" "-3615 -198 -377"
 			}
 			training_annotation
 			{
@@ -808,7 +806,7 @@ WaveSchedule
 			  "parentname" "hatch_prop"
 			  "display_text" "The hatch will unlock when all bots are dead"
 			  "lifetime"     "10"
-			  "origin" "-3822 -224 -352"
+			  "origin" "-3615 -198 -377"
 			}
 			training_annotation
 			{
@@ -1121,23 +1119,42 @@ WaveSchedule
 		}
 		disablebarrier
 		{
-
             NoFixup 1
 			trigger_multiple
 			{
 				"targetname" "thirdperson"
 				"StartDisabled" "1"
 				"spawnflags" "3"
-				"origin" "-3822.866699 -202.705338 -329.256287"
+				"origin" "-3615 -198 -377"
 				"maxs" "50 50 50"
 				"mins" "-50 -50 -50"
 				"filtername" "filter_blue"
-				"OnStartTouch" "!activator,SetForcedTauntCam,1,0,-1"
-				"OnStartTouch" "!activator,SetHUDVisibility,0,0.01,-1"
-				"OnStartTouch" "!activator,DisableDamageForces,,0,-1"
-				"OnEndTouch" "!activator,SetForcedTauntCam,0,0,-1"
-				"OnEndTouch" "!activator,SetHUDVisibility,1,0,-1"
-				"OnEndTouch" "!activator,EnableDamageForces,,0,-1"
+			}
+			OnSpawnOutput
+			{
+				Target thirdperson
+				Action RunScriptCode
+				Param "
+					function OnStartTouch()
+					{
+						if (!activator.HasItem())
+							return
+
+						activator.SetForcedTauntCam(1)
+						activator.SetForceLocalDraw(true)
+						activator.SetHudHideFlags(Constants.FHideHUD.HIDEHUD_ALL)
+						activator.AddEFlags(Constants.FEntityEFlags.EFL_NO_DAMAGE_FORCES)
+					}
+					function OnEndTouch()
+					{
+						activator.SetForcedTauntCam(0)
+						activator.SetForceLocalDraw(false)
+						activator.SetHudHideFlags(0)
+						activator.RemoveEFlags(Constants.FEntityEFlags.EFL_NO_DAMAGE_FORCES)
+					}
+					self.ConnectOutput(`OnStartTouch`, `OnStartTouch`)
+					self.ConnectOutput(`OnEndTouch`, `OnEndTouch`)
+				"
 			}
 		}
 		ammokiller1
