@@ -28,6 +28,8 @@ PrecacheModel("models/props_halloween/ghost_no_hat.mdl")
 PrecacheModel("models/props_halloween/ghost_no_hat_red.mdl")
 PrecacheModel("models/props_graveyard/healing_ghost.mdl")
 PrecacheScriptSound("Halloween.GhostBoo")
+PrecacheScriptSound("Announcer.MVM_Tank_Alert_Multiple")
+PrecacheScriptSound("Announcer.MVM_Tank_Alert_Halfway_Multiple")
 
 if (!("ConstantNamingConvention" in ROOT))
 	foreach (a,b in Constants)
@@ -1416,6 +1418,30 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 			}
 			EntFire("gameover_relay", "Trigger")
 			TrespasserLosses++
+		}
+	}
+
+	BlockedBroadcasts =
+	{
+		"Announcer.MVM_Tank_Alert_Multiple" : null,
+		"Announcer.MVM_Tank_Alert_Halfway_Multiple" : null
+	}
+
+	// TankExt depends on teamplay_broadcast_audio to detect tank spawns,
+	//  so we can't use rafmod DisableSound to block some announcer cues.
+	// So we cancel them here instead (which allows teamplay_broadcast_audio to still fire).
+	function OnGameEvent_teamplay_broadcast_audio(params)
+	{
+		if (!(params.sound in BlockedBroadcasts))
+			return
+
+		for (local i = MAX_CLIENTS; --i;)
+		{
+			local human = PlayerInstanceFromIndex(i)
+			if (!human || human.IsBotOfType(TF_BOT_TYPE))
+				continue
+
+			human.StopSound(params.sound)
 		}
 	}
 
