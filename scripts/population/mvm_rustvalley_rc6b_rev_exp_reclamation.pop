@@ -2683,6 +2683,25 @@ WaveSchedule
 			MaxActive 1
 			SpawnCount 1
 			Support Limited
+			FirstSpawnOutput {
+				Target BigNet
+				Action RunScriptCode
+				Delay 0.1
+				Param "
+					for (local i = MaxClients().tointeger(); --i;)
+					{
+						local bot = PlayerInstanceFromIndex(i)
+						if (!bot || !bot.IsBotOfType(Constants.EBotType.TF_BOT_TYPE))
+							continue
+
+						if (!bot.IsAlive() || !bot.HasBotTag(`vip_antistuck`))
+							continue
+
+						bot.SetAbsOrigin(bot.GetOrigin() + Vector(-50.0, 0.0, 0.0))
+						break
+					}
+				"
+			}
 			LastSpawnOutput {
 				Target resetfixendurance
 				Action Trigger
@@ -2699,6 +2718,7 @@ WaveSchedule
 					{
 						BehaviorModifiers Push			// having these will cause bots to run towards gates
 						Attributes IgnoreFlag			// having these will cause bots to run towards gates
+						Tag vip_antistuck
 						Tag nav_prefer_gate1_flank 		// having these will cause bots to run towards gates
 						Tag bot_gatebot 				// having these will cause bots to run towards gates
 						Tag bot_giant
@@ -2726,6 +2746,7 @@ WaveSchedule
 					{
 						Tag bot_giant
 						Skill Expert
+						Tag vip_antistuck
 						Attributes HoldFireUntilFullReload
 						Attributes MiniBoss
 						Attributes UseBossHealthBar
