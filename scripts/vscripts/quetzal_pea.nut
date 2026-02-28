@@ -13,9 +13,9 @@
 
 	teledestination_array =
 	[
-		Vector(-500, 200, -250), Vector(1100, 0, -400), Vector(500, 200, -250), // back
+		Vector(-500, 200, -250), Vector(1100, -150, -400), Vector(500, 200, -250), // back
 		Vector(-100, -1400, -150), Vector(500, -700, -150), // middle
-		Vector(1000, -2000, -400), Vector(-600, -1700, -380) // front
+		Vector(1000, -1700, -400), Vector(-600, -1700, -380) // front
 	]
 
 	teleport_status = "disabled"
