@@ -2071,39 +2071,6 @@ WaveSchedule
 	Wave
 	{
         SpawnTemplate barriers_front
-		InitWaveOutput
-		{
-			Target BigNet
-			Action RunScriptCode
-			Param
-			"
-				::FixGiantKnockback <-
-				{
-					mvm_stats = Entities.FindByClassname(null, `tf_mann_vs_machine_stats`)
-
-					function OnGameEvent_player_spawn(params)
-					{
-						local bot = GetPlayerFromUserID(params.userid)
-						if (!bot.IsBotOfType(Constants.EBotType.TF_BOT_TYPE))
-							return
-
-						EntFireByHandle(bot, `RunScriptCode`, `if (self.IsMiniBoss()) self.AddCustomAttribute(\`damage force reduction\`, 0.0, 0.0)`, 0.015, null, null)
-					}
-
-					function OnGameEvent_recalculate_holidays(_)
-					{
-						if (GetRoundState() != Constants.ERoundState.GR_STATE_PREROUND)
-							return
-
-						if (NetProps.GetPropInt(mvm_stats, `m_iCurrentWaveIdx`) != 0)
-							return
-
-						delete ::FixGiantKnockback
-					}
-				}
-				__CollectGameEventCallbacks(FixGiantKnockback)
-			"
-		}
 	    StartWaveOutput
 		{
 		    Target wave_start_relay
