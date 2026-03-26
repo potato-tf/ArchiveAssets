@@ -692,8 +692,10 @@ function ActivateFireSale()
 				ents.FindByName("dumpster_warp_eff"..box):AcceptInput("Start")
 				ents.FindByName("dumpster_warp_beam"..box):AcceptInput("Stop")
 				ents.FindByName("dumpster_disappear"..box):AcceptInput("PlaySound")
-				timer.Simple(1, function() ents.FindByName("dumpster_prop"..box):AcceptInput("$TeleportToEntity","dumpster_tele_out") end)
-				timer.Simple(1, function() ents.FindByName("dumpster_msg"..box):AcceptInput("Disable") end)
+				timer.Simple(1, function()
+					ents.FindByName("dumpster_prop"..box):AcceptInput("$TeleportToEntity","dumpster_tele_out")
+				end)
+				ents.FindByName("dumpster_msg"..box):AcceptInput("DisableAndEndTouch")
 				BoxTable[box].spawned = false
 				BoxTable[DumpsterRouletteIndex].dud = true
 			end
