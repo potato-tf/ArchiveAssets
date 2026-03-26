@@ -19,10 +19,6 @@ function OnWaveInit()
 	DumpsterCost = 950
 end
 
-function OnWaveStart()
-	waveActive = true
-end
-
 function rejuvenatorHit(damage, activator, caller)
 	local damageThreshold = 1
 
@@ -424,6 +420,7 @@ function ShuffleInPlace(t) --copied from stack overflow
 end
 
 function OnWaveStart()
+	ents.FindByName("red_respawnroom1"):Remove()
 	BoxTable = {}
 	waveActive = true
 	ThunderGunTaken = false
