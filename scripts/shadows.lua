@@ -448,7 +448,7 @@ function OnWaveStart()
 			function(_, player)
 				if player:IsRealPlayer() then
 					player.InteractWith = "nothing"
-					player:Print(2,"")
+					player:Print(PRINT_TARGET_CENTER, "")
 				end
 			end)
 		ents.FindByName("vm_quickrevmsg"):AddCallback(ON_START_TOUCH,
@@ -461,7 +461,7 @@ function OnWaveStart()
 			function(_, player)
 				if player:IsRealPlayer() then
 					player.InteractWith = "nothing"
-					player:Print(2,"")
+					player:Print(PRINT_TARGET_CENTER, "")
 				end
 			end)
 		ents.FindByName("vm_speedmsg"):AddCallback(ON_START_TOUCH,
@@ -475,7 +475,7 @@ function OnWaveStart()
 			function(_, player)
 				if player:IsRealPlayer() then
 					player.InteractWith = "nothing"
-					player:Print(2,"")
+					player:Print(PRINT_TARGET_CENTER, "")
 				end
 			end)
 		ents.FindByName("vm_blastermsg"):AddCallback(ON_START_TOUCH,
@@ -488,7 +488,7 @@ function OnWaveStart()
 			function(_, player)
 				if player:IsRealPlayer() then
 					player.InteractWith = "nothing"
-					player:Print(2,"")
+					player:Print(PRINT_TARGET_CENTER, "")
 				end
 			end)
 		ents.FindByName("vm_dtmsg"):AddCallback(ON_START_TOUCH,
@@ -501,7 +501,7 @@ function OnWaveStart()
 			function(_, player)
 				if player:IsRealPlayer() then
 					player.InteractWith = "nothing"
-					player:Print(2,"")
+					player:Print(PRINT_TARGET_CENTER, "")
 				end
 			end)
 	end)
@@ -550,7 +550,7 @@ function Interact(player)
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
 		else
-			player:Print(2,"You already have this perk!")
+			player:Print(PRINT_TARGET_CENTER, "You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_quickrevbutton" and player.m_nCurrency >= 1500 then
 		if player:InCond(70) == false then
@@ -559,7 +559,7 @@ function Interact(player)
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
 		elseif player:InCond(70) == true then
-			player:Print(2,"You already have this perk!")
+			player:Print(PRINT_TARGET_CENTER, "You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_speedbutton" and player.m_nCurrency >= 3000 then
 		if player:GetAttributeValue("move speed bonus") == nil then
@@ -568,7 +568,7 @@ function Interact(player)
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
 		else
-			player:Print(2,"You already have this perk!")
+			player:Print(PRINT_TARGET_CENTER, "You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_blasterbutton" and player.m_nCurrency >= 1500 then
 		if player:GetAttributeValue("explosive sniper shot") == nil then
@@ -577,7 +577,7 @@ function Interact(player)
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
 		else
-			player:Print(2,"You already have this perk!")
+			player:Print(PRINT_TARGET_CENTER, "You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_dtbutton" and player.m_nCurrency >= 2000 then
 		if player:GetAttributeValue("fire rate bonus") == nil then
@@ -586,7 +586,7 @@ function Interact(player)
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
 		else
-			player:Print(2,"You already have this perk!")
+			player:Print(PRINT_TARGET_CENTER, "You already have this perk!")
 		end
 	end
 end
@@ -656,7 +656,7 @@ function ActivateDoublePoints()
 	DoublePointsDuration = 1980 -- 1980 ticks divided by 66 tick rate = 30 seconds
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
-			player:Print(2,"Double Points!")
+			player:Print(PRINT_TARGET_CENTER, "Double Points!")
 			player:PlaySoundToSelf("shadows/powerup_doublepoints.mp3")
 			player:PlaySoundToSelf("ui/quest_status_tick_advanced.wav")
 		end
@@ -666,7 +666,7 @@ end
 function ActivateFireSale()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
-			player:Print(2,"Fire Sale!")
+			player:Print(PRINT_TARGET_CENTER, "Fire Sale!")
 			player:PlaySoundToSelf("shadows/powerup_firesale01.mp3")
 			player:PlaySoundToSelf("mvm/mvm_bought_upgrade.wav")
 			if FireSaleDuration <= 0 then
@@ -704,7 +704,7 @@ end
 
 function ActivateInstakill(_,player)
 	InstakillDuration = 1980 -- 1980 ticks divided by 66 tick rate = 30 seconds
-		player:Print(2,"Instakill!")
+		player:Print(PRINT_TARGET_CENTER, "Instakill!")
 		player:PlaySoundToSelf("items/powerup_pickup_crits.wav")
 		player:PlaySoundToSelf("shadows/powerup_instagib.mp3")
 		player:AddCond(TF_COND_CRITBOOSTED_CARD_EFFECT, 30)
@@ -723,7 +723,7 @@ end
 function ActivateMaxAmmo()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
-			player:Print(2,"Max Ammo!")
+			player:Print(PRINT_TARGET_CENTER, "Max Ammo!")
 			player:PlaySoundToSelf("items/powerup_pickup_agility.wav")
 			player:PlaySoundToSelf("shadows/powerup_resupply_01.mp3")
 			player:PlaySoundToSelf("weapons/dispenser_generate_metal.wav")
@@ -735,7 +735,7 @@ end
 function ActivateBonusPoints()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
-			player:Print(2,"Bonus Points!")
+			player:Print(PRINT_TARGET_CENTER, "Bonus Points!")
 			player:AcceptInput("$AddCurrency",2000)
 			player:PlaySoundToSelf("shadows/powerup_money_01.mp3")
 			player:PlaySoundToSelf("mvm/mvm_money_pickup.wav")
@@ -907,14 +907,14 @@ function SpawnDumpsterBox(box)
 		function(_, player)
 			if player:IsRealPlayer() then
 				player.InteractWith = "dumpsterbutton"..box
-				player:Print(2,"Hold Action key to receive a weapon for $"..DumpsterCost)
+				player:Print(PRINT_TARGET_CENTER, "Hold Action key to receive a weapon for $"..DumpsterCost)
 			end
 		end)
 		ents.FindByName("dumpster_msg"..box):AddCallback(ON_END_TOUCH,
 		function(_, player)
 			if player:IsRealPlayer() then
 				player.InteractWith = "nothing"
-				player:Print(2,"")
+				player:Print(PRINT_TARGET_CENTER, "")
 			end
 		end)
 	end
@@ -976,7 +976,7 @@ function OpenDumpsterBox(player, box)
 					function(_, player)
 						if player:IsRealPlayer() and player == owner then
 							player.InteractWith = "tradeweapon"..box
-							player:Print(2,"Hold Action key to trade your " .. BoxTable[box].slot .. " weapon with " .. BoxTable[box].text)
+							player:Print(PRINT_TARGET_CENTER, "Hold Action key to trade your " .. BoxTable[box].slot .. " weapon with " .. BoxTable[box].text)
 						end
 					end)
 				ents.FindByName("dumpster_msg"..box):AcceptInput("Enable")
@@ -999,7 +999,7 @@ function OpenDumpsterBox(player, box)
 				function(_, player)
 					if player:IsRealPlayer() and player == owner then
 						player.InteractWith = "tradeweapon"..box
-						player:Print(2,"Hold Action key to trade your " .. BoxTable[box].slot .. " weapon with " .. BoxTable[box].text)
+						player:Print(PRINT_TARGET_CENTER, "Hold Action key to trade your " .. BoxTable[box].slot .. " weapon with " .. BoxTable[box].text)
 					end
 				end)
 			else
@@ -1007,7 +1007,7 @@ function OpenDumpsterBox(player, box)
 					function(_, player)
 						if player:IsRealPlayer() and player == owner then
 							player.InteractWith = "tradeweapon"..box
-							player:Print(2,"Hold Action key to trade your " .. BoxTable[box].slot .. " weapon with " .. BoxTable[box].text)
+							player:Print(PRINT_TARGET_CENTER, "Hold Action key to trade your " .. BoxTable[box].slot .. " weapon with " .. BoxTable[box].text)
 						end
 					end)
 				ents.FindByName("dumpster_msg"..box):AcceptInput("Enable")
@@ -1022,7 +1022,7 @@ function OpenDumpsterBox(player, box)
 				function(_, player)
 					if player:IsRealPlayer() then
 						player.InteractWith = "dumpsterbutton"..box
-						player:Print(2,"Hold Action key to receive a weapon for $"..DumpsterCost)
+						player:Print(PRINT_TARGET_CENTER, "Hold Action key to receive a weapon for $"..DumpsterCost)
 					end
 				end)
 			timer.Simple(1, function() ents.FindByName("dumpster_msg"..box):AcceptInput("Enable") end)
@@ -1064,7 +1064,7 @@ function DumpsterBoxTakeWeapon(player, box)
 	function(_, player)
 		if player:IsRealPlayer() then
 			player.InteractWith = "dumpsterbutton"..box
-			player:Print(2,"Hold Action key to receive a weapon for $"..DumpsterCost)
+			player:Print(PRINT_TARGET_CENTER, "Hold Action key to receive a weapon for $"..DumpsterCost)
 		end
 	end)
 	timer.Simple(1, function() ents.FindByName("dumpster_msg"..box):AcceptInput("Enable") end)
@@ -1098,6 +1098,14 @@ function spawn_revive_marker(_, activator)
 		return
 	end
 
+	if ents.FindByClass("tf_gamerules").m_iRoundState == 10 --[[GR_STATE_BETWEEN_RNDS]] then
+		timer.Simple(5.0, function()
+			if (not activator:IsAlive()) then
+				activator:ForceRespawnDead()
+			end
+		end)
+	end
+
 	local template_ents = ents.SpawnTemplate("Revivemarker", {parent = revive_marker})
 	local revive_trigger = template_ents[1]
 
@@ -1114,6 +1122,7 @@ function spawn_revive_marker(_, activator)
 			--        for multiple overlapping triggers.
 			--       Should use some kind of queue that tracks all of these and sets
 			--        InteractWith based on priority in that queue and touch recency.
+			player:Print(PRINT_TARGET_CENTER, "")
 			player.InteractWith = "nothing"
 			player.TouchingReviveMarker = nil
 		end
