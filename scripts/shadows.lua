@@ -4,16 +4,6 @@
 local deathCounts = {}
 local waveActive = false
 
-function OnPlayerConnected(player)
-	local handle = player:GetHandleIndex()
-
-	deathCounts[handle] = 0
-
-	player:AddCallback(ON_DEATH, function()
-		deathCounts[handle] = deathCounts[handle] + 1
-	end)
-end
-
 function OnPlayerDisconnected(player)
 	deathCounts[player:GetHandleIndex()] = nil
 end
@@ -395,6 +385,7 @@ function OnPlayerConnected(player)
 	if player:IsRealPlayer() then
 		player.HoldTime = 0
 		player.InteractWith = "nothing"
+		player.TouchingReviveMarker = nil
 		player.InteractCooldown = false
 		player.loadout = {[0] = "Default", [1] = "Default", [2] = "Default"}
 		player.m_nCurrencyDiff = 0
@@ -1116,6 +1107,7 @@ function spawn_revive_marker(_, activator)
 	revive_trigger:AddCallback(ON_START_TOUCH, function(_, player)
 		if player:IsRealPlayer() then
 			player.InteractWith = "revive_button"
+			player.TouchingReviveMarker = revive_marker
 		end
 	end)
 
@@ -1126,6 +1118,7 @@ function spawn_revive_marker(_, activator)
 			--       Should use some kind of queue that tracks all of these and sets
 			--        InteractWith based on priority in that queue and touch recency.
 			player.InteractWith = "nothing"
+			player.TouchingReviveMarker = nil
 		end
 	end)
 end
@@ -1137,34 +1130,22 @@ function revivelogic(_, activator) -- haw haw now start living
 		return
 	end
 
-	-- Find revive marker
-	--  If found, initiate taunt
-	--  Set timer to run revive logic
-	--   When the revive completes, stun everyone who is currently reviving this marker
-	--    Unset EF_NODRAW on active weapons after stun expires
+	local reanimator = activator.TouchingReviveMarker
 
 	activator:TauntFromItem("Laugh Taunt")
-	local think_timer = nil;
-	local found_animator = false;
+
 	think_timer = timer.Simple(0.65, function()
-		for _, reanimator in pairs(ents.FindInSphere(activator:GetAbsOrigin(), 150)) do
-			if reanimator:GetClassname() == "entity_revive_marker" then
-			found_animator = true;
+		activator:StunPlayer(0, 1, TF_STUNFLAG_BONKSTUCK)
+		activator.m_hActiveWeapon:RemoveEffects(EF_NODRAW)
 
+		-- The revive marker may be removed in the time it takes us to complete
+		--  the revive process.
+		if (reanimator:IsValid()) then
 			reanimator.m_hOwner:ForceRespawnDead()
-			reanimator.m_hOwner:PlaySoundToSelf("mvm/mvm_revive.wav")
-			reanimator.m_hOwner:SpeakResponseConcept("TLK_RESURRECTED")
-			activator:PlaySoundToSelf("mvm/mvm_revive.wav")
 			reanimator.m_hOwner:Teleport(activator:GetAbsOrigin())
-			reanimator.m_hOwner:AddCond(TF_COND_INVULNERABLE_HIDE_UNLESS_DAMAGED, 2) -- give invulnerability to revived players
-			activator:StunPlayer(0.2, 1, TF_STUNFLAG_BONKSTUCK)
-		--	activator:AddCurrency(50) -- damn it people
-			return -- we did it reddit
-			end
-		end
-
-		if not found_animator then
-			pcall(timer.Stop, think_timer);
+			reanimator.m_hOwner:AddCond(TF_COND_INVULNERABLE_HIDE_UNLESS_DAMAGED, 2)
+			reanimator.m_hOwner:PlaySound("MVM.PlayerRevived")
+			reanimator.m_hOwner:SpeakResponseConcept("TLK_RESURRECTED")
 		end
 	end)
 end
