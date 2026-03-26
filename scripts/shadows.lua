@@ -40,7 +40,7 @@ function rejuvenatorHit(damage, activator, caller)
 		return
 	end
 
-	caller:AddCond(43, 5, activator)
+	caller:AddCond(TF_COND_REPROGRAMMED, 5, activator)
 
 	timer.Simple(5, function()
 		caller:Suicide()
@@ -50,7 +50,7 @@ end
 function chargerLogic(_, activator)
 	local callbacks = {}
 
-	local function removeCallbacks() 
+	local function removeCallbacks()
 		for _, callbackData in pairs(callbacks) do
 			activator:RemoveCallback(callbackData.Type, callbackData.ID)
 		end
@@ -62,12 +62,12 @@ function chargerLogic(_, activator)
 			if key ~= IN_ATTACK2 then
 				return
 			end
-			
-			if activator.m_flChargeMeter < 95 then -- from 100, so the chargers have a bit of a 'tell' when they're getting ready to charge
-                return
-            end
 
-			activator:PlaySequence("Charger_Charge") 
+			if activator.m_flChargeMeter < 95 then -- from 100, so the chargers have a bit of a 'tell' when they're getting ready to charge
+				return
+			end
+
+			activator:PlaySequence("Charger_Charge")
 		end),
 	}
 
@@ -123,11 +123,11 @@ local function cashforhits(activator)
 			damage = curHealth
 			activator.m_iHealth = 0
 		end
-		
+
 		if damage > curHealth and activator.m_szNetname == "Tank" then -- snuck in here so we don't need a separate function for it
 			hitter:SpeakResponseConcept("TLK_MVM_TANK_DEAD") -- ding dong the tank is dead
 		end
-		
+
 		if activator.m_szNetname == "Zombie" and hitter.m_szNetname == "Tank" then
 			damage = curHealth
 			activator.m_iHealth = 0 -- if converted zombie is hit by Tank, treat it as Instakill
@@ -150,24 +150,24 @@ local function cashforhits(activator)
 		end
 
 		if (damageType & DMG_BLAST) ~= 0 then
-            addCurrency(75) -- used to be 50
-        --    print("explosive?")
+			addCurrency(75) -- used to be 50
+		--	print("explosive?")
 		elseif (damageType & DMG_MELEE) ~= 0 then
 			addCurrency(150)
-		--    print("melee?")
-        elseif (damageType & DMG_MELEE) == 0 and (damageType & DMG_CRITICAL) ~= 0 then -- this is used for headshots, may overlap with Instakill
-            addCurrency(100)
-        --    print("crit?")
-        elseif (damageType & DMG_BULLET) ~= 0 then
-            addCurrency(75)
-        --    print("bullet?")
+		--	print("melee?")
+		elseif (damageType & DMG_MELEE) == 0 and (damageType & DMG_CRITICAL) ~= 0 then -- this is used for headshots, may overlap with Instakill
+			addCurrency(100)
+		--	print("crit?")
+		elseif (damageType & DMG_BULLET) ~= 0 then
+			addCurrency(75)
+		--	print("bullet?")
 		elseif (damageType & DMG_USE_HITLOCATIONS) ~= 0 then
-            addCurrency(75)
-        --    print("fancier bullet?")
-        else
-            addCurrency(75)
-        --    print("hell if I know")
-        end ]]
+			addCurrency(75)
+		--	print("fancier bullet?")
+		else
+			addCurrency(75)
+		--	print("hell if I know")
+		end ]]
 	end)
 
 	callbacks.killed = activator:AddCallback(ON_DEATH, function(_, damageInfo)
@@ -198,7 +198,7 @@ local function cashforhits(activator)
 			damage = curHealth
 			activator.m_iHealth = 0
 		end
-		
+
 		if damage > curHealth and activator.m_szNetname == "Tank" then -- snuck in here so we don't need a separate function for it
 			hitter:SpeakResponseConcept("TLK_MVM_TANK_DEAD") -- ding dong the tank is dead
 		end
@@ -208,24 +208,24 @@ local function cashforhits(activator)
 		end
 
 		if (damageType & DMG_BLAST) ~= 0 then
-            addCurrency(65) -- used to be 50
-        --    print("explosive?")
+			addCurrency(65) -- used to be 50
+		--	print("explosive?")
 		elseif (damageType & DMG_MELEE) ~= 0 then
 			addCurrency(140)
-		--    print("melee?")
-        elseif (damageType & DMG_MELEE) == 0 and (damageType & DMG_CRITICAL) ~= 0 then -- this is used for headshots, may overlap with Instakill
-            addCurrency(90)
-        --    print("crit?")
-        elseif (damageType & DMG_BULLET) ~= 0 then
-            addCurrency(65)
-        --    print("bullet?")
+		--	print("melee?")
+		elseif (damageType & DMG_MELEE) == 0 and (damageType & DMG_CRITICAL) ~= 0 then -- this is used for headshots, may overlap with Instakill
+			addCurrency(90)
+		--	print("crit?")
+		elseif (damageType & DMG_BULLET) ~= 0 then
+			addCurrency(65)
+		--	print("bullet?")
 		elseif (damageType & DMG_USE_HITLOCATIONS) ~= 0 then
-            addCurrency(65)
-        --    print("fancier bullet?")
-        else
-            addCurrency(65)
-        --    print("hell if I know")
-        end
+			addCurrency(65)
+		--	print("fancier bullet?")
+		else
+			addCurrency(65)
+		--	print("hell if I know")
+		end
 	end)
 
 	callbacks.spawned = activator:AddCallback(1, function()
@@ -245,20 +245,20 @@ end
 
 function playertracker(_, activator) -- the only other thing here made by Sntr
 	local callbacks = {}
-	
+
 	local function removeCallbacks()
 		for _, callbackId in pairs(callbacks) do
 			activator:RemoveCallback(callbackId)
 		end
 	end
-	
+
 	local function DeathCounter()
 		if not waveActive then
 			return
 		end
 
 		local deathcount = 	deathCounts[activator:GetHandleIndex()]
-	
+
 		if deathcount >= 3 and deathcount < 4
 		then
 			util.PrintToChat(activator,"You have received a $750 comeback bonus.")
@@ -275,7 +275,7 @@ function playertracker(_, activator) -- the only other thing here made by Sntr
 			activator:AddCurrency(3000)
 		end
 	end
-	
+
 	callbacks.damagetype = activator:AddCallback(ON_DAMAGE_RECEIVED_PRE, function(_, damageInfo)
 		if activator:InCond(5) == true then
 			return
@@ -290,9 +290,9 @@ function playertracker(_, activator) -- the only other thing here made by Sntr
 
 		local damage = damageInfo.Damage
 		local curHealth = activator.m_iHealth
-				
-		if damage > curHealth and activator:InCond(129) == true then --  give full heal + uber when condition 70 is removed
-			activator:AddCond(5,2.5)
+
+		if damage > curHealth and activator:InCond(129) == true then -- give full heal + uber when condition 70 is removed
+			activator:AddCond(TF_COND_INVULNERABLE, 2.5)
 			activator:AddHealth(300,1)
 			activator:PlaySoundToSelf("misc/halloween/merasmus_stun.wav")
 			activator:RemoveCond(129)
@@ -300,18 +300,18 @@ function playertracker(_, activator) -- the only other thing here made by Sntr
 			activator.vm_quickrev = false -- added this for compatibility -washy
 		end
 	end)
-	
+
 --	callbacks.output = activator:AddCallback(ON_INPUT, function(_, medicbonus_relay)
 --
 --		local playerclass = activator.m_iClass
 --		local playercount = math_counter.m_OutValue
---	
+--
 --		if playerclass == 5
 --		then
 --			activator:AddCurrency( playercount * 75 )
 --		end
 --	end)
-		
+
 	callbacks.spawned = activator:AddCallback(1, function()
 		removeCallbacks()
 	end)
@@ -320,7 +320,7 @@ function playertracker(_, activator) -- the only other thing here made by Sntr
 		removeCallbacks()
 		DeathCounter()
 	end)
-	
+
 end
 
 -- and here's the stuff made by Washy
@@ -402,7 +402,7 @@ function OnPlayerConnected(player)
 		local handle = player:GetHandleIndex()
 
 		deathCounts[handle] = 0
-	
+
 		player:AddCallback(ON_DEATH, function()
 			deathCounts[handle] = deathCounts[handle] + 1
 		end)
@@ -414,11 +414,11 @@ function OnPlayerConnected(player)
 				end
 			end
 		end)
-		
+
 	else
 		player:AddCallback(ON_DEATH, function()
 			local number = math.random(1,100)
-			if number <= 3 then -- 3% chance 
+			if number <= 3 then -- 3% chance
 				DropPowerup(player)
 			end
 		end);
@@ -526,7 +526,7 @@ end
 
 function Interact(player)
 	if player.InteractWith == "revive_button" then -- trigger_multiple attached to reanimator
-		ents.FindByName("revive_button"):AcceptInput("Press",_,player)
+		ents.FindByName("revive_button"):AcceptInput("Press", _, player)
 		timer.Simple(1, function() player.InteractCooldown = true end) -- put way in the start because I hope I don't break the rest of this function
 		timer.Simple(2.3, function() player.InteractCooldown = false end)
 	end
@@ -719,7 +719,7 @@ function ActivateInstakill(_,player)
 		player:Print(2,"Instakill!")
 		player:PlaySoundToSelf("items/powerup_pickup_crits.wav")
 		player:PlaySoundToSelf("shadows/powerup_instagib.mp3")
-		player:AddCond(56,30)
+		player:AddCond(TF_COND_CRITBOOSTED_CARD_EFFECT, 30)
 end
 
 function ActivateNuke()
@@ -894,7 +894,7 @@ BoxRoulette =
 function SpawnDumpsterBox(box)
 	if FireSaleDuration <= 0 then
 		BoxTable[box].firesale = false
-		BoxTable[box].dud = true	
+		BoxTable[box].dud = true
 	end
 	if BoxTable[box].spawned == false then
 		BoxTable[box].spawned = true
@@ -1096,54 +1096,75 @@ function GiveSuperShank(_,player)
 	player.loadout[2] = "Super Shank"
 end
 
-function spawn_revive_marker(_,activator) -- return of Sntr, the logic below is a portover from Titanium Thieves
+-- return of Sntr, the logic below is a portover from Titanium Thieves
+function spawn_revive_marker(_, activator)
+	local revive_marker = nil
 
-    for k, marker in pairs(ents.FindAllByClass("entity_revive_marker")) do
-        if marker.m_hOwner == activator then
-            templateEnts = ents.SpawnTemplate("Revivemarker", {parent = marker})
-			ents.FindByName("revive_trigger*"):AddCallback(ON_START_TOUCH,
-			function(_, player)
-				if player:IsRealPlayer() and player:IsAlive() then -- IsAlive is so dead people somehow don't interact with the button
-					player.InteractWith = "revive_button"
-				end
-			end)
-			ents.FindByName("revive_trigger*"):AddCallback(ON_END_TOUCH,
-			function(_, player)
-				if player:IsRealPlayer() then
-					player.InteractWith = "nothing"
-					player:Print(2,"")
-				end
-			end)
-        end
-    end
+	for _, marker in pairs(ents.FindAllByClass("entity_revive_marker")) do
+		if marker.m_hOwner == activator then
+			revive_marker = marker
+		end
+	end
+
+	if (not revive_marker) then
+		return
+	end
+
+	local template_ents = ents.SpawnTemplate("Revivemarker", {parent = revive_marker})
+	local revive_trigger = template_ents[1]
+
+	revive_trigger:AddCallback(ON_START_TOUCH, function(_, player)
+		if player:IsRealPlayer() then
+			player.InteractWith = "revive_button"
+		end
+	end)
+
+	revive_trigger:AddCallback(ON_END_TOUCH, function(_, player)
+		if player:IsRealPlayer() then
+			-- TODO: Clearing InteractWith like this will introduce targeting issues
+			--        for multiple overlapping triggers.
+			--       Should use some kind of queue that tracks all of these and sets
+			--        InteractWith based on priority in that queue and touch recency.
+			player.InteractWith = "nothing"
+		end
+	end)
 end
 
-function revivelogic(_,activator) -- haw haw now start living
-    -- There's now Mince in here as well, everyone's invited to Shadows
-    if (not IsValid(activator) or not activator:IsAlive()) then return; end -- still has the thing where it stays active!!
-    
-    activator:TauntFromItem("Laugh Taunt")
-    local think_timer = nil;
-    local found_animator = false;
-    think_timer = timer.Simple(0.65, function()
-        for _, reanimator in pairs(ents.FindInSphere(activator:GetAbsOrigin(), 150)) do
-            if reanimator:GetClassname() == "entity_revive_marker" then
-            found_animator = true;
+function revivelogic(_, activator) -- haw haw now start living
+	-- There's now Mince in here as well, everyone's invited to Shadows
+	-- still has the thing where it stays active!!
+	if (not IsValid(activator) or not activator:IsAlive()) then
+		return
+	end
 
-            reanimator.m_hOwner:ForceRespawnDead()
-            reanimator.m_hOwner:PlaySoundToSelf("mvm/mvm_revive.wav")
-            reanimator.m_hOwner:SpeakResponseConcept("TLK_RESURRECTED")
-            activator:PlaySoundToSelf("mvm/mvm_revive.wav")
-            reanimator.m_hOwner:Teleport(activator:GetAbsOrigin())
-            reanimator.m_hOwner:AddCond(51,2) -- give invulnerability to revived players
-            activator:StunPlayer(0.2,1,TF_STUNFLAG_BONKSTUCK)
-        --    activator:AddCurrency(50) -- damn it people
-			return 	-- we did it reddit
+	-- Find revive marker
+	--  If found, initiate taunt
+	--  Set timer to run revive logic
+	--   When the revive completes, stun everyone who is currently reviving this marker
+	--    Unset EF_NODRAW on active weapons after stun expires
+
+	activator:TauntFromItem("Laugh Taunt")
+	local think_timer = nil;
+	local found_animator = false;
+	think_timer = timer.Simple(0.65, function()
+		for _, reanimator in pairs(ents.FindInSphere(activator:GetAbsOrigin(), 150)) do
+			if reanimator:GetClassname() == "entity_revive_marker" then
+			found_animator = true;
+
+			reanimator.m_hOwner:ForceRespawnDead()
+			reanimator.m_hOwner:PlaySoundToSelf("mvm/mvm_revive.wav")
+			reanimator.m_hOwner:SpeakResponseConcept("TLK_RESURRECTED")
+			activator:PlaySoundToSelf("mvm/mvm_revive.wav")
+			reanimator.m_hOwner:Teleport(activator:GetAbsOrigin())
+			reanimator.m_hOwner:AddCond(TF_COND_INVULNERABLE_HIDE_UNLESS_DAMAGED, 2) -- give invulnerability to revived players
+			activator:StunPlayer(0.2, 1, TF_STUNFLAG_BONKSTUCK)
+		--	activator:AddCurrency(50) -- damn it people
+			return -- we did it reddit
 			end
-        end
+		end
 
-        if not found_animator then
-          pcall(timer.Stop, think_timer);
-        end
-    end)
+		if not found_animator then
+			pcall(timer.Stop, think_timer);
+		end
+	end)
 end
