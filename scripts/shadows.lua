@@ -326,6 +326,11 @@ end
 function OnGameTick()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
+			if not player.HasEverSelectedClass and player.m_iDesiredPlayerClass ~= TF_CLASS_UNDEFINED then
+				player:Print(PRINT_TARGET_CENTER, "You will spawn when the round ends.")
+				player.HasEverSelectedClass = true
+			end
+
 			if player.m_bUsingActionSlot == 1 and player.InteractCooldown ~= true then
 				player.HoldTime = player.HoldTime + 1
 				if player.HoldTime > 13 and player.InteractWith ~= "nothing" then
@@ -379,6 +384,7 @@ end
 
 function OnPlayerConnected(player)
 	if player:IsRealPlayer() then
+		player.HasEverSelectedClass = player.m_iDesiredPlayerClass ~= TF_CLASS_UNDEFINED
 		player.HoldTime = 0
 		player.InteractWith = "nothing"
 		player.TouchingReviveMarker = nil
@@ -1156,4 +1162,13 @@ function revivelogic(_, activator) -- haw haw now start living
 			reanimator.m_hOwner:SpeakResponseConcept("TLK_RESURRECTED")
 		end
 	end)
+end
+
+function AddLateJoiners(_)
+	for _, player in pairs(ents.GetAllPlayers()) do
+		if player:IsRealPlayer() and player.m_iTeamNum == TF_TEAM_RED
+			and player.m_iDesiredPlayerClass ~= TF_CLASS_UNDEFINED and not player:IsAlive() then
+			player:ForceRespawnDead()
+		end
+	end
 end
