@@ -340,7 +340,9 @@ function OnGameTick()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
 			if not player.HasEverSelectedClass and player.m_iDesiredPlayerClass ~= TF_CLASS_UNDEFINED then
-				player:Print(PRINT_TARGET_CENTER, "You will spawn when the round ends.")
+				if ents.FindByClass("tf_gamerules").m_iRoundState ~= 10 --[[GR_STATE_BETWEEN_RNDS]] then
+					player:Print(PRINT_TARGET_CENTER, "You will spawn when the round ends.")
+				end
 				player.HasEverSelectedClass = true
 			end
 
@@ -1188,9 +1190,9 @@ end
 
 function AddLateJoiners(_)
 	for _, player in pairs(ents.GetAllPlayers()) do
-		if player:IsRealPlayer() and player.m_iTeamNum == TF_TEAM_RED
-			and player.m_iDesiredPlayerClass ~= TF_CLASS_UNDEFINED and not player:IsAlive() then
-			player:ForceRespawnDead()
+		if player:IsRealPlayer() and player.m_iTeamNum == TEAM_RED and player.m_iClass == TF_CLASS_UNDEFINED then
+			player:SwitchClassInPlace(player.m_iDesiredPlayerClass) -- SwitchClass does not work but this arrangement does.
+			player:ForceRespawn()
 		end
 	end
 end
