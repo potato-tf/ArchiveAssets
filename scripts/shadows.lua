@@ -1166,9 +1166,11 @@ function revivelogic(_, activator) -- haw haw now start living
 
 	local reanimator = activator.TouchingReviveMarker
 
+	activator:SetAttributeValue("always allow taunt", 1)
 	activator:TauntFromItem("Laugh Taunt")
 
 	think_timer = timer.Simple(0.65, function()
+		activator:SetAttributeValue("always allow taunt", 0)
 		activator:StunPlayer(0, 1, TF_STUNFLAG_BONKSTUCK)
 		activator.m_hActiveWeapon:RemoveEffects(EF_NODRAW)
 
