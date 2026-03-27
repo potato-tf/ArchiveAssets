@@ -105,7 +105,7 @@ local function cashforhits(activator)
 
 		local curHealth = activator.m_iHealth
 
-		if InstakillDuration > 0 and activator.m_szNetname == "Zombie" and hitter:InCond(56) == true then --instakill functionality -washy
+		if InstakillDuration > 0 and hitter:InCond(TF_COND_CRITBOOSTED_CARD_EFFECT) and activator.CanBeInstakilled then --instakill functionality -washy
 			damage = curHealth
 			activator.m_iHealth = 0
 		end
@@ -114,7 +114,7 @@ local function cashforhits(activator)
 			hitter:SpeakResponseConcept("TLK_MVM_TANK_DEAD") -- ding dong the tank is dead
 		end
 
-		if activator.m_szNetname == "Zombie" and hitter.m_szNetname == "Tank" then
+		if activator.CanBeInstakilled and hitter.m_szNetname == "Tank" then
 			damage = curHealth
 			activator.m_iHealth = 0 -- if converted zombie is hit by Tank, treat it as Instakill
 		end
@@ -180,7 +180,7 @@ local function cashforhits(activator)
 
 		local curHealth = activator.m_iHealth
 
-		if InstakillDuration > 0 and activator.m_szNetname == "Zombie" and hitter:InCond(56) == true then --instakill functionality -washy
+		if InstakillDuration > 0 and activator.CanBeInstakilled and hitter:InCond(TF_COND_CRITBOOSTED_CARD_EFFECT) then --instakill functionality -washy
 			damage = curHealth
 			activator.m_iHealth = 0
 		end
@@ -223,7 +223,15 @@ local function cashforhits(activator)
 	end)
 end
 
-function OnWaveSpawnBot(bot)
+function OnWaveSpawnBot(bot, wave, tags)
+	bot.CanBeInstakilled = true
+    for _, tag in pairs(tags) do
+        if tag == "bigguyalert" then
+            bot.CanBeInstakilled = false
+			break
+        end
+    end
+
 	timer.Simple(1, function()
 		cashforhits(bot)
 	end)
@@ -263,7 +271,7 @@ function playertracker(_, activator) -- the only other thing here made by Sntr
 	end
 
 	callbacks.damagetype = activator:AddCallback(ON_DAMAGE_RECEIVED_PRE, function(_, damageInfo)
-		if activator:InCond(5) == true then
+		if activator:InCond(TF_COND_INVULNERABLE) then
 			return
 		end
 
@@ -277,7 +285,7 @@ function playertracker(_, activator) -- the only other thing here made by Sntr
 		local damage = damageInfo.Damage
 		local curHealth = activator.m_iHealth
 
-		if damage > curHealth and activator:InCond(129) == true then -- give full heal + uber when condition 70 is removed
+		if damage > curHealth and activator:InCond(TF_COND_POWERUPMODE_DOMINANT) then -- give full heal + uber when condition 70 is removed
 			activator:AddCond(TF_COND_INVULNERABLE, 2.5)
 			activator:AddHealth(300,1)
 			activator:PlaySoundToSelf("misc/halloween/merasmus_stun.wav")
@@ -559,12 +567,12 @@ function Interact(player)
 			player:Print(PRINT_TARGET_CENTER, "You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_quickrevbutton" and player.m_nCurrency >= 1500 then
-		if player:InCond(70) == false then
+		if not player:InCond(TF_COND_PREVENT_DEATH) then
 			ents.FindByName("vm_quickrevbutton"):AcceptInput("Press",_,player)
 			if player:GetPlayerItemBySlot(1):GetClassname() ~= "tf_weapon_pipebomblauncher" then PlayViewmodelSequence(player) end
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
-		elseif player:InCond(70) == true then
+		elseif player:InCond(TF_COND_PREVENT_DEATH) then
 			player:Print(PRINT_TARGET_CENTER, "You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_speedbutton" and player.m_nCurrency >= 3000 then
