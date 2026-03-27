@@ -16,6 +16,7 @@ function OnWaveInit()
 	DoublePointsText = ""
 	FireSaleText = ""
 	InstakillText = ""
+	InstaKillTextUser = ""
 	DoublePointsDuration = 0
 	FireSaleDuration = 0
 	InstakillDuration = 0
@@ -393,9 +394,10 @@ function OnGameTick()
 	end
 	if InstakillDuration > 0 then
 		InstakillDuration = InstakillDuration - 1
-		InstakillText = "Instakill: ".. math.floor(InstakillDuration/66+1)
+		InstakillText = InstakillTextUser .. "'s Instakill: ".. math.floor(InstakillDuration / 66 + 1)
 	else
 		InstakillText = ""
+		InstakillTextUser = ""
 	end
 end
 
@@ -731,10 +733,11 @@ end
 
 function ActivateInstakill(_,player)
 	InstakillDuration = 1980 -- 1980 ticks divided by 66 tick rate = 30 seconds
-		player:Print(PRINT_TARGET_CENTER, "Instakill!")
-		player:PlaySoundToSelf("items/powerup_pickup_crits.wav")
-		player:PlaySoundToSelf("shadows/powerup_instagib.mp3")
-		player:AddCond(TF_COND_CRITBOOSTED_CARD_EFFECT, 30)
+	InstakillTextUser = player.m_szNetname
+	player:Print(PRINT_TARGET_CENTER, "Instakill!")
+	player:PlaySoundToSelf("items/powerup_pickup_crits.wav")
+	player:PlaySoundToSelf("shadows/powerup_instagib.mp3")
+	player:AddCond(TF_COND_CRITBOOSTED_CARD_EFFECT, 30)
 end
 
 function ActivateNuke()
