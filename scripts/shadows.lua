@@ -525,10 +525,12 @@ function OnWaveStart()
 			end)
 	end)
 	TextDisplay = timer.Create(1, function()
-		ents.FindByName("poweruptext"):AcceptInput("$SetKey$message",FireSaleText .. "\n" ..InstakillText .. "\n" ..DoublePointsText)
-		ents.FindByName("poweruptext"):AcceptInput("Display")
+		local poweruptext = ents.FindByName("poweruptext")
+		poweruptext.m_iszMessage = FireSaleText .. "\n" ..InstakillText .. "\n" ..DoublePointsText
+		poweruptext:AcceptInput("Display")
 		ents.FindByName("enemytext"):AcceptInput("Display")
-		ents.FindByName("roundtext"):AcceptInput("Display") end, 0)
+		-- ents.FindByName("roundtext"):AcceptInput("Display")
+	end, 0)
 end
 
 function Interact(player)
