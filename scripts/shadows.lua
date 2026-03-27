@@ -1159,6 +1159,11 @@ function revivelogic(_, activator) -- haw haw now start living
 		return
 	end
 
+	-- No reviving while midair.
+	if (not activator.m_hGroundEntity) then
+		return
+	end
+
 	local reanimator = activator.TouchingReviveMarker
 
 	activator:TauntFromItem("Laugh Taunt")
