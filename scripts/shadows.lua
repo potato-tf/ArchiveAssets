@@ -8,6 +8,8 @@ local deathCounts = {}
 local waveActive = false
 TextDisplay = -1
 
+Gamerules = ents.FindByClass("tf_gamerules")
+
 function OnPlayerDisconnected(player)
 	deathCounts[player:GetHandleIndex()] = nil
 end
@@ -347,7 +349,7 @@ function OnGameTick()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
 			if not player.HasEverSelectedClass and player.m_iDesiredPlayerClass ~= TF_CLASS_UNDEFINED then
-				if ents.FindByClass("tf_gamerules").m_iRoundState ~= GR_STATE_BETWEEN_RNDS then
+				if Gamerules.m_iRoundState ~= GR_STATE_BETWEEN_RNDS then
 					player:Print(PRINT_TARGET_CENTER, "You will spawn when the round ends.")
 				end
 				player.HasEverSelectedClass = true
@@ -1132,7 +1134,7 @@ function spawn_revive_marker(_, activator)
 		return
 	end
 
-	if ents.FindByClass("tf_gamerules").m_iRoundState == GR_STATE_BETWEEN_RNDS then
+	if Gamerules.m_iRoundState == GR_STATE_BETWEEN_RNDS then
 		timer.Simple(5.0, function()
 			if (not activator:IsAlive()) then
 				activator:ForceRespawnDead()
@@ -1229,4 +1231,68 @@ function AddSnapToGroundCallback(targetname)
 			entity:SetAbsOrigin(result.HitPos)
 		end
 	end)
+end
+
+TutorialAnnotations =
+{
+	"Money is earned by dealing damage and killing enemies.",
+	"Enemies become faster and stronger each round.",
+	"You can revive teammates by holding the Action key at their reanimator.",
+	"You can purchase Perk Bonuses from vending machines around the map.",
+	"Perk Bonuses are not permanent and are lost on death.",
+	"Perk Bonuses stack with your weapon upgrades.",
+	"Perk Bonuses cannot be purchased multiple times per life.",
+	"You can also receive random weapons from your local Weapons Dumpster.",
+	"Dumpster Weapons are returned to you after respawning.",
+	"Medics supply ammo and health to nearby teammates.",
+	"Moving and crouching both affect your accuracy.",
+	"Powerups have a chance to drop from zombies during waves.",
+	"Powerups despawn 30 seconds after being dropped."
+}
+CurrentTutorialAnnotation = 1
+TutorialTimer = -1
+
+function StartTutorial()
+	if Gamerules.m_iRoundState ~= GR_STATE_BETWEEN_RNDS then
+		return
+	end
+
+	FireEvent("show_annotation",
+	{
+		text = TutorialAnnotations[CurrentTutorialAnnotation],
+		lifetime = 4,
+		worldPosX = 328,
+		worldPosY = -150,
+		worldPosZ = 52,
+		play_sound = "misc/null.wav"
+	})
+
+	if CurrentTutorialAnnotation >= #TutorialAnnotations then
+		CurrentTutorialAnnotation = 1
+	else
+		CurrentTutorialAnnotation = CurrentTutorialAnnotation + 1
+	end
+
+	TutorialTimer = timer.Create(4.0, StartTutorial)
+end
+
+function StopTutorial()
+	FireEvent("hide_annotation", {})
+
+	if TutorialTimer ~= -1 then
+		timer.Stop(TutorialTimer)
+		TutorialTimer = -1
+	end
+end
+
+precache.PrecacheSound("ui/hint.wav")
+
+function ShowDumpsterAnnotation()
+	FireEvent("show_annotation",
+	{
+		text = "Follow the beam of light to find the Weapons Dumpster!",
+		lifetime = 5,
+		play_sound = "ui/hint.wav",
+		follow_entindex = ents.FindByName("dumpster_prop" .. DumpsterRoulette[1]):GetNetIndex()
+	})
 end
