@@ -8,7 +8,7 @@ if ("NoGiantKnockback" in getroottable())
 
 ::NoGiantKnockback <-
 {
-	TICK_INTERVAL <- floor(1000.0 / Convars.GetFloat("sv_maxupdaterate")) / 1000.0
+	TICK_INTERVAL = floor(1000.0 / Convars.GetFloat("sv_maxupdaterate")) / 1000.0
 	mvm_stats = Entities.FindByClassname(null, "tf_mann_vs_machine_stats")
 
 	function OnGameEvent_player_spawn(params)
