@@ -2,6 +2,7 @@
 -- they deserve a LOT of kudos for everything here
 
 GR_STATE_BETWEEN_RNDS = 10
+MAX_COORD_FLOAT = 16384.0
 
 local deathCounts = {}
 local waveActive = false
@@ -96,6 +97,9 @@ local function cashforhits(activator)
 
 		local damageType = damageInfo.DamageType
 		local hitter = damageInfo.Attacker
+		if not hitter or not hitter:IsRealPlayer() then
+			return
+		end
 
 		if (damageType & DMG_BURN) ~= 0 then
 			return
@@ -1203,4 +1207,26 @@ function AddLateJoiners(_)
 			player:ForceRespawn()
 		end
 	end
+end
+
+function AddSnapToGroundCallback(targetname)
+	prop = ents.FindByName(targetname)
+
+	prop:AddCallback(ON_INPUT, function(entity, inputName, value, activator, caller)
+		if (inputName:lower() ~= "enable") then
+			return
+		end
+
+		local result = util.Trace(
+		{
+			start = entity:GetAbsOrigin(),
+			distance = MAX_COORD_FLOAT,
+			angles = Vector(90.0, 0.0, 0.0),
+			mask = MASK_PLAYERSOLID_BRUSHONLY
+		})
+
+		if result.Hit then
+			entity:SetAbsOrigin(result.HitPos)
+		end
+	end)
 end
