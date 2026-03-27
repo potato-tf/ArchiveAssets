@@ -3,6 +3,7 @@
 
 local deathCounts = {}
 local waveActive = false
+TextDisplay = -1
 
 function OnPlayerDisconnected(player)
 	deathCounts[player:GetHandleIndex()] = nil
@@ -328,7 +329,11 @@ function OnWaveReset()
 			end
 		end
 	end
-	timer.Stop(TextDisplay)
+
+	if TextDisplay > -1 then
+		timer.Stop(TextDisplay)
+		TextDisplay = -1
+	end
 end
 
 function OnGameTick()
