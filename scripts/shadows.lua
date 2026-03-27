@@ -1,6 +1,8 @@
 -- the stuff below is made by Royal
 -- they deserve a LOT of kudos for everything here
 
+GR_STATE_BETWEEN_RNDS = 10
+
 local deathCounts = {}
 local waveActive = false
 TextDisplay = -1
@@ -45,7 +47,7 @@ function chargerLogic(_, activator)
 
 	callbacks.keypress = { -- Apply animation when bot pushes M2
 		Type = 7,
-		ID = activator:AddCallback(7, function(_, key)
+		ID = activator:AddCallback(ON_KEY_PRESSED, function(_, key)
 			if key ~= IN_ATTACK2 then
 				return
 			end
@@ -60,14 +62,14 @@ function chargerLogic(_, activator)
 
 	callbacks.spawned = {
 		Type = 1,
-		ID = activator:AddCallback(1, function()
+		ID = activator:AddCallback(ON_SPAWN, function()
 			removeCallbacks()
 		end),
 	}
 
 	callbacks.died = {
 		Type = 9,
-		ID = activator:AddCallback(9, function()
+		ID = activator:AddCallback(ON_DEATH, function()
 			removeCallbacks()
 		end),
 	}
@@ -215,11 +217,11 @@ local function cashforhits(activator)
 		end
 	end)
 
-	callbacks.spawned = activator:AddCallback(1, function()
+	callbacks.spawned = activator:AddCallback(ON_SPAWN, function()
 		removeCallbacks()
 	end)
 
-	callbacks.died = activator:AddCallback(9, function()
+	callbacks.died = activator:AddCallback(ON_DEATH, function()
 		removeCallbacks()
 	end)
 end
@@ -307,11 +309,11 @@ function playertracker(_, activator) -- the only other thing here made by Sntr
 --		end
 --	end)
 
-	callbacks.spawned = activator:AddCallback(1, function()
+	callbacks.spawned = activator:AddCallback(ON_SPAWN, function()
 		removeCallbacks()
 	end)
 
-	callbacks.died = activator:AddCallback(9, function()
+	callbacks.died = activator:AddCallback(ON_DEATH, function()
 		removeCallbacks()
 		DeathCounter()
 	end)
@@ -340,7 +342,7 @@ function OnGameTick()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
 			if not player.HasEverSelectedClass and player.m_iDesiredPlayerClass ~= TF_CLASS_UNDEFINED then
-				if ents.FindByClass("tf_gamerules").m_iRoundState ~= 10 --[[GR_STATE_BETWEEN_RNDS]] then
+				if ents.FindByClass("tf_gamerules").m_iRoundState ~= GR_STATE_BETWEEN_RNDS then
 					player:Print(PRINT_TARGET_CENTER, "You will spawn when the round ends.")
 				end
 				player.HasEverSelectedClass = true
@@ -1123,7 +1125,7 @@ function spawn_revive_marker(_, activator)
 		return
 	end
 
-	if ents.FindByClass("tf_gamerules").m_iRoundState == 10 --[[GR_STATE_BETWEEN_RNDS]] then
+	if ents.FindByClass("tf_gamerules").m_iRoundState == GR_STATE_BETWEEN_RNDS then
 		timer.Simple(5.0, function()
 			if (not activator:IsAlive()) then
 				activator:ForceRespawnDead()
