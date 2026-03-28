@@ -400,7 +400,7 @@ function OnGameTick()
 	end
 	if InstakillDuration > 0 then
 		InstakillDuration = InstakillDuration - 1
-		InstakillText = InstakillTextUser .. "'s Instakill: ".. math.floor(InstakillDuration / 66 + 1)
+		InstakillText = "Instakill (" .. InstakillTextUser .. "): " .. math.floor(InstakillDuration / 66 + 1)
 	else
 		InstakillText = ""
 		InstakillTextUser = ""
@@ -739,7 +739,14 @@ end
 
 function ActivateInstakill(_,player)
 	InstakillDuration = 1980 -- 1980 ticks divided by 66 tick rate = 30 seconds
+
 	InstakillTextUser = player.m_szNetname
+	-- This is a bad way of truncating, but string.len() seems broken in raflua (always returns 0).
+	local truncate = InstakillTextUser:sub(10)
+	if truncate ~= "" then
+		InstakillTextUser = InstakillTextUser:sub(1, 10) .. "..."
+	end
+
 	player:Print(PRINT_TARGET_CENTER, "Instakill!")
 	player:PlaySoundToSelf("items/powerup_pickup_crits.wav")
 	player:PlaySoundToSelf("shadows/powerup_instagib.mp3")
