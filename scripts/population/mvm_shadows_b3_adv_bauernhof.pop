@@ -901,7 +901,6 @@ WaveSchedule
 		{
 			OriginalItemName "TF_WEAPON_SHOTGUN_SOLDIER"
 			"custom item model" "models\weapons\c_models\c_drg_phlogistinator\c_drg_phlogistinator.mdl"
-			"custom weapon fire sound" "=80|shadows/thundergun_fire.mp3"
 			"special item description" "Fires a lethal charge of electricity"
 			"attach particle effect" 3045
 			"fire rate bonus HIDDEN" 2.5
@@ -911,12 +910,12 @@ WaveSchedule
 			"custom kill icon" phlogistinator
 			"clip size penalty" 0.35
 			"can headshot" -1
+			"override projectile type" -1 // Hide tracers
 		}
 		"Zeus Cannon" // box only
 		{
 			OriginalItemName "TF_WEAPON_SHOTGUN_SOLDIER"
 			"custom item model" "models\weapons\c_models\c_drg_phlogistinator\c_drg_phlogistinator.mdl"
-			"custom weapon fire sound" "=80|shadows/thundergun_fire.mp3"
 			"special item description" "Fires a lethal charge of electricity"
 			"attach particle effect" 3045
 			"fire rate bonus HIDDEN" 2.3
@@ -927,6 +926,7 @@ WaveSchedule
 			"clip size penalty" 0.66
 			"cannot be upgraded" 1
 			"can headshot" -1
+			"override projectile type" -1 // Hide tracers
 		}
 		"Great Gatsby" // pistol
 		{
@@ -2769,13 +2769,13 @@ WaveSchedule
 			{
 				"targetname" "mainrelay"
 
+				"OnMapSpawn" "intel,Kill,,0,-1"
 				"OnMapSpawn" "wave_finished_relay,Kill,,0,-1" // this relay is causing all kinds of shit!!!
 				"OnMapSpawn" "door_red_large_win_*,Open,,0,-1"
 				"OnMapSpawn" "trigger_multiple,Kill,,0,-1"
 				"OnMapSpawn" "trigger_push,Kill,,0,-1"
 				"OnMapSpawn" "ufo_*,Kill,,0,-1"
 				"OnMapSpawn" "trigger_catapult,Kill,,0,-1"
-				"OnMapSpawn" "red_respawnroom1,Kill,,0,-1"
 				"OnMapSpawn" "bombpath_arrows_*,Kill,,0,-1"
 				"OnMapSpawn" "m0*,Kill,,0,-1"
 				"OnMapSpawn" "m10,Kill,,0,-1"
@@ -2798,14 +2798,12 @@ WaveSchedule
 				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger LMA:Enable:0:-1"
 				"OnMapSpawn" "func_flagdetectionzone,AddOutput,alarm 0"
 				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger DUMMY_*:Kill:0:-1"
-				//"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger tutorial_relay2:Disable:0:-1"
-				//"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger hints_*:Kill:0:-1"
-				//"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger tutorial_*:Kill:0:-1"
 			//	"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger hologram_nuke_hurt:Disable:0:-1"
-			//	"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger dumpster_hint:Show:2:-1"
-				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger navman:RecomputeBlockers:0:-1"
-				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger navman:RecomputeBlockers:1:-1"
-				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger navman:RecomputeBlockers:2:-1"
+				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger navman:RecomputeBlockers::2:-1"
+
+				"OnMapSpawn" "popscript,$StartTutorial,,4,-1"
+				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger popscript:$StopTutorial::0:-1"
+				"OnMapSpawn" "wave_start_relay,AddOutput,OnTrigger popscript:$ShowDumpsterAnnotation::2:-1"
 			}
 			tf_point_nav_interface
 			{
@@ -2830,6 +2828,7 @@ WaveSchedule
 			game_forcerespawn
 			{
 				targetname respawner
+				OnForceRespawn "popscript,$AddLateJoiners,,0,-1"
 			}
 			logic_relay // only for testing, never really use this
 			{
@@ -4438,11 +4437,12 @@ WaveSchedule
 				Target "relay_enemycount_add"
 				Action "trigger"
 			}
-			OnSpawnOutput
-			{
-				Target "popscript"
-				Action "$OnWaveSpawnBot"
-			}
+			// OnSpawnOutput
+			// {
+			//  fellen : IDK what this is for but it causes errors.
+			// 	Target "popscript"
+			// 	Action "$OnWaveSpawnBot"
+			// }
 		//	OnSpawnOutput // money for kill
 		//  {
 		//      Target "!activator"
@@ -4475,6 +4475,12 @@ WaveSchedule
 				Action "SetPlaybackRate"
 				Param 0
 				Delay 0.01
+			}
+			OnSpawnOutput
+			{
+				Target "popscript"
+				Action "$AddSnapToGroundCallback"
+				Param "hankerman"
 			}
 			OnParentKilledOutput
 			{
@@ -4560,7 +4566,6 @@ WaveSchedule
 				Target "popscript"
 				Action "$chargerLogic"
 			}
-
 		}
 
 		Soldier_Tank
@@ -4584,6 +4589,12 @@ WaveSchedule
 				solid 0
 				skin 1
 				targetname autotank_body
+			}
+			OnSpawnOutput
+			{
+				Target "popscript"
+				Action "$AddSnapToGroundCallback"
+				Param "autotank_body"
 			}
 			prop_dynamic // gibby~
 			{
@@ -4709,6 +4720,7 @@ WaveSchedule
 			{
 				targetname autotank_death
 				"OnTrigger" "autotank_idle,StopSound,,0,-1"
+				"OnTrigger" "autotank_body,Enable,,0,-1" // This prop is already enabled, just a hack to trigger AddSnapToGroundCallback.
 				"OnTrigger" "autotank_gibby,Enable,,0,-1"
 				"OnTrigger" "autotank_smoke,Stop,,0,-1"
 				"OnTrigger" "autotank_gibby,SetAnimation,PRIMARY_Stun_begin,0,-1"
@@ -4775,6 +4787,12 @@ WaveSchedule
 				skin 1
 				targetname blord
 			}
+			OnSpawnOutput
+			{
+				Target "popscript"
+				Action "$AddSnapToGroundCallback"
+				Param "blord"
+			}
 			ambient_generic
 			{
 				targetname blord_deathsound
@@ -4828,132 +4846,6 @@ WaveSchedule
 				"OnTrigger" "blord_*,Kill,,8,-1"
 			}
 		}
-		// tutorial
-		// {
-		// 	NoFixup 1
-		// 	logic_relay
-		// 	{
-		// 		"spawnflags" "2"
-		// 		"targetname" "tutorial_relay"
-		// 		"OnTrigger" "hints_1,Show,,0,-1"
-		// 		"OnTrigger" "hints_2,Show,,4,-1"
-		// 		"OnTrigger" "hints_3,Show,,8,-1"
-		// 		"OnTrigger" "hints_4,Show,,12,-1"
-		// 		"OnTrigger" "hints_5,Show,,16,-1"
-		// 		"OnTrigger" "hints_6,Show,,20,-1"
-		// 		"OnTrigger" "hints_7,Show,,24,-1"
-		// 		"OnTrigger" "hints_8,Show,,28,-1"
-		// 		"OnTrigger" "hints_9,Show,,32,-1"
-		// 		"OnTrigger" "hints_10,Show,,36,-1"
-		// 		"OnTrigger" "hints_11,Show,,40,-1"
-		// 		"OnTrigger" "hints_12,Show,,44,-1"
-		// 		"OnTrigger" "hints_15,Show,,48,-1"
-		// 		"OnTrigger" "tutorial_relay2,Trigger,,52,-1"
-		// 	}
-		// 	logic_relay
-		// 	{
-		// 		"spawnflags" "2"
-		// 		"targetname" "tutorial_relay2"
-		// 		"OnTrigger" "tutorial_relay,Trigger,,0,-1"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 	  "targetname"   "hints_1"
-		// 	  "display_text" "Money is earned only by dealing damage and killing enemies."
-		// 	  "lifetime"     "4"
-		// 	  "origin" "328 -150 52"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 	  "targetname"   "hints_2"
-		// 	  "display_text" "Enemies become faster and stronger each round."
-		// 	  "lifetime"     "4"
-		// 	  "origin" "328 -150 52"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 	  "targetname"   "hints_3"
-		// 	  "display_text" "You can purchase Perk Bonuses from vending machines around the map."
-		// 	  "lifetime"     "4"
-		// 	  "origin" "328 -150 52"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 	  "targetname"   "hints_4"
-		// 	  "display_text" "Perk Bonuses are not permanent and are lost on death."
-		// 	  "lifetime"     "4"
-		// 	  "origin" "328 -150 52"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 	  "targetname"   "hints_5"
-		// 	  "display_text" "Perk Bonuses stack with your weapon upgrades."
-		// 	  "lifetime"     "4"
-		// 	  "origin" "328 -150 52"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 	  "targetname"   "hints_6"
-		// 	  "display_text" "Perk Bonuses do not stack per additional purchase."
-		// 	  "lifetime"     "4"
-		// 	  "origin" "328 -150 52"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 	 "targetname"   "hints_7"
-		// 	  "display_text" "You can also receive random weapons from your local Weapons Dumpster."
-		// 	  "lifetime"     "4"
-		// 	  "origin" "328 -150 52"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 	 "targetname"   "hints_8"
-		// 	  "display_text" "Weapons received are returned to you after death."
-		// 	  "lifetime"     "4"
-		// 	  "origin" "328 -150 52"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 	  "targetname"   "hints_9"
-		// 	  "display_text" "Medics supply ammo and health to nearby teammates."
-		// 	  "lifetime"     "4"
-		// 	  "origin" "328 -150 52"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 	  "targetname"   "hints_10"
-		// 	  "display_text" "Moving and crouching both affect your accuracy."
-		// 	  "lifetime"     "4"
-		// 	  "origin" "328 -150 52"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 		"targetname"   "hints_11"
-		// 		"display_text" "Powerups have a chance to drop from zombies during waves."
-		// 		"lifetime"     "4"
-		// 		"origin" "328 -150 52"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 		"targetname"   "hints_12"
-		// 		"display_text" "Powerups despawn after 30 seconds of being dropped."
-		// 		"lifetime"     "4"
-		// 		"origin" "328 -150 52"
-		// 	}
-		// 	training_annotation
-		// 	{
-		// 	  "targetname"   "hints_15"
-		// 	  "display_text" "Players cannot join the game once it begins."
-		// 	  "lifetime"     "4"
-		// 	  "origin" "328 -150 52"
-		// 	}
-		// 	OnSpawnOutput
-		// 	{
-		// 		Target "tutorial_relay"
-		// 		Action "Trigger"
-		// 		Delay 4
-		// 	}
-		// }
 		DummyMachines
 		{
 			NoFixup 1
@@ -5496,19 +5388,19 @@ WaveSchedule
 				Action SetValue
 				Param 0
 			}
-			game_text // obsolete but kept since removing it causes lua problems
-			{
-				"targetname" "roundtext"
-				"color" "255 65 65" 	// 222 222 222 breaktime color
-				"color2" "0 0 0"	// scan color
-				"fxtime" "2.3" // how
-				"holdtime" "36000"
-				"spawnflags" "1"
-				"effect" 2
-				"channel" 1
-				"x" "0.1"
-				"y" "0.05" // mess with later to find proper spot
-			}
+			// game_text
+			// {
+			// 	"targetname" "roundtext"
+			// 	"color" "255 65 65" 	// 222 222 222 breaktime color
+			// 	"color2" "0 0 0"	// scan color
+			// 	"fxtime" "2.3" // how
+			// 	"holdtime" "36000"
+			// 	"spawnflags" "1"
+			// 	"effect" 2
+			// 	"channel" 1
+			// 	"x" "0.1"
+			// 	"y" "0.05" // mess with later to find proper spot
+			// }
 			game_text
 			{
 				"targetname" "enemytext"
@@ -5530,7 +5422,7 @@ WaveSchedule
 				"holdtime" "36000"
 				"spawnflags" "1"
 				"channel" 3
-				"x" "0.27"
+				"x" "0.18"
 				"y" "0.9"
 			}
 			math_counter
@@ -8261,6 +8153,12 @@ WaveSchedule
 			}
 			OnSpawnOutput
 			{
+				Target !activator
+				Action RunScriptCode
+				Param "self.EmitSound(`shadows/thundergun_fire.mp3`)"
+			}
+			OnSpawnOutput
+			{
 				Target thundergun*
 				Action Kill
 				Delay 0.35
@@ -8307,6 +8205,12 @@ WaveSchedule
 				Target thundergun_hurt
 				Action $SetOwner
 				Param !activator
+			}
+			OnSpawnOutput
+			{
+				Target !activator
+				Action RunScriptCode
+				Param "self.EmitSound(`shadows/thundergun_fire.mp3`)"
 			}
 			OnSpawnOutput
 			{
@@ -8380,7 +8284,6 @@ WaveSchedule
 	SpawnTemplate "DummyMachines"
 	SpawnTemplate "Spawn_things"
 	SpawnTemplate "PlayersLeftLogic"
-	//SpawnTemplate "tutorial"
 	SpawnTemplate "BuildingBlocks"
 	//SpawnTemplate "Plate_Big"
 	SpawnTemplate "Camera_Crew_Death"
@@ -8650,6 +8553,7 @@ WaveSchedule
 			}
 			CharacterAttributes
 			{
+				"always allow taunt" 1
 				"voice pitch scale" 0
 				"cancel falling damage" 1
 				"torso scale" 0
@@ -8833,6 +8737,7 @@ WaveSchedule
 			}
 			CharacterAttributes
 			{
+				"always allow taunt" 1
 				"voice pitch scale" 1
 				"cancel falling damage" 1
 				"override footstep sound set" 0
@@ -9259,6 +9164,7 @@ WaveSchedule
 					}
 					CharacterAttributes
 					{
+						"always allow taunt" 1
 						"voice pitch scale" 0
 						"move speed bonus"	0.4
 						"gesture speed increase" 1.33 // sync attack animation better
@@ -9308,6 +9214,7 @@ WaveSchedule
 					}
 					CharacterAttributes
 					{
+						"always allow taunt" 1
 						"voice pitch scale" 0
 						"move speed bonus"	0.8
 						"attach particle effect" 2
@@ -9529,91 +9436,17 @@ WaveSchedule
 
 	Wave
 	{
-		WaitWhenDone	65
-		Checkpoint	Yes
-	//	CustomWaveNumber 0
 		CustomMaxWaveNumber 0
 
 		StartWaveOutput
 		{
-			Target	wave_start_relay
-			Action	RunScriptCode
-			Param "
-				self.AcceptInput(`Trigger`, null, null, null)
-				StopTutorial()
-				EntFireByHandle(self, `RunScriptCode`, `ShowDumpster()`, 2.0, null, null)
-			"
+			Target wave_start_relay
+			Action Trigger
 		}
 		InitWaveOutput
 		{
 			Target wave_output_clear
-			Action RunScriptCode
-			Param "
-				self.AcceptInput(`Trigger`, null, null, null)
-
-				local wave_start_relay = Entities.FindByName(null, `wave_start_relay`)
-				wave_start_relay.ValidateScriptScope()
-				local scope = wave_start_relay.GetScriptScope()
-				scope.AnnotationIndex <- 0
-				scope.Annotations <- [
-					`Money is earned only by dealing damage and killing enemies.`,
-					`Enemies become faster and stronger each round.`,
-					`You can purchase Perk Bonuses from vending machines around the map.`,
-					`Perk Bonuses are not permanent and are lost on death.`,
-					`Perk Bonuses stack with your weapon upgrades.`,
-					`Perk Bonuses do not stack per additional purchase.`,
-					`You can also receive random weapons from your local Weapons Dumpster.`,
-					`Weapons received are returned to you after death.`,
-					`Medics supply ammo and health to nearby teammates.`,
-					`Moving and crouching both affect your accuracy.`,
-					`Powerups have a chance to drop from zombies during waves.`,
-					`Powerups despawn 30 seconds after being dropped.`,
-					`Players cannot join the game once it begins.`
-				]
-				scope.ShowTutorial <- function(index) {
-					SendGlobalGameEvent(`show_annotation`, {
-						text = Annotations[index]
-						lifetime = 4
-						worldPosX = 328
-						worldPosY = -150
-						worldPosZ = 52
-						id = 0
-						play_sound = `misc/null.wav`
-					})
-					if (index >= Annotations.len() - 1)
-						return 0
-					return index + 1
-				}
-				scope.AnnotationsThink <- function() {
-					AnnotationIndex = ShowTutorial(AnnotationIndex)
-					return 4.0
-				}
-				scope.StopTutorial <- function() {
-					AddThinkToEnt(self, null)
-					NetProps.SetPropString(self, `m_iszScriptThinkFunction`, ``)
-					SendGlobalGameEvent(`hide_annotation`, {id = 0})
-				}
-				scope.popscript <- Entities.FindByClassname(null, `$script_manager`)
-				scope.dumpster <- 0
-				scope.ShowDumpster <- function() {
-					# Fetch the first value in DumpsterRoulette from popscript.
-					popscript.AcceptInput(
-						`$ExecuteScript`, @`ents.FindByName(``wave_start_relay``):AcceptInput(
-							``RunScriptCode``, ``dumpster=``..tostring(DumpsterRoulette[1])
-						)`,
-					null, null)
-					SendGlobalGameEvent(`show_annotation`, {
-						text = `Follow the beam of light to find the Weapons Dumpster!`
-						lifetime = 5
-						id = 0
-						play_sound = `misc/null.wav`
-						follow_entindex = Entities.FindByName(null, `dumpster_prop` + dumpster.tostring()).entindex()
-					})
-				}
-				EntFireByHandle(wave_start_relay, `RunScriptCode`,
-					`if (GetRoundState() == 10) AddThinkToEnt(self, \`AnnotationsThink\`)`,
-				4.0, null, null)
-			"
+			Action Trigger
 		}
 		DoneOutput
 		{
@@ -12137,6 +11970,7 @@ WaveSchedule
 			WaitBetweenSpawns 0
 			WaitForAllDead	"stage_20_transition"
 			TotalCurrency 0
+			HideIcon 1
 
 			FirstSpawnOutput
 			{
@@ -12148,15 +11982,10 @@ WaveSchedule
 				Target autotank_death
 				Action Trigger
 			}
-			Squad
+
+			TFBot
 			{
-				Squad
-				{
-					TFBot
-					{
-						Template T_Robot_Boss_Treadkill
-					}
-				}
+				Template T_Robot_Boss_Treadkill
 			}
 		}
 		WaveSpawn
@@ -12170,21 +11999,17 @@ WaveSchedule
 			WaitBetweenSpawns 0
 			WaitForAllDead	"stage_20_transition"
 			TotalCurrency 0
+			HideIcon 1
 
 			DoneOutput
 			{
 				Target blord_death
 				Action Trigger
 			}
-			Squad
+
+			TFBot
 			{
-				Squad
-				{
-					TFBot
-					{
-						Template T_Robot_Boss_Battlelord
-					}
-				}
+				Template T_Robot_Boss_Battlelord
 			}
 		}
 		WaveSpawn // finale
@@ -12438,6 +12263,7 @@ WaveSchedule
 			WaitBetweenSpawns 0
 			WaitForAllDead	stage_20
 			TotalCurrency 4444
+			HideIcon 1
 
 			StartWaveOutput
 			{
@@ -12445,24 +12271,18 @@ WaveSchedule
 				Action Trigger
 			}
 
-			Squad
+			TFBot
 			{
-				Squad
+				Class Heavyweapons
+				WeaponRestrictions MeleeOnly
+				Attributes IgnoreFlag
+				CharacterAttributes
 				{
-					TFBot
-					{
-						Class Heavyweapons
-						WeaponRestrictions MeleeOnly
-						Attributes IgnoreFlag
-						CharacterAttributes
-						{
-							"move speed bonus" 0.08
-							"is suicide counter" 2000
-							"force distribute currency on death" 1
-						}
-						Health 10000
-					}
+					"move speed bonus" 0.08
+					"is suicide counter" 2000
+					"force distribute currency on death" 1
 				}
+				Health 10000
 			}
 		}
 	}
