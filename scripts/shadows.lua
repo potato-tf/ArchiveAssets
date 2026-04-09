@@ -1,18 +1,14 @@
 -- the stuff below is made by Royal
 -- they deserve a LOT of kudos for everything here
 
+GR_STATE_BETWEEN_RNDS = 10
+MAX_COORD_FLOAT = 16384.0
+
 local deathCounts = {}
 local waveActive = false
+TextDisplay = -1
 
-function OnPlayerConnected(player)
-	local handle = player:GetHandleIndex()
-
-	deathCounts[handle] = 0
-
-	player:AddCallback(ON_DEATH, function()
-		deathCounts[handle] = deathCounts[handle] + 1
-	end)
-end
+Gamerules = ents.FindByClass("tf_gamerules")
 
 function OnPlayerDisconnected(player)
 	deathCounts[player:GetHandleIndex()] = nil
@@ -23,14 +19,11 @@ function OnWaveInit()
 	DoublePointsText = ""
 	FireSaleText = ""
 	InstakillText = ""
+	InstaKillTextUser = ""
 	DoublePointsDuration = 0
 	FireSaleDuration = 0
 	InstakillDuration = 0
 	DumpsterCost = 950
-end
-
-function OnWaveStart()
-	waveActive = true
 end
 
 function rejuvenatorHit(damage, activator, caller)
@@ -40,7 +33,7 @@ function rejuvenatorHit(damage, activator, caller)
 		return
 	end
 
-	caller:AddCond(43, 5, activator)
+	caller:AddCond(TF_COND_REPROGRAMMED, 5, activator)
 
 	timer.Simple(5, function()
 		caller:Suicide()
@@ -50,7 +43,7 @@ end
 function chargerLogic(_, activator)
 	local callbacks = {}
 
-	local function removeCallbacks() 
+	local function removeCallbacks()
 		for _, callbackData in pairs(callbacks) do
 			activator:RemoveCallback(callbackData.Type, callbackData.ID)
 		end
@@ -58,29 +51,29 @@ function chargerLogic(_, activator)
 
 	callbacks.keypress = { -- Apply animation when bot pushes M2
 		Type = 7,
-		ID = activator:AddCallback(7, function(_, key)
+		ID = activator:AddCallback(ON_KEY_PRESSED, function(_, key)
 			if key ~= IN_ATTACK2 then
 				return
 			end
-			
-			if activator.m_flChargeMeter < 95 then -- from 100, so the chargers have a bit of a 'tell' when they're getting ready to charge
-                return
-            end
 
-			activator:PlaySequence("Charger_Charge") 
+			if activator.m_flChargeMeter < 95 then -- from 100, so the chargers have a bit of a 'tell' when they're getting ready to charge
+				return
+			end
+
+			activator:PlaySequence("Charger_Charge")
 		end),
 	}
 
 	callbacks.spawned = {
 		Type = 1,
-		ID = activator:AddCallback(1, function()
+		ID = activator:AddCallback(ON_SPAWN, function()
 			removeCallbacks()
 		end),
 	}
 
 	callbacks.died = {
 		Type = 9,
-		ID = activator:AddCallback(9, function()
+		ID = activator:AddCallback(ON_DEATH, function()
 			removeCallbacks()
 		end),
 	}
@@ -106,6 +99,9 @@ local function cashforhits(activator)
 
 		local damageType = damageInfo.DamageType
 		local hitter = damageInfo.Attacker
+		if not hitter or not hitter:IsRealPlayer() then
+			return
+		end
 
 		if (damageType & DMG_BURN) ~= 0 then
 			return
@@ -119,16 +115,16 @@ local function cashforhits(activator)
 
 		local curHealth = activator.m_iHealth
 
-		if InstakillDuration > 0 and activator.m_szNetname == "Zombie" and hitter:InCond(56) == true then --instakill functionality -washy
+		if InstakillDuration > 0 and hitter:InCond(TF_COND_CRITBOOSTED_CARD_EFFECT) and activator.CanBeInstakilled then --instakill functionality -washy
 			damage = curHealth
 			activator.m_iHealth = 0
 		end
-		
+
 		if damage > curHealth and activator.m_szNetname == "Tank" then -- snuck in here so we don't need a separate function for it
 			hitter:SpeakResponseConcept("TLK_MVM_TANK_DEAD") -- ding dong the tank is dead
 		end
-		
-		if activator.m_szNetname == "Zombie" and hitter.m_szNetname == "Tank" then
+
+		if activator.CanBeInstakilled and hitter.m_szNetname == "Tank" then
 			damage = curHealth
 			activator.m_iHealth = 0 -- if converted zombie is hit by Tank, treat it as Instakill
 		end
@@ -150,24 +146,24 @@ local function cashforhits(activator)
 		end
 
 		if (damageType & DMG_BLAST) ~= 0 then
-            addCurrency(75) -- used to be 50
-        --    print("explosive?")
+			addCurrency(75) -- used to be 50
+		--	print("explosive?")
 		elseif (damageType & DMG_MELEE) ~= 0 then
 			addCurrency(150)
-		--    print("melee?")
-        elseif (damageType & DMG_MELEE) == 0 and (damageType & DMG_CRITICAL) ~= 0 then -- this is used for headshots, may overlap with Instakill
-            addCurrency(100)
-        --    print("crit?")
-        elseif (damageType & DMG_BULLET) ~= 0 then
-            addCurrency(75)
-        --    print("bullet?")
+		--	print("melee?")
+		elseif (damageType & DMG_MELEE) == 0 and (damageType & DMG_CRITICAL) ~= 0 then -- this is used for headshots, may overlap with Instakill
+			addCurrency(100)
+		--	print("crit?")
+		elseif (damageType & DMG_BULLET) ~= 0 then
+			addCurrency(75)
+		--	print("bullet?")
 		elseif (damageType & DMG_USE_HITLOCATIONS) ~= 0 then
-            addCurrency(75)
-        --    print("fancier bullet?")
-        else
-            addCurrency(75)
-        --    print("hell if I know")
-        end ]]
+			addCurrency(75)
+		--	print("fancier bullet?")
+		else
+			addCurrency(75)
+		--	print("hell if I know")
+		end ]]
 	end)
 
 	callbacks.killed = activator:AddCallback(ON_DEATH, function(_, damageInfo)
@@ -194,11 +190,11 @@ local function cashforhits(activator)
 
 		local curHealth = activator.m_iHealth
 
-		if InstakillDuration > 0 and activator.m_szNetname == "Zombie" and hitter:InCond(56) == true then --instakill functionality -washy
+		if InstakillDuration > 0 and activator.CanBeInstakilled and hitter:InCond(TF_COND_CRITBOOSTED_CARD_EFFECT) then --instakill functionality -washy
 			damage = curHealth
 			activator.m_iHealth = 0
 		end
-		
+
 		if damage > curHealth and activator.m_szNetname == "Tank" then -- snuck in here so we don't need a separate function for it
 			hitter:SpeakResponseConcept("TLK_MVM_TANK_DEAD") -- ding dong the tank is dead
 		end
@@ -208,36 +204,44 @@ local function cashforhits(activator)
 		end
 
 		if (damageType & DMG_BLAST) ~= 0 then
-            addCurrency(65) -- used to be 50
-        --    print("explosive?")
+			addCurrency(65) -- used to be 50
+		--	print("explosive?")
 		elseif (damageType & DMG_MELEE) ~= 0 then
 			addCurrency(140)
-		--    print("melee?")
-        elseif (damageType & DMG_MELEE) == 0 and (damageType & DMG_CRITICAL) ~= 0 then -- this is used for headshots, may overlap with Instakill
-            addCurrency(90)
-        --    print("crit?")
-        elseif (damageType & DMG_BULLET) ~= 0 then
-            addCurrency(65)
-        --    print("bullet?")
+		--	print("melee?")
+		elseif (damageType & DMG_MELEE) == 0 and (damageType & DMG_CRITICAL) ~= 0 then -- this is used for headshots, may overlap with Instakill
+			addCurrency(90)
+		--	print("crit?")
+		elseif (damageType & DMG_BULLET) ~= 0 then
+			addCurrency(65)
+		--	print("bullet?")
 		elseif (damageType & DMG_USE_HITLOCATIONS) ~= 0 then
-            addCurrency(65)
-        --    print("fancier bullet?")
-        else
-            addCurrency(65)
-        --    print("hell if I know")
-        end
+			addCurrency(65)
+		--	print("fancier bullet?")
+		else
+			addCurrency(65)
+		--	print("hell if I know")
+		end
 	end)
 
-	callbacks.spawned = activator:AddCallback(1, function()
+	callbacks.spawned = activator:AddCallback(ON_SPAWN, function()
 		removeCallbacks()
 	end)
 
-	callbacks.died = activator:AddCallback(9, function()
+	callbacks.died = activator:AddCallback(ON_DEATH, function()
 		removeCallbacks()
 	end)
 end
 
-function OnWaveSpawnBot(bot)
+function OnWaveSpawnBot(bot, wave, tags)
+	bot.CanBeInstakilled = true
+    for _, tag in pairs(tags) do
+        if tag == "bigguyalert" then
+            bot.CanBeInstakilled = false
+			break
+        end
+    end
+
 	timer.Simple(1, function()
 		cashforhits(bot)
 	end)
@@ -245,20 +249,20 @@ end
 
 function playertracker(_, activator) -- the only other thing here made by Sntr
 	local callbacks = {}
-	
+
 	local function removeCallbacks()
 		for _, callbackId in pairs(callbacks) do
 			activator:RemoveCallback(callbackId)
 		end
 	end
-	
+
 	local function DeathCounter()
 		if not waveActive then
 			return
 		end
 
 		local deathcount = 	deathCounts[activator:GetHandleIndex()]
-	
+
 		if deathcount >= 3 and deathcount < 4
 		then
 			util.PrintToChat(activator,"You have received a $750 comeback bonus.")
@@ -275,9 +279,9 @@ function playertracker(_, activator) -- the only other thing here made by Sntr
 			activator:AddCurrency(3000)
 		end
 	end
-	
+
 	callbacks.damagetype = activator:AddCallback(ON_DAMAGE_RECEIVED_PRE, function(_, damageInfo)
-		if activator:InCond(5) == true then
+		if activator:InCond(TF_COND_INVULNERABLE) then
 			return
 		end
 
@@ -290,9 +294,9 @@ function playertracker(_, activator) -- the only other thing here made by Sntr
 
 		local damage = damageInfo.Damage
 		local curHealth = activator.m_iHealth
-				
-		if damage > curHealth and activator:InCond(129) == true then --  give full heal + uber when condition 70 is removed
-			activator:AddCond(5,2.5)
+
+		if damage > curHealth and activator:InCond(TF_COND_POWERUPMODE_DOMINANT) then -- give full heal + uber when condition 70 is removed
+			activator:AddCond(TF_COND_INVULNERABLE, 2.5)
 			activator:AddHealth(300,1)
 			activator:PlaySoundToSelf("misc/halloween/merasmus_stun.wav")
 			activator:RemoveCond(129)
@@ -300,27 +304,27 @@ function playertracker(_, activator) -- the only other thing here made by Sntr
 			activator.vm_quickrev = false -- added this for compatibility -washy
 		end
 	end)
-	
+
 --	callbacks.output = activator:AddCallback(ON_INPUT, function(_, medicbonus_relay)
 --
 --		local playerclass = activator.m_iClass
 --		local playercount = math_counter.m_OutValue
---	
+--
 --		if playerclass == 5
 --		then
 --			activator:AddCurrency( playercount * 75 )
 --		end
 --	end)
-		
-	callbacks.spawned = activator:AddCallback(1, function()
+
+	callbacks.spawned = activator:AddCallback(ON_SPAWN, function()
 		removeCallbacks()
 	end)
 
-	callbacks.died = activator:AddCallback(9, function()
+	callbacks.died = activator:AddCallback(ON_DEATH, function()
 		removeCallbacks()
 		DeathCounter()
 	end)
-	
+
 end
 
 -- and here's the stuff made by Washy
@@ -334,12 +338,23 @@ function OnWaveReset()
 			end
 		end
 	end
-	timer.Stop(TextDisplay)
+
+	if TextDisplay > -1 then
+		timer.Stop(TextDisplay)
+		TextDisplay = -1
+	end
 end
 
 function OnGameTick()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
+			if not player.HasEverSelectedClass and player.m_iDesiredPlayerClass ~= TF_CLASS_UNDEFINED then
+				if Gamerules.m_iRoundState ~= GR_STATE_BETWEEN_RNDS then
+					player:Print(PRINT_TARGET_CENTER, "You will spawn when the round ends.")
+				end
+				player.HasEverSelectedClass = true
+			end
+
 			if player.m_bUsingActionSlot == 1 and player.InteractCooldown ~= true then
 				player.HoldTime = player.HoldTime + 1
 				if player.HoldTime > 13 and player.InteractWith ~= "nothing" then
@@ -385,16 +400,19 @@ function OnGameTick()
 	end
 	if InstakillDuration > 0 then
 		InstakillDuration = InstakillDuration - 1
-		InstakillText = "Instakill: ".. math.floor(InstakillDuration/66+1)
+		InstakillText = "Instakill (" .. InstakillTextUser .. "): " .. math.floor(InstakillDuration / 66 + 1)
 	else
 		InstakillText = ""
+		InstakillTextUser = ""
 	end
 end
 
 function OnPlayerConnected(player)
 	if player:IsRealPlayer() then
+		player.HasEverSelectedClass = player.m_iDesiredPlayerClass ~= TF_CLASS_UNDEFINED
 		player.HoldTime = 0
 		player.InteractWith = "nothing"
+		player.TouchingReviveMarker = nil
 		player.InteractCooldown = false
 		player.loadout = {[0] = "Default", [1] = "Default", [2] = "Default"}
 		player.m_nCurrencyDiff = 0
@@ -402,7 +420,7 @@ function OnPlayerConnected(player)
 		local handle = player:GetHandleIndex()
 
 		deathCounts[handle] = 0
-	
+
 		player:AddCallback(ON_DEATH, function()
 			deathCounts[handle] = deathCounts[handle] + 1
 		end)
@@ -414,11 +432,11 @@ function OnPlayerConnected(player)
 				end
 			end
 		end)
-		
+
 	else
 		player:AddCallback(ON_DEATH, function()
 			local number = math.random(1,100)
-			if number <= 3 then -- 3% chance 
+			if number <= 3 then -- 3% chance
 				DropPowerup(player)
 			end
 		end);
@@ -433,6 +451,7 @@ function ShuffleInPlace(t) --copied from stack overflow
 end
 
 function OnWaveStart()
+	ents.FindByName("red_respawnroom1"):Remove()
 	BoxTable = {}
 	waveActive = true
 	ThunderGunTaken = false
@@ -460,7 +479,7 @@ function OnWaveStart()
 			function(_, player)
 				if player:IsRealPlayer() then
 					player.InteractWith = "nothing"
-					player:Print(2,"")
+					player:Print(PRINT_TARGET_CENTER, "")
 				end
 			end)
 		ents.FindByName("vm_quickrevmsg"):AddCallback(ON_START_TOUCH,
@@ -473,7 +492,7 @@ function OnWaveStart()
 			function(_, player)
 				if player:IsRealPlayer() then
 					player.InteractWith = "nothing"
-					player:Print(2,"")
+					player:Print(PRINT_TARGET_CENTER, "")
 				end
 			end)
 		ents.FindByName("vm_speedmsg"):AddCallback(ON_START_TOUCH,
@@ -487,7 +506,7 @@ function OnWaveStart()
 			function(_, player)
 				if player:IsRealPlayer() then
 					player.InteractWith = "nothing"
-					player:Print(2,"")
+					player:Print(PRINT_TARGET_CENTER, "")
 				end
 			end)
 		ents.FindByName("vm_blastermsg"):AddCallback(ON_START_TOUCH,
@@ -500,7 +519,7 @@ function OnWaveStart()
 			function(_, player)
 				if player:IsRealPlayer() then
 					player.InteractWith = "nothing"
-					player:Print(2,"")
+					player:Print(PRINT_TARGET_CENTER, "")
 				end
 			end)
 		ents.FindByName("vm_dtmsg"):AddCallback(ON_START_TOUCH,
@@ -513,20 +532,22 @@ function OnWaveStart()
 			function(_, player)
 				if player:IsRealPlayer() then
 					player.InteractWith = "nothing"
-					player:Print(2,"")
+					player:Print(PRINT_TARGET_CENTER, "")
 				end
 			end)
 	end)
 	TextDisplay = timer.Create(1, function()
-		ents.FindByName("poweruptext"):AcceptInput("$SetKey$message",FireSaleText .. "\n" ..InstakillText .. "\n" ..DoublePointsText)
-		ents.FindByName("poweruptext"):AcceptInput("Display")
+		local poweruptext = ents.FindByName("poweruptext")
+		poweruptext.m_iszMessage = FireSaleText .. "\n" ..InstakillText .. "\n" ..DoublePointsText
+		poweruptext:AcceptInput("Display")
 		ents.FindByName("enemytext"):AcceptInput("Display")
-		ents.FindByName("roundtext"):AcceptInput("Display") end, 0)
+		-- ents.FindByName("roundtext"):AcceptInput("Display")
+	end, 0)
 end
 
 function Interact(player)
 	if player.InteractWith == "revive_button" then -- trigger_multiple attached to reanimator
-		ents.FindByName("revive_button"):AcceptInput("Press",_,player)
+		ents.FindByName("revive_button"):AcceptInput("Press", _, player)
 		timer.Simple(1, function() player.InteractCooldown = true end) -- put way in the start because I hope I don't break the rest of this function
 		timer.Simple(2.3, function() player.InteractCooldown = false end)
 	end
@@ -562,16 +583,16 @@ function Interact(player)
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
 		else
-			player:Print(2,"You already have this perk!")
+			player:Print(PRINT_TARGET_CENTER, "You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_quickrevbutton" and player.m_nCurrency >= 1500 then
-		if player:InCond(70) == false then
+		if not player:InCond(TF_COND_PREVENT_DEATH) then
 			ents.FindByName("vm_quickrevbutton"):AcceptInput("Press",_,player)
 			if player:GetPlayerItemBySlot(1):GetClassname() ~= "tf_weapon_pipebomblauncher" then PlayViewmodelSequence(player) end
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
-		elseif player:InCond(70) == true then
-			player:Print(2,"You already have this perk!")
+		elseif player:InCond(TF_COND_PREVENT_DEATH) then
+			player:Print(PRINT_TARGET_CENTER, "You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_speedbutton" and player.m_nCurrency >= 3000 then
 		if player:GetAttributeValue("move speed bonus") == nil then
@@ -580,7 +601,7 @@ function Interact(player)
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
 		else
-			player:Print(2,"You already have this perk!")
+			player:Print(PRINT_TARGET_CENTER, "You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_blasterbutton" and player.m_nCurrency >= 1500 then
 		if player:GetAttributeValue("explosive sniper shot") == nil then
@@ -589,7 +610,7 @@ function Interact(player)
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
 		else
-			player:Print(2,"You already have this perk!")
+			player:Print(PRINT_TARGET_CENTER, "You already have this perk!")
 		end
 	elseif player.InteractWith == "vm_dtbutton" and player.m_nCurrency >= 2000 then
 		if player:GetAttributeValue("fire rate bonus") == nil then
@@ -598,7 +619,7 @@ function Interact(player)
 			timer.Simple(1, function() player.InteractCooldown = true end)
 			timer.Simple(2.3, function() player.InteractCooldown = false end)
 		else
-			player:Print(2,"You already have this perk!")
+			player:Print(PRINT_TARGET_CENTER, "You already have this perk!")
 		end
 	end
 end
@@ -668,7 +689,7 @@ function ActivateDoublePoints()
 	DoublePointsDuration = 1980 -- 1980 ticks divided by 66 tick rate = 30 seconds
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
-			player:Print(2,"Double Points!")
+			player:Print(PRINT_TARGET_CENTER, "Double Points!")
 			player:PlaySoundToSelf("shadows/powerup_doublepoints.mp3")
 			player:PlaySoundToSelf("ui/quest_status_tick_advanced.wav")
 		end
@@ -678,7 +699,7 @@ end
 function ActivateFireSale()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
-			player:Print(2,"Fire Sale!")
+			player:Print(PRINT_TARGET_CENTER, "Fire Sale!")
 			player:PlaySoundToSelf("shadows/powerup_firesale01.mp3")
 			player:PlaySoundToSelf("mvm/mvm_bought_upgrade.wav")
 			if FireSaleDuration <= 0 then
@@ -704,8 +725,10 @@ function ActivateFireSale()
 				ents.FindByName("dumpster_warp_eff"..box):AcceptInput("Start")
 				ents.FindByName("dumpster_warp_beam"..box):AcceptInput("Stop")
 				ents.FindByName("dumpster_disappear"..box):AcceptInput("PlaySound")
-				timer.Simple(1, function() ents.FindByName("dumpster_prop"..box):AcceptInput("$TeleportToEntity","dumpster_tele_out") end)
-				timer.Simple(1, function() ents.FindByName("dumpster_msg"..box):AcceptInput("Disable") end)
+				timer.Simple(1, function()
+					ents.FindByName("dumpster_prop"..box):AcceptInput("$TeleportToEntity","dumpster_tele_out")
+				end)
+				ents.FindByName("dumpster_msg"..box):AcceptInput("DisableAndEndTouch")
 				BoxTable[box].spawned = false
 				BoxTable[DumpsterRouletteIndex].dud = true
 			end
@@ -716,10 +739,18 @@ end
 
 function ActivateInstakill(_,player)
 	InstakillDuration = 1980 -- 1980 ticks divided by 66 tick rate = 30 seconds
-		player:Print(2,"Instakill!")
-		player:PlaySoundToSelf("items/powerup_pickup_crits.wav")
-		player:PlaySoundToSelf("shadows/powerup_instagib.mp3")
-		player:AddCond(56,30)
+
+	InstakillTextUser = player.m_szNetname
+	-- This is a bad way of truncating, but string.len() seems broken in raflua (always returns 0).
+	local truncate = InstakillTextUser:sub(10)
+	if truncate ~= "" then
+		InstakillTextUser = InstakillTextUser:sub(1, 10) .. "..."
+	end
+
+	player:Print(PRINT_TARGET_CENTER, "Instakill!")
+	player:PlaySoundToSelf("items/powerup_pickup_crits.wav")
+	player:PlaySoundToSelf("shadows/powerup_instagib.mp3")
+	player:AddCond(TF_COND_CRITBOOSTED_CARD_EFFECT, 30)
 end
 
 function ActivateNuke()
@@ -735,7 +766,7 @@ end
 function ActivateMaxAmmo()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
-			player:Print(2,"Max Ammo!")
+			player:Print(PRINT_TARGET_CENTER, "Max Ammo!")
 			player:PlaySoundToSelf("items/powerup_pickup_agility.wav")
 			player:PlaySoundToSelf("shadows/powerup_resupply_01.mp3")
 			player:PlaySoundToSelf("weapons/dispenser_generate_metal.wav")
@@ -747,7 +778,7 @@ end
 function ActivateBonusPoints()
 	for _, player in pairs(ents.GetAllPlayers()) do
 		if player:IsRealPlayer() then
-			player:Print(2,"Bonus Points!")
+			player:Print(PRINT_TARGET_CENTER, "Bonus Points!")
 			player:AcceptInput("$AddCurrency",2000)
 			player:PlaySoundToSelf("shadows/powerup_money_01.mp3")
 			player:PlaySoundToSelf("mvm/mvm_money_pickup.wav")
@@ -894,7 +925,7 @@ BoxRoulette =
 function SpawnDumpsterBox(box)
 	if FireSaleDuration <= 0 then
 		BoxTable[box].firesale = false
-		BoxTable[box].dud = true	
+		BoxTable[box].dud = true
 	end
 	if BoxTable[box].spawned == false then
 		BoxTable[box].spawned = true
@@ -919,14 +950,14 @@ function SpawnDumpsterBox(box)
 		function(_, player)
 			if player:IsRealPlayer() then
 				player.InteractWith = "dumpsterbutton"..box
-				player:Print(2,"Hold Action key to receive a weapon for $"..DumpsterCost)
+				player:Print(PRINT_TARGET_CENTER, "Hold Action key to receive a weapon for $"..DumpsterCost)
 			end
 		end)
 		ents.FindByName("dumpster_msg"..box):AddCallback(ON_END_TOUCH,
 		function(_, player)
 			if player:IsRealPlayer() then
 				player.InteractWith = "nothing"
-				player:Print(2,"")
+				player:Print(PRINT_TARGET_CENTER, "")
 			end
 		end)
 	end
@@ -988,7 +1019,7 @@ function OpenDumpsterBox(player, box)
 					function(_, player)
 						if player:IsRealPlayer() and player == owner then
 							player.InteractWith = "tradeweapon"..box
-							player:Print(2,"Hold Action key to trade your " .. BoxTable[box].slot .. " weapon with " .. BoxTable[box].text)
+							player:Print(PRINT_TARGET_CENTER, "Hold Action key to trade your " .. BoxTable[box].slot .. " weapon with " .. BoxTable[box].text)
 						end
 					end)
 				ents.FindByName("dumpster_msg"..box):AcceptInput("Enable")
@@ -1011,7 +1042,7 @@ function OpenDumpsterBox(player, box)
 				function(_, player)
 					if player:IsRealPlayer() and player == owner then
 						player.InteractWith = "tradeweapon"..box
-						player:Print(2,"Hold Action key to trade your " .. BoxTable[box].slot .. " weapon with " .. BoxTable[box].text)
+						player:Print(PRINT_TARGET_CENTER, "Hold Action key to trade your " .. BoxTable[box].slot .. " weapon with " .. BoxTable[box].text)
 					end
 				end)
 			else
@@ -1019,7 +1050,7 @@ function OpenDumpsterBox(player, box)
 					function(_, player)
 						if player:IsRealPlayer() and player == owner then
 							player.InteractWith = "tradeweapon"..box
-							player:Print(2,"Hold Action key to trade your " .. BoxTable[box].slot .. " weapon with " .. BoxTable[box].text)
+							player:Print(PRINT_TARGET_CENTER, "Hold Action key to trade your " .. BoxTable[box].slot .. " weapon with " .. BoxTable[box].text)
 						end
 					end)
 				ents.FindByName("dumpster_msg"..box):AcceptInput("Enable")
@@ -1034,7 +1065,7 @@ function OpenDumpsterBox(player, box)
 				function(_, player)
 					if player:IsRealPlayer() then
 						player.InteractWith = "dumpsterbutton"..box
-						player:Print(2,"Hold Action key to receive a weapon for $"..DumpsterCost)
+						player:Print(PRINT_TARGET_CENTER, "Hold Action key to receive a weapon for $"..DumpsterCost)
 					end
 				end)
 			timer.Simple(1, function() ents.FindByName("dumpster_msg"..box):AcceptInput("Enable") end)
@@ -1076,7 +1107,7 @@ function DumpsterBoxTakeWeapon(player, box)
 	function(_, player)
 		if player:IsRealPlayer() then
 			player.InteractWith = "dumpsterbutton"..box
-			player:Print(2,"Hold Action key to receive a weapon for $"..DumpsterCost)
+			player:Print(PRINT_TARGET_CENTER, "Hold Action key to receive a weapon for $"..DumpsterCost)
 		end
 	end)
 	timer.Simple(1, function() ents.FindByName("dumpster_msg"..box):AcceptInput("Enable") end)
@@ -1096,54 +1127,179 @@ function GiveSuperShank(_,player)
 	player.loadout[2] = "Super Shank"
 end
 
-function spawn_revive_marker(_,activator) -- return of Sntr, the logic below is a portover from Titanium Thieves
+-- return of Sntr, the logic below is a portover from Titanium Thieves
+function spawn_revive_marker(_, activator)
+	local revive_marker = nil
 
-    for k, marker in pairs(ents.FindAllByClass("entity_revive_marker")) do
-        if marker.m_hOwner == activator then
-            templateEnts = ents.SpawnTemplate("Revivemarker", {parent = marker})
-			ents.FindByName("revive_trigger*"):AddCallback(ON_START_TOUCH,
-			function(_, player)
-				if player:IsRealPlayer() and player:IsAlive() then -- IsAlive is so dead people somehow don't interact with the button
-					player.InteractWith = "revive_button"
-				end
-			end)
-			ents.FindByName("revive_trigger*"):AddCallback(ON_END_TOUCH,
-			function(_, player)
-				if player:IsRealPlayer() then
-					player.InteractWith = "nothing"
-					player:Print(2,"")
-				end
-			end)
-        end
-    end
+	for _, marker in pairs(ents.FindAllByClass("entity_revive_marker")) do
+		if marker.m_hOwner == activator then
+			revive_marker = marker
+		end
+	end
+
+	if (not revive_marker) then
+		return
+	end
+
+	if Gamerules.m_iRoundState == GR_STATE_BETWEEN_RNDS then
+		timer.Simple(5.0, function()
+			if (not activator:IsAlive()) then
+				activator:ForceRespawnDead()
+			end
+		end)
+	end
+
+	local template_ents = ents.SpawnTemplate("Revivemarker", {parent = revive_marker})
+	local revive_trigger = template_ents[1]
+
+	revive_trigger:AddCallback(ON_START_TOUCH, function(_, player)
+		if player:IsRealPlayer() then
+			player.InteractWith = "revive_button"
+			player.TouchingReviveMarker = revive_marker
+		end
+	end)
+
+	revive_trigger:AddCallback(ON_END_TOUCH, function(_, player)
+		if player:IsRealPlayer() then
+			-- TODO: Clearing InteractWith like this will introduce targeting issues
+			--        for multiple overlapping triggers.
+			--       Should use some kind of queue that tracks all of these and sets
+			--        InteractWith based on priority in that queue and touch recency.
+			player:Print(PRINT_TARGET_CENTER, "")
+			player.InteractWith = "nothing"
+			player.TouchingReviveMarker = nil
+		end
+	end)
 end
 
-function revivelogic(_,activator) -- haw haw now start living
-    -- There's now Mince in here as well, everyone's invited to Shadows
-    if (not IsValid(activator) or not activator:IsAlive()) then return; end -- still has the thing where it stays active!!
-    
-    activator:TauntFromItem("Laugh Taunt")
-    local think_timer = nil;
-    local found_animator = false;
-    think_timer = timer.Simple(0.65, function()
-        for _, reanimator in pairs(ents.FindInSphere(activator:GetAbsOrigin(), 150)) do
-            if reanimator:GetClassname() == "entity_revive_marker" then
-            found_animator = true;
+function revivelogic(_, activator) -- haw haw now start living
+	-- There's now Mince in here as well, everyone's invited to Shadows
+	-- still has the thing where it stays active!!
+	if (not IsValid(activator) or not activator:IsAlive()) then
+		return
+	end
 
-            reanimator.m_hOwner:ForceRespawnDead()
-            reanimator.m_hOwner:PlaySoundToSelf("mvm/mvm_revive.wav")
-            reanimator.m_hOwner:SpeakResponseConcept("TLK_RESURRECTED")
-            activator:PlaySoundToSelf("mvm/mvm_revive.wav")
-            reanimator.m_hOwner:Teleport(activator:GetAbsOrigin())
-            reanimator.m_hOwner:AddCond(51,2) -- give invulnerability to revived players
-            activator:StunPlayer(0.2,1,TF_STUNFLAG_BONKSTUCK)
-        --    activator:AddCurrency(50) -- damn it people
-			return 	-- we did it reddit
-			end
-        end
+	-- No reviving while midair.
+	if (not activator.m_hGroundEntity) then
+		return
+	end
 
-        if not found_animator then
-          pcall(timer.Stop, think_timer);
-        end
-    end)
+	local reanimator = activator.TouchingReviveMarker
+
+	activator:SetAttributeValue("always allow taunt", 1)
+	activator:TauntFromItem("Laugh Taunt")
+
+	think_timer = timer.Simple(0.65, function()
+		if (not IsValid(activator) or not activator:IsAlive()) then
+			return
+		end
+		activator:SetAttributeValue("always allow taunt", 0)
+		activator:StunPlayer(0, 1, TF_STUNFLAG_BONKSTUCK)
+		activator.m_hActiveWeapon:RemoveEffects(EF_NODRAW)
+
+		-- The revive marker may be removed in the time it takes us to complete
+		--  the revive process.
+		if (reanimator:IsValid()) then
+			reanimator.m_hOwner:ForceRespawnDead()
+			reanimator.m_hOwner:Teleport(activator:GetAbsOrigin())
+			reanimator.m_hOwner:AddCond(TF_COND_INVULNERABLE_HIDE_UNLESS_DAMAGED, 2)
+			reanimator.m_hOwner:PlaySound("MVM.PlayerRevived")
+			reanimator.m_hOwner:SpeakResponseConcept("TLK_RESURRECTED")
+		end
+	end)
+end
+
+function AddLateJoiners(_)
+	for _, player in pairs(ents.GetAllPlayers()) do
+		if player:IsRealPlayer() and player.m_iTeamNum == TEAM_RED and player.m_iClass == TF_CLASS_UNDEFINED then
+			player:SwitchClassInPlace(player.m_iDesiredPlayerClass) -- SwitchClass does not work but this arrangement does.
+			player:ForceRespawn()
+		end
+	end
+end
+
+function AddSnapToGroundCallback(targetname)
+	prop = ents.FindByName(targetname)
+
+	prop:AddCallback(ON_INPUT, function(entity, inputName, value, activator, caller)
+		if (inputName:lower() ~= "enable") then
+			return
+		end
+
+		local result = util.Trace(
+		{
+			start = entity:GetAbsOrigin(),
+			distance = MAX_COORD_FLOAT,
+			angles = Vector(90.0, 0.0, 0.0),
+			mask = MASK_PLAYERSOLID_BRUSHONLY
+		})
+
+		if result.Hit then
+			entity:SetAbsOrigin(result.HitPos)
+		end
+	end)
+end
+
+TutorialAnnotations =
+{
+	"Money is earned by dealing damage and killing enemies.",
+	"Enemies become faster and stronger each round.",
+	"You can revive teammates by holding the Action key at their reanimator.",
+	"You can purchase Perk Bonuses from vending machines around the map.",
+	"Perk Bonuses are not permanent and are lost on death.",
+	"Perk Bonuses stack with your weapon upgrades.",
+	"Perk Bonuses cannot be purchased multiple times per life.",
+	"You can also receive random weapons from your local Weapons Dumpster.",
+	"Dumpster Weapons are returned to you after respawning.",
+	"Medics supply ammo and health to nearby teammates.",
+	"Moving and crouching both affect your accuracy.",
+	"Powerups have a chance to drop from zombies during waves.",
+	"Powerups despawn 30 seconds after being dropped."
+}
+CurrentTutorialAnnotation = 1
+TutorialTimer = -1
+
+function StartTutorial()
+	if Gamerules.m_iRoundState ~= GR_STATE_BETWEEN_RNDS then
+		return
+	end
+
+	FireEvent("show_annotation",
+	{
+		text = TutorialAnnotations[CurrentTutorialAnnotation],
+		lifetime = 4,
+		worldPosX = 328,
+		worldPosY = -150,
+		worldPosZ = 52,
+		play_sound = "misc/null.wav"
+	})
+
+	if CurrentTutorialAnnotation >= #TutorialAnnotations then
+		CurrentTutorialAnnotation = 1
+	else
+		CurrentTutorialAnnotation = CurrentTutorialAnnotation + 1
+	end
+
+	TutorialTimer = timer.Create(4.0, StartTutorial)
+end
+
+function StopTutorial()
+	FireEvent("hide_annotation", {})
+
+	if TutorialTimer ~= -1 then
+		timer.Stop(TutorialTimer)
+		TutorialTimer = -1
+	end
+end
+
+precache.PrecacheSound("ui/hint.wav")
+
+function ShowDumpsterAnnotation()
+	FireEvent("show_annotation",
+	{
+		text = "Follow the beam of light to find the Weapons Dumpster!",
+		lifetime = 5,
+		play_sound = "ui/hint.wav",
+		follow_entindex = ents.FindByName("dumpster_prop" .. DumpsterRoulette[1]):GetNetIndex()
+	})
 end

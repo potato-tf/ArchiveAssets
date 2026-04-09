@@ -13,9 +13,9 @@
 
 	teledestination_array =
 	[
-		Vector(-500, 200, -250), Vector(1100, 0, -400), Vector(500, 200, -250), // back
+		Vector(-500, 200, -250), Vector(1100, -150, -400), Vector(500, 200, -250), // back
 		Vector(-100, -1400, -150), Vector(500, -700, -150), // middle
-		Vector(1000, -2000, -400), Vector(-600, -1700, -380) // front
+		Vector(1000, -1700, -400), Vector(-600, -1700, -380) // front
 	]
 
 	teleport_status = "disabled"
@@ -86,7 +86,7 @@
 	tele_spot_back2 = SpawnEntityFromTable("prop_dynamic",
 	{
 		targetname    = "tele_spot_back2"
-		origin        = Vector(1100, 0, -413)
+		origin        = Vector(1100, -150, -413)
 		angles        = QAngle(0, -90, 0)
 		StartDisabled = 1
 		model         = "models/props_mvm/robot_spawnpoint.mdl"
@@ -97,7 +97,7 @@
 	skybeam_tele_spot_back2 = SpawnEntityFromTable("info_particle_system",
 	{
 		targetname    	   = "tele_spot_skybeam_back2"
-		origin        	   = Vector(1100, 0, -413)
+		origin        	   = Vector(1100, -150, -413)
 		angles             = QAngle(0, 90, 0)
 		start_active       = 0,
 		effect_name        = "teleporter_mvm_bot_persist"
@@ -166,7 +166,7 @@
 	tele_spot_forward1 = SpawnEntityFromTable("prop_dynamic",
 	{
 		targetname    = "tele_spot_forward1"
-		origin        = Vector(1000, -2000, -407)
+		origin        = Vector(1000, -1700, -407)
 		angles        = QAngle(0, 90, 0)
 		StartDisabled = 1
 		model         = "models/props_mvm/robot_spawnpoint.mdl"
@@ -177,7 +177,7 @@
 	skybeam_tele_spot_forward1 = SpawnEntityFromTable("info_particle_system",
 	{
 		targetname    	   = "tele_spot_skybeam_forward1"
-		origin        	   = Vector(1000, -2000, -407)
+		origin        	   = Vector(1000, -1700, -407)
 		angles             = QAngle(0, 90, 0)
 		start_active       = 0,
 		effect_name        = "teleporter_mvm_bot_persist"
@@ -404,11 +404,11 @@
 		EntFireByHandle(gamerules_entity, "PlayVO", "supplydrop_morse.wav", -1.0, null, null)
 		
 		EntFireByHandle(gamerules_entity, "RunScriptCode", "SupplyDropTeles_SpawnHeliTemplate(`back1`, -500, 200)", RandomFloat(1.0, 5.0), null, null);
-		EntFireByHandle(gamerules_entity, "RunScriptCode", "SupplyDropTeles_SpawnHeliTemplate(`back2`, 1100, 0)", RandomFloat(1.0, 5.0), null, null);
+		EntFireByHandle(gamerules_entity, "RunScriptCode", "SupplyDropTeles_SpawnHeliTemplate(`back2`, 1100, -150)", RandomFloat(1.0, 5.0), null, null);
 		EntFireByHandle(gamerules_entity, "RunScriptCode", "SupplyDropTeles_SpawnHeliTemplate(`back3`, 500, 200)", RandomFloat(1.0, 5.0), null, null);
 		EntFireByHandle(gamerules_entity, "RunScriptCode", "SupplyDropTeles_SpawnHeliTemplate(`middle1`, -100, -1400)", RandomFloat(1.0, 5.0), null, null);
 		EntFireByHandle(gamerules_entity, "RunScriptCode", "SupplyDropTeles_SpawnHeliTemplate(`middle2`, 500, -700)", RandomFloat(1.0, 5.0), null, null);
-		EntFireByHandle(gamerules_entity, "RunScriptCode", "SupplyDropTeles_SpawnHeliTemplate(`forward1`, 1000, -2000)", RandomFloat(1.0, 5.0), null, null);
+		EntFireByHandle(gamerules_entity, "RunScriptCode", "SupplyDropTeles_SpawnHeliTemplate(`forward1`, 1000, -1700)", RandomFloat(1.0, 5.0), null, null);
 		EntFireByHandle(gamerules_entity, "RunScriptCode", "SupplyDropTeles_SpawnHeliTemplate(`forward2`, -600, -1700)", RandomFloat(1.0, 5.0), null, null);
 		
 		for (local i = 1; i <= Constants.Server.MAX_PLAYERS; i++)

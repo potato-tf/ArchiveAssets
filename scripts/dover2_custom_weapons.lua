@@ -209,7 +209,7 @@ local function getAllPlayersInBusterExplosion(blastCenter, blastRadius)
         if blastVictim:IsPlayer() == false then
             goto continue
         end
-        
+
         if blastVictim:IsAlive() == false then
             goto continue
         end
@@ -217,7 +217,7 @@ local function getAllPlayersInBusterExplosion(blastCenter, blastRadius)
 		if blastVictim.m_iTeamNum ~= 3 then
 			goto continue
 		end
-        
+
         -- Jank af, didnt use
 
         -- local hitEntityFromBlast = fireTraceBetweenTwoEntities(blastCenter, blastVictim)
@@ -875,7 +875,7 @@ function BTEquip(_, activator)
 		--Reset model
 		activator:SetCustomModel("")
 	end)
-	
+
 
 	if callbacks.bt[handle] then
 		BTUnequip(activator, handle)
@@ -905,7 +905,7 @@ function BTEquip(_, activator)
 	end)
 
 	btCallbacks.onmouse2 = activator:AddCallback(ON_KEY_PRESSED, function(ent, key)
-		
+
 		--mouse2 is 2048
 		if key ~= 2048 or activator.m_flChargeMeter < 100 then
 			return
@@ -946,7 +946,7 @@ function BTEquip(_, activator)
 		end)
 
 		btTimers.tauntChecker = timer.Create(0.1, function()
-			
+
 			if not activator:InCond(TF_COND_TAUNTING) then
 				goto noTaunt
 			end
@@ -960,7 +960,7 @@ function BTEquip(_, activator)
 			end)
 
 			btTimers.detonatorLogicMain = timer.Create(1.95, function()
-				
+
 				activator:PlaySound("mvm/sentrybuster/mvm_sentrybuster_explode.wav")
 
 				--Is there no remove attribute?
@@ -998,18 +998,18 @@ function BTEquip(_, activator)
 						DamageForce = Vector(0,0,0), -- Knockback force of the attack
 						ReportedPosition = activator:GetAbsOrigin() -- Where the attacker attacked from
 					}
-			
+
 					if blastVictim.m_bIsMiniBoss == 1 then
 						BusterTakeDamage.Damage = BUSTER_TRANSFORMER_GIANT_DAMAGE
 						blastVictim:TakeDamage(BusterTakeDamage)
 						goto continue
 					end
-					
+
 					blastVictim:TakeDamage(BusterTakeDamage)
-			
+
 					::continue::
 				end
-			
+
 				for _, blastVictim in pairs(getAllSentriesInBusterExplosion(activator:GetAbsOrigin(), BUSTER_TRANSFORMER_BLAST_RADIUS)) do
 					BusterTakeDamage = {
 						Attacker = activator, -- Attacker
@@ -1023,7 +1023,7 @@ function BTEquip(_, activator)
 						ReportedPosition = activator:GetAbsOrigin() -- Where the attacker attacked from
 					}
 					blastVictim:TakeDamage(BusterTakeDamage)
-			
+
 					::continue::
 				end
 
@@ -1040,7 +1040,7 @@ function BTEquip(_, activator)
 						ReportedPosition = activator:GetAbsOrigin() -- Where the attacker attacked from
 					}
 					blastVictim:TakeDamage(BusterTakeDamage)
-			
+
 					::continue::
 				end
 
@@ -1048,7 +1048,7 @@ function BTEquip(_, activator)
 			end)
 			::noTaunt::
 		end, 0)
-		
+
 	end)
 end
 
@@ -1321,14 +1321,14 @@ function ThunderdomeEquipped(_, activator)
 			angles = shieldAngles,
 			spawnflags = 1,
 			teamnum = activator.m_iTeamNum,
+			renderamt = 150
 		}, true, true)
 
-
-		shield["$fakeparentoffset"] = shieldOffset
-		shield["$fakeparentrotation"] = shieldAngles
+		shield:SetLocalOrigin(shieldOffset)
+		shield:SetLocalAngles(shieldAngles)
 
 		shield:SetModel("models/props_mvm/mvm_comically_small_player_shield.mdl")
-		shield:SetFakeParent(rotate)
+		shield:AcceptInput("SetParent", "!activator", rotate)
 		local shieldName = namePrefix..tostring(shield:GetHandleIndex().."Shield")
 		shield:SetName(shieldName)
 
