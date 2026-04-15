@@ -50,13 +50,13 @@ if (!("ConstantNamingConvention" in ROOT))
 	{
 		if (AllowSpyUpdates)
 			return
-		
+
 		if (params["class"] != TF_CLASS_SPY)
 			return
 
 		local sound_string = params.count > 0 ? "Announcer.MVM_Spy_Alert" : "Announcer.mvm_spybot_death_all"
 
-		for (local i = MaxClients().tointeger(); --i;)
+		for (local i = MaxClients().tointeger(); i > 0; --i)
 		{
 			local player = PlayerInstanceFromIndex(i)
 			if (!player || player.IsBotOfType(TF_BOT_TYPE))
@@ -65,7 +65,7 @@ if (!("ConstantNamingConvention" in ROOT))
 			player.StopSound(sound_string)
 		}
 	}
-	
+
 	function OnGameEvent_stats_resetround(_)
 	{
 		if (GetRoundState() != GR_STATE_PREROUND)
