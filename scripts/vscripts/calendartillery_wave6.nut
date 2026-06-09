@@ -32,7 +32,7 @@ OnSpawn = function(bot,tag) {
 	EntFire("heavy_model_prop","RunScriptCode","self.GetScriptScope().NextAttackTime <- Time() + 0.1",0.1)
 	EntFire("heavy_model_prop","RunScriptCode","self.GetScriptScope().StopAnimation <- false",0.1)
 	EntFire("heavy_model_prop","RunScriptCode","TheGeneralsCarAddThink(self,!activator)",0.1,bot)
-	
+
 	::TheGeneralsHealth <- 1
 	::TheGeneralsOrigin <- bot.GetOrigin()
 	::TheGeneralsAngles <- bot.GetAbsAngles()
@@ -41,7 +41,7 @@ OnSpawn = function(bot,tag) {
 	bot.GetScriptScope().prizeFound <- false
 	bot.GetScriptScope().gotShotWhileSitting <- false
 	SetPropInt(bot, "m_debugOverlays", GetPropInt(bot, "m_debugOverlays") | OVERLAY_BUDDHA_MODE)
-	
+
 	bot.GetScriptScope().PlayerThinkTable.bossThink <- function() {
 		TheGeneralsHealth = fabs(self.GetHealth()) / fabs(self.GetMaxHealth())
 		TheGeneralsOrigin = self.GetOrigin()
@@ -54,20 +54,20 @@ OnSpawn = function(bot,tag) {
 			//Phase change handled through func for delay.
 			currentPhase = 2
 			EntFireByHandle(self,"CallScriptFunction","TheGeneralsPhaseChange",0.7,null,null)
-			
+
 			EmitSoundEx({
 			sound_name = "weapons/buff_banner_horn_blue.wav",
 			sound_level = 105,
 			entity = self
 			}); //900 HU
-			
+
 			for (local i = 1; i <= MaxPlayers ; i++)
 			{
 				local player = PlayerInstanceFromIndex(i)
 				if (player == null) continue
 				if (!player.IsBotOfType(TF_BOT_TYPE)) continue
-				if (GetPropInt(player, "m_lifeState") != 0) continue
-				
+				if (!player.IsAlive()) continue
+
 				if (player.HasBotTag("the_general_medic"))
 				{
 					player.AddCustomAttribute("move speed penalty",1,-1) //RemoveCustomAttribute didn't work. wack.
@@ -88,7 +88,7 @@ OnSpawn = function(bot,tag) {
 				child.DisableDraw();
 			TheGeneralsBattFlag.Destroy()
 			TheGeneralsBuffFlag.Destroy()
-			
+
 			SpawnTemplate("TheGeneralsDefeat",null,TheGeneralsOrigin);
 			EntFire("heavy_model_prop_defeat","RunScriptCode","self.GetScriptScope().StopAnimation <- false",0.1)
 			EntFire("heavy_model_prop_defeat","RunScriptCode","AddThinkToEnt(self,`TheGeneralsDefeatThink`)",0.1,bot)
@@ -98,20 +98,20 @@ OnSpawn = function(bot,tag) {
 				if (player == null) continue
 				if (!player.IsBotOfType(TF_BOT_TYPE)) continue
 				if (player == self) continue
-				
+
 				if (player.HasBotTag("the_general_medic"))
 				{
 					player.TakeDamage(999, DMG_GENERIC, PopExtUtil.Worldspawn)
 					continue
 				}
-				
+
 				self.AddCond(87) //FREEZE_INPUT
 				player.AddBotAttribute(IGNORE_ENEMIES)
 				player.AddBotAttribute(IGNORE_FLAG)
 				player.SetAbsOrigin(Vector(2940,-2960,-95)) //Spawnbot
 			}
 			EntFire("Classic_Mode_Intel","ForceResetAndDisableSilent") //Who names their intel like that?
-			
+
 			self.AddCond(87) //FREEZE_INPUT
 			self.AddBotAttribute(IGNORE_ENEMIES)
 			self.SetHealth(self.GetMaxHealth() * 0.05)
@@ -130,8 +130,8 @@ OnSpawn = function(bot,tag) {
 				local player = PlayerInstanceFromIndex(i)
 				if (player == null) continue
 				if (player.IsBotOfType(TF_BOT_TYPE)) continue
-				if (GetPropInt(player, "m_lifeState") != 0) continue
-				
+				if (!player.IsAlive()) continue
+
 				if (GetPropInt(PopExtUtil.GetItemInSlot(player,SLOT_MELEE),"m_AttributeManager.m_Item.m_iItemDefinitionIndex") == 1071)
 				{
 					prizeFound = true
@@ -143,12 +143,12 @@ OnSpawn = function(bot,tag) {
 }
 OnTakeDamage = function(bot,params) {
 	if (!(bot.GetScriptScope().currentPhase == 3)) return
-	
+
 	if (GetPropInt(params.weapon,"m_AttributeManager.m_Item.m_iItemDefinitionIndex") != 1071)
 		params.damage = params.damage * 0.2
 	else
 		params.damage = params.const_entity.GetHealth() + 1
-	
+
 	if (!bot.GetScriptScope().gotShotWhileSitting && bot.GetScriptScope().prizeFound && GetPropInt(params.weapon,"m_AttributeManager.m_Item.m_iItemDefinitionIndex") != 1071)
 	{
 		ClientPrint(null,3,"\x07F1C232The General \x078FCE00: Ah. How insulting it is, to be belittled in this way. You are a cruel bunch; in another path, I would have respected that in you.")
@@ -159,7 +159,7 @@ OnTakeDamage = function(bot,params) {
 		params.damage_type = DMG_NEVERGIB
 		for (local child = bot.FirstMoveChild(); child != null; child = child.NextMovePeer())
 			child.EnableDraw();
-		
+
 		EntFire("heavy_model_prop_defeat","Kill","",-1)
 	}
 }
@@ -173,7 +173,7 @@ OnTakeDamage = function(bot,params) {
 	SetPropBool(TheGeneralsPrize, "m_Item.m_bInitialized", true)
 	TheGeneralsPrize.SetModelSimple("models/weapons/c_models/c_frying_pan/c_frying_pan.mdl")
 	TheGeneralsPrize.SetSkin(2)
-	
+
 	local botOrigin = bot.GetOrigin()
 	::dropOrigin <- botOrigin
 	local desiredNav = null;
@@ -191,11 +191,11 @@ OnTakeDamage = function(bot,params) {
 	}
 	if (desiredNav != null)
 		dropOrigin = desiredNav.GetCenter();
-	
+
 	TheGeneralsPrize.SetAbsOrigin(dropOrigin)
 
 	TheGeneralsPrize.DispatchSpawn()
-	
+
 	ClientPrint(null,3,"\x07F1C232The General \x078FCE00: I ask only for a simple kindness: allow me to pass with vanity, in the absence of infamy.")
 	EntFire("prize_particle","RunScriptCode","self.SetAbsOrigin(dropOrigin)")
 	EntFire("prize_particle","SetParent","!activator",-1,TheGeneralsPrize)
@@ -208,13 +208,13 @@ OnTakeDamage = function(bot,params) {
 	for (local child = self.FirstMoveChild(); child != null; child = child.NextMovePeer())
 		child.EnableDraw();
 	::TheGeneralsBattFlag <- PopExtUtil.CreatePlayerWearable(self,"models/weapons/c_models/c_battalion_buffbanner/c_batt_buffbanner.mdl",true,"flag")
-	
+
 	::TheGeneralsBuffFlag <- PopExtUtil.CreatePlayerWearable(self,"models/weapons/c_models/c_buffbanner/c_buffbanner.mdl",false,"flag")
 	TheGeneralsBuffFlag.SetLocalAngles(QAngle(90,-90,20))
 	TheGeneralsBuffFlag.SetLocalOrigin(Vector(-5,30,-10))
-	
+
 	self.RemoveBotAttribute(SUPPRESS_FIRE)
-	
+
 	SpawnTemplate("TheGeneralsBuffs",self,"","",true)
 	SINS.ChangeClassIcon(self,"heavy_buff_backup_v1")
 }
@@ -265,7 +265,7 @@ OnTakeDamage = function(bot,params) {
 }
 ::TheGeneralsDefeatThink <- function()
 {
-	if (!self.IsValid()) 
+	if (!self.IsValid())
 	{
 		//printl("Debug: ERROR: NO SELF FOUND.")
 		return -1;

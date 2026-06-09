@@ -2,7 +2,7 @@
 /////////////////////////////////////////////////////////////////
 
 //yes this popfile is a gigantic mess
-//yes navigating the pop is a complete nightmare 
+//yes navigating the pop is a complete nightmare
 //yes this is neccesary dont ask why
 // all by stardustspy with some help
 //Night Fight Arena - Clash Royale OST Soundtrack Theme (Season 63)
@@ -100,7 +100,7 @@ function TimerTag()
         self.RemoveCondEx(24, true)
         self.RemoveCondEx(27, true)
     }
-    PopExt.AddRobotTag("bot_timer", 
+    PopExt.AddRobotTag("bot_timer",
     {
         OnSpawn = function(bot, tag)
         {
@@ -111,12 +111,12 @@ function TimerTag()
             bot.DisableDraw()
             bot.SetMoveType(MOVETYPE_NOCLIP + MOVETYPE_FLY, MOVECOLLIDE_DEFAULT) // completely stops a player in place
             bot.SetCollisionGroup(13)
-            bot.SetSolid(0) // cannot be affected by trace but bot cannot be hit    
+            bot.SetSolid(0) // cannot be affected by trace but bot cannot be hit
             bot.SetModelSimple("models/player/heavy.mdl")
             bot.AddCondEx(64, -1, null)
             PopExtUtil.AddThinkToEnt(bot, "TimerThink")
 
-            local bot_win_temp = SpawnEntityFromTable("game_round_win", 
+            local bot_win_temp = SpawnEntityFromTable("game_round_win",
             {
                 TeamNum = 3
                 origin = Vector(480, 768, 752)
@@ -148,8 +148,8 @@ function SummonRain()
 
 
     // Spawn hand-placed sawmill rain particles
-    local rain001 = [ Vector(1188, 7162, 1385) 
-        Vector(1406, 3900, 2065) Vector(285, 4022, 1866) Vector(383, 4575, 1784) Vector(1419, 4788, 1775) 
+    local rain001 = [ Vector(1188, 7162, 1385)
+        Vector(1406, 3900, 2065) Vector(285, 4022, 1866) Vector(383, 4575, 1784) Vector(1419, 4788, 1775)
         Vector(1618, 5618, 1629) Vector(928, 5895, 1522) Vector(663, 6615, 1440) Vector(1223, 8556, 1836)
         Vector(-337, 2734, 1703) Vector(1417, 2845, 1498) Vector(-952, 1165, 1450) Vector(672, 1081, 1466)
         Vector(665, 216, 1388) Vector(-707, 346, 1412) Vector(824 1835 1962) Vector(-207, 1705, 1824)
@@ -177,7 +177,7 @@ function SummonRain()
     EntFireByHandle(MerasmusNamespace.gamerules, "CallScriptFunction", "StopRain", 22, null, null)
 }
 
-function StopRain() 
+function StopRain()
 {
     for(local rain; rain = FindByName(rain, "rain_summoned");)
     {
@@ -185,7 +185,7 @@ function StopRain()
     }
 }
 
-function StopEarthquake() 
+function StopEarthquake()
 {
     for(local earthquake; earthquake = FindByName(earthquake, "particle_quake");)
     {
@@ -240,7 +240,7 @@ function RespawnBombCarrier()
 }
 /////////////BOSS
 
-::MerasmusThink <- function () 
+::MerasmusThink <- function ()
 {
     local origin = self.GetOrigin()
     local melee = PopExtUtil.GetItemInSlot(self, 2)
@@ -256,7 +256,7 @@ function RespawnBombCarrier()
     {
         eyepos_end = self.EyePosition()+self.EyeAngles().Forward()*925
     }
-    else 
+    else
     {
         eyepos_end = self.EyePosition()+self.EyeAngles().Forward()*1850
     }
@@ -275,7 +275,7 @@ function RespawnBombCarrier()
     local mins = self.GetPlayerMins()
     local maxs = self.GetPlayerMaxs()
 
-    local classnames = 
+    local classnames =
     {
         "player" : 1
         "obj_sentrygun" : 1
@@ -389,7 +389,7 @@ function RespawnBombCarrier()
                     MerasmusNamespace.UnstuckEntity(player)
 
                     wep.SetClip1(1)
-                    
+
                     player.AddCondEx(5, 3, null)
 
                     local skele_anim = SpawnEntityFromTable("prop_dynamic",
@@ -438,7 +438,7 @@ function RespawnBombCarrier()
     {
         // Check if the enemy is already in the target array, or if it's dead
         if (targetArray.find(enemy) != null) return
-        if (NetProps.GetPropInt(enemy, "m_lifeState") != 0) return
+        if (!enemy.IsAlive()) return
 
         // Add the enemy to the target array
         targetArray.append(enemy)
@@ -466,13 +466,13 @@ function RespawnBombCarrier()
     }
 
     //# ENABLE THIS
-    
+
     //Special AI used to allow Merasmus to attack with ranged melee
 
     //i had some code here b4 but i cant do math so i had chatgpt write the code :trollskull:
 
     // Function to calculate the distance between two vectors (origin and ent origin)
-    function CalculateDistance(ent) 
+    function CalculateDistance(ent)
     {
         local ent_origin = ent.GetOrigin();
         local vec = origin - ent_origin;
@@ -480,7 +480,7 @@ function RespawnBombCarrier()
     }
 
     // Main loop to find all entities in range and select the closest one
-    function FindClosestEntity() 
+    function FindClosestEntity()
     {
         targetArray.clear(); // Clear the target array before starting
 
@@ -488,17 +488,17 @@ function RespawnBombCarrier()
         targeted = null;               // Reset targeted
 
         local ent = null; // Initialize ent to null for the loop
-        for (ent = FindInSphere(ent, origin, 2000); ent != null; ent = FindInSphere(ent, origin, 2000)) 
+        for (ent = FindInSphere(ent, origin, 2000); ent != null; ent = FindInSphere(ent, origin, 2000))
         {
             // Check if the entity is valid and from a different team
-            if (ent.GetClassname() in classnames && ent.GetTeam() != TEAM_SPECTATOR && ent.GetTeam() != self.GetTeam()) 
+            if (ent.GetClassname() in classnames && ent.GetTeam() != TEAM_SPECTATOR && ent.GetTeam() != self.GetTeam())
             {
                 //is ent invisible or disguised
 
                 if (ent.GetClassname() == "player" && ent.GetDisguiseTeam() == self.GetTeam() || ent.GetClassname() == "player" && ent.InCond(4)) continue
 
                 // Check if the entity is not already in the target array
-                if (targetArray.find(ent) == null) 
+                if (targetArray.find(ent) == null)
                 {
                     local distance = CalculateDistance(ent);  // Calculate the distance
                     targetArray.append({"entity": ent, "distance": distance});  // Add entity and its distance to the array
@@ -508,10 +508,10 @@ function RespawnBombCarrier()
                // PopExtUtil.PrintTable(targetArray);
 
                 // Now compare distances to find the closest entity
-                foreach (target in targetArray) 
+                foreach (target in targetArray)
                 {
                     local dist = target.distance;
-                    if (closest_distance == null || dist < closest_distance) 
+                    if (closest_distance == null || dist < closest_distance)
                     {
                         closest_distance = dist;
                         targeted = target.entity;  // Set the closest entity as the targeted one
@@ -521,7 +521,7 @@ function RespawnBombCarrier()
         }
 
         // After the loop, print the targeted entity (the one with the shortest distance)
-        if (targeted != null) 
+        if (targeted != null)
         {
             //printl("Targeted entity: " + targeted);
             aibot.LookAt(targeted.GetOrigin(), 1950, 1950)
@@ -532,7 +532,7 @@ function RespawnBombCarrier()
     // Call the function to find the closest entity
     FindClosestEntity();
 
-    local eyetrace = 
+    local eyetrace =
     {
         start  = eyepos_start,
         end    = eyepos_end
@@ -543,34 +543,34 @@ function RespawnBombCarrier()
     }
     TraceHull(eyetrace)
 
-    function SpawnLaser(ent, rand_intmin, rand_intmax) 
+    function SpawnLaser(ent, rand_intmin, rand_intmax)
     {
         local sound_range = (40 + (20 * log10(300 / 36.0))).tointeger();
-        
-        local target = SpawnEntityFromTable("info_target", 
+
+        local target = SpawnEntityFromTable("info_target",
         {
-            effect_name = "merasmus_targ", 
+            effect_name = "merasmus_targ",
             spawnflags = 1
             origin = Vector(0, 0, 0) //self.EyeAngles().Forward()*300
             angles = Vector(0, 0, 0)
         })
-        laser = SpawnEntityFromTable("info_particle_system", 
+        laser = SpawnEntityFromTable("info_particle_system",
         {
-            effect_name = "merasmus_zap_beam_bits", 
+            effect_name = "merasmus_zap_beam_bits",
             targetname = "laser"
             origin = self.GetOrigin()
             angles = Vector(0, 0, 0)
         })
-        
+
         if (target == null) return
-        
+
         if (ent == null && target != null)
         {
             if (laser_mode == 1)
             {
                 target.SetAbsOrigin(eyetrace.end + Vector(RandomInt(rand_intmin, rand_intmax), RandomInt(rand_intmin, rand_intmax), 0))
             }
-            else 
+            else
             {
                 target.SetAbsOrigin(eyetrace.end + Vector(RandomInt(rand_intmin, rand_intmax), RandomInt(rand_intmin, rand_intmax), 0))
             }
@@ -581,11 +581,11 @@ function RespawnBombCarrier()
             {
                 target.SetAbsOrigin(ent.GetOrigin() + Vector(RandomInt(rand_intmin, rand_intmax), RandomInt(rand_intmin, rand_intmax), 0)) // problem
             }
-            else 
+            else
             {
                 target.SetAbsOrigin(ent.GetOrigin() + Vector(RandomInt(rand_intmin, rand_intmax), RandomInt(rand_intmin, rand_intmax), 0))
             }
-            
+
         }
 
         SetPropEntityArray(laser, "m_hControlPointEnts", target, 0)
@@ -612,11 +612,11 @@ function RespawnBombCarrier()
                 ent.TakeDamageEx(null, self, null, Vector(0, 0, 0), ent.GetOrigin(), damage, 2)
             }
         }
-        
+
         EmitSoundEx({
             sound_name = "misc/halloween/spell_lightning_ball_impact.wav",
             origin = target.GetOrigin(),
-            sound_level = sound_range 
+            sound_level = sound_range
         });
         EntFireByHandle(laser, "Start", "", 0.1, null, null)
         target.AcceptInput("SetParent", "!activator", laser, target) // causes weird particle placement if placed before firing particle
@@ -626,7 +626,7 @@ function RespawnBombCarrier()
         //DebugDrawBox(target.GetOrigin(), Vector(-10, -10, -10), Vector(10, 10, 10), 132, 55, 75, 0, 2)
         // DebugDrawBox(laser.GetOrigin(), Vector(-10, -10, -10), Vector(10, 10, 10), 132, 55, 75, 0, 2)
     }
-    
+
     if (!self.InCond(51) && !self.HasBotTag("bot_transform"))
     {
         switch_spell_mode()
@@ -651,8 +651,8 @@ function RespawnBombCarrier()
                     {
                         shield_owner.AddCustomAttribute("increase buff duration HIDDEN", 0.17, 0.09)
                     }
-                    else 
-                    { 
+                    else
+                    {
                         shield_owner.AddCustomAttribute("increase buff duration HIDDEN", 0.39, 0.3)
                     }
 
@@ -660,50 +660,50 @@ function RespawnBombCarrier()
                     // shield_owner.SetRageMeter(33)
                     // NetProps.SetPropFloat(shield_owner, "m_flRageMeter", 0)
                 }
-                
+
                 if (enemy.GetTeam() != self.GetTeam() && enemy.GetTeam() != TEAM_SPECTATOR)
                 {
                     if (laser_mode == 0)
                     {
                         SpawnLaser(enemy, 0, 0)
                     }
-                    else 
+                    else
                     {
 
                         for(local L = 0; L <= 4; L++)
                         {
                             if (enemy == null) continue
                            // printl("multi attack")
-                            SpawnLaser(enemy, -40, 40) 
+                            SpawnLaser(enemy, -40, 40)
                         }
                     }
                 }
-                else 
+                else
                 {
                     if (laser_mode == 0)
                     {
                         SpawnLaser(null, 0, 0)
                     }
-                    else 
+                    else
                     {
 
                         for(local L = 0; L <= 4; L++)
                         {
                             if (enemy == null) continue
                            // printl("multi attack")
-                            SpawnLaser(null, -40, 40) 
+                            SpawnLaser(null, -40, 40)
                         }
                     }
                 }
             }
-            else 
+            else
             {
                 //something was hit but isn't relavent (i.e. worldspawn)
                 if (laser_mode == 0)
                 {
                     SpawnLaser(null, 0, 0)
                 }
-                else 
+                else
                 {
                     for(local L = 0; L <= 4; L++)
                     {
@@ -712,9 +712,9 @@ function RespawnBombCarrier()
                     }
                 }
             }
-            
+
 		}
-		
+
 		// continue smack detection
 		NetProps.SetPropInt(self, "m_Shared.m_iNextMeleeCrit", -2)
 	}
@@ -741,7 +741,7 @@ function RespawnBombCarrier()
                 spots.append(nav)
             }
         }
-        
+
         local nav = spots[RandomInt(0, spots.len() - 1)]
         local spot = nav.FindRandomSpot()
 
@@ -772,21 +772,21 @@ function RespawnBombCarrier()
         else if (num == 3)
         {
             EmitSoundEx({
-                sound_name = "vo/halloween_merasmus/sf12_found04.mp3", // 
+                sound_name = "vo/halloween_merasmus/sf12_found04.mp3", //
                 origin = origin,
             });
         }
         else if (num == 4)
         {
             EmitSoundEx({
-                sound_name = "vo/halloween_merasmus/sf12_appears10.mp3", // 
+                sound_name = "vo/halloween_merasmus/sf12_appears10.mp3", //
                 origin = origin,
             });
         }
         else if (num == 5)
         {
             EmitSoundEx({
-                sound_name = "vo/halloween_merasmus/sf12_found02.mp3", // 
+                sound_name = "vo/halloween_merasmus/sf12_found02.mp3", //
                 origin = origin,
             });
         }
@@ -797,9 +797,9 @@ function RespawnBombCarrier()
             origin = origin,
         });
 
-        local teleport = SpawnEntityFromTable("info_particle_system", 
+        local teleport = SpawnEntityFromTable("info_particle_system",
         {
-            effect_name = "merasmus_tp", 
+            effect_name = "merasmus_tp",
             targetname = "telep"
             origin = origin
             angles = Vector(0, 0, 0)
@@ -808,12 +808,12 @@ function RespawnBombCarrier()
         EntFireByHandle(teleport, "Start", "", 0, null, null)
         EntFireByHandle(teleport, "Stop", "", 0.1, null, null)
         EntFireByHandle(teleport, "Kill", "", 0.2, null, null)
-        teleport = null 
+        teleport = null
     }
 
     // # 1, 300
     local TeleportRand = RandomInt(1, 300)
-    
+
     if (TeleportRand == 1 && NoAction == false && !self.HasBotTag("bot_transform") && !self.InCond(51) && !self.InCond(87))
     {
         local tele_spots = {}
@@ -854,7 +854,7 @@ function RespawnBombCarrier()
                 sound_name = "vo/halloween_merasmus/sf12_ranged_attack06.mp3",
                 origin = self.GetOrigin(),
             });
-            self.AddCustomAttribute("dmg taken increased", 0, 2) 
+            self.AddCustomAttribute("dmg taken increased", 0, 2)
 
             MerasmusNamespace.disguise_boss_health = 15000
             DoAnimation(self, "leave", 2, "models/bots/soldier/bot_soldier.mdl")
@@ -888,7 +888,7 @@ function RespawnBombCarrier()
             self.SetPlayerClass(4);
             SetPropInt(self, "m_Shared.m_iDesiredPlayerClass", 4);
             self.RemoveWeaponRestriction(3)
-            self.AddCustomAttribute("dmg taken increased", 0, 2) 
+            self.AddCustomAttribute("dmg taken increased", 0, 2)
             self.AddBotTag("bot_transform")
             MerasmusNamespace.disguise_boss_health = 17500
 
@@ -926,7 +926,7 @@ function RespawnBombCarrier()
         SetPropInt(self, "m_Shared.m_iDesiredPlayerClass", 7);
         self.RemoveWeaponRestriction(3)
         self.AddBotTag("bot_transform")
-        self.AddCustomAttribute("dmg taken increased", 0, 2) 
+        self.AddCustomAttribute("dmg taken increased", 0, 2)
         MerasmusNamespace.disguise_boss_health = 17500
         //self.SetCustomModelWithClassAnimations("models/bots/pyro/bot_pyro.mdl")
         DoAnimation(self, "leave", 2, "models/bots/pyro/bot_pyro.mdl")
@@ -980,7 +980,7 @@ function RespawnBombCarrier()
     {
         NoCastSpell = false
     }
-    
+
    // printl(force_cast_Timer)
    //printl(force_cast_Timer)
     if (merasmus_buttons_pressed & Constants.FButtons.IN_ATTACK2 && tickspell == false && NUM_MAX_SPELL_TIER > 0)
@@ -989,7 +989,7 @@ function RespawnBombCarrier()
        // NUM_MAX_SPELL_TIER = 9
 
         spell_number = RandomInt(1, NUM_MAX_SPELL_TIER)
-        
+
         tickspell = true
         NoCastSpell = true
         attackTime = 3
@@ -1032,14 +1032,14 @@ function RespawnBombCarrier()
             });
             local burn_indicator = {}
             GetNavAreasInRadius(origin, 500, burn_indicator)
-            
+
             foreach(nav in burn_indicator)
             {
                 if (max_particles <= 10)
                 local area = nav.GetCenter()
-                local particle = SpawnEntityFromTable("info_particle_system", 
+                local particle = SpawnEntityFromTable("info_particle_system",
                 {
-                    effect_name = "eb_aura_angry01", 
+                    effect_name = "eb_aura_angry01",
                     targetname = "particle_blood"
                     origin = area
                     angles = Vector(0, 0, 0)
@@ -1124,7 +1124,7 @@ function RespawnBombCarrier()
         ClientPrint(null, 4, "DISGUISE HEALTH: "+floor(MerasmusNamespace.disguise_boss_health))
         self.SetModelScale(2, 0)
     }
-    else 
+    else
     {
         self.AddWeaponRestriction(3)
         self.SetModelScale(1, 0)
@@ -1133,22 +1133,22 @@ function RespawnBombCarrier()
     merasmus_buttons_last = merasmus_buttons;
 }
 
-::ChainThink <- function () 
+::ChainThink <- function ()
 {
     self.SetAbsOrigin(merasmus.GetOrigin() + Vector(0,0 , 50))
 
     return -1 // not supported by popextutil, needed here
 }
 
-::TornadoThink <- function () 
+::TornadoThink <- function ()
 {
     self.SetModelSimple("models/empty.mdl")
     if (particle == null || particle.IsValid() == false)
     {
         local sound_range = (40 + (20 * log10(300 / 36.0))).tointeger();
-        particle = SpawnEntityFromTable("info_particle_system", 
+        particle = SpawnEntityFromTable("info_particle_system",
         {
-            effect_name = "set_taunt_saharan_spy", 
+            effect_name = "set_taunt_saharan_spy",
             targetname = "particle_tornado"
             origin = self.GetOrigin()
             angles = Vector(0, 0, 0)
@@ -1159,7 +1159,7 @@ function RespawnBombCarrier()
             sound_name = "misc/halloween/hwn_plumes_capture.wav",
 
             origin = self.GetOrigin(),
-            sound_level = sound_range 
+            sound_level = sound_range
         });
         EntFireByHandle(particle, "SetParent", "!activator", 0, self, null)
         //self.SetAbsOrigin(self.GetOrigin())
@@ -1177,13 +1177,13 @@ function RespawnBombCarrier()
     }
 }
 
-::GravWellThink <- function() 
+::GravWellThink <- function()
 {
     local touched = NetProps.GetPropBool(self, "m_bTouched")
     local sound_range = (40 + (20 * log10(3000 / 36.0))).tointeger();
     local gamerules = FindByClassname(null, "tf_gamerules")
     local origin = self.GetOrigin()
-    local classnames = 
+    local classnames =
     {
         "player" : 1
         "obj_sentrygun" : 1
@@ -1193,7 +1193,7 @@ function RespawnBombCarrier()
     }
     for (local ent; ent = FindInSphere(ent, origin, 150);)
     {
-        //i would use a basic for loop, but i cant be bothered. 
+        //i would use a basic for loop, but i cant be bothered.
         if (ent.GetClassname() in classnames && ent.GetTeam() != TEAM_SPECTATOR && ent.GetTeam() != merasmus.GetTeam())
         {
             //no buildings
@@ -1202,7 +1202,7 @@ function RespawnBombCarrier()
             local player_origin = ent.GetOrigin()
             local vec = origin - player_origin;
 
-            if (PopExtUtil.IsOnGround(ent)) 
+            if (PopExtUtil.IsOnGround(ent))
             {
                 player_origin.z = player_origin.z + 32;
                 ent.SetAbsOrigin(player_origin);
@@ -1220,7 +1220,7 @@ function RespawnBombCarrier()
         ({
             sound_name = "misc/hologram_move.wav",
             origin = self.GetOrigin(),
-            sound_level = sound_range 
+            sound_level = sound_range
             //filter_type = RECIPIENT_FILTER_GLOBAL
         });
         // DispatchParticleEffect("merasmus_dazed_explosion", origin, Vector(-90, 0, 0))
@@ -1237,12 +1237,12 @@ function RespawnBombCarrier()
     }
 }
 
-::BookBombThink <- function() 
+::BookBombThink <- function()
 {
     local touched = NetProps.GetPropBool(self, "m_bTouched")
     local sound_range = (40 + (20 * log10(1000 / 36.0))).tointeger();
 
-    local classnames = 
+    local classnames =
     {
         "player" : 1
         "obj_sentrygun" : 1
@@ -1259,7 +1259,7 @@ function RespawnBombCarrier()
         ({
             sound_name = "weapons/bombinomicon_explode1.wav",
             origin = self.GetOrigin(),
-            sound_level = sound_range 
+            sound_level = sound_range
         });
         DispatchParticleEffect("merasmus_dazed_explosion", origin, Vector(-90, 0, 0))
         for (local ent; ent = FindInSphere(ent, origin, 150);)
@@ -1296,19 +1296,19 @@ function MakeEarthquake(ent)
             {
                 building.TakeDamageEx(null, merasmus, null, Vector(0, 0, 0), self.GetOrigin(), 250, 64)
             }
-            else 
+            else
             {
                 continue
             }
         }
-        
+
         EmitSoundEx
         ({
             sound_name = "ambient/atmosphere/terrain_rumble1.wav",
             origin = self.GetOrigin(),
-            sound_level = sound_range 
+            sound_level = sound_range
         });
-        
+
         return 1
     }
 
@@ -1325,7 +1325,7 @@ function ApplyThunderThink(player, caster)
     scope.ambience <- false
     scope.thunder_storm_timer <- 22
     scope.thunder_time_server <- 0
-    scope.thunder_duration <- function() 
+    scope.thunder_duration <- function()
     {
         if (thunder_storm_timer == null) return
         local time = floor(Time())
@@ -1339,7 +1339,7 @@ function ApplyThunderThink(player, caster)
             }
             if (thunder_storm_timer == 0)
             {
-                local names = 
+                local names =
                 {
                     "swave" : 1
                     "thunder_struck" : 1
@@ -1360,22 +1360,22 @@ function ApplyThunderThink(player, caster)
                     }
                 }
 
-                delete self.GetScriptScope().PlayerThinkTable.ThunderThink 
+                delete self.GetScriptScope().PlayerThinkTable.ThunderThink
             }
         }
     }
 
     scope.thunder_bolt <- null
-    scope.thunder_cloud <- SpawnEntityFromTable("info_particle_system", 
+    scope.thunder_cloud <- SpawnEntityFromTable("info_particle_system",
     {
-        effect_name = "utaunt_electricity_cloud_parent_WY", 
+        effect_name = "utaunt_electricity_cloud_parent_WY",
         targetname = "thunder_cloud"
         origin = player.GetOrigin()
         angles = Vector(0, 0, 0)
     })
-    scope.thunder_targ <- SpawnEntityFromTable("info_target", 
+    scope.thunder_targ <- SpawnEntityFromTable("info_target",
     {
-        effect_name = "shock_targ", 
+        effect_name = "shock_targ",
         spawnflags = 1
         origin = player.GetOrigin()
         angles = Vector(0, 0, 0)
@@ -1386,7 +1386,7 @@ function ApplyThunderThink(player, caster)
     {
         local origin = self.GetOrigin()
         local strike_prepare = 90
-        local classnames = 
+        local classnames =
         {
             "player" : 1
             "obj_sentrygun" : 1
@@ -1397,19 +1397,19 @@ function ApplyThunderThink(player, caster)
         //ambient\energy\electric_loop.wav
         local sound_range = (40 + (20 * log10(3000 / 36.0))).tointeger();
 
-        if (NetProps.GetPropInt(self, "m_lifeState") != 0 || self == null)
+        if (self == null || !self.IsAlive())
         {
             thunder_storm_timer = 0
-            delete self.GetScriptScope().PlayerThinkTable.ThunderThink 
+            delete self.GetScriptScope().PlayerThinkTable.ThunderThink
         }
 
-        local thund_trace = 
+        local thund_trace =
         {
             start  = thunder_cloud.GetOrigin(),
             end    = thunder_cloud.GetOrigin() + Vector(0, 0, -380)
             hullmin = Vector(-10, -10, -10)
             hullmax = Vector(10, 10, 10)
-            mask = -1 
+            mask = -1
             ignore = self
         }
 
@@ -1422,9 +1422,9 @@ function ApplyThunderThink(player, caster)
 
         if (thunder_bolt == null)
         {
-            thunder_bolt = SpawnEntityFromTable("info_particle_system", 
+            thunder_bolt = SpawnEntityFromTable("info_particle_system",
             {
-                effect_name = "underworld_skull_zap", 
+                effect_name = "underworld_skull_zap",
                 targetname = "thunder_struck"
                 origin = player.GetOrigin()
                 angles = Vector(90, 0, 0)
@@ -1453,11 +1453,11 @@ function ApplyThunderThink(player, caster)
             ({
                 sound_name = "items/powerup_pickup_crits.wav",
                 origin = thunder_targ.GetOrigin(),
-                sound_level = sound_range 
+                sound_level = sound_range
             });
-            local shockwave = SpawnEntityFromTable("info_particle_system", 
+            local shockwave = SpawnEntityFromTable("info_particle_system",
             {
-                effect_name = "taunt_yeti_fistslam_shockwave", 
+                effect_name = "taunt_yeti_fistslam_shockwave",
                 targetname = "swave"
                 origin = thunder_targ.GetOrigin()
                 angles = Vector(90, 0, 0)
@@ -1491,7 +1491,7 @@ function ApplyThunderThink(player, caster)
 }
 
 
-::SpawnMerasmus <- function () 
+::SpawnMerasmus <- function ()
 {
     self.ValidateScriptScope()
     PlayBossMusic()
@@ -1522,7 +1522,7 @@ function ApplyThunderThink(player, caster)
 
     sniperscope.force_cast_Timer <- 8
     sniperscope.time_cast_server <- 0
-    sniperscope.check_spell_cast <- function() 
+    sniperscope.check_spell_cast <- function()
     {
         if (force_cast_Timer == null) return
         local time = floor(Time())
@@ -1535,14 +1535,14 @@ function ApplyThunderThink(player, caster)
             }
             if (force_cast_Timer == 0)
             {
-                force_cast_Timer = 8 
+                force_cast_Timer = 8
                 self.PressAltFireButton(0.1)
             }
         }
     }
     sniperscope.switch_attackmode_time <- 6
     sniperscope.attack_time_server<- 0
-    sniperscope.switch_spell_mode <- function() 
+    sniperscope.switch_spell_mode <- function()
     {
         if (switch_attackmode_time == null) return
         local time = floor(Time())
@@ -1561,7 +1561,7 @@ function ApplyThunderThink(player, caster)
                     laser_mode = 1
                     //printl(laser_mode)
                 }
-                else 
+                else
                 {
                     melee.RemoveAttribute("fire rate penalty")
                     laser_mode = 0
@@ -1576,7 +1576,7 @@ function ApplyThunderThink(player, caster)
     sniperscope.spell_number <- null
     sniperscope.anim <- null
     sniperscope.is_disguising <- 0
-    sniperscope.cast_spell <- function(spell_type) 
+    sniperscope.cast_spell <- function(spell_type)
     {
         if (attackTime == null) return
         local time = floor(Time())
@@ -1592,49 +1592,49 @@ function ApplyThunderThink(player, caster)
             {
                 if (spell_type == 1) // SPELL: WEAK. SUMMON FIREBALL: Spawns fireballs in 4 directions
                 {
-                    local fireball = SpawnEntityFromTable("tf_projectile_spellfireball", 
+                    local fireball = SpawnEntityFromTable("tf_projectile_spellfireball",
                     {
                         basevelocity = Vector(-900, 0, 0),
                         teamnum      = self.GetTeam(),
                         origin       = origin + Vector(-50, 0, 80)
                         angles       = self.EyeAngles()
                     })
-                    local fireball2 = SpawnEntityFromTable("tf_projectile_spellfireball", 
+                    local fireball2 = SpawnEntityFromTable("tf_projectile_spellfireball",
                     {
                         basevelocity = Vector(900, 0, 0),
                         teamnum      = self.GetTeam(),
                         origin       = origin + Vector(75, 0, 80)
                         angles       = self.EyeAngles()
                     })
-                    local fireball3 = SpawnEntityFromTable("tf_projectile_spellfireball", 
+                    local fireball3 = SpawnEntityFromTable("tf_projectile_spellfireball",
                     {
                         basevelocity = Vector(0, 900, 0),
                         teamnum      = self.GetTeam(),
                         origin       = origin + Vector(0, 75, 80)
                         angles       = self.EyeAngles()
                     })
-                    local fireball4 = SpawnEntityFromTable("tf_projectile_spellfireball", 
+                    local fireball4 = SpawnEntityFromTable("tf_projectile_spellfireball",
                     {
                         basevelocity = Vector(0, -900, 0),
                         teamnum      = self.GetTeam(),
                         origin       = origin + Vector(20, 75, 80)
                         angles       = self.EyeAngles()
                     })
-                    fireball.SetOwner(self) 
-                    fireball2.SetOwner(self) 
-                    fireball3.SetOwner(self) 
-                    fireball4.SetOwner(self) 
+                    fireball.SetOwner(self)
+                    fireball2.SetOwner(self)
+                    fireball3.SetOwner(self)
+                    fireball4.SetOwner(self)
                 }
                 if (spell_type == 2) // SPELL: WEAL. SUMMON MONOCULUS: Summon monoculus spell.
                 {
-                    local eye_spell = SpawnEntityFromTable("tf_projectile_spellmeteorshower", 
+                    local eye_spell = SpawnEntityFromTable("tf_projectile_spellmeteorshower",
                     {
                         basevelocity = Vector(0, 0, 0),
                         teamnum      = self.GetTeam(),
                         origin       = self.EyePosition()
                         angles       = self.EyeAngles()
                     })
-                    eye_spell.SetOwner(self) 
+                    eye_spell.SetOwner(self)
                     eye_spell.SetCollisionGroup(27)
                     local velocity = PopExtUtil.AnglesToVector(self.EyeAngles())
                     eye_spell.SetPhysVelocity(Vector(velocity.x * 500, velocity.y * 500, 500))
@@ -1647,9 +1647,9 @@ function ApplyThunderThink(player, caster)
                         {
                             player.AddCustomAttribute("mod weapon blocks healing", 1, 10)
                             player.BleedPlayerEx(10, 2, false, 64)
-                            local chain = SpawnEntityFromTable("info_particle_system", 
+                            local chain = SpawnEntityFromTable("info_particle_system",
                             {
-                                effect_name = "passtime_beam", 
+                                effect_name = "passtime_beam",
                                 targetname = "cursed_chain"
                                 origin = self.GetOrigin()
                                 angles = Vector(0, 0, 0)
@@ -1674,69 +1674,69 @@ function ApplyThunderThink(player, caster)
                     EmitSoundEx
                     ({
                         sound_name = "misc/halloween/merasmus_disappear.wav",
-            
+
                         origin = self.GetOrigin(),
 
                     });
-                    local tornado_particle = SpawnEntityFromTable("info_particle_system", 
+                    local tornado_particle = SpawnEntityFromTable("info_particle_system",
                     {
-                        effect_name = "set_taunt_saharan_spy", 
+                        effect_name = "set_taunt_saharan_spy",
                         targetname = "particle_tornado"
                         origin = self.GetOrigin()
                         angles = Vector(0, 0, 0)
                     })
-                    local tornado_particle2 = SpawnEntityFromTable("info_particle_system", 
+                    local tornado_particle2 = SpawnEntityFromTable("info_particle_system",
                     {
-                        effect_name = "set_taunt_saharan_spy", 
+                        effect_name = "set_taunt_saharan_spy",
                         targetname = "particle_tornado"
                         origin = self.GetOrigin()
                         angles = Vector(0, 0, 0)
                     })
-                    local tornado_particle3 = SpawnEntityFromTable("info_particle_system", 
+                    local tornado_particle3 = SpawnEntityFromTable("info_particle_system",
                     {
-                        effect_name = "set_taunt_saharan_spy", 
+                        effect_name = "set_taunt_saharan_spy",
                         targetname = "particle_tornado"
                         origin = self.GetOrigin()
                         angles = Vector(0, 0, 0)
                     })
-                    
-                    local projectile_tornado = SpawnEntityFromTable("tf_projectile_energy_ring", 
+
+                    local projectile_tornado = SpawnEntityFromTable("tf_projectile_energy_ring",
                     {
                         basevelocity = self.EyeAngles().Forward()*250 + QAngle(80, -80),
                         teamnum      = self.GetTeam(),
                         origin       = origin + Vector(0, 0, 20)
                         angles       = self.EyeAngles()
                     })
-                    projectile_tornado.SetOwner(self) 
-                    local projectile_tornado2 = SpawnEntityFromTable("tf_projectile_energy_ring", 
+                    projectile_tornado.SetOwner(self)
+                    local projectile_tornado2 = SpawnEntityFromTable("tf_projectile_energy_ring",
                     {
                         basevelocity = self.EyeAngles().Forward()*250 + QAngle(-80, 80),
                         teamnum      = self.GetTeam(),
                         origin       = origin + Vector(0, 0, 20.1)
                         angles       = self.EyeAngles()
                     })
-                    projectile_tornado2.SetOwner(self) 
-                    local projectile_tornado3 = SpawnEntityFromTable("tf_projectile_energy_ring", 
+                    projectile_tornado2.SetOwner(self)
+                    local projectile_tornado3 = SpawnEntityFromTable("tf_projectile_energy_ring",
                     {
                         basevelocity = self.EyeAngles().Forward()*250,
                         teamnum      = self.GetTeam(),
                         origin       = origin + Vector(0, 0, 20.2)
                         angles       = self.EyeAngles()
                     })
-                    projectile_tornado3.SetOwner(self) 
+                    projectile_tornado3.SetOwner(self)
 
                     projectile_tornado3.ValidateScriptScope()
                     local scope3 = projectile_tornado3.GetScriptScope()
                     scope3.particle <- null
                     scope3.merasmus <- self
                     PopExtUtil.AddThinkToEnt(projectile_tornado3, "TornadoThink")
-                    
+
                     projectile_tornado.ValidateScriptScope()
                     local scope1 = projectile_tornado.GetScriptScope()
                     scope1.particle <- null
                     scope1.merasmus <- self
                     PopExtUtil.AddThinkToEnt(projectile_tornado, "TornadoThink")
-                    
+
                     projectile_tornado2.ValidateScriptScope()
                     local scope2 = projectile_tornado2.GetScriptScope()
                     scope2.particle <- null
@@ -1755,11 +1755,11 @@ function ApplyThunderThink(player, caster)
                     ({
                         sound_name = "ambient/explosions/explode_8.wav",
                         origin = self.GetOrigin(),
-                        sound_level = sound_range_spell_6 
+                        sound_level = sound_range_spell_6
                     });
-                    local earthquake = SpawnEntityFromTable("info_target", 
+                    local earthquake = SpawnEntityFromTable("info_target",
                     {
-                        targetname = "earthquake", 
+                        targetname = "earthquake",
                         spawnflags = 1
                         origin = self.GetOrigin()
                         angles = Vector(0, 0, 0)
@@ -1772,14 +1772,14 @@ function ApplyThunderThink(player, caster)
 
                     local earthquake_location = {}
                     GetNavAreasInRadius(self.GetOrigin(), 750, earthquake_location)
-                    
+
                     foreach(nav in earthquake_location)
                     {
                         if (max_particles <= 10)
                         local area = nav.GetCenter()
-                        local particle = SpawnEntityFromTable("info_particle_system", 
+                        local particle = SpawnEntityFromTable("info_particle_system",
                         {
-                            effect_name = "utaunt_god_lava_crack3", 
+                            effect_name = "utaunt_god_lava_crack3",
                             //moon_drill_rock_debris
                             targetname = "particle_quake"
                             origin = area
@@ -1793,9 +1793,9 @@ function ApplyThunderThink(player, caster)
                 }
                 if (spell_type == 7)
                 {
-                    function SpawnBomb() 
+                    function SpawnBomb()
                     {
-                        local book_bomb = SpawnEntityFromTable("tf_projectile_stun_ball", 
+                        local book_bomb = SpawnEntityFromTable("tf_projectile_stun_ball",
                         {
                             targetname = "bomb"
                         })
@@ -1810,7 +1810,7 @@ function ApplyThunderThink(player, caster)
                     }
 
                     for(local i = 0; i <= 10; i++){
-                        SpawnBomb() 
+                        SpawnBomb()
                     }
                 }
                 if (spell_type == 8)
@@ -1822,14 +1822,14 @@ function ApplyThunderThink(player, caster)
                         origin = self.GetOrigin(),
                         sound_level = sound_range_spell
                     });
-                    local grav_well = SpawnEntityFromTable("tf_projectile_stun_ball", 
+                    local grav_well = SpawnEntityFromTable("tf_projectile_stun_ball",
                     {
                         targetname = "gravity_vortex"
                     })
                     grav_well.SetModelSimple("models/passtime/ball/passtime_ball.mdl")
                     grav_well.SetOrigin(self.GetOrigin() + Vector(0, 0, 100))
 
-                    // local vortex = SpawnEntityFromTable("point_push", 
+                    // local vortex = SpawnEntityFromTable("point_push",
                     // {
                     //     targetname = "big_succ"
                     //     magnitude = -900
@@ -1838,10 +1838,10 @@ function ApplyThunderThink(player, caster)
                     //     enabled = 1
                     //     spawnflags = 9
                     // })
-                    
-                    local vortex_particle = SpawnEntityFromTable("info_particle_system", 
+
+                    local vortex_particle = SpawnEntityFromTable("info_particle_system",
                     {
-                        effect_name = "eyeboss_tp_vortex", 
+                        effect_name = "eyeboss_tp_vortex",
                         targetname = "fx_vortex"
                         origin = self.GetOrigin()
                         angles = Vector(0, 0, 0)
@@ -1880,7 +1880,7 @@ function ApplyThunderThink(player, caster)
 
                     for (local ent; ent = FindInSphere(ent, origin, INT_MAX);)
                     {
-                        local classnames = 
+                        local classnames =
                         {
                             "player" : 1
                         }
@@ -1900,7 +1900,7 @@ function ApplyThunderThink(player, caster)
 
     sniperscope.Vector_Compare <- null
 
-    
+
     self.Weapon_Switch(melee)
     NetProps.SetPropInt(self, "m_Shared.m_iNextMeleeCrit", -2)
     self.SetCustomModelWithClassAnimations("models/bots/merasmus/merasmus.mdl")
@@ -1912,20 +1912,20 @@ function ApplyThunderThink(player, caster)
     PopExtUtil.AddThinkToEnt(self, "MerasmusThink")
 }
 
-::MerasmusNamespace <- 
+::MerasmusNamespace <-
 {
     Cleanup = function()
     {
         // cleanup any persistent changes here
-        
+
         // keep this at the end
-        delete ::MerasmusNamespace            
+        delete ::MerasmusNamespace
     }
-    
+
     // mandatory events
     OnGameEvent_recalculate_holidays = function(_) { if (GetRoundState() == 3) Cleanup() }
     OnGameEvent_mvm_wave_complete = function(_) { Cleanup() }
-    
+
     // add stored variables or your own events here
     //
     // e.g.
@@ -1938,7 +1938,7 @@ function ApplyThunderThink(player, caster)
     areas = {}
     disguise_boss_health = 0
 
-    classnames = 
+    classnames =
     {
         "player" : 1
         "obj_sentrygun" : 1
@@ -1947,20 +1947,20 @@ function ApplyThunderThink(player, caster)
         "entity_medigun_shield" : 1
     }
 
-    function BossSetup() 
+    function BossSetup()
     {
-        PopExt.AddRobotTag("bot_merasmus", 
+        PopExt.AddRobotTag("bot_merasmus",
         {
-            OnSpawn = function(bot, tag) 
+            OnSpawn = function(bot, tag)
             {
                 bot.ValidateScriptScope()
 
                 bot.AcceptInput("CallScriptFunction", "SpawnMerasmus", bot, bot)
             }
         })
-        PopExt.AddRobotTag("bot_skeleton", 
+        PopExt.AddRobotTag("bot_skeleton",
         {
-            OnSpawn = function(bot, tag) 
+            OnSpawn = function(bot, tag)
             {
                 local class_string = PopExtUtil.Classes[bot.GetPlayerClass()]
                 local wep = bot.GetActiveWeapon()
@@ -1973,20 +1973,20 @@ function ApplyThunderThink(player, caster)
                 bot.AddCustomAttribute("move speed penalty", 0.0001, -1)
                 bot.AddCondEx(64, -1, null)
             }
-            OnDeath = function(bot, tag) 
+            OnDeath = function(bot, tag)
             {
                 local sound_range = (40 + (20 * log10(1500 / 36.0))).tointeger();
                 EmitSoundEx({
                     sound_name = "misc/halloween/skeleton_break.wav",
                     origin = bot.GetOrigin(),
-                    sound_level = sound_range 
+                    sound_level = sound_range
                 });
             }
         })
 
-        PopExt.AddRobotTag("bot_runner", 
+        PopExt.AddRobotTag("bot_runner",
         {
-            OnSpawn = function(bot, tag) 
+            OnSpawn = function(bot, tag)
             {
                 local gamerules = FindByClassname(null, "tf_gamerules")
                 gamerules.AcceptInput("RunScriptCode", "EmitSoundEx({ sound_name = `misc/halloween/spell_athletic.wav`});", null, null)
@@ -1994,7 +1994,7 @@ function ApplyThunderThink(player, caster)
         })
     }
 
-    function SkeletonSetup(player, model) 
+    function SkeletonSetup(player, model)
     {
         player.ValidateScriptScope()
         local scope = player.GetScriptScope()
@@ -2022,7 +2022,7 @@ function ApplyThunderThink(player, caster)
         }
     }
 
-    function IsMiniCritAttacker(entity) 
+    function IsMiniCritAttacker(entity)
     {
         local CritArray = [16, 19, 31]
         foreach(crit in CritArray)
@@ -2035,7 +2035,7 @@ function ApplyThunderThink(player, caster)
         return false
     }
 
-    function IsMiniCritVictim(entity) 
+    function IsMiniCritVictim(entity)
     {
         local CritArray = [24, 30]
         foreach(crit in CritArray)
@@ -2048,7 +2048,7 @@ function ApplyThunderThink(player, caster)
         return false
     }
 
-    function IsCritAttacker(entity) 
+    function IsCritAttacker(entity)
     {
         local CritArray = [11, 34, 37, 39, 40, 44, 56]
         foreach(crit in CritArray)
@@ -2061,7 +2061,7 @@ function ApplyThunderThink(player, caster)
         return false
     }
 
-    OnScriptHook_OnTakeDamage = function(params) 
+    OnScriptHook_OnTakeDamage = function(params)
     {
         local victim = params.const_entity
         local weapon = params.weapon
@@ -2095,7 +2095,7 @@ function ApplyThunderThink(player, caster)
                     if (victim.GetHealth() == 1)
                     {
                         if (scope.anim == null)
-                        {   
+                        {
                             boss_defeat = true
                             local bot_win = FindByName(null, "bots_win")
                             local bomb = FindByName(null, "intel_ironman")
@@ -2106,9 +2106,9 @@ function ApplyThunderThink(player, caster)
                             EntFireByHandle(bot_win, "Kill", "", 0, null, null)
                             victim.RemoveCondEx(70, true)
                             EntFireByHandle(scope.anim, "Kill", "", 5, null, null)
-                            local die_effect = SpawnEntityFromTable("info_particle_system", 
+                            local die_effect = SpawnEntityFromTable("info_particle_system",
                             {
-                                effect_name = "moon_miasma_purple01", 
+                                effect_name = "moon_miasma_purple01",
                                 targetname = "die"
                                 origin = victim.GetOrigin()
                                 angles = Vector(0, 0, 0)
@@ -2149,7 +2149,7 @@ function ApplyThunderThink(player, caster)
                             {
                                 factor = 3.0
                             }
-                            else 
+                            else
                             {
                                 factor = 1.35
                             }
@@ -2159,12 +2159,12 @@ function ApplyThunderThink(player, caster)
                             factor = 3.0
                         }
                     }
-                    
+
                     if (victim.InCond(87))
                     {
                         factor = 0
                     }
-                    else 
+                    else
                     {
                         NetProps.SetPropInt(victim, "m_iHealth", victim.GetHealth() + damage * factor)
                         disguise_boss_health = disguise_boss_health - damage * factor
@@ -2208,7 +2208,7 @@ function ApplyThunderThink(player, caster)
                                 origin = victim.GetOrigin(),
                             });
                         }
-                        
+
                         victim.ValidateScriptScope()
                         local scope = victim.GetScriptScope()
                         scope.is_disguising = 0
@@ -2232,23 +2232,23 @@ function ApplyThunderThink(player, caster)
                 if (victim.HasBotTag("bot_hitbox"))
                 {
                     local origin = victim.GetOrigin()
-                    local head_hitbox_min = Vector(-22, -22, -22);  
-                    local head_hitbox_max = Vector(22, 22, 22);     
+                    local head_hitbox_min = Vector(-22, -22, -22);
+                    local head_hitbox_max = Vector(22, 22, 22);
                     local origin_head = origin + Vector(0, 0, 100)
 
-                    local hitbox_trace = 
+                    local hitbox_trace =
                     {
                         start  = origin_head,
-                        end    = origin_head, 
+                        end    = origin_head,
                         hullmin = head_hitbox_min
                         hullmax = head_hitbox_max
-                        //mask = -1 
+                        //mask = -1
                         ignore = victim
                     }
                     TraceHull(hitbox_trace)
                     //DebugDrawBox(origin_head, head_hitbox_min, head_hitbox_max, 5, 33, 123, 0, 0.1)
 
-                    if (hitbox_trace.hit && hitbox_trace.enthit.GetClassname() == "tf_projectile_arrow" && weapon.GetClassname() == "tf_weapon_compound_bow") 
+                    if (hitbox_trace.hit && hitbox_trace.enthit.GetClassname() == "tf_projectile_arrow" && weapon.GetClassname() == "tf_weapon_compound_bow")
                     {
                         //printl("arrow is headshot")
 
@@ -2256,7 +2256,7 @@ function ApplyThunderThink(player, caster)
                         params.damage_stats = TF_DMG_CUSTOM_HEADSHOT
                     }
 
-                    victim.AddCustomAttribute("dmg taken increased", 0, 0.1) // victim here is merasmuses extended hitbox. 
+                    victim.AddCustomAttribute("dmg taken increased", 0, 0.1) // victim here is merasmuses extended hitbox.
                     //use delay here so the params.damage is updated but the attribute is applied before damage is actually taken
                     for (local player; player = FindByClassname(player, "player");)
                     {
@@ -2315,7 +2315,7 @@ function ApplyThunderThink(player, caster)
         //printl(secondary)
         player.ValidateScriptScope()
         local playerscope = player.GetScriptScope()
-        
+
     }
 
     function OnGameEvent_mvm_wave_failed(params)
@@ -2336,7 +2336,7 @@ function ApplyThunderThink(player, caster)
             flags = SND_STOP
         });
 
-        StopEarthquake() 
+        StopEarthquake()
         StopRain()
     }
 
@@ -2358,12 +2358,12 @@ function ApplyThunderThink(player, caster)
             flags = SND_STOP
         });
 
-        StopEarthquake() 
+        StopEarthquake()
         StopRain()
     }
 
 };
 
 __CollectGameEventCallbacks(MerasmusNamespace)
-GetAllAreas(MerasmusNamespace.areas) 
+GetAllAreas(MerasmusNamespace.areas)
 MerasmusNamespace.BossSetup()

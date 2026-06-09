@@ -44,19 +44,19 @@ const POWERUP_TIME = 30;
 
 ::AnimationTable <-		// check itemclass of weapon and setmodel to respective class
 {
-	tf_weapon_pistol =						{ model = "models/player/engineer.mdl",}	
-	tf_weapon_shotgun_primary = 			{ model = "models/player/engineer.mdl",}	
-	tf_weapon_shotgun_pyro = 				{ model = "models/player/pyro.mdl",}	
-	tf_weapon_flamethrower = 				{ model = "models/player/pyro.mdl",}	
-	tf_weapon_scattergun = 					{ model = "models/player/scout.mdl",}	
-	tf_weapon_sniperrifle = 				{ model = "models/player/sniper.mdl",}	
-	tf_weapon_smg = 						{ model = "models/player/sniper.mdl",}	
-	tf_weapon_grenadelauncher = 			{ model = "models/player/demo.mdl",}	
-	tf_weapon_buff_item = 					{ model = "models/player/soldier.mdl",}	
-	tf_weapon_rocketlauncher = 				{ model = "models/player/soldier.mdl",}	
-	tf_weapon_minigun = 					{ model = "models/player/heavy.mdl",}	
-	tf_weapon_crossbow = 					{ model = "models/player/medic.mdl",}	
-	tf_weapon_revolver = 					{ model = "models/player/spy.mdl",}	
+	tf_weapon_pistol =						{ model = "models/player/engineer.mdl",}
+	tf_weapon_shotgun_primary = 			{ model = "models/player/engineer.mdl",}
+	tf_weapon_shotgun_pyro = 				{ model = "models/player/pyro.mdl",}
+	tf_weapon_flamethrower = 				{ model = "models/player/pyro.mdl",}
+	tf_weapon_scattergun = 					{ model = "models/player/scout.mdl",}
+	tf_weapon_sniperrifle = 				{ model = "models/player/sniper.mdl",}
+	tf_weapon_smg = 						{ model = "models/player/sniper.mdl",}
+	tf_weapon_grenadelauncher = 			{ model = "models/player/demo.mdl",}
+	tf_weapon_buff_item = 					{ model = "models/player/soldier.mdl",}
+	tf_weapon_rocketlauncher = 				{ model = "models/player/soldier.mdl",}
+	tf_weapon_minigun = 					{ model = "models/player/heavy.mdl",}
+	tf_weapon_crossbow = 					{ model = "models/player/medic.mdl",}
+	tf_weapon_revolver = 					{ model = "models/player/spy.mdl",}
 }
 ::PlayerModels <-
 [
@@ -85,7 +85,7 @@ const POWERUP_TIME = 30;
 		return
 	}
 	if (!(wep in AnimationTable)) return
-	local animmodel = AnimationTable[weapon].model 
+	local animmodel = AnimationTable[weapon].model
 	self.SetCustomModelWithClassAnimations(animmodel)
 	SetPropInt(self,"m_nRenderMode",8)
 	SetPropInt(self,"Alpha",1)
@@ -227,9 +227,9 @@ const POWERUP_TIME = 30;
 //	UnstuckEntity(self)
 }
 
-::UseBossSpawnLocation <- function(self)	// use above function 
+::UseBossSpawnLocation <- function(self)	// use above function
 {
-	
+
 	local lobby = false
 	local hallways = false
 	local warehouse = false
@@ -423,8 +423,8 @@ const POWERUP_TIME = 30;
 	if (GetRoundState() == 10) // give starting weapon because it's pre-round
 	{
 		self.SetCurrency(500)
-		local items = 
-		{							 
+		local items =
+		{
 			weapon_primary = "null"
 			weapon_secondary = "ZM_Pistol"
 			weapon_melee = "null"
@@ -454,7 +454,7 @@ const POWERUP_TIME = 30;
 			if (round_number > 10)
 			{
 				self.SetCurrency(5000)
-				local items = 
+				local items =
 				{
 					weapon_primary = "ZM_Rusty"
 					weapon_secondary = "ZM_Raygun"
@@ -467,7 +467,7 @@ const POWERUP_TIME = 30;
 				}
 				EntFireByHandle(self,"runscriptcode","self.AddCustomAttribute(`max health additive bonus`,100,-1)",1.2,null,self);
 				scope.PRESERVED.powerups["Saxton Ale"] <- true
-				
+
 				PopExtWeapons.GiveItem(scope.PRESERVED.weapon_primary, self)
 				PopExtWeapons.GiveItem(scope.PRESERVED.weapon_secondary, self)
 				PopExtWeapons.GiveItem(scope.PRESERVED.weapon_melee, self)
@@ -476,7 +476,7 @@ const POWERUP_TIME = 30;
 		else
 		{
 			self.SetCurrency(500)
-			local items = 
+			local items =
 			{
 				weapon_primary = "null"
 				weapon_secondary = "ZM_Pistol"
@@ -527,7 +527,7 @@ const POWERUP_TIME = 30;
 	local instakilltext = ""
 	local doublepointstext = ""
 	local text_powerup = FindByName(null, "__text_powerup")
-	
+
 	doublepointstext = format("Double Points: %i", scope.doublepointstime - Time())
 	instakilltext = format("Instakill: %i", scope.instakilltime - Time())
 	deathmachinetext = format("Death Machine: %i", scope.miniguntime - Time())
@@ -552,7 +552,7 @@ const POWERUP_TIME = 30;
 	}
 	NetProps.SetPropString(text_powerup, "m_iszMessage", format("%s \n %s \n %s", doublepointstext, instakilltext, deathmachinetext))
 	text_powerup.AcceptInput("Display","",self,null)
-	
+
 	if (scope.instakilltime > Time() || scope.doublepointstime > Time() || scope.miniguntime > Time()) EntFireByHandle(self,"runscriptcode","UpdatePowerupDurations(self)",1,null,self);
 }
 
@@ -561,14 +561,14 @@ const POWERUP_TIME = 30;
 //	return 		// disable for now, can't get this shit to display right
 	local scope = self.GetScriptScope().PRESERVED
 	local hasostarion = false
-	local hassaxton = false 
-	local hasdoubletap = false 
-	local hasquickola = false 
+	local hassaxton = false
+	local hasdoubletap = false
+	local hasquickola = false
 	if (self.GetCustomAttribute("Reload time decreased",0)) hasquickola = true
 	if (self.GetCustomAttribute("fire rate bonus",0) != 0) hasdoubletap = true
 	if (self.GetCustomAttribute("max health additive bonus",0)) hassaxton = true
 	if (self.InCond(129)) hasostarion = true
-	
+
 	if ( hasostarion && !hassaxton && !hasdoubletap && !hasquickola) self.SetScriptOverlayMaterial("zombies/powerups/powerups_1___")
 	if ( hasostarion && hassaxton && !hasdoubletap && !hasquickola)  self.SetScriptOverlayMaterial("zombies/powerups/powerups_12__")
 	if ( hasostarion && hassaxton && hasdoubletap && !hasquickola)   self.SetScriptOverlayMaterial("zombies/powerups/powerups_123_")
@@ -676,15 +676,15 @@ const POWERUP_TIME = 30;
 	local botcount = (NetProps.GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveClassCounts"))
 	local dicecheck = 0
 	local round_threshold = 0
-	
+
 	// count our powerup odds
 	if (round_number <= 5) round_threshold = 2
 	if (round_number > 5 && round_number <= 10) round_threshold = 1
 	if (round_number > 10 && round_number <= 15) round_threshold = 0.5
 	if (round_number > 15) round_threshold = 0.33
-	
+
 	dicecheck = (botcount * round_threshold) + powerupfail
-	
+
 	if (diceroll > dicecheck)
 	{
 		powerupfail += 2
@@ -703,8 +703,8 @@ const POWERUP_TIME = 30;
 	powerupcount += 1
 	powerupfail = 0
 	powerupcooldown = 2
-	
-	if (powerupindex >= 6) 
+
+	if (powerupindex >= 6)
 	{
 		powerupindex = 0
 	}
@@ -739,7 +739,7 @@ const POWERUP_TIME = 30;
 			PopExtUtil.PlaySoundOnClient(player,"deadlands/pickup_maxammo.mp3",1.0,100)
 			PopExtUtil.PlaySoundOnClient(player,"deadlands/powerup_maxammo.mp3",1.0,100)
 			SetPropIntArray(player, "m_iAmmo", PopExtWeapons.GetMaxAmmo(player, 1), 1)
-			SetPropIntArray(player, "m_iAmmo", PopExtWeapons.GetMaxAmmo(player, 2), 2) 
+			SetPropIntArray(player, "m_iAmmo", PopExtWeapons.GetMaxAmmo(player, 2), 2)
 			ClientPrint(player, HUD_PRINTCENTER, "Max Ammo!");
 		}
 	}
@@ -781,7 +781,7 @@ const POWERUP_TIME = 30;
     }
     foreach (bot in PopExtUtil.BotArray)
     {
-        if (PopExtUtil.IsAlive(bot) && !bot.HasBotTag("Cooldude"))
+        if (bot.IsAlive() && !bot.HasBotTag("Cooldude"))
         {
             // bot.TakeDamage(bot.GetHealth(),8256,self) // self credits player for kill
             bot.TakeDamageEx(killicon_dummy, self, null, Vector(), Vector(), bot.GetHealth(), DMG_BLAST)
@@ -796,13 +796,13 @@ const POWERUP_TIME = 30;
 	local scope = self.GetScriptScope();
 	PopExtUtil.PlaySoundOnClient(self,"ui/item_heavy_gun_pickup.wav",1.0,100)
 	PopExtUtil.PlaySoundOnClient(self,"deadlands/powerup_minigun.mp3",1.0,100)
-	
+
 	for (local i = 0; i < MAX_WEAPONS; i++)
 	{
 		local weapon = NetProps.GetPropEntityArray(self, "m_hMyWeapons", i)
 		if (weapon == null)
 		continue
-		if (weapon.GetSlot() == 0) 
+		if (weapon.GetSlot() == 0)
 		{
 			NetProps.SetPropEntityArray(self, "m_hMyWeapons", null, i)
 			weapon.Destroy()
@@ -819,7 +819,7 @@ const POWERUP_TIME = 30;
 	scope.PRESERVED.hasdeathmachine = true
 	UpdatePowerupDurations(self)
 }
-::PlayPerkAnimation <- function(self) 
+::PlayPerkAnimation <- function(self)
 {
 	local main_viewmodel = GetPropEntity(self, "m_hViewModel")
 	PopExtWeapons.GiveItem("Perk Bottle", self);
@@ -831,7 +831,7 @@ const POWERUP_TIME = 30;
 ::RollZombieModel <- function(self)
 {
 	local diceroll = RandomInt(0,8)
-	local model = ModelTable[diceroll]	
+	local model = ModelTable[diceroll]
 	self.SetCustomModelWithClassAnimations(model)
 }
 
@@ -852,14 +852,14 @@ const POWERUP_TIME = 30;
 	}
 	if (targetarray.len() == 0) return
 	target = targetarray[RandomInt(0,targetarray.len()-1)]
-	
+
 	if (target == null) return	// wtf??
 	self.GetScriptScope().PRESERVED.attackcooldown = Time() + POWERUP_TIME;
 	self.Taunt(0,11)
 	self.Taunt(0,11)
 	self.AddCustomAttribute("no_attack", 1, 3)
 //	self.AddCustomAttribute("mult_player_movespeed_active", 0.0001, 3)
-	
+
 	GetNavAreasInRadius(target.GetOrigin(),500,targetnav)	// now rewritten with some of Stardustspy's code
 	GetNavAreasInRadius(target.GetOrigin(),150,filternav)
 	foreach(id, nav in targetnav)
@@ -878,23 +878,23 @@ const POWERUP_TIME = 30;
 	}
 	local nav = spots[RandomInt(0, spots.len() - 1)]
 	local warpsite = nav.FindRandomSpot()
-	local starteff = SpawnEntityFromTable("info_particle_system", 
+	local starteff = SpawnEntityFromTable("info_particle_system",
 	{
-		effect_name = "utaunt_electric_mist_parent", 
+		effect_name = "utaunt_electric_mist_parent",
 		targetname = "tele_eff"
 		origin = self.GetOrigin()
 		angles = Vector(0,0,0)
 	})
-	local teleport = SpawnEntityFromTable("info_particle_system", 
+	local teleport = SpawnEntityFromTable("info_particle_system",
 	{
-		effect_name = "utaunt_electric_mist_parent", 
+		effect_name = "utaunt_electric_mist_parent",
 		targetname = "tele_eff_1"
 		origin = warpsite
 		angles = Vector(0,0,0)
 	})
-	local teleport_2 = SpawnEntityFromTable("info_particle_system", 
+	local teleport_2 = SpawnEntityFromTable("info_particle_system",
 	{
-		effect_name = "utaunt_lightning_bolt", 
+		effect_name = "utaunt_lightning_bolt",
 		targetname = "tele_eff_2"
 		origin = warpsite + Vector(0,0,24)
 		angles = Vector(0,0,0)
@@ -931,7 +931,7 @@ const POWERUP_TIME = 30;
 	EntFireByHandle(starteff,"Kill","",3,self,null);
 	EntFireByHandle(teleport,"Kill","",3,self,null);
 	EntFireByHandle(teleport_2,"Kill","",3,self,null);
-	
+
 }
 
 //similarly from Stardustspy, written by Lite
@@ -977,7 +977,7 @@ const POWERUP_TIME = 30;
 	local players_escaping = 0
 	local player_count = 0
 	local building = Entities.FindByName(null, "escape_check")
-	
+
 	players_escaping = players_escaping + GetPropInt(escape_counter, "m_OutValue")
 	foreach (player in PopExtUtil.HumanArray)
 	{
@@ -1004,10 +1004,10 @@ const POWERUP_TIME = 30;
 	}
 }
 ::ExitStageLeft <- function() // remove bot from wave counter
-{ 
+{
 	local botcount = NetProps.GetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveClassCounts")
 	if (botcount == 0) return
-	
+
 	botcount-= 1
 	NetProps.SetPropInt(PopExtUtil.ObjectiveResource, "m_nMannVsMachineWaveClassCounts", botcount)
 }

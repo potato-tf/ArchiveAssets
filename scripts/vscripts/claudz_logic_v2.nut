@@ -69,12 +69,7 @@
 
     IsPlayerAlive = function(player)
     {
-        // lifeState corresponds to the following values:
-        // 0 - alive
-        // 1 - dying (probably unused)
-        // 2 - dead
-        // 3 - respawnable (spectating)
-        return player != null && player.IsValid() && NetProps.GetPropInt(player, "m_lifeState") == 0;
+        return player != null && player.IsValid() && player.IsAlive();
     }
 
     IsPlayerLOSofMe = function(me, player, ignore = null, seeThroughNpc = false)

@@ -1369,7 +1369,7 @@ Bread.DoScript <- function(scriptname) {
 }
 Bread.DoChase <- 0
 ::AnimThinkTest <- function() {
-    if(!(NetProps.GetPropInt(self, "m_lifeState") == 0)) EntFire("tf_gamerules", "$SetBossHealthPercentage", 0)
+    if(!self.IsAlive()) EntFire("tf_gamerules", "$SetBossHealthPercentage", "0")
     if (!("Bread" in getroottable())) return
     local bot = self
     //if(dbug) ClientPrint(null, 4, Bread.AnimQueue.len().tostring())
@@ -1497,7 +1497,7 @@ Bread.Phase3AttackScripts <- [
 ]
 Bread.Phase <- 0
 Bread.TriggerNextAttack <- function() {
-    if(!(NetProps.GetPropInt(Bread.breadboss, "m_lifeState") == 0)) return
+    if(!Bread.breadboss.IsAlive()) return
 
     Bread.AttackIndex += 1
     local nextAttack = ""
@@ -1563,7 +1563,7 @@ Bread.StopAllRelays <- function() {
 Bread.PayloadHitFunc <- function() {
     if(dbug) ClientPrint(null, 3, "payloadhit called")
     //If boss has not died from payload damage
-    if((NetProps.GetPropInt(Bread.breadboss, "m_lifeState") == 0)) {
+    if(Bread.breadboss.IsAlive()) {
         if(dbug) ClientPrint(null, 3, "trigger phase 3")
         Bread.ResetBoss()
         EntFire("tf_gamerules", "RunScriptCode", "Bread.TriggerPhase3()", 0.2)
@@ -1772,7 +1772,7 @@ Bread.TentyRotate <- function(tenty) {
 //  if closest target is far, shoot
 //  if closest target is near (300), lunge then sweep
 ::TentacleThink <- function() {
-    //if(!(NetProps.GetPropInt(self, "m_lifeState") == 0)) return
+    //if(!self.IsAlive()) return
     //ClientPrint(null, 4,self.GetCycle().tostring())
 
     local scope = self.GetScriptScope()

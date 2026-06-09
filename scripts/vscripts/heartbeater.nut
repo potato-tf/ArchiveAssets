@@ -19,7 +19,7 @@ PrecacheSound("ui/heartbeat5.mp3")
 			if(player == null) continue
 			if(IsPlayerABot(player)) continue
 			if(player.GetTeam() != TF_TEAM_RED) continue
-			
+
 			player.RemoveCustomAttribute("move speed penalty")
 			player.RemoveCustomAttribute("halloween increased jump height")
 			player.RemoveCustomAttribute("uber duration bonus")
@@ -30,21 +30,21 @@ PrecacheSound("ui/heartbeat5.mp3")
 		//delete ::playerMaxMoveSpeed
 		delete ::heartbeaterCallbacks
     }
-	
+
 	function OnGameEvent_mvm_wave_complete(_) {
 		Cleanup()
 	}
-	
+
 	function OnGameEvent_recalculate_holidays(_) {
 		if(GetRoundState() == 3) {
 			Cleanup()
-		} 
+		}
 	}
-	
+
 	function OnGameEvent_player_spawn(params) {
 		local player = GetPlayerFromUserID(params.userid)
 		if(player == null) return
-		
+
 		if(!IsPlayerABot(player) && player.GetTeam() == TF_TEAM_RED) {
 			player.AcceptInput("SetFogController", "heartbeater_fog", null, null)
 			EntFireByHandle(player, "RunScriptCode", "heartbeaterCallbacks.NerfPlayerUberShield()", -1, player, null)
@@ -54,12 +54,12 @@ PrecacheSound("ui/heartbeat5.mp3")
 		if(player.GetTeam() != TF_TEAM_BLUE) return
 		EntFireByHandle(player, "RunScriptCode", "heartbeaterCallbacks.addHeartbeaterThink()", -1, player, null)
 	}
-	
+
 	function addHeartbeaterThink() {
 		if(!activator.HasBotTag("heartbeater")) {
 			return
 		}
-		
+
 		local stunDurationList = [40, 40, 40, 40, 60, 60, 60, 60, 60, 100, 100, 100, 100, 100, 100, 120, 120, 160, 160, 200]
 		// Raw sound names, new version calls ambient_generic entities instead
 		local stunDurationAudioList = ["heartbeat1", "heartbeat1", "heartbeat1", "heartbeat1", "heartbeat2", "heartbeat2", "heartbeat2", "heartbeat2", "heartbeat2", "heartbeat3", "heartbeat3", "heartbeat3", "heartbeat3", "heartbeat3", "heartbeat3", "heartbeat4", "heartbeat4", "heartbeat5", "heartbeat6", "heartbeat7"]
@@ -88,10 +88,10 @@ PrecacheSound("ui/heartbeat5.mp3")
 
 		activator.SetCustomModelWithClassAnimations("models/bots/forgotten/disease_bot_soldier_boss.mdl")
 		activator.GetScriptScope().heartbeaterThink <- function() {
-			if(NetProps.GetPropInt(self, "m_lifeState") != 0) {
+			if(!self.IsAlive()) {
 				AddThinkToEnt(self, null)
 				NetProps.SetPropString(self, "m_iszScriptThinkFunction", "")
-			
+
 				if(rageParticle.IsValid()) {
 					rageParticle.Kill()
 				}
@@ -102,12 +102,12 @@ PrecacheSound("ui/heartbeat5.mp3")
 				delete dhParticle
 				return
 			}
-			
+
 			if(activeDuration == 0 && eligibleForStun) { //if not stunned and eligible for stun
 				stunDurationChoice = bossIsBuffed ? RandomInt(0,8) : RandomInt(0,16) //Yes it maxes out at 19 but I don't like the ultra long delays
 				//printl("Stun Audio: " + stunDurationAudioList[stunDurationChoice])
 				//printl("Stun Duration: " + stunDurationList[stunDurationChoice])
-				
+
 				local soundname = "ui/" + stunDurationAudioList[stunDurationChoice] + ".mp3"
 				EmitSoundEx({
 					sound_name = soundname,
@@ -136,7 +136,7 @@ PrecacheSound("ui/heartbeat5.mp3")
 					origin = self.GetCenter(),
 					filter_type = RECIPIENT_FILTER_GLOBAL
 				})
-				
+
 				self.AddCondEx(TF_COND_MVM_BOT_STUN_RADIOWAVE, stunDurationList[stunDurationChoice] / 10, null)
 				activeDuration = RandomInt(20,160)
 				eligibleForStatChange = true
@@ -151,7 +151,7 @@ PrecacheSound("ui/heartbeat5.mp3")
 					modeToUse = MELEEMODE
 				}
 			}
-			
+
 			if(self.GetCondDuration(TF_COND_MVM_BOT_STUN_RADIOWAVE) != 0) return //if actively stunned, return
 			//printl("Active Duration: " + activeDuration)
 			eligibleForStun = true
@@ -162,7 +162,7 @@ PrecacheSound("ui/heartbeat5.mp3")
 			self.AcceptInput("DispatchEffect", "ParticleEffectStop", null, null)
 			if(bossIsBuffed) {
 				rageParticle.AcceptInput("StartTouch", "!activator", self, self)
-			}				
+			}
 
 			EntFire("wakeup_sound*", "PlaySound")
 			EntFire("wakeup_shake*", "StartShake")
@@ -193,7 +193,7 @@ PrecacheSound("ui/heartbeat5.mp3")
 		}
 		AddThinkToEnt(activator, "heartbeaterThink")
 	}
-	
+
 	function NerfPlayerUberShield() {
 		// local currentUberDuration = self.GetCustomAttribute("uber duration bonus", 0)
 		activator.AddCustomAttribute("uber duration bonus", -6, -1)
@@ -246,7 +246,7 @@ PrecacheSound("ui/heartbeat5.mp3")
 			})
 
 			DispatchParticleEffect("cardiac_arrest_timer", player.GetCenter() + Vector(0,0,128), Vector())
-			
+
 			//player.AddCondEx(TF_COND_CRITBOOSTED_USER_BUFF, -1, null)
 			player.AddCondEx(TF_COND_SODAPOPPER_HYPE, -1, null)
 			player.AddCustomAttribute("fire rate penalty", 0.4, -1)
@@ -265,7 +265,7 @@ for (local i = 1; i <= MaxPlayers ; i++) {
 	if(player == null) continue
 	if(IsPlayerABot(player)) continue
 	if(player.GetTeam() != TF_TEAM_RED) continue
-	
+
 	local maxMoveSpeed = player.GetCustomAttribute("move speed bonus", 1)
 	if(maxMoveSpeed > playerMaxMoveSpeed) playerMaxMoveSpeed = maxMoveSpeed
 	player.AcceptInput("RunScriptCode", "heartbeaterCallbacks.NerfPlayerUberShield()", player, null)

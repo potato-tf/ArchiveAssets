@@ -56,7 +56,7 @@ PrecacheEntityFromTable({classname = "ukgr_death_explosion", effect_name = "boss
 	cleanupPhase1Support = function() { //if some of the phase 1 soldiers are still floating around
 		local support = ukgr.GetScriptScope().support
 		foreach(bot in support) {
-			if(NetProps.GetPropInt(bot, "m_lifeState") == 0) {
+			if(bot.IsAlive()) {
 				bot.TakeDamage(1000, 0, bot)
 			}
 			EntFireByHandle(bot, "runscriptcode", "self.ForceChangeTeam(TEAM_SPECTATOR, true)", -1, null, null)
@@ -76,7 +76,7 @@ PrecacheEntityFromTable({classname = "ukgr_death_explosion", effect_name = "boss
 						if(player.InCond(TF_COND_HALLOWEEN_GHOST_MODE)) {
 							player.ForceRespawn()
 							if(datatable.reanimEntity && datatable.reanimEntity.IsValid()) {
-								datatable.reanimEntity.Kill();		
+								datatable.reanimEntity.Kill();
 								datatable.reanimCount++;
 							}
 						}

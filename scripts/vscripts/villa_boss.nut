@@ -192,7 +192,7 @@ startPhase1 <-  function() {
 		local player = PlayerInstanceFromIndex(i)
 		if(player == null) continue
 		if(!IsPlayerABot(player)) continue
-		if(NetProps.GetPropInt(player, "m_lifeState") != LIFE_ALIVE) continue
+		if(!player.IsAlive()) continue
 		if(!player.HasBotTag("gmedsupport")) continue
 
 		support.append(player)
@@ -401,7 +401,7 @@ changePhase <- function() {
 
 			//Taunts to forcefully apply Tachycardia debuff on everyone
 			//Debuff function below
-			
+
 			self.Weapon_Switch(amputator)
 			EntFireByHandle(self, "RunScriptCode", "self.Taunt(TAUNT_BASE_WEAPON, 11)", 0.1, null, null)
 			break
@@ -706,7 +706,7 @@ self.AddCondEx((TF_COND_PREVENT_DEATH) , -1, null)
 thinkTable.offensiveThink <- offensiveThink
 thinkTable.phase1skinBuffThink <- phase1skinBuffThink
 mainThink <- function() { //this is mostly to make the customweapons think works
-	if(NetProps.GetPropInt(self, "m_lifeState") != 0) {
+	if(!self.IsAlive()) {
 		cleanup()
 		return
 	}

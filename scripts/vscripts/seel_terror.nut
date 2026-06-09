@@ -13,7 +13,7 @@ IncludeScript("popextensions_main.nut",getroottable())
         // keep this at the end
         delete ::SeelTerror
     }
-    
+
     // mandatory events
     OnGameEvent_recalculate_holidays = function(_) { if (GetRoundState() == 3) Cleanup() }
     OnGameEvent_mvm_wave_complete = function(_) { Cleanup() }
@@ -45,11 +45,11 @@ PopExt.AddRobotTag("cultchief", {
 		bot.GetScriptScope().bCasting <- false
 		bot.GetScriptScope().bCastingDone <- false
 		::hEyeBoss <- null
-		
+
         PrecacheModel("models/props_halloween/halloween_demoeye.mdl")
         bot.GetScriptScope().iEyeRocketModelIndex <- PrecacheModel("models/props_halloween/eyeball_projectile.mdl")
         bot.GetScriptScope().flEyeRocketSpeed <- 550.0
-		
+
 		bot.GetScriptScope().PlayerThinkTable.bossThink <- function()
 		{
 			if (self.InCond(7) && !bCasting)
@@ -65,7 +65,7 @@ PopExt.AddRobotTag("cultchief", {
 				eyeboss_proj.KeyValueFromVector("origin",self.GetOrigin() + Vector(0,0,2));
 				SetPropEntity(eyeboss_proj,"m_hThrower",self);
 				DispatchSpawn(eyeboss_proj)
-				
+
 				self.RemoveCond(7)
 			}
 			if (hEyeBoss == null)
@@ -76,7 +76,7 @@ PopExt.AddRobotTag("cultchief", {
 			{
 				hEyeBoss.KeyValueFromInt("solid",0)
 				hEyeBoss.SetAbsOrigin(self.GetOrigin() + Vector(0,0,(60 + 85 * 1.75)))
-				
+
 				//Snippet by lite. Slows down rockets.
 				for(local hRocket; hRocket = FindByClassname(hRocket, "tf_projectile_rocket");)
 					if(GetPropInt(hRocket, "m_nModelIndex") == iEyeRocketModelIndex && hRocket.GetOwner() == hEyeBoss)
@@ -142,7 +142,7 @@ PopExt.AddRobotTag("unichief", {
 	{
 		local vecTarget = bot.GetOrigin()+Vector(0,0,65)
 		printl("Attempting to dispatch particle effect at"+vecTarget.tostring())
-		
+
 		// EmitSoundEx({
 			// sound_name = "Halloween.PlayerEscapedUnderworld",
 			// entity = bot
@@ -161,7 +161,7 @@ PopExt.AddRobotTag("unichief", {
 			effect_name = "eyeboss_tp_vortex"
 			start_active = 0
 		})
-		
+
 		EntFire("!activator","Start","",1.7,hSpawnParticle)
 		EntFire("!activator","RunScriptCode","BossSound(`Halloween.spell_teleport`)",1.7,hSpawnParticle)
 		EntFire("!activator","Stop","",5,hSpawnParticle)
@@ -227,7 +227,7 @@ PopExt.AddRobotTag("unichief_final", {
 		"$weaponname":"Light of Miquella"
 		"$weaponnosound":1
 	})
-	
+
 	EntFire("laser_mimic*","$SetOwner","!activator",0,bot)
 	hLaserMimic_1.ValidateScriptScope()
 	hLaserMimic_1.GetScriptScope().hBot <- bot
@@ -238,24 +238,24 @@ PopExt.AddRobotTag("unichief_final", {
 	::Laser_Think <- function()
 	{
 		local scope = self.GetScriptScope()
-		if (hBot == null || !PopExtUtil.IsAlive(hBot))
+		if (hBot == null || !player.IsAlive())
 		{
 			self.Destroy()
 			return
 		}
 		self.SetAbsOrigin(hBot.GetOrigin() + Vector(0,0,40))
-		
+
 		//Cooldown: 1 second
 		if (scope.tick > 210)
 			scope.tick = 1
-		
+
 		//11 times per second, trigger 24 times for 120 degrees covered
 		if (scope.tick % 6 == 0 && scope.tick <= 144)
 		{
 			self.AcceptInput("FireOnce","",null,null)
 			self.SetAbsAngles(self.GetAbsAngles() + QAngle(0,5,0))
 		}
-		
+
 		scope.tick = scope.tick + 1
 		return -1
 	}
@@ -264,7 +264,7 @@ PopExt.AddRobotTag("unichief_final", {
 }
 ::BossModelThink <- function()
 {
-	if (!self.IsValid()) 
+	if (!self.IsValid())
 	{
 		printl("Debug: ERROR: NO SELF FOUND.")
 		return -1
@@ -289,7 +289,7 @@ PopExt.AddRobotTag("unichief_final", {
 		if (player == null) continue
 		if (player.IsBotOfType(TF_BOT_TYPE)) continue
 		if (!player.IsAlive()) continue
-		
+
 		local vecPlayerOrigin = player.GetOrigin()
 		local flDist = (vecPlayerOrigin - vecBotOrigin).Length()
 		if (flDist > 400) continue;
@@ -297,7 +297,7 @@ PopExt.AddRobotTag("unichief_final", {
 		local flDiffx = vecPlayerOrigin.x - vecBotOrigin.x
 		local flDiffy = vecPlayerOrigin.y - vecBotOrigin.y
 		local vecDiff = Vector(flDiffx, flDiffy, 0)
-		
+
 		vecDiff = vecDiff * (0.15*pow(1+1000/flDist,2))
 		vecDiff.z = 330
 		player.SetAbsVelocity(vecDiff)
@@ -308,7 +308,7 @@ PopExt.AddRobotTag("unichief_final", {
 {
 	//Fire a trace from the bot's Y rotation straight ahead.
 	//Along this trace, fire a bunch of lasers from the sky.
-	
+
 	//Stop the trace prematurely if it hits a wall.
 }
 
@@ -317,7 +317,7 @@ PopExt.AddRobotTag("unichief_final", {
 	//Initial Test
 	//Create a particle on the ground underneath the nearest player within a certain distance.
 	//Don't do this if the player is above our eye level.
-	
+
 	// DispatchParticleEffect("eyeboss_tp_escape",self.GetOrigin(),self.GetAbsAngles().Forward())
 	//SpawnEntityFromTable?
 	local hBombTest = CreateByClassname("tf_generic_bomb");
@@ -334,9 +334,9 @@ PopExt.AddRobotTag("unichief_final", {
 	// hBombTest.SetGravity(-50);
 	// hBombTest.AddSolidFlags(FSOLID_NOT_SOLID) //not_solid
 	DispatchSpawn(hBombTest)
-	
+
 	local Microcosm_Think = function()
 	{
-		
+
 	}
 }

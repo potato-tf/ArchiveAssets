@@ -25,7 +25,7 @@ local CurrentWaveNum = GetPropInt(FindByClassname(null, "tf_objective_resource")
             if(debugzz) ClientPrint(null, 3 , "cleaning up " + player.tostring())
             local scope = player.GetScriptScope()
 
-            local alive = PopExtUtil.IsAlive(player)
+            local alive = player.IsAlive()
             if (alive && !("botCreated" in scope)) {
                 scope.botCreated <- true
 
@@ -234,12 +234,7 @@ for (local i = 1, player; i <= MaxClients().tointeger(); i++)
 
 ::IsPlayerAlive <- function(player)
 {
-    // lifeState corresponds to the following values:
-    // 0 - alive
-    // 1 - dying (probably unused)
-    // 2 - dead
-    // 3 - respawnable (spectating)
-    return player!= null && player.IsValid() && NetProps.GetPropInt(player, "m_lifeState") == 0;
+    return player!= null && player.IsValid() && player.IsAlive();
 }
 
 ::MASK_VISIBLE_AND_NPCS <-  33579137
@@ -1281,19 +1276,19 @@ PopExt.AddRobotTag("engidrone", {
 Contact.lock <- false
 Contact.KillEngiDrone <- function()
 {
-    // if(Contact.engiDrone != null && Contact.engiDrone.IsValid() && NetProps.GetPropInt(Contact.engiDrone, "m_lifeState") == 0) {
+    // if(Contact.engiDrone != null && Contact.engiDrone.IsValid() && Contact.engiDrone.IsAlive() {
     //     Contact.engiDroneLastLoc <- Contact.engiDrone.GetOrigin()
     //     EntFireByHandle(Contact.engiDrone, "$Suicide", null, 0.1, null, null)
     // }
     if (Contact.lock) {
-        if(Contact.engiDrone != null && Contact.engiDrone.IsValid() && Contact.engiDrone.GetClassname() == "player" && NetProps.GetPropInt(Contact.engiDrone, "m_lifeState") == 0) {
+        if(Contact.engiDrone != null && Contact.engiDrone.IsValid() && Contact.engiDrone.GetClassname() == "player" && Contact.engiDrone.IsAlive()) {
         	EntFire("bignet", "RunScriptCode", "Contact.KillEngiDrone()", 0.1, null)
         }
     }
     Contact.lock = true
-    if(Contact.engiDrone != null && Contact.engiDrone.IsValid() && Contact.engiDrone.GetClassname() == "player" && NetProps.GetPropInt(Contact.engiDrone, "m_lifeState") == 0) {
+    if(Contact.engiDrone != null && Contact.engiDrone.IsValid() && Contact.engiDrone.GetClassname() == "player" && Contact.engiDrone.IsAlive()) {
         Contact.engiDroneLastLoc <- Contact.engiDrone.GetOrigin()
-        EntFireByHandle(Contact.engiDrone, "RunScriptCode", "if(self.IsValid() && NetProps.GetPropInt(self, `m_lifeState`) == 0) EntFireByHandle(Contact.engiDrone, `$Suicide`, null, 0, null, null); Contact.lock=false", 0.5, null, null)
+        EntFireByHandle(Contact.engiDrone, "RunScriptCode", "if(self.IsValid() && self.IsAlive()) EntFireByHandle(Contact.engiDrone, `$Suicide`, null, 0, null, null); Contact.lock=false", 0.5, null, null)
 
     }
     //Contact.engiDrone.TakeDamage(9999999, 1, Contact.engiDrone)

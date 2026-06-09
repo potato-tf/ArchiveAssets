@@ -1,13 +1,13 @@
 EntFire("xdd","Kill")
-	
+
 ::PostPlayerSpawn <- function()
 {
     if(self.HasBotTag("tank_icon") == true) {
 		self.SetOrigin(Vector(-1604,-173,-500))
 		self.RemoveBotTag("tank_icon")
 	}
-	
-	if(self.HasBotTag("buster") == true) {	
+
+	if(self.HasBotTag("buster") == true) {
 		for (local wearable = self.FirstMoveChild(); wearable != null; wearable = wearable.NextMovePeer())
 	{
     if (wearable.GetClassname() != "tf_wearable")
@@ -26,7 +26,7 @@ EntFire("xdd","Kill")
 
 			scope.BotModelThink <- function() {
 			local owner = self.GetMoveParent()
-        	if(NetProps.GetPropInt(owner, "m_lifeState") != 0){self.Kill()}
+        	if(!owner.IsAlive()){self.Kill()}
           	return -1
         	}
         	AddThinkToEnt(wearable, "BotModelThink")
@@ -34,8 +34,8 @@ EntFire("xdd","Kill")
 	self.RemoveBotTag("buster")
 	}
 	}
-}	
-		
+}
+
 function OnGameEvent_player_spawn(params)
 {
 	if(params.team == 3) //Is the player blue

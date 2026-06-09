@@ -118,11 +118,6 @@ if (!("ConstantNamingConvention" in ROOT)) // make sure folding is only done onc
 {
     IsWaveStarted = false
 
-    IsAlive = function(player)
-    {
-		return GetPropInt(player, "m_lifeState") == 0
-	}
-
     Cleanup = function()
     {
         for (local player; player = Entities.FindByClassname(player, "player");)
@@ -565,13 +560,13 @@ if (!("ConstantNamingConvention" in ROOT)) // make sure folding is only done onc
                         continue
                     }
 
-                    if (victim == null || !crocBossScript.IsAlive(victim))
+                    if (victim == null || !victim.IsAlive())
                     {
                         ////printl("removing "+victim)
                         tPlayersToRegenerate.remove(key)
                     }
 
-                    if (crocBossScript.IsAlive(victim) && victim != null)
+                    if (victim.IsAlive() && victim != null)
                     {
                         ////printl("entity "+victim+" is missing health, the virus infects...")
                         local dmg_penalty = victim.GetCustomAttribute("damage penalty", 1)
@@ -632,7 +627,7 @@ if (!("ConstantNamingConvention" in ROOT)) // make sure folding is only done onc
                             victim.TakeDamageCustom(null, attacker, attacker.GetActiveWeapon(), Vector(0, 0, 0), victim.GetOrigin(), 99999, 4096 + 131072, 16)
                         }
                     }
-                    // else if (crocBossScript.IsAlive(victim) && victim != null && victim.GetHealth() >= victim.GetMaxHealth())
+                    // else if (victim != null && victim.IsAlive() && victim.GetHealth() >= victim.GetMaxHealth())
                     // {
                     //     //printl("entity "+victim+" is max health! The virus corrupts!")
                     //     victim.SetScriptOverlayMaterial("")
@@ -1004,7 +999,7 @@ if (!("ConstantNamingConvention" in ROOT)) // make sure folding is only done onc
             local cur_time = Time()
             local origin = self.GetOrigin()
 
-            if (GetPropInt(self, "m_lifeState") != 0)
+            if (!self.IsAlive())
             {
                 NetProps.SetPropString(self, "m_iszScriptThinkFunction", "")
                 AddThinkToEnt(self, null)

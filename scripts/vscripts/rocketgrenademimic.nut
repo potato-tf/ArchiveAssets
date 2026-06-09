@@ -7,14 +7,14 @@ const INTERVAL = 1;
 for(local i = 0; i < NetProps.GetPropArraySize(self, "m_hMyWeapons"); i++) {
 	local weapon = NetProps.GetPropEntityArray(self, "m_hMyWeapons", i);
 	if(weapon == null) continue;
-	
+
 	if(weapon.GetClassname() == "tf_weapon_rocketlauncher") {
 		rocketLauncher = weapon;
 	}
 }
 
 function Think() {
-	if(NetProps.GetPropInt(self, "m_lifeState") != 0) {
+	if(!self.IsAlive()) {
 		AddThinkToEnt(self, null);
 		NetProps.SetPropString(self, "m_iszScriptThinkFunction", "");
 		self.TerminateScriptScope();
@@ -31,14 +31,14 @@ function Think() {
 			}
 		}
 	}
-	
+
 	foreach(rocket, data in rockets) {
 		if(!rocket.IsValid()) { //rocket blew up on something and isn't valid anymore
 			//ClientPrint(null, 3, "rocket " + data.origin.tostring())
-			
+
 			originQueue.append(data.origin);
 			angleQueue.append(data.angles);
-			
+
 			local mimic = SpawnEntityFromTable("tf_point_weapon_mimic", {
 				teamnum = self.GetTeam(),
 				["$preventshootparent"] = 1,
@@ -47,9 +47,9 @@ function Think() {
 			});
 			mimic.SetOwner(self);
 			mimic.SetAbsOrigin(originQueue.remove(0))
-			
+
 			//ClientPrint(null, 3, mimic.GetOrigin().tostring())
-			
+
 			mimic.ValidateScriptScope()
 			mimic.GetScriptScope().first <- true
 			mimic.GetScriptScope().Think <- function() {
@@ -63,7 +63,7 @@ function Think() {
 			}
 			EntFireByHandle(mimic, "FireOnce", null, -1, null, null);
 			AddThinkToEnt(mimic, "Think")
-			
+
 			delete rockets[rocket];
 		}
 		else { //update data

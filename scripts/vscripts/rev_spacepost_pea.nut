@@ -720,7 +720,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 
 	spyalert_cooldown = 0
 
-	RespawnIfDead = function() { if (NetProps.GetPropInt(self, "m_lifeState") != 0) self.ForceRespawn() }
+	RespawnIfDead = function() { if (!self.IsAlive()) self.ForceRespawn() }
 
 	red_filter = SpawnEntityFromTable("filter_activator_tfteam",
 	{
@@ -1018,7 +1018,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 
 		// ClientPrint(debugger, 3, "Delivering visual tip to " + NetProps.GetPropString(player, "m_szNetname") + "...")
 
-		if (!scope.tip_table[tip_name] && NetProps.GetPropInt(player, "m_lifeState") == 0 && !scope.in_vistip_cooldown)
+		if (!scope.tip_table[tip_name] && player.IsAlive() && !scope.in_vistip_cooldown)
 		{
 			if (debugger != null)
 			{
@@ -1510,7 +1510,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 						if (bot == null) continue
 						if (!bot.IsFakeClient()) continue
 						if (bot.GetTeam() != 2) continue
-						if (NetProps.GetPropInt(bot, "m_lifeState") != 0) continue
+						if (!bot.IsAlive()) continue
 						if (bot.HasBotTag("aggrobot")) continue
 						if (bot.IsInASquad()) continue
 
@@ -2151,7 +2151,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 
 			for (local i = 0; i <= players_joining_array.len() - 1; i++)
 			{
-				if (!players_joining_array[i].IsValid() || NetProps.GetPropInt(players_joining_array[i], "m_lifeState") == 0)
+				if (!players_joining_array[i].IsValid() || players_joining_array[i].IsAlive())
 				{
 					// printl(players_joining_array[i].GetTeam())
 					players_to_cull_array.append(players_joining_array[i])
@@ -2306,7 +2306,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 
 			if (bot == null) continue
 			if (!bot.IsFakeClient()) continue
-			if (NetProps.GetPropInt(bot, "m_lifeState") != 0) continue
+			if (!bot.IsAlive()) continue
 
 			if (bot.GetPlayerClass() == spy) spies_found = true
 		}
@@ -2424,7 +2424,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 		for (local player; player = Entities.FindByClassnameWithin(player, "player", self.GetOrigin(), 500.0); )
 		{
 			if (!player.IsFakeClient()) continue
-			if (NetProps.GetPropInt(player, "m_lifeState") != 0) continue
+			if (!player.IsAlive()) continue
 			if (player.GetTeam() != 2) continue
 
 			// if (!player.HasBotTag("aggrobot")) reds_near_bloodtank++
@@ -3300,7 +3300,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 
 	AoEUber_Think = function()
 	{
-		if (NetProps.GetPropInt(self, "m_lifeState") != 0)
+		if (!self.IsAlive())
 		{
 			NetProps.SetPropString(self, "m_iszScriptThinkFunction", "")
 			return
@@ -3528,7 +3528,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 					local player = PlayerInstanceFromIndex(i)
 					if (player == null) continue
 					if (!player.IsFakeClient()) continue
-					if (NetProps.GetPropInt(player, "m_lifeState") != 0) continue
+					if (!player.IsAlive()) continue
 
 					player.AddCondEx(71, 15.0, player)
 				}
@@ -3903,7 +3903,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 		{
 			local scope = bluplayer.GetScriptScope().bloodstorage
 
-			if (NetProps.GetPropInt(bluplayer, "m_lifeState") != 0) scope.pos_before_iceblock_cutscene = Vector(100, 1700, 0) // prevent issues with dead spectator camera
+			if (!bluplayer.IsAlive()) scope.pos_before_iceblock_cutscene = Vector(100, 1700, 0) // prevent issues with dead spectator camera
 			else												 	scope.pos_before_iceblock_cutscene = bluplayer.GetOrigin()
 
 			EntFireByHandle(bluplayer, "RunScriptCode", "self.SetMoveType(0, 0)", -1.0, null, null)
@@ -4060,7 +4060,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 
 	DisplayIceblockHealthbar_Think = function()
 	{
-		if (NetProps.GetPropInt(self, "m_lifeState") != 0)
+		if (!self.IsAlive())
 		{
 			NetProps.SetPropString(self, "m_iszScriptThinkFunction", "")
 			return
@@ -4155,7 +4155,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 
 		if (self.GetHealth() > 0) self.SetHealth(self.GetMaxHealth() - (scope.barricadebomb.GetMaxHealth() - scope.barricadebomb.GetHealth()))
 
-		if ((self.GetHealth() <= 0 || NetProps.GetPropInt(self, "m_lifeState") != 0) && !barricade_destroyed_recently)
+		if ((self.GetHealth() <= 0 || !self.IsAlive()) && !barricade_destroyed_recently)
 		{
 			barricade_destroyed_recently = true
 
@@ -4540,7 +4540,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 
 		foreach (bluplayer in bluplayer_array)
 		{
-			if (NetProps.GetPropInt(bluplayer, "m_lifeState") != 0 || Entities.FindByNameWithin(null, "blood_tank", bluplayer.GetOrigin(), 1000.0) == null)
+			if (!bluplayer.IsAlive() || Entities.FindByNameWithin(null, "blood_tank", bluplayer.GetOrigin(), 1000.0) == null)
 			{
 				if (!bluplayer.IsFakeClient()) bluplayer.ForceRespawn()
 
@@ -5108,7 +5108,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 			{
 				local scope = bluplayer.GetScriptScope().bloodstorage
 
-				if (scope.escaped != "[X]" && NetProps.GetPropInt(bluplayer, "m_lifeState") != 0) bluplayer.ForceRespawn()
+				if (scope.escaped != "[X]" && !bluplayer.IsAlive()) bluplayer.ForceRespawn()
 			}
 
 			bluplayer.AddHudHideFlags(4)
@@ -5431,7 +5431,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 
 			if (bluplayer.IsFakeClient())
 			{
-				if (NetProps.GetPropInt(bluplayer, "m_lifeState") != 0) continue
+				if (!bluplayer.IsAlive()) continue
 
 				if (scope.escaped == "[X]" && IsInside(bluplayer.GetOrigin(), Vector(900, -800, -1000), Vector(1400, -600, 1000)) && in_endgame)
 				{
@@ -5465,7 +5465,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 
 			if (in_cutscene) continue
 
-			if (NetProps.GetPropInt(bluplayer, "m_lifeState") != 0) continue
+			if (!bluplayer.IsAlive()) continue
 
 			if (scope.excess_count > 0)
 			{
@@ -5811,7 +5811,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 			{
 				if (player == null) continue
 				if (player.GetTeam() != 2) continue
-				if (NetProps.GetPropInt(player, "m_lifeState") != 0) continue
+				if (!player.IsAlive()) continue
 
 				player.Teleport(true, Vector(2500, 600, -50), false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
 			}
@@ -5820,7 +5820,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 			{
 				if (player == null) continue
 				if (player.GetTeam() != 2) continue
-				if (NetProps.GetPropInt(player, "m_lifeState") != 0) continue
+				if (!player.IsAlive()) continue
 
 				player.Teleport(true, Vector(900, -1400, -350), false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
 			}
@@ -5934,7 +5934,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 					{
 						if (player_to_extract_from == null) continue;
 						if (player_to_extract_from.IsFakeClient()) continue
-						if (NetProps.GetPropInt(player_to_extract_from, "m_lifeState") != 0) continue
+						if (!player_to_extract_from.IsAlive()) continue
 
 						player_to_extract_from.ValidateScriptScope()
 						local scope = player_to_extract_from.GetScriptScope().bloodstorage
@@ -6302,7 +6302,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 		for (local bluplayer; bluplayer = Entities.FindByClassnameWithin(bluplayer, "player", bombcart.GetOrigin(), 200); )
 		{
 			if (bluplayer == null) continue
-			if (NetProps.GetPropInt(bluplayer, "m_lifeState") != 0) continue
+			if (!bluplayer.IsAlive()) continue
 			if (bluplayer.GetTeam() != 3) continue
 
 			is_blu_player_near_bombcart = true
@@ -6390,7 +6390,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 		{
 			if (player.GetTeam() != 3) continue
 			if (player.IsFakeClient()) continue
-			if (NetProps.GetPropInt(player, "m_lifeState") != 0) continue
+			if (!player.IsAlive()) continue
 
 			player.ValidateScriptScope()
 			local scope = player.GetScriptScope().bloodstorage
@@ -6568,7 +6568,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 		{
 			if (escort_robot == null) continue;
 			if (!escort_robot.IsFakeClient()) continue;
-			if (NetProps.GetPropInt(escort_robot, "m_lifeState") != 0) continue
+			if (!escort_robot.IsAlive()) continue
 
 			if (escort_robot.HasBotTag("escortbot"))
 			{
@@ -6602,7 +6602,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 
 	EscortBot_Think = function()
 	{
-		if (NetProps.GetPropInt(self, "m_lifeState") != 0)
+		if (!self.IsAlive())
 		{
 			NetProps.SetPropString(self, "m_iszScriptThinkFunction", "")
 			return
@@ -6646,7 +6646,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 			if (blu_player == null) continue
 			if (blu_player.IsFakeClient()) continue
 
-			if (NetProps.GetPropInt(blu_player, "m_lifeState") != 0) continue
+			if (!blu_player.IsAlive()) continue
 
 			is_blu_player_near_escortbot = true
 		}
@@ -7813,7 +7813,7 @@ for (local ent; ent = Entities.FindByName(ent, "portablestation*"); ) ent.Kill()
 
 			if (escaped == "[✔]") owner.AddCustomAttribute("healing received penalty", 0, -1.0)
 
-			if (NetProps.GetPropInt(owner, "m_lifeState") == 0 && !in_setup()) life_tick++
+			if (owner.IsAlive() && !in_setup()) life_tick++
 
 			return -1
 		}

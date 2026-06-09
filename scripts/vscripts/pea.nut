@@ -108,7 +108,7 @@
 		{
 			for (local player_to_collect; player_to_collect = Entities.FindByClassnameWithin(player_to_collect, "player", self.GetOrigin(), 288); )
 			{
-				if (player_to_collect != null && player_to_collect.GetTeam() == 2 && !player_to_collect.IsFakeClient() && NetProps.GetPropInt(player_to_collect, "m_lifeState") == 0 && NetProps.GetPropInt(player_to_collect, "m_PlayerClass") == Constants.ETFClass.TF_CLASS_SCOUT)
+				if (player_to_collect != null && player_to_collect.GetTeam() == 2 && !player_to_collect.IsFakeClient() && player_to_collect.IsAlive() && NetProps.GetPropInt(player_to_collect, "m_PlayerClass") == Constants.ETFClass.TF_CLASS_SCOUT)
 				{
 					self.Teleport(true, player_to_collect.GetOrigin(), false, QAngle(0, 0, 0), false, Vector(0, 0, 0))
 					self.DisableDraw()
