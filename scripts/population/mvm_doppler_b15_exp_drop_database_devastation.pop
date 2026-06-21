@@ -18,9 +18,9 @@ population
 	BodyPartScaleSpeed 20
 	//FlagEscortCountOffset -4
 	MaxSpectators 3
-	CustomNavFile "mvm_doppler_b12_nostupiddropsv2.nav"
-	UpgradeStationKeepWeapons	1	
-	
+	//CustomNavFile "mvm_doppler_b12_nostupiddropsv2.nav"
+	UpgradeStationKeepWeapons	1
+
 	FlagResetTime   //Overrides default bomb reset time
 	{
 		Name "intel" //Name of flag entity on the map
@@ -36,7 +36,7 @@ population
 		Name "intel3" //Name of flag entity on the map
 		ResetTime 99999
 	}
-	
+
 	CustomWeapon   //Allows you to use an alias for items with custom attributes
     {
     "Sawblade Launcher"
@@ -71,12 +71,12 @@ population
             "reset arrow hits on bounce" 1
             "projectile lifetime"            5
             "projectile penetration"        1
-            } 
+            }
         }
-		
-	PointTemplates   
+
+	PointTemplates
 	{
-	
+
 	SawbladeLauncherLogic    // rotating sword demo logic from midnight patrol, slightly modified with permission
         {
             func_rotating
@@ -109,46 +109,40 @@ population
             }
         }
 		FixedSpawns //thanksselpit
-{
-    logic_relay
-    {
-        "targetname" "initMainFixed"
-        //Add an extra output to the timer that asks the randomizer to pick spawns.
-        //Still letting it pick random spawns, but then just picking one specifically afterwards, hah
-        //VALUES:
-        //3 or 4: Enables top and bottom spawns. If 3, use g0s2a and g0s0b. If 4, use g0s2b and g0s0a.
-        "OnTrigger" "initMain_timer,AddOutput,OnTimer initMain_spawns:InValue:3:0.03:-1,0,-1"
-        
-        //Additional outputs.
-        //These will keep the top (0) and bottom (2) doors open.
-        "OnTrigger" "initMain_timer,AddOutput,OnTimer gate0s0_entrance_door:Open::0.04:-1,0,-1"
-        "OnTrigger" "initMain_timer,AddOutput,OnTimer gate0s2_entrance_door:Open::0.04:-1,0,-1"
-        
-        //This will close the right (1) door.
-        "OnTrigger" "initMain_timer,AddOutput,OnTimer gate0s1_entrance_door:Close::0.04:-1,0,-1"
-        
-        //These will make sure the paths are correctly indicated.
-        //g0_s0: top spawn indicators. Bomb route top (entirely). Also shows 1 arrow for top gate route...
-        //g0_s2: bottom spawn indicators. Gate route top. Also shows part of bottom bomb route...
-        //g0: Shows the rest of bomb route bottom, gate route top.
-        "OnTrigger" "initMain_timer,AddOutput,OnTimer path_g0_s0:Enable::0.05:-1,0,-1"
-        "OnTrigger" "initMain_timer,AddOutput,OnTimer path_g0_s2:Enable::0.05:-1,0,-1"
-        "OnTrigger" "initMain_timer,AddOutput,OnTimer path_g0:Enable::0.05:-1,0,-1"
-        
-		//thing she told me to add on?
-		"OnTrigger" "initMain_timer,AddOutput,OnTimer path_g0_s1:Disable::0.05:-1,0,-1"
-		
-        //Then do everything as usual.
-        "OnTrigger" "initMain,Trigger,,0.01,-1"
-    }
-}
+		{
+			logic_relay
+			{
+				"targetname" "initMainFixed"
+				//Additional outputs.
+				//These will keep the top (0) and bottom (2) doors open.
+				"OnTrigger" "initMain_timer,AddOutput,OnTimer gate0s0_entrance_door:Open::0.04:-1,0,-1"
+				"OnTrigger" "initMain_timer,AddOutput,OnTimer gate0s2_entrance_door:Open::0.04:-1,0,-1"
+
+				//This will close the right (1) door.
+				"OnTrigger" "initMain_timer,AddOutput,OnTimer gate0s1_entrance_door:Close::0.04:-1,0,-1"
+
+				//These will make sure the paths are correctly indicated.
+				//g0_s0: top spawn indicators. Bomb route top (entirely). Also shows 1 arrow for top gate route...
+				//g0_s2: bottom spawn indicators. Gate route top. Also shows part of bottom bomb route...
+				//g0: Shows the rest of bomb route bottom, gate route top.
+				"OnTrigger" "initMain_timer,AddOutput,OnTimer path_g0_s0:Enable::0.05:-1,0,-1"
+				"OnTrigger" "initMain_timer,AddOutput,OnTimer path_g0_s2:Enable::0.05:-1,0,-1"
+				"OnTrigger" "initMain_timer,AddOutput,OnTimer path_g0:Enable::0.05:-1,0,-1"
+
+				//thing she told me to add on?
+				"OnTrigger" "initMain_timer,AddOutput,OnTimer path_g0_s1:Disable::0.05:-1,0,-1"
+
+				//Then do everything as usual.
+				"OnTrigger" "initMain,Trigger,,0.01,-1"
+			}
+		}
 		StunProtectBomb //thanks mina!!!
         {
 		     NoFixup 1
             OnSpawnOutput { Target "item_teamflag" Action "Addoutput" Param "OnPickup1 filter_bot_is_umed_pocket:TestActivator:0:0:-1"}
-            
-        
-        
+
+
+
             filter_tf_bot_has_tag
             {
             "targetname" "filter_bot_is_umed_pocket"
@@ -159,18 +153,18 @@ population
             "Negated" "1"
             "tags" "umed_pocket"
             }
-			
+
         }
 	}
-	
-	
+
+
 	PlayerShootTemplate    //Shoot defined point template. Template is spawned at player position in looking direction, forward velocity being applied to spawned entities
     {
         Name SawbladeLauncherLogic
         AttachToProjectile 1 //If set, the template is spawned as a child of the projectile being fired. Incompatible with overrideshoot
         ItemName "Sawblade Launcher"
     }
-	
+
 //	ExtraLoadoutItems   // Extra loadout items available after typing !missionitems in chat
 //    {
 //
@@ -183,17 +177,17 @@ population
         //    Primary "Sharpshooter"
         //}
   //  }
-	
+
 	ExtraSpawnPoint    //Adds spawn points on specified location
     {
         Name "spawnalt"  //748 857.74 -174
 		// StartDisabled 1 // If the spawn point starts disabled (Default: 0)
         TeamNum 3 // 2 - Red team 3 - Robots. If you are adding spawn for reprogrammed robots, use team 3
-        X	"748"                     
-        Y	"857.74"                  
-        Z	"-174"        
+        X	"748"
+        Y	"857.74"
+        Z	"-174"
     }
-	
+
 	Mission
 	{
 		Objective	DestroySentries
@@ -250,8 +244,8 @@ population
 			skill expert
 		}
 	}
-	
-	
+
+
 
 	Mission
 	{
@@ -272,7 +266,7 @@ population
 			Template T_TFBot_Sniper   //_Sydney_Sleeper
 		}
 	}
-	
+
 	Mission
 	{
 		Objective	Spy
@@ -289,7 +283,7 @@ population
 			skill expert
 		}
 	}
-	
+
 	Templates
 	{
 	shield2
@@ -308,12 +302,12 @@ population
 						"generate rage on heal" 2
 						"increase buff duration" 9
 						"heal rate bonus" 5
-					}	
+					}
 					CharacterAttributes
 					{
 						"bot medic uber deploy delay duration" 6969
-					}	
-					
+					}
+
 					FireWeapon    //Periodically fires weapon
                 {
                     Delay 0
@@ -321,9 +315,9 @@ population
                     Repeats 0
 					//IfSeeTarget 1
                     Duration 0.1
-					Type "Special" 
+					Type "Special"
 				}
-				
+
 					Item "The Virus Doctor"
 					}
 	T_gigaton_fist
@@ -337,7 +331,7 @@ population
 			Scale 1.5						// Force scale to 1 when "Health" set high
 			WeaponRestrictions MeleeOnly
 			Item "Fists of Steel"
-			
+
 			    ItemColor   //Set item color
 				{
 					ItemName "Fists of Steel"
@@ -345,7 +339,7 @@ population
 					Green 169
 					Blue 169
 				}
-				
+
 			ItemAttributes
 			{
 			ItemName "Fists of Steel"
@@ -435,7 +429,7 @@ population
 				"head scale"									5
 				"torso scale"									0
 				"hand scale"									0
-				
+
 				//defense
 				"stomp player force" 280
 				"stomp player damage" 2
@@ -444,7 +438,7 @@ population
 				"cannot be headshot" 1
 				"stomp building damage" 125
 				"rage giving scale"	0.25
-				
+
 			}
 			WeaponResist   //Multiplies damage received from weapons listed below
 					{
@@ -494,7 +488,7 @@ population
 				"head scale"									5
 				"torso scale"									0
 				"hand scale"									0
-				
+
 				//defense
 				"stomp player force" 280
 				"stomp player damage" 2
@@ -503,9 +497,9 @@ population
 				"cannot be headshot" 1
 				"stomp building damage" 125
 				"rage giving scale"	0.25
-				
-				//uber tank 
-				
+
+				//uber tank
+
 				 "add cond when active" 52
 			}
 			WeaponResist   //Multiplies damage received from weapons listed below
@@ -563,7 +557,7 @@ population
 				"head scale"									5
 				"torso scale"									0
 				"hand scale"									0
-				
+
 				//defense
 				"stomp player force" 280
 				"stomp player damage" 2
@@ -572,7 +566,7 @@ population
 				"cannot be headshot" 1
 				"stomp building damage" 125
 				"rage giving scale"	0.25
-				
+
 			}
 			WeaponResist   //Multiplies damage received from weapons listed below
 					{
@@ -616,7 +610,7 @@ population
 				"head scale"									5
 				"torso scale"									0
 				"hand scale"									0
-				
+
 				//defense
 				"stomp player force" 280
 				"stomp player damage" 2
@@ -625,7 +619,7 @@ population
 				"cannot be headshot" 1
 				"rage giving scale"	0.25
 				"stomp building damage" 125
-				
+
 			}
 			WeaponResist   //Multiplies damage received from weapons listed below
 					{
@@ -676,7 +670,7 @@ population
 						"uber duration bonus" 100
 						"increase buff duration" 9
 						"heal rate bonus" 5
-					}	
+					}
 					FireWeapon    //Periodically fires weapon
                     {
                     Delay 1 //Time before the first fire input starts (Default: 10)
@@ -693,13 +687,13 @@ population
 				}
 				T_lasers
 			{
-			
+
 			ClassIcon			engineer_ranger_nys_penetrate_giant
 					//WeaponRestrictions	SecondaryOnly
 					Health	4000
 					Skill	Normal
-					
-					item "The Rescue Ranger"  
+
+					item "The Rescue Ranger"
 					scale 1.8
 					Name	"Skibidinator MK4"
 					//UseMeleeThreatPrioritization 1
@@ -715,13 +709,13 @@ population
 					{
 					itemname "The Rescue Ranger"
 					"mult projectile count" 3
-					
+
 					"projectile spread angle penalty" 3
 					"damage penalty" 0.75
 					"projectile speed bonus" 0.85
 					"custom item model"	"models/workshop/weapons/c_models/c_invasion_sniperrifle/c_invasion_sniperrifle.mdl"
 			"ignores other projectiles" 1
-"projectile gravity" 1			
+"projectile gravity" 1
 "ragdolls plasma effect" 1
             "mult projectile scale"			0.01
 
@@ -748,8 +742,8 @@ population
 						"faster reload rate" 0.1
 						"airblast vertical vulnerability multiplier"	0.3
 					}
-					
-					
+
+
 			}
 	shield
 				{
@@ -766,7 +760,7 @@ population
 						ItemName "The Quick-Fix"
 						"generate rage on heal" 2
 						"increase buff duration" 9
-					}	
+					}
 					FireWeapon    //Periodically fires weapon
                     {
                     Delay 1 //Time before the first fire input starts (Default: 10)
@@ -775,7 +769,7 @@ population
 				    }
 					Item 	"The Quick-Fix"
 				}
-	
+
 	T_fiery_wrath_gate
 		{
 
@@ -790,9 +784,9 @@ population
 				Default
 				{
 					Tag nav_prefer_gate1_flank	// having these will cause bots to run towards its death
-					Tag bot_gatebot				
-					BehaviorModifiers push		
-					Attributes IgnoreFlag		
+					Tag bot_gatebot
+					BehaviorModifiers push
+					Attributes IgnoreFlag
 
 					Item "MvM GateBot Light Pyro"
 					Skill Hard
@@ -872,8 +866,8 @@ population
 					"item_meter_charge_rate" 0.6
 					}
 		}
-	
-		    
+
+
 			T_whatthefuck
 			{
 			classicon medic_uber_invert
@@ -906,7 +900,7 @@ population
 			}
 			    ExtAttr SuppressCanteenUse   //If set, the bot will not automatically activate canteens when looking at the enemy
 				Item "Battery Canteens"
-				UseBestWeapon 1   
+				UseBestWeapon 1
 				ItemAttributes
 				{
 					ItemName "Battery Canteens"
@@ -928,7 +922,7 @@ population
 					IfHealthBelow 54
 				}
 			}
-	
+
 	T_Crit_BBox_gate
 	{
 	Class Soldier
@@ -978,7 +972,7 @@ population
 						"item style override" 1
 					}
 					Skill Expert
-					Attributes MiniBoss 
+					Attributes MiniBoss
 					Tag bot_giant
 					WeaponRestrictions PrimaryOnly
 					Attributes AlwaysCrit
@@ -1040,8 +1034,8 @@ population
 				"cancel falling damage" 1
 			}
 		}
-	
-	
+
+
 		T_guber
 		{
 				    Name "Giant Uber Medic"
@@ -1141,12 +1135,12 @@ population
 					Item "the diplomat"
 	}
 	}
-	
+
 	SpawnTemplate StunProtectBomb
 	SpawnTemplate "FixedSpawns"
-	
-	
-	
+
+
+
 	Wave
 	{
 		WaitWhenDone 60
@@ -1188,7 +1182,7 @@ population
 		}
 		WaveSpawn
 		{
-		name firstimpression 
+		name firstimpression
 			TotalCurrency	25
 			TotalCount	1
 			MaxActive	1
@@ -1219,7 +1213,7 @@ population
 				Classicon heavy_armored_shotgun
 				Health 650
 				Scale 1.35
-				
+
 				Skill Easy
 					MaxVisionRange 800
 					CharacterAttributes
@@ -1229,7 +1223,7 @@ population
 					"bullets per shot bonus" 2
 					"damage force reduction" 0.8
 					}
-					
+
 				}
 		}
 		WaveSpawn
@@ -1251,7 +1245,7 @@ population
 		}
 		WaveSpawn
 		{
-		Waitforalldead firstimpression 
+		Waitforalldead firstimpression
 		name w1DEMS
 			TotalCurrency	150
 			TotalCount	6
@@ -1275,7 +1269,7 @@ CharacterAttributes
 		WaveSpawn
 		{
 		name 11
-		Waitforalldead firstimpression 
+		Waitforalldead firstimpression
 			TotalCurrency	50
 			TotalCount	24
 			MaxActive	12
@@ -1283,13 +1277,13 @@ CharacterAttributes
 			Where spawnbot_g2s1_alt
 			WaitBeforeStarting	1
 			WaitBetweenSpawns	10
-			
+
 				TFBot
 				{
 					Class Pyro
 					Skill easy
 				}
-			
+
 		}
 		WaveSpawn
 		{
@@ -1378,7 +1372,7 @@ CharacterAttributes
 				}
 		}
 		WaveSpawn
-		{   
+		{
 		    WaitforallSpawned 12
 			TotalCurrency	25
 			TotalCount	10
@@ -1398,7 +1392,7 @@ CharacterAttributes
 				}
 		}
 		WaveSpawn
-		{   
+		{
 		    WaitforallSpawned 12
 			TotalCurrency	25
 			TotalCount	10
@@ -1481,7 +1475,7 @@ CharacterAttributes
 			WaitBetweenSpawns	2.5
 			TFBot
 			{
-			Class Demoman 
+			Class Demoman
 			Skill normal
 			//Attributes AlwaysCrit
 			}
@@ -1631,7 +1625,7 @@ CharacterAttributes
 			{
 			TFBot
 			{
-			Class Demoman 
+			Class Demoman
 			Skill expert
 			}
 			TFBot
@@ -1728,7 +1722,7 @@ CharacterAttributes
 			Support 1
 			TFBot
 			{
-			
+
 			Class heavyweapons
 			name "Shotgun Heavy"
 			ClassIcon heavy_shotgun
@@ -1748,7 +1742,7 @@ CharacterAttributes
 			Support 1
 			TFBot
 			{
-			
+
 			Class heavyweapons
 			name "Shotgun Heavy"
 			ClassIcon heavy_shotgun
@@ -1933,17 +1927,17 @@ CharacterAttributes
 
 					Item "MvM GateBot Light Soldier"
 					Skill expert
-					 Item "The Original"	
+					 Item "The Original"
 				ItemAttributes
 				{
-				itemname "The Original"	
+				itemname "The Original"
 				"fire rate penalty" 2
 				"projectile speed increased" 0.5
 				}
 				}
 				RevertGateBotsBehavior
 				{
-				
+
 				Attributes AlwaysCrit
 					Item "MvM GateBot Light Soldier"
 					ItemAttributes               // turn off light hat
@@ -1952,14 +1946,14 @@ CharacterAttributes
 						"item style override" 1
 					}
 					Skill  expert
-					 Item "The Original"	
+					 Item "The Original"
 				ItemAttributes
 				{
-				itemname "The Original"	
+				itemname "The Original"
 				"fire rate penalty" 2
 				"projectile speed increased" 0.5
 				}
-				
+
 				}
 			}
 			}
@@ -2012,7 +2006,7 @@ CharacterAttributes
 			{
 			"move speed bonus" 0.5
 			}
-			
+
 			}
 		}
 		WaveSpawn
@@ -2061,9 +2055,9 @@ CharacterAttributes
 			AlwaysGlow 1
 			classicon spy_hyper
 			Scale 1.3
-			
+
 			ExtAttr IgnoreBuildings
-			
+
 			Skill expert
 			Attributes IgnoreFlag
 			health 10000
@@ -2079,7 +2073,7 @@ CharacterAttributes
 		name "Agent Annoyance"
 			//item "The Dead Ringer"
  		item "The Big Earner"
-		ItemAttributes 
+		ItemAttributes
 		{
 		ItemName "The Big Earner"
 		"damage bonus" 1.5
@@ -2087,7 +2081,7 @@ CharacterAttributes
 				"dmg bonus vs buildings" 2
 		"killstreak tier" 1
 		}
-			    
+
 				CharacterAttributes
 				{
 				"add cond on kill" 9
@@ -2100,7 +2094,7 @@ CharacterAttributes
 						"damage force reduction"	0.01
 				"mult stun resistance" 0.8
 				"cloak regen rate increased" 2
-				
+
 				"cancel falling damage" 1
 			"cannot disguise" 1
 				"melee range multiplier" 1.15
@@ -2225,7 +2219,7 @@ Explanation    //Dispayed once the wave is initialized
                     Repeats 0
 					IfSeeTarget 1
                     Duration 0.1
-					Type "Secondary" 
+					Type "Secondary"
 				}
 				CharacterAttributes
 				{
@@ -2380,7 +2374,7 @@ Explanation    //Dispayed once the wave is initialized
 		    Where spawnbot_g2s0b
 		    Where spawnbot_g2s1b
 			WaitBeforeStarting 10
-			TFBot 
+			TFBot
 			{
 			Class Scout
 			skill normal
@@ -2498,7 +2492,7 @@ Explanation    //Dispayed once the wave is initialized
                     Repeats 0
 					IfSeeTarget 1
                     Duration 0.1
-					Type "Secondary" 
+					Type "Secondary"
 				}
 				CharacterAttributes
 				{
@@ -2519,7 +2513,7 @@ Explanation    //Dispayed once the wave is initialized
                     Repeats 0
 					IfSeeTarget 1
                     Duration 0.1
-					Type "Secondary" 
+					Type "Secondary"
 				}
 				CharacterAttributes
 				{
@@ -2604,7 +2598,7 @@ Explanation    //Dispayed once the wave is initialized
 		    Where spawnbot_g2s0_alt
 		    Where spawnbot_g2s1_alt
 			TFBot  //I PASTED THE ENTIRE TEMPLTE... JUST SO I COULD ADD CRITS!
-			       // i am EVIL 
+			       // i am EVIL
 			{
 			Class Scout
 			Name "Force-a-Nature Super Scout"
@@ -2780,7 +2774,7 @@ Explanation    //Dispayed once the wave is initialized
                     Repeats 0
 					//IfSeeTarget 1
                     Duration 0.1
-					Type "Primary" 
+					Type "Primary"
 				}
 			Attributes AlwaysFireWeapon
 			Attributes DisableDodge
@@ -2813,7 +2807,7 @@ Explanation    //Dispayed once the wave is initialized
 				"head scale"									5
 				"torso scale"									0
 				"hand scale"									0
-				
+
 				//defense
 				"stomp player force" 280
 				"stomp player damage" 2
@@ -2822,7 +2816,7 @@ Explanation    //Dispayed once the wave is initialized
 				"cannot be headshot" 1
 				"stomp building damage" 125
 				"rage giving scale"	0.25
-				
+
 			}
 			WeaponResist   //Multiplies damage received from weapons listed below
 					{
@@ -2858,7 +2852,7 @@ Explanation    //Dispayed once the wave is initialized
                     Repeats 0
 					//IfSeeTarget 1
                     Duration 0.1
-					Type "Special" 
+					Type "Special"
 				}
 			Skill Expert
 			Health 10000
@@ -2900,7 +2894,7 @@ Explanation    //Dispayed once the wave is initialized
 				"torso scale"									0
 				"bot medic uber deploy delay duration" 6969
 				"hand scale"									0
-				
+
 				//defense
 				"stomp player force" 280
 				"stomp player damage" 2
@@ -2909,7 +2903,7 @@ Explanation    //Dispayed once the wave is initialized
 				"cannot be headshot" 1
 				"stomp building damage" 125
 				"rage giving scale"	0.25
-				
+
 			}
 			WeaponResist   //Multiplies damage received from weapons listed below
 					{
@@ -2918,7 +2912,7 @@ Explanation    //Dispayed once the wave is initialized
 					}
 			}
 		}
-		
+
 		WaveSpawn
 		{
 		    Waitforalldead 51
@@ -2935,7 +2929,7 @@ Explanation    //Dispayed once the wave is initialized
 		    Where spawnbot_g2s1_alt
 			TFBot
 			{
-			
+
 			AlwaysGlow 1
 	Class Scout
 			Name "Stand-in Fast Tank"
@@ -2975,7 +2969,7 @@ Explanation    //Dispayed once the wave is initialized
 				"head scale"									5
 				"torso scale"									0
 				"hand scale"									0
-				
+
 				//defense
 				"stomp player force" 280
 				"stomp player damage" 2
@@ -2984,14 +2978,14 @@ Explanation    //Dispayed once the wave is initialized
 				"cannot be headshot" 1
 				"stomp building damage" 125
 				"rage giving scale"	0.25
-				
+
 			}
 			WeaponResist   //Multiplies damage received from weapons listed below
 					{
 						"TF_WEAPON_KNIFE" 0.15
 						"TF_WEAPON_MINIGUN" 0.25
 					}
-					
+
 			}
 		}
 		WaveSpawn
@@ -3129,26 +3123,20 @@ Explanation    //Dispayed once the wave is initialized
 		}
 		InitWaveOutput     //Mainfix by SEEL! Cool sparkles of boss by STARDUSTSPY!
         {
-            Target gamerules   
+            Target gamerules
             Action RunScriptCode
             Param "
                 IncludeScript(`colonel_psychic_punch.nut`, getroottable())
 
-                local relay_ent = null
-                for (local relay; relay = FindByClassname(relay, `logic_relay`);)
-                {
-                    local relay_name = relay.GetName()
+				local initMain_timer = Entities.FindByName(null, `initMain_timer`)
 
-                    if (relay_name == `initMainFixed`)
-                    {
-                        relay_ent = relay
-                        break
-                    }
-                }
-                EntFireByHandle(relay_ent, `Trigger`, ``, -1, relay_ent, relay_ent)
+				EntityOutputs.RemoveOutput(initMain_timer, `OnTimer`, `initMain_spawns`, `PickRandomShuffle`, ``)
+				EntityOutputs.AddOutput(initMain_timer, `OnTimer`, `initMain_spawns`, `InValue`, `3`, -1.0, -1)
+
+				EntFire(`initMainFixed`, `Trigger`)
             "
         }
-                Explanation    //Dispayed once the wave is initialized
+        Explanation    // Displayed once the wave is initialized
 		{
 			Line "{blue}A Concheror tank{green} will appear!"
 		}
@@ -3161,10 +3149,7 @@ Explanation    //Dispayed once the wave is initialized
 			Waitbeforestarting 0
 			TotalCurrency 100
 			Where spawnbot_g0s0a
-		    Where spawnbot_g1s0a
-		    Where spawnbot_g1s1a
-		    Where spawnbot_g2s0a
-		    Where spawnbot_g2s1a
+
 			WaitBeforeStarting 1
 			StartWaveMessage "{green}Beware of his {red}infinite range{green} psychic punch..."
 			WaitBetweenSpawns 0
@@ -3172,22 +3157,19 @@ Explanation    //Dispayed once the wave is initialized
 			{
 			Class Heavyweapons
 			CustomEyeGlowColor "225 17 255"
-			
-			
+
 			Skill normal
 			AimTrackingInterval 0.625
-			
+
 			WeaponRestrictions MeleeOnly
 			Name "Psychic Punch"
 			ClassIcon heavy_psychic
 			Attributes AlwaysFireWeapon
 			Health 30000
-			
-			Tag "bot_psychic_punchie"
+
 			tag bot_psychic
-			
-			
 			tag bot_giant
+
 			Scale 1.75
 			Item "Starboard Crusader"
 			Item "The Killing Gloves of Boxing"
@@ -3195,7 +3177,7 @@ Explanation    //Dispayed once the wave is initialized
 			Attributes UseBossHealthBar
 			AddCond
             {
-                Index 36
+                Index TF_COND_SODAPOPPER_HYPE
             }
 			ItemAttributes
 			{
@@ -3206,9 +3188,9 @@ Explanation    //Dispayed once the wave is initialized
 				"apply look velocity on damage" -1200
 				"apply z velocity on damage" 100
 				//"damage bonus" 2
-				
+
 				"dmg max health" 0.33
-				
+
 				"mult crit dmg" 0.35 //dont do too much crit damage
 				"dmg pierces resists absorbs" 1 //pierce for wrangler and lowered crit dmg should cover
 			}
@@ -3232,7 +3214,7 @@ Explanation    //Dispayed once the wave is initialized
 				"rage giving scale" 0.1
 			}
 			}
-			
+
 		}
 		WaveSpawn
 		{
@@ -3342,7 +3324,7 @@ Explanation    //Dispayed once the wave is initialized
 					}
 				}
 			}
-			
+
 			}
 		}
 		WaveSpawn
@@ -3411,7 +3393,7 @@ Explanation    //Dispayed once the wave is initialized
 				"head scale"									5
 				"torso scale"									0
 				"hand scale"									0
-				
+
 				//defense
 				"stomp player force" 280
 				"stomp player damage" 2
@@ -3420,7 +3402,7 @@ Explanation    //Dispayed once the wave is initialized
 				"cannot be headshot" 1
 				"stomp building damage" 125
 				"rage giving scale"	0.25
-				
+
 			}
 			WeaponResist   //Multiplies damage received from weapons listed below
 					{
@@ -3464,7 +3446,7 @@ Explanation    //Dispayed once the wave is initialized
 				"head scale"									5
 				"torso scale"									0
 				"hand scale"									0
-				
+
 				//defense
 				"stomp player force" 280
 				"stomp player damage" 2
@@ -3473,7 +3455,7 @@ Explanation    //Dispayed once the wave is initialized
 				"cannot be headshot" 1
 				"rage giving scale"	0.25
 				"stomp building damage" 125
-				
+
 			}
 			WeaponResist   //Multiplies damage received from weapons listed below
 					{
@@ -3575,7 +3557,7 @@ Explanation    //Dispayed once the wave is initialized
 			{
 			   Class Soldier
 					Skill expert
-					
+
 			}
 		}
 		WaveSpawn
@@ -3673,8 +3655,8 @@ Explanation    //Dispayed once the wave is initialized
 			WaitBetweenSpawns 17.5
 			Squad
 			{
-			
-			
+
+
 			TFBot
 			{
 			    Class Soldier
@@ -3688,19 +3670,19 @@ Explanation    //Dispayed once the wave is initialized
 			tag bot_giant
 			Attributes HoldFireUntilFullReload
 			//Attributes AlwaysCrit
-			
+
 			ItemAttributes
 			{
 				ItemName "TF_WEAPON_ROCKETLAUNCHER"
 				"damage bonus" 2.0
 				"faster reload rate" 0.4
 				"fire rate bonus" 0.2
-				
+
 				"clip size upgrade atomic" 5.0
 				"Projectile speed increased" 0.75
 			}
-		
-			
+
+
 			CharacterAttributes
 		{
 				"move speed bonus"	0.5
@@ -3741,30 +3723,30 @@ Explanation    //Dispayed once the wave is initialized
                     Repeats 1
 					//IfSeeTarget 1
                     Duration 0.1
-					Type "Primary" 
+					Type "Primary"
 				}
 			name "Stand-in Conch Tank"
 			Health 35000 //DIE DIE DIE
 			Attributes SpawnWithFullCharge
 			Item "The Concheror"
 			Item "Soldier's Stash"
-			
+
 			Item "The Tank Top"
-			
+
 			ItemAttributes
 			{
 				ItemName "The Tank Top"
 				"set item tint RGB"	15132390	//WHITE cause looks like final tank AND its conch!
 			}
-			
-			
+
+
 			CharacterAttributes
 			{
 				"increase buff duration"	9.0
 				"mod soldier buff range" 1.33
 				"move speed bonus" 0.3 //just so they dont go too fast... and 40k too
 			}
-			
+
 			}
 		}
 	}

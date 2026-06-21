@@ -1,6 +1,6 @@
 // Base structure for setting up script that can be easily compatible with other scripts
 // Structure by StardustSpy, and borrowed some stuff from lite, popextensions (braindawg) and ficool2
-// Assumes basic VScript abilities, Source knowledge, and how MvM works 
+// Assumes basic VScript abilities, Source knowledge, and how MvM works
 
 // Useful links:
 // TF2's VScript functions: https://developer.valvesoftware.com/wiki/Team_Fortress_2/Scripting/Script_Functions
@@ -18,7 +18,7 @@
 ::ROOT <- getroottable()
 ::MAX_CLIENTS <- MaxClients().tointeger() // get all players that can spawn in a server
 
-// This is useful to automatically fold constants, as they are always accessible 
+// This is useful to automatically fold constants, as they are always accessible
 // Especially helpful for trace masks, also runs x2 faster according to wiki
 // Credit to Lite for folds
 if (!("ConstantNamingConvention" in ROOT))
@@ -53,13 +53,13 @@ foreach(k, v in ::NavMesh.getclass())
 	if (k != "IsValid" && !(k in ROOT))
 		ROOT[k] <- ::NavMesh[k].bindenv(::NavMesh)
 
-        
+
 // This will store things like variables into the root table, allowing us to refer to these anywhere in the script
 // Keep these in mind for later when you reach the Game Hooks section
 
 // Ents that are useful to refer to in the script
 // Gamerules will likely be used far more, since it is often used for EntFireByHandle and AcceptInput
-// Also, FindByClassname would usually require "Entities.", but we folded that already so we dont need to use it 
+// Also, FindByClassname would usually require "Entities.", but we folded that already so we dont need to use it
 ::gamerules <- FindByClassname(null, "tf_gamerules")
 ::player_manager <- FindByClassname(null, "tf_player_manager")
 ::WORLD_SPAWN <- FindByClassname(null, "worldspawn")
@@ -73,7 +73,7 @@ foreach(k, v in ::NavMesh.getclass())
 ::TF_NAV_SPAWN_ROOM_RED <- 2
 ::TF_NAV_SPAWN_ROOM_BLUE <- 4
 
-// Source sets up some "puppet bots" used for SourceTV spectating. As a result, we shouldnt check for IsPlayerABot since that wont get actual MvM Bots. 
+// Source sets up some "puppet bots" used for SourceTV spectating. As a result, we shouldnt check for IsPlayerABot since that wont get actual MvM Bots.
 // Instead we use IsBotOfType
 // Use this when using IsBotOfType
 ::TF_BOT_FAKE_CLIENT <- 1337
@@ -82,20 +82,20 @@ const SINGLE_TICK = 0.015
 
 // get into the habit of putting everything in namespaces if you want to have better compatibility with other scripts
 // You dont need to precache things within the namespace unless it may conflict with the map or other missions
-::myNamespace <- 
+::myNamespace <-
 {
     Player_Cleanup_Table = []
 
     // Borrowed from PopExtensions. Useful utility functions that can print tables and their contents
     // PrintTable should be used, as DoPrintTable appears to be a "wrapper" (i.e. this function simplifies DoPrintTable)
-    PrintTable = function(table) 
+    PrintTable = function(table)
     {
         if (table == null) return;
 
         this.DoPrintTable(table, 0)
     }
 
-    DoPrintTable = function(table, indent) 
+    DoPrintTable = function(table, indent)
     {
         local line = ""
         for (local i = 0; i < indent; i++) {
@@ -149,13 +149,13 @@ const SINGLE_TICK = 0.015
             //printl("WARNING: Start delay is slower then end delay! Particle may not spawn!")
         }
 
-        local particle = SpawnEntityFromTable("info_particle_system", 
+        local particle = SpawnEntityFromTable("info_particle_system",
         {
-            effect_name = name, 
+            effect_name = name,
             targetname = "temporary"
             origin = origin
             angles = angles
-        })  
+        })
 
         if (will_parent == true)
         {
@@ -163,7 +163,7 @@ const SINGLE_TICK = 0.015
         }
 
         if (ent_attachment != null)
-        {   
+        {
             SetPropEntityArray(particle, "m_hControlPointEnts", ent_attachment, 0);
         }
 
@@ -171,7 +171,7 @@ const SINGLE_TICK = 0.015
         {
             particle.AcceptInput("Start", "", null, null)
         }
-        else 
+        else
         {
             EntFireByHandle(particle, "Start", "", delay_start, null, null);
         }
@@ -197,17 +197,17 @@ const SINGLE_TICK = 0.015
             {
                 continue;
             }
-            
+
             ////printl("Cleaning: " + ent)
             player.ValidateScriptScope()
             local scope = player.GetScriptScope()
-            
+
             // Keep this here since this function may break certain things without it.
             if (scope.len() <= 5) return
 
             // These are contained within the script scope and are used by the game, not us.
             // Deleting these may cause problems, so they should be ignored.
-            local ignore_table = 
+            local ignore_table =
             {
                 "self"      : null,
                 "__vname"   : null,
@@ -238,22 +238,22 @@ const SINGLE_TICK = 0.015
         {
             PlayerCleanup(player)
         }
-        
+
         // keep this at the end of this function
         delete ::myNamespace
     }
-    
+
     // mandatory events
-    OnGameEvent_recalculate_holidays = function(_) 
-    { 
-        if (GetRoundState() == 3) 
+    OnGameEvent_recalculate_holidays = function(_)
+    {
+        if (GetRoundState() == 3)
         {
             Cleanup()
-        } 
+        }
     }
-    OnGameEvent_mvm_wave_complete = function(_) 
+    OnGameEvent_mvm_wave_complete = function(_)
     {
-        Cleanup() 
+        Cleanup()
     }
 
     //Thinks
@@ -261,7 +261,7 @@ const SINGLE_TICK = 0.015
     // [#4] Example think function  within a namespace
     // Usually, you would do something like ::myThink1, which stores the think in the root table so that it can be accessed anywhere
     // However, we live in a namespace, which is already stored in the root, so everything (including thinks, locals, etc) is formatted like:
-    // myVariableName = myDesiredTask 
+    // myVariableName = myDesiredTask
 ,
     // We also put return -1 at the end of our thinks to tell the game to run this think after that many seconds in the server (-1 = end of every frame)
     // Don't do this for these function and any functions you want to add, since our PlayerThinks already do this
@@ -278,17 +278,17 @@ const SINGLE_TICK = 0.015
         // Also useful for: getting player origin, eye angles, active weapon, etc
         local cur_time = Time()
 
-        // This is only for the example, but its also here for something important 
+        // This is only for the example, but its also here for something important
         // Defining this variable here as a local means that, every time this function is ran, the variable is overriden
         // This means that if we define something like a float here, it will always be updated to 2, even if the script updates the number later
-        // If we are trying to preserve infomation, this will cause trouble 
+        // If we are trying to preserve infomation, this will cause trouble
         local run_after_time = 2
 
         // This will initilise our variable and also ensure that if it is null, it means its 0
         // Don't worry about this resetting the value of server_time_check, since this will only run if server_time_check is null
         if (typeof(server_time_check) == "null")
         {
-            // You may wonder why ";" is used at the end of some lines. 
+            // You may wonder why ";" is used at the end of some lines.
             // Here is why, according to ficool2:
 
             // `it separates a statement, its for people used to other languages where ; are mandatory
@@ -329,49 +329,49 @@ const SINGLE_TICK = 0.015
         local weapon_last_fire_time = GetPropFloat(active_wep, "m_flNextPrimaryAttack")
         local cur_time = Time()
 
-        function SpawnLaser(ent, rand_intmin, rand_intmax) 
+        function SpawnLaser(ent, rand_intmin, rand_intmax)
         {
             local sound_range = (40 + (20 * log10(300 / 36.0))).tointeger();
-            
-            local target = SpawnEntityFromTable("info_target", 
+
+            local target = SpawnEntityFromTable("info_target",
             {
-                effect_name = "merasmus_targ", 
+                effect_name = "merasmus_targ",
                 spawnflags = 1
                 origin = Vector(0, 0, 0) //self.EyeAngles().Forward()*300
                 angles = Vector(0, 0, 0)
             })
-            laser = SpawnEntityFromTable("info_particle_system", 
+            laser = SpawnEntityFromTable("info_particle_system",
             {
-                effect_name = "merasmus_zap_beam_bits", 
+                effect_name = "merasmus_zap_beam_bits",
                 targetname = "laser"
                 origin = self.GetOrigin()
                 angles = Vector(0, 0, 0)
             })
-            
+
             if (target == null) return
-            
+
             if (ent == null && target != null)
             {
 
                 target.SetAbsOrigin(eyetrace.end + Vector(RandomInt(rand_intmin, rand_intmax), RandomInt(rand_intmin, rand_intmax), 0))
-                
+
             }
             else if (ent != null && target != null)
             {
 
                 target.SetAbsOrigin(ent.GetOrigin() + Vector(RandomInt(rand_intmin, rand_intmax), RandomInt(rand_intmin, rand_intmax), 0))
-                
-                
+
+
             }
 
             SetPropEntityArray(laser, "m_hControlPointEnts", target, 0)
             laser.SetAbsOrigin(cur_origin + Vector(0, RandomInt(rand_intmin, rand_intmax), 80))
             laser.SetAbsAngles(cur_eye_look)
-            
+
             // EmitSoundEx({
             //     sound_name = "misc/halloween/spell_lightning_ball_impact.wav",
             //     origin = target.GetOrigin(),
-            //     sound_level = sound_range 
+            //     sound_level = sound_range
             // });
             EntFireByHandle(laser, "Start", "", 0.1, null, null)
             target.AcceptInput("SetParent", "!activator", laser, target) // causes weird particle placement if placed before firing particle
@@ -401,34 +401,34 @@ const SINGLE_TICK = 0.015
             //printl("hit!")
 
             local pos_hit = trace_params.pos
-            local target = SpawnEntityFromTable("info_target", 
+            local target = SpawnEntityFromTable("info_target",
             {
-                targetname = "zap_targ", 
+                targetname = "zap_targ",
                 spawnflags = 1
-                origin = pos_hit 
+                origin = pos_hit
                 angles = cur_eye_angle
             })
-            local particle = SpawnEntityFromTable("info_particle_system", 
+            local particle = SpawnEntityFromTable("info_particle_system",
             {
-                effect_name = "merasmus_zap_beam_bits", 
+                effect_name = "merasmus_zap_beam_bits",
                 targetname = "temporary"
                 origin = cur_eye_pos
                 angles = cur_eye_angle
-            })  
+            })
             particle.SetAbsAngles(cur_eye_look)
 
             SetPropEntityArray(particle, "m_hControlPointEnts", target, 0);
-        
+
             EntFireByHandle(particle, "Start", "", -1, null, null);
-        
+
 
             EntFireByHandle(particle, "Stop", "", 0.001, null, null);
             EntFireByHandle(particle, "Kill", "", 0.001 + SINGLE_TICK, null, null);
             EntFireByHandle(target, "Kill", "", 0.002 + SINGLE_TICK, null, null);
 
-            SpawnLaser(target, 0, 0) 
-            
-            
+            SpawnLaser(target, 0, 0)
+
+
             // continue smack detection
             SetPropInt(self, "m_Shared.m_iNextMeleeCrit", -2)
         }
@@ -452,29 +452,29 @@ const SINGLE_TICK = 0.015
         //PrintTable(Player_Cleanup_Table)
 
         // example of how to add multiple thinks to an ent
-        // Think Tables are mostly used for players, but also useful for projectiles and tanks which can be copied to make their own tables. Just change its name to something relavent 
+        // Think Tables are mostly used for players, but also useful for projectiles and tanks which can be copied to make their own tables. Just change its name to something relavent
         // This also checks if the table exists in player scope, as to not override existing tables
-        if (!("myThinkTable" in scope)) 
+        if (!("myThinkTable" in scope))
         {
             ////printl("Created think table")
-            // [#1] This is important, as we run our thinks from here 
-            scope.myThinkTable <- {} 
+            // [#1] This is important, as we run our thinks from here
+            scope.myThinkTable <- {}
         }
 
-        scope.PlayerThinks <- function() 
-        { 
+        scope.PlayerThinks <- function()
+        {
             ////printl("Running multiple Player Thinks!")
-            foreach (name, func in scope.myThinkTable) 
+            foreach (name, func in scope.myThinkTable)
             {
-                func.call(scope); 
+                func.call(scope);
             }
             // [#2] This has the think run on every server tick (or "at the end of every frame"). This ensures the script runs consistently, as anything else may cause inconsistencies, including return 0 or return 0.015
             // If you want to know how to run something after a certain amount of time, see [#5]
-            return -1 
+            return -1
         }
 
 		AddThinkToEnt(player, "PlayerThinks")
-        
+
         // Remember, we store all our functions within a player's scope, which contains a table
         // This means that ALL functions will share this variable
         // If this creates undesirable effects, make another variable and change the name
@@ -504,32 +504,32 @@ const SINGLE_TICK = 0.015
         // Also its best to insert the thinks after inserting our variables so that our script doesnt spit out something not existing
         // scope.myThinkTable.myThink1 <- myThink1
         scope.myThinkTable.PsychicPunchieThink <- PsychicPunchieThink
-    }   
-    
+    }
+
     SpawnMagic = function(player)
     {
-        if ( player && player.GetTeam() == TEAM_BLU)
+        if (player.GetTeam() == TEAM_BLU)
         {
             if (player.IsBotOfType(TF_BOT_FAKE_CLIENT))
             {
                 if ( player.HasBotTag("bot_psychic") )
                 {
                     printl("found psychic")
+					player.SetAbsOrigin(Vector(-1616.0, 1104.0, 41.0)) // fellen: this hack is because IDK how Doppler works exactly but the bot keeps going out the wrong spawn.
                     player.ValidateScriptScope()
                     //printl("found punch")
                     SetPropInt(player, "m_Shared.m_iNextMeleeCrit", -2)
                     PlayerSpawn(player)
                 }
-
             }
         }
     }
     // Event Hooks
 
-    OnGameEvent_player_death = function(params) 
+    OnGameEvent_player_death = function(params)
     {
         local player = GetPlayerFromUserID(params.userid)
-        
+
         PlayerCleanup(player)
     }
 
@@ -541,14 +541,14 @@ const SINGLE_TICK = 0.015
         local player = GetPlayerFromUserID(params.userid)
         player.ValidateScriptScope()
         local playerscope = player.GetScriptScope()
-        
+
         // // Remember our variables at the top of the script? We use one here. TEAM_RED is the same as 2, only in text form
         // if (player && player.GetTeam() == TEAM_RED)
         // {
         //     PlayerSpawn(player)
         // }
-        
-        EntFireByHandle(player, "RunScriptCode", "myNamespace.SpawnMagic(self)", 0.1, player, player)
+
+        EntFireByHandle(player, "RunScriptCode", "if (self.IsAlive()) myNamespace.SpawnMagic(self)", 0.1, player, player)
 
         // if ( player && player.GetTeam() == TEAM_BLU)
         // {
@@ -565,8 +565,8 @@ const SINGLE_TICK = 0.015
 
         //     }
         // }
-        
-        
+
+
     }
 
     OnGameEvent_player_spawn = function(params)
@@ -577,12 +577,12 @@ const SINGLE_TICK = 0.015
 
         // If for some reason you cant use post_inventory_application but you need to load something when a player spawns, you can call a function here
         // Because of the quirk with wave initilising, this wont usually run, however we can "late load" this event, which causes it to run. See [#6]
-        
+
         // if (player && player.GetTeam() == TEAM_RED)
         // {
         //     PlayerSpawn(player)
         // }
-        
+
     }
 
     OnScriptHook_OnTakeDamage = function(params)
