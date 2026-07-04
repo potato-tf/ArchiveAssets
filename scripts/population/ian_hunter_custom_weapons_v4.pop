@@ -1,0 +1,455 @@
+// Custom weapons created by Ian Hunter.
+// For mission makers, feel free to use my custom weapons in your missions.
+WaveSchedule
+{
+	PointTemplates
+	{
+		PackTemplate
+		{
+			OnSpawnOutput
+			{
+				Target	!activator
+				Action	RunScriptCode
+				Param	"
+				local hPack;
+				for (local hWearable = self.FirstMoveChild(); hWearable != null; hWearable = hWearable.NextMovePeer()) {
+					if(NetProps.GetPropInt(hWearable, `m_AttributeManager.m_Item.m_iItemDefinitionIndex`) == 781) {
+						hPack = hWearable;
+						break;
+					}
+				}
+				if(hPack && hPack.IsValid()) {
+					hPack.ValidateScriptScope();
+					local hPackScope = hPack.GetScriptScope();
+					hPackScope.hOwner <- hPack.GetOwner();
+					hPackScope.PackThink <- function() {
+						local hWeapon = hOwner.GetActiveWeapon();
+						if(hWeapon && hWeapon.GetSlot() == 2) {
+							hOwner.AddCustomAttribute(`dmg bonus vs buildings`, 2, 0.1);
+							hOwner.AddCustomAttribute(`dmg penalty vs players`, 2, 0.1);
+						}
+						return -1;
+					}
+					`PopExtUtil` in getroottable() ? PopExtUtil.AddThinkToEnt(hPack, `PackThink`) : AddThinkToEnt(hPack, `PackThink`)
+				}	"
+			}
+		}
+		PackTemplate
+		{
+			OnSpawnOutput
+			{
+				Target	!activator
+				Action	RunScriptCode
+				Param	"
+				local hPack;
+				for (local hWearable = self.FirstMoveChild(); hWearable != null; hWearable = hWearable.NextMovePeer()) {
+					if(NetProps.GetPropInt(hWearable, `m_AttributeManager.m_Item.m_iItemDefinitionIndex`) == 30513) {
+						hPack = hWearable;
+						break;
+					}
+				}
+				if(hPack && hPack.IsValid()) {
+					hPack.ValidateScriptScope();
+					local hPackScope = hPack.GetScriptScope();
+					hPackScope.hOwner <- hPack.GetOwner();
+					hPackScope.PackThink <- function() {
+						local hWeapon = hOwner.GetActiveWeapon();
+						if(hWeapon && hWeapon.GetSlot() == 2) {
+							hOwner.AddCustomAttribute(`damage bonus`, 1.3, 0.1);
+							hOwner.AddCustomAttribute(`melee cleave attack`, 1, 0.1);
+						}
+						return -1;
+					}
+					`PopExtUtil` in getroottable() ? PopExtUtil.AddThinkToEnt(hPack, `PackThink`) : AddThinkToEnt(hPack, `PackThink`)
+				}	"
+			}
+		}
+	}
+	PlayerItemEquipSpawnTemplate
+	{
+		Name		PackTemplate
+		ItemName	"The Money Spirit [Passive Weapon]"
+		ItemName	"The Real Mr. Mundee's Wild Ride [Passive Weapon]"
+	}
+	CustomWeapon
+	{
+		"The Money Spirit [Passive Weapon]"
+		{
+			OriginalItemName			"Dillinger's Duffel"
+			"attach particle effect"		3007
+			"set item tint RGB"			4345659
+			"health regen"				5
+			"mult stun resistance"			0
+			"mult credit collect range"		1.5
+			"health from credits"			25
+			"special item description"		"★ Unusual Effect: Skill Gotten Gains"
+			"special item description 2"		"+5 health regenerated per second on wearer"
+			"special item description 3"		"+100% general melee damage bonus"
+		}
+		"The Safety Boots [Passive Weapon]"
+		{
+			OriginalItemName			"Forest Footwear"
+			"max health additive bonus"		25
+			"ammo regen"				0.25
+			"damage force reduction"		0.5
+			"airblast vulnerability multiplier"	0.5
+			"cancel falling damage"			1
+			"mult stun resistance"			0
+			"special item description"		"+25 max health on wearer"
+			"special item description 2"		"+25% ammo regenerated every 5 seconds on wearer"
+			"special item description 3"		"-50% reduction in push force taken from damage and airblast vulnerability"
+			"special item description 4"		"Wearer never takes falling damage"
+		}
+		"Army of One"
+		{
+			OriginalItemName			"The Black Box"
+			"custom kill icon"			"megaton"
+			"set_item_texture_wear"			0
+			"paintkit_proto_def_index"		217
+			"attach particle effect"		702
+			"killstreak tier"			1
+			"damage bonus"				5
+			"blast radius increased"		2
+			"energy weapon no deflect"		0
+			"mod max primary clip override"		-1
+			"mod no reload DISPLAY ONLY"		1
+			"use large smoke explosion"		1
+			"crit mod disabled"			0
+			"maxammo primary reduced"		0.05
+			"projectile speed decreased"		0.3
+			"blast dmg to self increased"		4
+			"fire rate penalty HIDDEN"		2.5
+			"single wep deploy time increased"	1.5
+			"mult projectile scale"			2
+			"no damage falloff"			1
+			"projectile no deflect"			1
+			"mult dmg vs tanks"			1.5
+			"penetrate teammates"			1
+			"cannot be upgraded"			1
+			"special item description"		"No ammo from dispensers"
+			"special item description 2"		"This weapon shoots a large projectile."
+		// Removed Attributes.
+			"health on radius damage"		0
+			"clip size penalty"			1
+		}
+		"The Bouncing Betty"
+		{
+			OriginalItemName			"tf_weapon_grenadelauncher"
+			"custom item model"			"models/workshop/weapons/c_models/c_bouncing_betty/c_bouncing_betty.mdl"
+			"custom weapon fire sound"		"=80|weapons/the_bouncing_betty_shoot.wav"
+			"killstreak tier"			1
+			"card: damage bonus"			1.4
+			"projectile speed increased"		2
+			"grenade no spin"			1
+			"clip size penalty"			0.75
+			"fire rate penalty"			1.25
+			"self dmg push force decreased"		0.3
+			"maxammo primary reduced"		0.625
+			"reload time increased"			1.25
+			"blast radius decreased"		0.65
+			"max health additive penalty"		-25
+			"blast dmg to self increased"		1.4
+			"grenade explode on impact"		1
+			"special item description"		"Does it bounce? Nope, but it explodes."
+		}
+		"The Deflector"
+		{
+			OriginalItemName			"Deflector"
+			"killstreak tier"			1
+			"attack projectiles"			2
+		}
+		"Ludmila"
+		{
+			OriginalItemName			"Natascha"
+		//	"custom item model"			"models/weapons/c_models/c_minigun/c_minigun_ludmila.mdl" // (Custom minigun spin models not working properly.)
+			"attach particle effect"		4
+			"killstreak idleeffect"			6
+			"killstreak tier"			1
+			"heal on hit for rapidfire"		3
+			"fire rate penalty"			1.2
+			"maxammo primary reduced"		0.75
+		// Removed Attributes.
+			"slow enemy on hit"			0
+			"spunup_damage_resistance"		1
+			"damage penalty"			1
+			"minigun spinup time increased"		1
+		}
+		"Heavy Packable Provisions [Passive Weapon]"
+		{
+			OriginalItemName			"The Sandvich Safe"
+			"custom item model"			"models/workshop/player/items/engineer/dec16_packable_provisions/dec16_packable_provisions_heavy.mdl"
+			"maxammo secondary increased"		1.5
+			"move speed bonus"			1.3
+			"max health additive penalty"		-50
+			"teleport instead of die"		0.35
+			"mult credit collect range"		2.5
+			"health from credits"			25
+			"special item description"		"+50% max secondary ammo on wearer"
+			"special item description 2"		"+30% faster move speed on wearer"
+			"special item description 3"		"-50 max health on wearer"
+		}
+		"The Real Mr. Mundee's Wild Ride [Passive Weapon]"
+		{
+			OriginalItemName			"Mr. Mundee's Wild Ride"
+			"move speed bonus"			1.3
+			"cancel falling damage"			1
+			"increased jump height"			1.15
+			"special item description"		"+30% faster move speed on wearer"
+			"special item description 2"		"Wearer never takes falling damage"
+			"special item description 3"		"+15% greater jump height on wearer"
+			"special item description 4"		"+30% melee damage bonus and attacks all enemies in range"
+		}
+		"The Full Throttle"
+		{
+			OriginalItemName			"upgradeable tf_weapon_shotgun_primary"
+			"custom item model"			"models/workshop/weapons/c_models/c_full_throttle/c_full_throttle.mdl"
+			"custom weapon fire sound"		"=80|weapons/the_full_throttle_shoot.wav"
+			"killstreak tier"			1
+			"clip size bonus"			1.5
+			"weapon spread bonus"			0.7
+			"minicrits become crits"		1
+			"fire rate bonus with reduced health"	0.4
+			"damage penalty"			0.85
+			"fire rate penalty"			1.2
+			"crit mod disabled"			0
+		}
+		"The Steel Battalion"
+		{
+			OriginalItemName			"Panic Attack Shotgun"
+			"custom item model"			"models/workshop/weapons/c_models/c_steel_battalion/c_steel_battalion.mdl"
+			"custom weapon fire sound"		"=80|weapons/the_steel_battalion_shoot.wav"
+			"killstreak tier"			1
+			"bullets per shot bonus"		2
+			"clip size penalty"			0.34
+			"spread penalty"			2
+			"maxammo secondary reduced"		0.75
+		// Removed Attributes.
+			"single wep deploy time decreased"	1
+			"fixed_shot_pattern"			0
+			"damage penalty"			1
+			"mult_spread_scales_consecutive"	0
+		}
+		"The Steel Battalion [Engineer]"
+		{
+			OriginalItemName			"Panic Attack Shotgun"
+			"custom item model"			"models/workshop/weapons/c_models/c_steel_battalion/c_steel_battalion.mdl"
+			"custom weapon fire sound"		"=80|weapons/the_steel_battalion_shoot.wav"
+			"killstreak tier"			1
+			"bullets per shot bonus"		2
+			"clip size penalty"			0.34
+			"spread penalty"			2
+			"maxammo primary reduced"		0.75
+		// Removed Attributes.
+			"single wep deploy time decreased"	1
+			"fixed_shot_pattern"			0
+			"damage penalty"			1
+			"mult_spread_scales_consecutive"	0
+		}
+		"Bullet Blow"
+		{
+			OriginalItemName			"tf_weapon_pistol"
+			"custom weapon fire sound"		"=80|weapons/the_bullet_blow_shoot.wav"
+			"attach particle effect"		704
+			"killstreak tier"			1
+			"damage bonus"				13.34
+			"weapon spread bonus"			0.25
+			"single wep deploy time decreased"	0.5
+			"dmg pierces resists absorbs"		1
+			"clip size penalty"			0.5
+			"fire rate penalty"			2
+			"maxammo secondary reduced"		0.667
+			"self mark for death"			0
+			"dmg penalty vs buildings"		0.25
+			"no damage falloff"			1
+			"collect currency on kill"		1
+			"mult dmg vs giants"			0.25
+			"mult dmg vs tanks"			0.25
+			"add cond when active"			48
+			"cannot be upgraded"			1
+			"special item description"		"This weapon deals 200 damage"
+		}
+		"Bullet Blow [Engineer]"
+		{
+			OriginalItemName			"tf_weapon_pistol"
+			"custom weapon fire sound"		"=80|weapons/the_bullet_blow_shoot.wav"
+			"attach particle effect"		704
+			"killstreak tier"			1
+			"damage bonus"				13.34
+			"weapon spread bonus"			0.25
+			"single wep deploy time decreased"	0.5
+			"dmg pierces resists absorbs"		1
+			"clip size penalty"			0.5
+			"fire rate penalty"			2
+			"maxammo secondary reduced"		0.12
+			"self mark for death"			0
+			"dmg penalty vs buildings"		0.25
+			"no damage falloff"			1
+			"collect currency on kill"		1
+			"mult dmg vs giants"			0.25
+			"mult dmg vs tanks"			0.25
+			"add cond when active"			48
+			"cannot be upgraded"			1
+			"special item description"		"This weapon deals 200 damage"
+		}
+		"Texan Trickshot"
+		{
+			OriginalItemName			"tf_weapon_pistol"
+			"custom item model"			"models/workshop/player/items/engineer/taunt_texan_trickshot/taunt_texan_trickshot.mdl"
+			"custom weapon fire sound"		"=80|player/taunt_western_shoot1.wav"
+			"custom kill icon"			"taunt_trickshot"
+			"killstreak tier"			1
+			"damage bonus HIDDEN"			2.667	// 40 base damage like Spy revolvers.
+			"revolver use hit locations"		0
+			"weapon spread bonus"			0
+			"damage applies to sappers"		1
+			"damage penalty"			0.75
+			"crit mod disabled"			0
+			"hidden secondary max ammo penalty"	0.18	// 24 ammo capacity like Spy revolvers, but with +50% bonus.
+			"fire rate penalty HIDDEN"		3.334	// Same Spy revolvers fire rate.
+			"clip size penalty HIDDEN"		0.5	// 6 rounds, it's a revolver.
+			"dmg penalty vs buildings"		1.2
+			"can headshot"				1
+			"no damage falloff"			1
+			"collect currency on kill"		1
+		}
+		"The Burping Blaster"
+		{
+			OriginalItemName			"tf_weapon_smg"
+			"custom item model"			"models/workshop/weapons/c_models/c_burping_blaster/c_burping_blaster.mdl"
+			"custom weapon fire sound"		"=80|weapons/the_burping_blaster_shoot.wav"
+			"killstreak tier"			1
+			"card: damage bonus"			2.5
+			"fire rate bonus"			0.3
+			"weapon spread bonus"			0
+			"auto fires full clip"			1
+			"clip size penalty"			0.2
+			"maxammo secondary reduced"		0.667
+			"reload time increased"			1.5
+			"mult dmg vs tanks"			0.75
+		}
+		"(White Noise) Southern Hospitality"
+		{
+			OriginalItemName			"The Southern Hospitality"
+			"custom item model"			"models/workshop/weapons/c_models/c_spikewrench/c_spikewrench_wn.mdl"
+			"killstreak tier"			1
+			"engy sentry damage bonus"		0.8
+			"mult dispenser rate"			2
+			"mult teleporter recharge rate"		0.5
+			"special item description"		"-20% sentry damage penalty"
+			"special item description 2"		"This Southern Hospitality are from 'White Noise' mission that was created by Seelpit."
+		// Removed Attributes.
+			"bleeding duration"			0
+			"crit mod disabled"			1
+			"dmg taken from fire increased"		1
+		}
+	}
+	ExtraLoadoutItems
+	{
+		Scout
+		{
+			Primary
+			{
+				Item	"The Money Spirit [Passive Weapon]"
+			}
+			Primary
+			{
+				Item	"The Safety Boots [Passive Weapon]"
+			}
+			Secondary
+			{
+				Item	"Bullet Blow"
+			}
+		}
+		Soldier
+		{
+			Primary
+			{
+				Item	"Army of One"
+			}
+			Secondary
+			{
+				Item	"The Full Throttle"
+			}
+			Secondary
+			{
+				Item	"The Steel Battalion"
+			}
+		}
+		Pyro
+		{
+			Secondary
+			{
+				Item	"The Full Throttle"
+			}
+			Secondary
+			{
+				Item	"The Steel Battalion"
+			}
+		}
+		Demoman
+		{
+			Primary
+			{
+				Item	"The Bouncing Betty"
+			}
+		}
+		HeavyWeapons
+		{
+			Primary
+			{
+				Item	"The Deflector"
+				Cost	300
+			}
+			Primary
+			{
+				Item	"Ludmila"
+			}
+			Primary
+			{
+				Item	"Heavy Packable Provisions [Passive Weapon]"
+			}
+			Secondary
+			{
+				Item	"The Full Throttle"
+			}
+			Secondary
+			{
+				Item	"The Steel Battalion"
+			}
+		}
+		Engineer
+		{
+			Primary
+			{
+				Item	"The Full Throttle"
+			}
+			Primary
+			{
+				Item	"The Steel Battalion [Engineer]"
+			}
+			Secondary
+			{
+				Item	"Bullet Blow [Engineer]"
+			}
+			Secondary
+			{
+				Item	"Texan Trickshot"
+			}
+			Melee
+			{
+				Item	"(White Noise) Southern Hospitality"
+			}
+		}
+		Sniper
+		{
+			Primary
+			{
+				Item	"The Real Mr. Mundee's Wild Ride [Passive Weapon]"
+			}
+			Secondary
+			{
+				Item	"The Burping Blaster"
+			}
+		}
+	}
+}
