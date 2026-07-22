@@ -2,7 +2,9 @@
 
 // BRAINDAWG 9/24/25:
 // encore wave 4 has a vscript error that crashes the server with this
-Convars.SetValue("sig_util_vscript_send_output_to_admins", 0)
+local obj_res = Entities.FindByClassname(null, "tf_objective_resource")
+if (endswith(NetProps.GetPropString(obj_res, "m_iszMvMPopfileName"), "exp_impasse.pop"))
+	Convars.SetValue("sig_util_vscript_send_output_to_admins", false)
 
 ::ROOT <- getroottable()
 ::MAX_CLIENTS <- MaxClients().tointeger()
