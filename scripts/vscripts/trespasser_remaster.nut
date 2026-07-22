@@ -380,8 +380,8 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 					callback = function(response, error) {
 						// GetPlayerWins() wipes the Wins table until it completes, so we have to print unlock
 						//  info in this callback rather than in mvm_mission_complete to get an accurate readout.
-						// Alternatively we could remove GetPlayerWins() from OnGameEvent_mvm_mission_complete
-						//  but I'm not willing to do this without knowing why it was added there to begin with.
+						// NOTE: Might not be necessary anymore as I (fellen) (tentatively) removed GetPlayerWins()
+						//       from OnGameEvent_mvm_mission_complete.
 						Trespasser.PrintUnlockTextForStoredPlayers()
 						Trespasser.StoredUnlockTextInfo.clear()
 					}
@@ -398,7 +398,7 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 	StoredUnlockTextInfo = {}
 	function OnGameEvent_mvm_mission_complete(_)
 	{
-		GetPlayerWins()
+		//GetPlayerWins()
 		for(local i = 1; i <= MAX_PLAYERS; i++)
 		{
 			local hPlayer = PlayerInstanceFromIndex(i)
