@@ -382,8 +382,8 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 						//  info in this callback rather than in mvm_mission_complete to get an accurate readout.
 						// Alternatively we could remove GetPlayerWins() from OnGameEvent_mvm_mission_complete
 						//  but I'm not willing to do this without knowing why it was added there to begin with.
-						PrintUnlockTextForStoredPlayers()
-						StoredUnlockTextInfo.clear()
+						Trespasser.PrintUnlockTextForStoredPlayers()
+						Trespasser.StoredUnlockTextInfo.clear()
 					}
 				})
 		}
