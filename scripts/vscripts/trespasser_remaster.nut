@@ -4409,8 +4409,8 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 						hPlayer.ForceChangeTeam(TEAM_SPECTATOR, true)
 					else
 					{
-						player.SetHealth(0)
-						player.TakeDamage(1, 0, null)
+						hPlayer.SetHealth(0)
+						hPlayer.TakeDamage(1, 0, null)
 					}
 				}
 				RemovePlayerFromPullDownTable.append(hPlayer)
