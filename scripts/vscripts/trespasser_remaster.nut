@@ -3839,6 +3839,30 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 		bDisableSentries = bool
 	}
 
+	function VectorToQAngle(forward)
+	{
+		local yaw, pitch
+		if (forward.y == 0.0 && forward.x == 0.0)
+		{
+			yaw = 0.0
+			if (forward.z > 0.0)
+				pitch = 270.0
+			else
+				pitch = 90.0
+		}
+		else
+		{
+			yaw = (atan2(forward.y, forward.x) * 180.0 / PI)
+			if (yaw < 0.0)
+				yaw += 360.0
+			pitch = (atan2(-forward.z, forward.Length2D()) * 180.0 / PI)
+			if (pitch < 0.0)
+				pitch += 360.0
+		}
+
+		return QAngle(pitch, yaw, 0.0)
+	}
+
 	function BomberRocket()
 	{
 		local hPlayer = self
@@ -3856,7 +3880,7 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 				local vecTarget = hPlayer.GetAbsVelocity()
 				vecTarget.Norm()
 				vecFakeForward = vecFakeForward + (vecTarget - vecFakeForward) * 0.1
-				hPlayer.SnapEyeAngles(TankExt.VectorToQAngle(vecFakeForward))
+				hPlayer.SnapEyeAngles(Trespasser.VectorToQAngle(vecFakeForward))
 				if(endswith(hPlayer.GetSequenceName(hPlayer.GetSequence()), "deploybomb")) hPlayer.RemoveCond(TF_COND_TAUNTING)
 
 				local vecOrigin = hPlayer.GetOrigin()
