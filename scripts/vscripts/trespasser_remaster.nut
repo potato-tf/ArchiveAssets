@@ -425,7 +425,7 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 				bAllSurvivorsAliveUnlock = true
 				Wins[sNetworkID][2] = true
 			}
-			StoredUnlockTextInfo[sPlayerName] <- clone Wins[sNetworkID]
+			StoredUnlockTextInfo[sPlayerName] <- Wins[sNetworkID]
 		}
 		SavePlayerWins()
 	}
