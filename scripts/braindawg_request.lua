@@ -48,7 +48,7 @@ function OnPlayerConnected(player)
 	end
 
 	-- dumb half fix
-	if playersCount < 6 and playersAlive < 6 then 
+	if playersCount < 6 and playersAlive < 6 then
 		playersCount = playersCount + 1
 		playersAlive = playersAlive + 1
 		playersHandle[player:GetHandleIndex()] = true
@@ -99,7 +99,7 @@ function onPlayerSpawn(player)
 	onPlayerCountChange(player)
 end
 
--- function onBotSpawn(player) 
+-- function onBotSpawn(player)
 --	player:AcceptInput( "$SetProp$m_bIsMiniBoss" , "1" )
 --	player:SetAttributeValue("override footstep sound set" , "9" )
 --end
@@ -144,8 +144,8 @@ function SpecificPlayersCountCheck()
 
  	--set speed if < 3 players die after tank is spawned
 	local tank = ents.FindByName("tankboss_ghost")
-	if tank then 
-		tank:AcceptInput( "SetSpeed" , "55" ) 
+	if IsValid(tank) and then
+		tank:AcceptInput( "SetSpeed" , "55" )
 	end
 
 --	local bossalive = ents.FindByName("bossbot")
@@ -153,7 +153,7 @@ function SpecificPlayersCountCheck()
 --	local spawnedchalices = ents.FindByClass("func_breakable")
 
 	--REMOVED force spawn the boss chalices early if only 3 players are alive
---	if bossalive and chalices and wave == 5 then 
+--	if bossalive and chalices and wave == 5 then
 --		chalices:AcceptInput( "ForceSpawn" )
 --	end
 
@@ -169,7 +169,7 @@ function SpecificPlayersCountCheck()
 			end
 		end
 	end
-	
+
 	if playersAlive == 1 then
 		for _, player in pairs(allPlayers) do
 			if player:IsRealPlayer() and player:IsAlive() then
@@ -203,7 +203,6 @@ function SpecificPlayersCountCheck()
 end
 
 function onPlayerCountChange(player)
-	print("players alive: " .. tostring(playersAlive))
 	SpecificPlayersCountCheck()
 end
 
