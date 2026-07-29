@@ -168,8 +168,7 @@ PrecacheSound("mvm/sentrybuster/mvm_sentrybuster_loop.wav")
 		local hThinkEnt = SpawnEntityFromTable("info_target", { targetname = sName, spawnflags = 0x01 })
 		SetPropBool(hThinkEnt, "m_bForcePurgeFixedupStrings", true)
 
-		local sParam = format("interrupt_action -posent %s -lookposent %s -killlook -waituntildone", sName, sName)
-		//EntFireByHandle(self, "$BotCommand", sParam, 0.1, null, null)
+		local sParam = format("interrupt_action -posent %s -lookposent %s -waituntildone", sName, sName)
 		EntFireByHandle(self, "$BotCommand", sParam, 1, null, null)
 
 		hThinkEnt.ValidateScriptScope()
