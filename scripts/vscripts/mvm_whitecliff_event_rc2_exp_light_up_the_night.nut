@@ -65,7 +65,7 @@ PrecacheSound("mvm/sentrybuster/mvm_sentrybuster_loop.wav")
 				if(hPlayer && !hPlayer.IsFakeClient())
 					hPlayer.SetScriptOverlayMaterial(null)
 			}
-			delete ::LightUpTheNight 
+			delete ::LightUpTheNight
 		}
 	}
 
@@ -90,11 +90,11 @@ PrecacheSound("mvm/sentrybuster/mvm_sentrybuster_loop.wav")
 			foreach(k, tag in BotTags)
 				if(startswith(tag, "bot_goldweapon"))
 					{ sParams = split(tag, "|"); sParams.remove(0); hVictim.RemoveBotTag(tag); bGaveWeapon = true; break }
-			
+
 			if(sParams)
 				foreach(sItem in sParams)
 					hVictim.AcceptInput("$GiveItem", sItem, null, null)
-				
+
 			if(bGaveWeapon)
 			{
 				ClientPrint(null, 3, format("\x0799CCFF%s \x07FBECCBhas turned \x07FFAF00Gold\x07FBECCB!", GetPropString(hVictim, "m_szNetname")))
@@ -161,15 +161,15 @@ PrecacheSound("mvm/sentrybuster/mvm_sentrybuster_loop.wav")
 			}
 		}
 	}
-	
+
 	SetStalker = function()
 	{
 		local sName = "stalkerent_" + self.entindex()
 		local hThinkEnt = SpawnEntityFromTable("info_target", { targetname = sName, spawnflags = 0x01 })
 		SetPropBool(hThinkEnt, "m_bForcePurgeFixedupStrings", true)
-		
-		local sParam = format("interrupt_action -posent %s -lookposent %s -waituntildone", sName, sName)
-		EntFireByHandle(self, "$BotCommand", sParam, 0.1, null, null)
+
+		local sParam = format("interrupt_action -posent %s -lookposent %s -killlook -waituntildone", sName, sName)
+		//EntFireByHandle(self, "$BotCommand", sParam, 0.1, null, null)
 		EntFireByHandle(self, "$BotCommand", sParam, 1, null, null)
 
 		hThinkEnt.ValidateScriptScope()
@@ -250,7 +250,7 @@ PrecacheSound("mvm/sentrybuster/mvm_sentrybuster_loop.wav")
 					hAnimProp.AcceptInput("SetAnimation", iRNG == 1 ? "taunt01" : "melee_deploybomb", null, null)
 					SetPropEntity(hGlow, "m_hTarget", hAnimPropOrnament)
 					self.KeyValueFromString("targetname", "")
-					
+
 					EmitSoundEx({
 						sound_name = "mvm/sentrybuster/mvm_sentrybuster_loop.wav"
 						entity = hStalker
@@ -264,22 +264,30 @@ PrecacheSound("mvm/sentrybuster/mvm_sentrybuster_loop.wav")
 							hBot.AddCustomAttribute("mult_player_movespeed_active", 0.01, 2)
 						}
 				}
-				if(hStalker.GetHealth() > 1 && hGiantsOrdered.len() > 0)
+				if(hStalker.GetHealth() > 1)
 				{
-					local hGiant
-					while(!(hGiant = hGiantsOrdered[0]).IsValid() || !hGiant.IsAlive())
-						{ hGiantsOrdered.remove(0); if(hGiantsOrdered.len() == 0) break }
-					
-					if(hGiant)
+					if (hGiantsOrdered.len() > 0)
 					{
-						local vecGiant = hGiant.GetOrigin()
-						self.SetAbsOrigin(vecGiant + Vector(0, 0, 150))
-						if((vecGiant - vecStalker).Length() < iRange / 3.0)
+						local hGiant
+						while(!(hGiant = hGiantsOrdered[0]).IsValid() || !hGiant.IsAlive())
+							{ hGiantsOrdered.remove(0); if(hGiantsOrdered.len() == 0) break }
+
+						if(hGiant)
 						{
-							SetPropInt(hStalker, "m_takedamage", 0)
-							hStalker.SetHealth(1)
+							local vecGiant = hGiant.GetOrigin()
+							self.SetAbsOrigin(vecGiant + Vector(0, 0, 150))
+							if((vecGiant - vecStalker).Length() < iRange / 3.0)
+							{
+								hStalker.AcceptInput("$BotCommand", "stop interrupt action", null, null)
+								SetPropInt(hStalker, "m_takedamage", 0)
+								hStalker.SetHealth(1)
+							}
 						}
+						else
+							hStalker.AcceptInput("$BotCommand", "stop interrupt action", null, null)
 					}
+					else
+						hStalker.AcceptInput("$BotCommand", "stop interrupt action", null, null)
 				}
 				else self.SetAbsOrigin(vecStalker), flTimeNext += 9999
 
@@ -380,7 +388,7 @@ PrecacheSound("mvm/sentrybuster/mvm_sentrybuster_loop.wav")
 			])
 		}
 	}
-	
+
 	function SetDestroyCallback(entity, callback)
 	{
 		entity.ValidateScriptScope();
@@ -437,7 +445,7 @@ PrecacheSound("mvm/sentrybuster/mvm_sentrybuster_loop.wav")
 				if(hIgnore != null)
 				{
 					if(sClassname == "player" && hEnt == hIgnore) continue
-					
+
 					if(startswith(sClassname, "obj_") && GetPropEntity(hEnt, "m_hBuilder") == hIgnore) continue
 
 					local hOwner = hEnt.GetOwner()
@@ -498,7 +506,7 @@ PrecacheSound("mvm/sentrybuster/mvm_sentrybuster_loop.wav")
 					Info.nextsecondaryattack <- 1
 					Info.timeweaponidle <- 1
 					Info.chargelevel <- GetPropFloat(hEnt, "m_flChargeLevel")
-					
+
 					local flEffectBarRegenTime = GetPropFloat(hEnt, "m_flEffectBarRegenTime")
 					if(flEffectBarRegenTime > 0) Info.effectbarregentime <- flEffectBarRegenTime - flTime
 				}
@@ -519,7 +527,7 @@ PrecacheSound("mvm/sentrybuster/mvm_sentrybuster_loop.wav")
 					RevertInfo.eflags <- EFL_NO_THINK_FUNCTION
 					hEnt.AddEFlags(EFL_NO_THINK_FUNCTION)
 				}
-				
+
 				if(RevertInfo.len() > 0) TimeStopRevertInfo[hEnt] <- RevertInfo
 				if(Info.len() > 0) TimeStopInfo[hEnt] <- Info
 			}
