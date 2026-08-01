@@ -376,14 +376,6 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 						wins=Array[0],
 						solo_win=Array[1],
 						all_survivors_alive_win=Array[2]
-					},
-					callback = function(response, error) {
-						// GetPlayerWins() wipes the Wins table until it completes, so we have to print unlock
-						//  info in this callback rather than in mvm_mission_complete to get an accurate readout.
-						// NOTE: Might not be necessary anymore as I (fellen) (tentatively) removed GetPlayerWins()
-						//       from OnGameEvent_mvm_mission_complete.
-						Trespasser.PrintUnlockTextForStoredPlayers()
-						Trespasser.StoredUnlockTextInfo.clear()
 					}
 				})
 		}
@@ -395,10 +387,9 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 	}
 
 	bAllSurvivorsAlive = true
-	StoredUnlockTextInfo = {}
 	function OnGameEvent_mvm_mission_complete(_)
 	{
-		//GetPlayerWins()
+		GetPlayerWins()
 		for(local i = 1; i <= MAX_PLAYERS; i++)
 		{
 			local hPlayer = PlayerInstanceFromIndex(i)
@@ -425,17 +416,11 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 				bAllSurvivorsAliveUnlock = true
 				Wins[sNetworkID][2] = true
 			}
-			StoredUnlockTextInfo[sPlayerName] <- Wins[sNetworkID]
+
+			EntFire("bignet", "RunScriptCode", format("Trespasser.UnlockText(%i, `%s`, %s, %s)", Wins[sNetworkID][0], sPlayerName, bSoloUnlock ? "true" : "false", bAllSurvivorsAliveUnlock ? "true" : "false"), 1, hPlayer)
 		}
 		SavePlayerWins()
 	}
-
-	function PrintUnlockTextForStoredPlayers()
-	{
-		foreach (player_name, unlock_info in StoredUnlockTextInfo)
-			UnlockText(unlock_info[0], player_name, unlock_info[1], unlock_info[2])
-	}
-
 	function UnlockText(iWins, sPlayerName, bSoloMode, bAllSurvivorsAlive)
 	{
 		local hPlayer = activator
