@@ -238,7 +238,7 @@ PopExt.AddRobotTag("unichief_final", {
 	::Laser_Think <- function()
 	{
 		local scope = self.GetScriptScope()
-		if (hBot == null || !player.IsAlive())
+		if (hBot == null || !hBot.IsAlive())
 		{
 			self.Destroy()
 			return
