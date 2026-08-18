@@ -1,41 +1,43 @@
-local ROOT = getroottable()
+if ("TextualTimer" in getroottable() && TextualTimer.hText && TextualTimer.hText.IsValid())
+	TextualTimer.Destroy()
 
-foreach(k, v in ::NetProps.getclass())
-	if (k != "IsValid" && !(k in ROOT))
-		ROOT[k] <- ::NetProps[k].bindenv(::NetProps)
-
-foreach(k, v in ::Entities.getclass())
-	if (k != "IsValid" && !(k in ROOT))
-		ROOT[k] <- ::Entities[k].bindenv(::Entities)
-
-if("TextualTimer" in ROOT && TextualTimer.hText && TextualTimer.hText.IsValid()) return
+const SF_ENVTEXT_ALLPLAYERS = 0x1
 
 local DefaultCallbacks = {
 	[0] = function()
 	{
-		local hRelay = FindByName(null, sRelay)
-		if(hRelay && hRelay.GetClassname() == "logic_relay")
-			hRelay.AcceptInput("Trigger", null, null, null)
+		local hRelay = Entities.FindByName(null, sRelay)
+		if (hRelay && hRelay.GetClassname() == "logic_relay")
+			hRelay.AcceptInput("Trigger", "", null, null)
 		else
 		{
-			local MAX_CLIENTS = MaxClients().tointeger()
-			for(local i = 1; i <= MAX_CLIENTS; i++)
+			for(local i = MaxClients().tointeger(); i > 0; i--)
 			{
 				local hPlayer = PlayerInstanceFromIndex(i)
-				if(hPlayer && !hPlayer.IsFakeClient())
+
+				if (!hPlayer || hPlayer.IsFakeClient())
+					continue
+
+				local win = SpawnEntityFromTable("game_round_win",
 				{
-					SpawnEntityFromTable("game_round_win", { teamnum = hPlayer.GetTeam() == 2 ? 3 : 2, force_map_reset = 1 }).AcceptInput("RoundWin", null, null, null)
-					ClientPrint(null, 4, "Wave Failed...")
-					break
-				}
+					teamnum = hPlayer.GetTeam() == TF_TEAM_RED ? TF_TEAM_BLUE : TF_TEAM_RED,
+					force_map_reset = true
+				})
+				NetProps.SetPropBool(win, "m_bForcePurgeFixedupStrings", true)
+				win.AcceptInput("RoundWin", "", null, null)
+
+				ClientPrint(null, HUD_PRINTCENTER, "Wave Failed...")
+				break
 			}
 		}
 	}
 }
 
 ::TextualTimer <- {
-	function OnGameEvent_recalculate_holidays(_) { if(GetRoundState() == 3) delete ::TextualTimer }
-
+	function OnGameEvent_mvm_reset_stats(_)
+	{
+		delete ::TextualTimer
+	}
 	function OnGameEvent_mvm_begin_wave(_)
 	{
 		if(bAuto) Start()
@@ -52,9 +54,10 @@ local DefaultCallbacks = {
 		flTimePauseStart = flTime
 		bActive = true
 	}
+
 	function Pause()
 	{
-		if(bPaused)
+		if (bPaused)
 		{
 			flTimeEnd += Time() - flTimePauseStart
 			bPaused = false
@@ -83,12 +86,12 @@ local DefaultCallbacks = {
 	function SetParams(Table)
 	{
 		local flNewTime = 0
-		foreach(key, value in Table)
+		foreach (key, value in Table)
 		{
-			switch(key)
+			switch (key)
 			{
 				case "minutes":
-					flNewTime += value.tofloat() * 60
+					flNewTime += value.tofloat() * 60.0
 					break
 				case "seconds":
 					flNewTime += value.tofloat()
@@ -123,19 +126,19 @@ local DefaultCallbacks = {
 					break
 			}
 		}
-		if(flNewTime > 0) flTimeDuration = flNewTime
+		if (flNewTime > 0) flTimeDuration = flNewTime
 	}
 	function AddCallbacks(Table)
 	{
-		foreach(Keyvalue, Callback in Table)
+		foreach (Keyvalue, Callback in Table)
 			TimerCallbacks[Keyvalue == "all" ? Keyvalue : Keyvalue.tointeger()] <- Callback
 	}
 	function RemoveCallbacks(Array)
 	{
-		foreach(Keyvalue in Array)
+		foreach (Keyvalue in Array)
 		{
-			if(Keyvalue != "all") Keyvalue = Keyvalue.tointeger()
-			if(Keyvalue in TimerCallbacks)
+			if (Keyvalue != "all") Keyvalue = Keyvalue.tointeger()
+			if (Keyvalue in TimerCallbacks)
 				delete TimerCallbacks[Keyvalue]
 		}
 	}
@@ -162,31 +165,24 @@ local DefaultCallbacks = {
 	bAuto              = true
 	TimerCallbacks     = clone DefaultCallbacks
 
-	hText = SpawnEntityFromTable("game_text", {
-		targetname = "textualtimer"
-		channel    = 5
-		holdtime   = 1
-		spawnflags = 1
-		x          = -1
-		y          = 0.77
-	})
+	hText = null
 
 	function Think()
 	{
-		if(bActive)
+		if (bActive)
 		{
 			local flTime = Time()
 			local GetTimeRemaining = @() ceil(flTimeEnd - (bPaused ? flTimePauseStart : flTime)).tointeger()
 			local iTimeRemaining = GetTimeRemaining()
-			if(iTimeRemaining < 0) iTimeRemaining = 0
+			if (iTimeRemaining < 0) iTimeRemaining = 0
 			local iMinutes = iTimeRemaining / 60
 			local iSeconds = iTimeRemaining % 60
-			local sZero = iSeconds < 10 ? "0" : ""
-			SetPropString(hText, "m_iszMessage", format("%s%i:%s%i%s", sTextPrefix, iMinutes, sZero, iSeconds, sTextSuffix))
-			if(!bHideText)
-				hText.AcceptInput("Display", null, null, null)
+			hText.KeyValueFromString("message", format("%s%i:%02i%s", sTextPrefix, iMinutes, iSeconds, sTextSuffix))
 
-			if(flTimeTarget == -1)
+			if (!bHideText)
+				hText.AcceptInput("Display", "", null, null)
+
+			if (flTimeTarget == -1.0)
 			{
 				if(iTimeRemainingLast != iTimeRemaining)
 				{
@@ -199,29 +195,37 @@ local DefaultCallbacks = {
 			else
 			{
 				local iDir = iTimeRemaining < flTimeTarget ? 1 : -1
-				if(hText.KeyValueFromString("color", iDir == 1 ? sColorNegative : sColorPositive))
+				hText.KeyValueFromString("color", iDir == 1 ? sColorNegative : sColorPositive)
 				flTimeEnd += iDir
 				iTimeRemaining = GetTimeRemaining()
-				if(iDir == 1 ? iTimeRemaining > flTimeTarget : iTimeRemaining < flTimeTarget)
+				if (iDir == 1 ? iTimeRemaining > flTimeTarget : iTimeRemaining < flTimeTarget)
 				{
 					hText.KeyValueFromString("color", sColor)
 					flTimeEnd = flTime + flTimeTarget
 					flTimePauseStart = flTime
-					flTimeTarget = -1
+					flTimeTarget = -1.0
 				}
 			}
 			iTimeRemainingLast = iTimeRemaining
 		}
+		return -1.0
 	}
 }
 __CollectGameEventCallbacks(TextualTimer)
 
-TextualTimer.hText.KeyValueFromString("color", TextualTimer.sColor)
-TextualTimer.hText.ValidateScriptScope()
-TextualTimer.hText.GetScriptScope().Think <- function()
+TextualTimer.hText = SpawnEntityFromTable("game_text",
 {
-	if("TextualTimer" in ROOT)
-		TextualTimer.Think()
-	return -1
-}
+	targetname = "textualtimer",
+	channel    = 5,
+	holdtime   = 1.0,
+	spawnflags = SF_ENVTEXT_ALLPLAYERS,
+	x          = -1.0,
+	y          = 0.77
+})
+NetProps.SetPropBool(TextualTimer.hText, "m_bForcePurgeFixedupStrings", true)
+
+TextualTimer.hText.KeyValueFromString("color", TextualTimer.sColor)
+
+TextualTimer.hText.ValidateScriptScope()
+TextualTimer.hText.GetScriptScope().Think <- TextualTimer.Think.bindenv(TextualTimer)
 AddThinkToEnt(TextualTimer.hText, "Think")
