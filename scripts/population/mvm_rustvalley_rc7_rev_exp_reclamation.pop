@@ -11,7 +11,6 @@
 
 WaveSchedule
 {
-
 	StartingCurrency				1200
 	CanBotsAttackWhileInSpawnRoom 	Yes
 	RespawnWaveTimeBlue 			3
@@ -835,6 +834,67 @@ WaveSchedule
 				"OnMapSpawn" "cap_a_trigtimer,AddOutput,OnCapTeam2 gateBspawn:Enable::0:-1,0,-1"
 			}
 		}
+		sentries_enable_roundstart
+		{
+			OnSpawnOutput
+			{
+				Target BigNet
+				Action RunScriptCode
+				Param "
+					::EnableSentriesOnRoundStart <-
+					{
+						InputParams = class
+						{
+							input = ``
+							param = ``
+							activator = null
+							caller = null
+							delay = 0.0
+						}
+
+						function FireUnownedRedSentryInput(params)
+						{
+							for (local sentry; sentry = Entities.FindByClassname(sentry, `obj_sentrygun`);)
+							{
+								NetProps.SetPropBool(sentry, `m_bForcePurgeFixedupStrings`, true)
+								if (sentry.GetTeam() != Constants.ETFTeam.TF_TEAM_RED)
+									continue
+								if (NetProps.GetPropEntity(sentry, `m_hBuilder`))
+									continue
+								EntFireByHandle(sentry, params.input, params.param, params.delay, params.activator, params.caller)
+							}
+						}
+
+						function OnGameEvent_mvm_begin_wave(params)
+						{
+							local delay = 3.0
+							switch (params.wave_index)
+							{
+								case 0:
+									delay = 10.0
+									break
+								case 4:
+									FireUnownedRedSentryInput(InputParams() {input = `Kill`, delay = 0.0})
+									return
+							}
+							FireUnownedRedSentryInput(InputParams() {input = `Show`, delay = delay})
+						}
+
+						function OnGameEvent_mvm_reset_stats(_)
+						{
+							local mvm_stats = Entities.FindByClassname(null, `tf_mann_vs_machine_stats`)
+							if (NetProps.GetPropInt(mvm_stats, `m_iCurrentWaveIdx`) == 0)
+								delete ::EnableSentriesOnRoundStart
+							else
+								FireUnownedRedSentryInput(InputParams() {input = `Show`, delay = 0.02})
+						}
+					}
+					local namespace = EnableSentriesOnRoundStart
+					__CollectGameEventCallbacks(namespace)
+					namespace.FireUnownedRedSentryInput(namespace.InputParams() {input = `Disable`, delay = 0.02})
+				"
+			}
+		}
 		teleporter
 		{
 			NoFixup 1
@@ -1497,6 +1557,8 @@ WaveSchedule
 			}
 		}
 	}
+	SpawnTemplate  "sentries_enable_roundstart"
+
 	SpawnTemplate  "redwin"
 
 	SpawnTemplate  "redwin2"
@@ -5008,9 +5070,16 @@ WaveSchedule
 			}
 		}
 	}
+
+	//--------------------------
+
+		//WAVE 5
+
+	//--------------------------
+
 	Wave {
 		Explanation
- 	 	{
+		{
 			Line "{0600A6}_____________________________"
 			Line "{green}Your support this wave:"
 			Line ""
