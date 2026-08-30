@@ -1304,6 +1304,24 @@ WaveSchedule
 			}
 			OnSpawnOutput
 			{
+				Target "idiot"
+				Action RunScriptCode
+				Param "
+					NetProps.SetPropBool(self, `m_bForcePurgeFixedupStrings`, true)
+
+					PrecacheScriptSound(`Robot.Collide`)
+					PrecacheScriptSound(`Robot.Greeting`)
+
+					function ThinkRobotChatter()
+					{
+						RandomInt(0, 1) ? self.EmitSound(`Robot.Collide`) : self.EmitSound(`Robot.Greeting`)
+						return RandomFloat(10.0, 20.0)
+					}
+					EntFireByHandle(self, `RunScriptCode`, `AddThinkToEnt(self, \`ThinkRobotChatter\`)`, RandomFloat(10.0, 20.0), null, null)
+				"
+			}
+			OnSpawnOutput
+			{
 				Target "upgradestation"
 				Action $SetLocalOrigin
 				Param "80 0 50"
