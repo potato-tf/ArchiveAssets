@@ -377,30 +377,28 @@
 			{
 				if (self == null) return
 
-				switch (GetMapName())
+				local map_name = GetMapName()
+
+				if (startswith(map_name, "mvm_hanami_"))
 				{
-					case "mvm_hanami_rc1":
-					{
-						EntFire("win_bots", "RoundWin")
-						EntFire("hatch_destroy_relay", "Trigger")
-						break
-					}
+					EntFire("win_bots", "RoundWin")
+					EntFire("hatch_destroy_relay", "Trigger")
+				}
+				else if (startswith(map_name, "mvm_null_"))
+				{
+					soldier_statue.Kill()
 
-					case "mvm_null_b9a":
-					{
-						soldier_statue.Kill()
-
-						EntFire("bots_win", "RoundWin")
-						EntFire("end_pit_destroy_particle", "Start")
-						EntFire("pit_explosion_wav", "PlaySound")
-						EntFire("hatch_explo_kill_players", "Enable")
-						EntFire("hatch_explo_kill_players", "Disable", null, 0.5)
-						EntFire("hatch_magnet_pit", "Enable")
-						EntFire("trigger_hurt_hatch_fire", "Enable")
-						break
-					}
-
-					case "mvm_quetzal_rc5": EntFire("boss_deploy_relay", "Trigger"); break
+					EntFire("bots_win", "RoundWin")
+					EntFire("end_pit_destroy_particle", "Start")
+					EntFire("pit_explosion_wav", "PlaySound")
+					EntFire("hatch_explo_kill_players", "Enable")
+					EntFire("hatch_explo_kill_players", "Disable", null, 0.5)
+					EntFire("hatch_magnet_pit", "Enable")
+					EntFire("trigger_hurt_hatch_fire", "Enable")
+				}
+				else if (startswith(map_name, "mvm_quetzal_"))
+				{
+					EntFire("boss_deploy_relay", "Trigger")
 				}
 			}
 
@@ -510,22 +508,25 @@ foreach (think in getroottable()["ThinksTable"]) delete getroottable()["ThinksTa
 
 for (local ent; ent = Entities.FindByName(ent, "blimp_path*"); ) if (NetProps.GetPropEntity(ent, "m_pnext") == null) EntityOutputs.AddOutput(ent, "OnPass", "!activator", "RunScriptCode", "self.GetScriptScope().parented_blimp.GetScriptScope().Deploy_Bomb_1()", -1.0, -1.0)
 
-switch (GetMapName())
+local map_names =
 {
-	case "mvm_sequoia_rc4": DisableRomevision(); break
-	case "mvm_meltdown_rc5": break
-	case "mvm_spacepost_rc1": break
-	case "mvm_derelict_rc2": DisableRomevision(); break
+	"mvm_decay_" : DisableRomevision,
+	"mvm_derelict_" : DisableRomevision,
+	"mvm_hideout_" : DisableRomevision,
+	"mvm_hoovydam_" : function() { DisableRomevision(); EntFire("initMain_roadside", "Trigger") },
+	"mvm_null_" : DisableRomevision,
+	"mvm_powerplant_" : DisableRomevision,
+	"mvm_quetzal_" : DisableRomevision,
+	"mvm_sequoia_" : DisableRomevision
+}
+local map_name = GetMapName()
+foreach (map, func in map_names)
+{
+	if (!startswith(map_name, map))
+		continue
 
-	case "mvm_hanami_rc1": break
-	case "mvm_hideout_b3": DisableRomevision(); break
-	case "mvm_hoovydam_b11": DisableRomevision(); EntFire("initMain_roadside", "Trigger"); break
-
-	case "mvm_null_b9a": DisableRomevision(); break
-	case "mvm_decay_rc1a": DisableRomevision(); break
-
-	case "mvm_quetzal_rc5": DisableRomevision(); break
-	case "mvm_powerplant_rc1": DisableRomevision(); break
+	func.call(this)
+	break
 }
 
 AssignThinkToThinksTable("TankFinder_Think")
