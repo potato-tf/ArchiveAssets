@@ -1229,7 +1229,7 @@
 		else
 		{
 			GiveNavAvoidToNavArea("nav_avoid_area261_dontdisable", NavMesh.GetNavAreaByID(261), "bomb_carrier nonzombie")
-			GiveNavAvoidToNavArea("nav_avoid_area404_dontdisable", NavMesh.GetNavAreaByID(404), "bomb_carrier nonzombie")
+			//GiveNavAvoidToNavArea("nav_avoid_area404_dontdisable", NavMesh.GetNavAreaByID(404), "bomb_carrier nonzombie")
 
 			EntFireByHandle(gamerules_entity, "CallScriptFunction", "RecognizeAvoids", 0.4, null, null)
 		}
@@ -1248,12 +1248,12 @@
 			}
 		}
 
-		blocknav_array.append(NavMesh.GetNavAreaByID(24))
-		blocknav_array.append(NavMesh.GetNavAreaByID(48))
+		// blocknav_array.append(NavMesh.GetNavAreaByID(24))
+		// blocknav_array.append(NavMesh.GetNavAreaByID(48))
 		blocknav_array.append(NavMesh.GetNavAreaByID(59))
-		blocknav_array.append(NavMesh.GetNavAreaByID(74))
+		// blocknav_array.append(NavMesh.GetNavAreaByID(74))
 		blocknav_array.append(NavMesh.GetNavAreaByID(147))
-		blocknav_array.append(NavMesh.GetNavAreaByID(377))
+		// blocknav_array.append(NavMesh.GetNavAreaByID(377))
 	}
 
 	BotTransformer = function(target)
@@ -2436,9 +2436,9 @@
 
 		if (thinkertick % 6 != 0) return
 
-		NavMesh.GetNavAreaByID(126).SetAttributeTF(4) // those occassionally have their flags reset
-		NavMesh.GetNavAreaByID(155).SetAttributeTF(4)
-		NavMesh.GetNavAreaByID(1997).SetAttributeTF(4)
+		//NavMesh.GetNavAreaByID(126).SetAttributeTF(4) // those occassionally have their flags reset
+		//NavMesh.GetNavAreaByID(155).SetAttributeTF(4)
+		//NavMesh.GetNavAreaByID(1997).SetAttributeTF(4)
 
 		foreach (player in GetAllPlayers(3))
 		{
@@ -3019,7 +3019,7 @@
 			scope.v1 <- Vector()
 			scope.hopapex <- Vector()
 			scope.v2 <- Vector()
-			scope.maxdist <- false
+			scope.maxdist <- 0.0
 			scope.disttospawn <- null
 			scope.patharray <- []
 			scope.maxdistarray <- []
@@ -3368,7 +3368,7 @@
 			if (calcresult.recovery)
 			{
 				EmitSoundEx({sound_name = "misc/ks_tier_02_kill_02.wav", channel = 6, entity = self, sound_level = 75})
-				disttohatch_before = (NavMesh.GetNavAreaByID(34).GetCenter() - v1).Length()
+				disttohatch_before = (/*NavMesh.GetNavAreaByID(34).GetCenter() */ Vector(644.0, 3547.0, -197.0) - v1).Length()
 				moving = true
 			}
 
@@ -3383,7 +3383,7 @@
 					else
 					{
 						EmitSoundEx({sound_name = "misc/ks_tier_02_kill_02.wav", channel = 6, entity = self, sound_level = 75})
-						disttohatch_before = (NavMesh.GetNavAreaByID(34).GetCenter() - v1).Length()
+						disttohatch_before = (/* NavMesh.GetNavAreaByID(34).GetCenter() */ Vector(644.0, 3547.0, -197.0) - v1).Length()
 						moving = true
 
 						break
@@ -3426,7 +3426,7 @@
 			if ((v2.GetCenter() - self.GetOrigin()).Length() <= 12.0)
 			{
 				restoredhoptime = 0
-				disttohatch_after = (NavMesh.GetNavAreaByID(34).GetCenter() - self.GetOrigin()).Length()
+				disttohatch_after = (/* NavMesh.GetNavAreaByID(34).GetCenter() */ Vector(644.0, 3547.0, -197.0) - self.GetOrigin()).Length()
 				DetermineReturnTime()
 
 				moving = false
