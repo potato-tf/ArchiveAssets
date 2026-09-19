@@ -1612,6 +1612,7 @@ if (debug)
 
 AddThinkToEnt(gamerules_entity, "GlobalThinker")
 
+/*
 seterrorhandler(function(e)
 {
 	for (local player; player = Entities.FindByClassname(player, "player");)
@@ -1645,5 +1646,6 @@ seterrorhandler(function(e)
 		}
 	}
 })
+*/
 
 EntFireByHandle(gamerules_entity, "RunScriptCode", "wavewon = false", -1.0, null, null)
