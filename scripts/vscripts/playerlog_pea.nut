@@ -15,7 +15,7 @@
 			{
 				local scope = player.GetScriptScope()
 
-				if (scope.fetching) scope.CheckFetchStatus()
+				if ("fetching" in scope && scope.fetching) scope.CheckFetchStatus()
 			}
 		}
 	}
