@@ -44,6 +44,7 @@ PopExt.AddRobotTag("bombi_explosion", {
 	}
 })
 
+CustomAttributes.TakeDamagePostTable <- {}
 CustomAttributes.TakeDamagePostTable["night_of_fire_lobotomy_bombi_explosion_ignite_on_hit"] <- function(params) {
 
 	local victim = GetPlayerFromUserID(params.userid)
