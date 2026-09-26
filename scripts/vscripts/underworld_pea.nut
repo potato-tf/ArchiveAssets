@@ -3661,7 +3661,7 @@
 	{
 		for (local ent; ent = Entities.FindByName(ent, "gallery_*"); )
 		{
-			ent.SetAbsAngles(ent.GetAngles() + QAngle(0, 1, 0))
+			ent.SetAbsAngles(ent.GetAbsAngles() + QAngle(0, 1, 0))
 
 			if (thinkertick % 50 == 0 && ent.GetName().find("shotgun"))
 			{
@@ -3718,6 +3718,8 @@
 				}
 
 				TraceLineEx(tracetable)
+				if (!tracetable.hit)
+					return
 
 				scope.lookingat = tracetable.enthit.GetName()
 
