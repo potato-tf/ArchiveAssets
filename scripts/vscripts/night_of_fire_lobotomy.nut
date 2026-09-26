@@ -8,7 +8,6 @@ MissionAttrs
 	NoRome = 1
 	NoThrillerTaunt = 1
 	NoCrumpkins = 1
-	HuntsmanDamageFix = 1
 })
 EntFire("route1_holos*", "SetModel", "models/props_mvm/robot_hologram_color.mdl")
 EntFire("route2_holos*", "SetModel", "models/props_mvm/robot_hologram_color.mdl")
