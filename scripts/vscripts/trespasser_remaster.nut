@@ -389,7 +389,6 @@ if(hObjectiveResource) hObjectiveResource.AcceptInput("$SetClientProp$m_iszMvMPo
 	bAllSurvivorsAlive = true
 	function OnGameEvent_mvm_mission_complete(_)
 	{
-		GetPlayerWins()
 		for(local i = 1; i <= MAX_PLAYERS; i++)
 		{
 			local hPlayer = PlayerInstanceFromIndex(i)
