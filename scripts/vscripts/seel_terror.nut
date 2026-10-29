@@ -52,51 +52,60 @@ PopExt.AddRobotTag("cultchief", {
 
 		bot.GetScriptScope().PlayerThinkTable.bossThink <- function()
 		{
-			if (self.InCond(7) && !bCasting)
+			if (self.InCond(TF_COND_TAUNTING) && !bCasting)
 			{
 				bCasting = true
-				EntFire("!activator","RunScriptCode","bCastingDone = true",2.43,self)
+				EntFire("!activator", "RunScriptCode", "bCastingDone = true", 2.43, self)
 			}
+
 			if (bCastingDone)
 			{
 				bCastingDone = false
-				local eyeboss_proj = CreateByClassname("tf_projectile_spellspawnboss");
-				eyeboss_proj.KeyValueFromInt("teamnum",3);
-				eyeboss_proj.KeyValueFromVector("origin",self.GetOrigin() + Vector(0,0,2));
-				SetPropEntity(eyeboss_proj,"m_hThrower",self);
-				DispatchSpawn(eyeboss_proj)
 
-				self.RemoveCond(7)
+				local eyeboss_proj = CreateByClassname("tf_projectile_spellspawnboss");
+				eyeboss_proj.SetTeam(self.GetTeam())
+				eyeboss_proj.SetAbsOrigin(self.GetOrigin() + Vector(0, 0, 2))
+				SetPropEntity(eyeboss_proj, "m_hThrower", self);
+				eyeboss_proj.DispatchSpawn()
+
+				self.RemoveCond(TF_COND_TAUNTING)
 			}
+
 			if (hEyeBoss == null)
 			{
-				hEyeBoss = FindByClassname(hEyeBoss,"eyeball_boss")
+				hEyeBoss = FindByClassname(null, "eyeball_boss")
+				if (hEyeBoss)
+					hEyeBoss.SetSolid(SOLID_NONE)
 			}
-			else
+			else if (hEyeBoss.IsValid() /* boss expires after 180s */)
 			{
-				hEyeBoss.KeyValueFromInt("solid",0)
 				hEyeBoss.SetAbsOrigin(self.GetOrigin() + Vector(0,0,(60 + 85 * 1.75)))
 
-				//Snippet by lite. Slows down rockets.
-				for(local hRocket; hRocket = FindByClassname(hRocket, "tf_projectile_rocket");)
-					if(GetPropInt(hRocket, "m_nModelIndex") == iEyeRocketModelIndex && hRocket.GetOwner() == hEyeBoss)
+				// Snippet by lite. Slows down rockets.
+				for (local hRocket; hRocket = FindByClassname(hRocket, "tf_projectile_rocket");)
+				{
+					if (GetPropInt(hRocket, "m_nModelIndex") != iEyeRocketModelIndex && hRocket.GetOwner() != hEyeBoss)
+						continue
+
+					local vecVelocity = hRocket.GetAbsVelocity()
+					if (vecVelocity.Length() > flEyeRocketSpeed)
 					{
-						local vecVelocity = hRocket.GetAbsVelocity()
-						if(vecVelocity.Length() > flEyeRocketSpeed)
-						{
-							vecVelocity.Norm()
-							hRocket.SetAbsVelocity(vecVelocity * flEyeRocketSpeed)
-						}
+						vecVelocity.Norm()
+						hRocket.SetAbsVelocity(vecVelocity * flEyeRocketSpeed)
 					}
+				}
 			}
 		}
 	}
-	OnDeath = function(bot,tag)
+	OnDeath = function(bot, tag)
 	{
+		printl("OnDeath") // DEBUG
+
 		if (hEyeBoss != null)
 		{
 			hEyeBoss.AddFlag(FL_FROZEN)
-			hEyeBoss.AcceptInput("AddOutput","rendermode 10",null,null)
+			hEyeBoss.KeyValueFromInt("rendermode", kRenderNone)
+
 			local hEyeBossProp = SpawnEntityFromTable("prop_dynamic",
 			{
 				targetname = "eyeball_boss_prop"
@@ -111,9 +120,9 @@ PopExt.AddRobotTag("cultchief", {
 				entity = hEyeBoss
 				sound_level = 67 //~800 HU
 			})
-			EntFire("!activator","CallScriptFunction","DisappearEyeball",3.94,hEyeBoss)
-			EntFire("!activator","Kill","",4,hEyeBoss)
-			EntFire("eyeball_boss_prop","Kill","",4)
+			EntFire("!activator", "CallScriptFunction", "DisappearEyeball", 3.94, hEyeBoss)
+			EntFire("!activator", "Kill", "", 4.0, hEyeBoss)
+			EntFire("eyeball_boss_prop", "Kill", "", 4.0)
 		}
 	}
 })
