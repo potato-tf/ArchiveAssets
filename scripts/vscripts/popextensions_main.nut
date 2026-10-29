@@ -491,7 +491,7 @@ POP_EVENT_HOOK( "player_death", "MainDeathCleanup", function( params ) {
 
 	PopExtMain.PlayerCleanup( player )
 
-}, EVENT_WRAPPER_MAIN)
+}, /* EVENT_WRAPPER_MAIN */ MAX_EVENT_FUNCTABLES - 1) // HACK: This must run last, otherwise we cleanup the script scope before OnDeath hooks run.
 
 /*************************************
  * FINAL CLEANUP STEP, MUST RUN LAST *
