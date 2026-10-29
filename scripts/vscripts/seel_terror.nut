@@ -99,8 +99,6 @@ PopExt.AddRobotTag("cultchief", {
 	}
 	OnDeath = function(bot, tag)
 	{
-		printl("OnDeath") // DEBUG
-
 		if (hEyeBoss != null)
 		{
 			hEyeBoss.AddFlag(FL_FROZEN)
